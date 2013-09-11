@@ -18,4 +18,5 @@ public @interface Cached {
     public abstract int expire() default CacheConsts.DEFAULT_EXPIRE;
     public abstract CacheType cacheType() default CacheType.REMOTE;
     public abstract int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
+    public abstract int version() default 1;
 }

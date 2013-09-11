@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.cache;
 
+import com.taobao.geek.cache.objectweb.asm.Type;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,7 +33,7 @@ public class ClassUtilTest {
         Object obj = new C2();
         Class<?>[] is = ClassUtil.getAllInterfaces(obj);
         Assert.assertEquals(3, is.length);
-        System.out.println(ClassUtilTest.class.getMethod("testGetAllInterfaces"));
+        System.out.println(Type.getType(ClassUtilTest.class).getDescriptor());
     }
 
 }

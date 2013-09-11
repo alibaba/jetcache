@@ -12,11 +12,11 @@ import java.lang.reflect.Method;
 class CachedHandler implements InvocationHandler {
 
     private CacheConfig cacheConfig;
-    private CacheWapper cacheWapper;
+    private CacheProvider cacheProvider;
 
-    public CachedHandler(CacheConfig cacheConfig, CacheWapper cacheWapper) {
+    public CachedHandler(CacheConfig cacheConfig, CacheProvider cacheProvider) {
         this.cacheConfig = cacheConfig;
-        this.cacheWapper = cacheWapper;
+        this.cacheProvider = cacheProvider;
     }
 
     @Override

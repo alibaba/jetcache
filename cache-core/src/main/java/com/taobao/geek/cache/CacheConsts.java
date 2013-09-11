@@ -16,4 +16,6 @@ public interface CacheConsts {
      */
     CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;
     int DEFAULT_LOCAL_LIMIT = 100;
+
+    int DEFAULT_VERSION = 1;
 }

@@ -13,6 +13,7 @@ public class CacheConfig {
     private int expire = CacheConsts.DEFAULT_EXPIRE;
     private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
     private int localLimit = CacheConsts.DEFAULT_LOCAL_LIMIT;
+    private int version = CacheConsts.DEFAULT_VERSION;
 
     @Override
     public boolean equals(Object obj) {
@@ -78,33 +79,35 @@ public class CacheConfig {
         return localLimit;
     }
 
-    public CacheConfig setArea(String area) {
+    public int getVersion() {
+        return version;
+    }
+
+    public void setArea(String area) {
         this.area = area;
-        return this;
     }
 
-    public CacheConfig setKeyPrefix(String keyPrefix) {
+    public void setKeyPrefix(String keyPrefix) {
         this.keyPrefix = keyPrefix;
-        return this;
     }
 
-    public CacheConfig setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-        return this;
     }
 
-    public CacheConfig setExpire(int expire) {
+    public void setExpire(int expire) {
         this.expire = expire;
-        return this;
     }
 
-    public CacheConfig setCacheType(CacheType cacheType) {
+    public void setCacheType(CacheType cacheType) {
         this.cacheType = cacheType;
-        return this;
     }
 
-    public CacheConfig setLocalLimit(int localLimit) {
+    public void setLocalLimit(int localLimit) {
         this.localLimit = localLimit;
-        return this;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 }
