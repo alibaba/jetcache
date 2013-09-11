@@ -8,7 +8,7 @@ package com.taobao.geek.cache;
  */
 public interface Cache {
 
-    public CacheResult get(byte[] key);
+    public CacheResult get(String key);
 
-    public CacheResultCode put(byte[] key, Object value);
+    public CacheResultCode put(String key, Object value);
 }

@@ -19,6 +19,7 @@ public class DefaultKeyGenerator implements KeyGenerator {
 
     @Override
     public String getKey(Method method, Object[] args, int version) {
+        // TODO 对参数的类型发生变化做出感知
         StringBuilder sb = new StringBuilder();
         sb.append(version).append('_');
 
