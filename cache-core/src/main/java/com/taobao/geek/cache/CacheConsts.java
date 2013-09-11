@@ -8,7 +8,6 @@ package com.taobao.geek.cache;
  */
 public interface CacheConsts {
     String DEFAULT_AREA = "";
-    String DEFAULT_KEY_PREFIX = "";
     boolean DEFAULT_ENABLED = true;
     int DEFAULT_EXPIRE = 600;
     /**

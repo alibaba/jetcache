@@ -8,7 +8,6 @@ package com.taobao.geek.cache;
  */
 public class CacheConfig {
     private String area = CacheConsts.DEFAULT_AREA;
-    private String keyPrefix = CacheConsts.DEFAULT_KEY_PREFIX;
     private boolean enabled = CacheConsts.DEFAULT_ENABLED;
     private int expire = CacheConsts.DEFAULT_EXPIRE;
     private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
@@ -21,7 +20,7 @@ public class CacheConfig {
             return false;
         }
         CacheConfig cc = (CacheConfig) obj;
-        return equals(area, cc.area) && equals(keyPrefix, cc.keyPrefix) &&
+        return equals(area, cc.area) &&
                 enabled == cc.enabled && expire == cc.expire
                 && equals(cacheType, cc.cacheType) && localLimit == cc.localLimit;
     }
@@ -31,9 +30,6 @@ public class CacheConfig {
         int hash = 0;
         if (area != null) {
             hash += area.hashCode();
-        }
-        if (keyPrefix != null) {
-            hash ^= keyPrefix.hashCode();
         }
         if (enabled) {
             hash = ~hash;
@@ -59,10 +55,6 @@ public class CacheConfig {
         return area;
     }
 
-    public String getKeyPrefix() {
-        return keyPrefix;
-    }
-
     public boolean isEnabled() {
         return enabled;
     }
@@ -85,10 +77,6 @@ public class CacheConfig {
 
     public void setArea(String area) {
         this.area = area;
-    }
-
-    public void setKeyPrefix(String keyPrefix) {
-        this.keyPrefix = keyPrefix;
     }
 
     public void setEnabled(boolean enabled) {
