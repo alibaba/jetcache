@@ -8,11 +8,22 @@ package com.taobao.geek.cache;
  */
 public class CacheContext {
 
+    private static ThreadLocal<CacheThreadLocal> cacheThreadLocal = new ThreadLocal<CacheThreadLocal>() {
+        @Override
+        protected CacheThreadLocal initialValue() {
+            return new CacheThreadLocal();
+        }
+    };
+
     private CacheContext() {
     }
 
     public static <T> T enableCache(T target) {
         return null;  //TODO
+    }
+
+    static boolean isCacheEnabled() {
+        return cacheThreadLocal.get().isEnabled();
     }
 
 }

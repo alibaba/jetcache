@@ -35,7 +35,7 @@ class CachedHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (cacheConfig.isEnabled()) {
+        if (cacheConfig.isEnabled() || CacheContext.isCacheEnabled()) {
             String key = cacheProvider.getKeyGenerator().getKey(method, args, cacheConfig.getVersion());
             GetCacheResult r = getFromCache(key);
             if (r.value != null) {
