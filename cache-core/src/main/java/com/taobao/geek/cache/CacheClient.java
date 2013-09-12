@@ -3,7 +3,7 @@
  */
 package com.taobao.geek.cache;
 
-import java.lang.reflect.Proxy;
+import com.taobao.geek.cache.impl.CacheImplSupport;
 
 /**
  * @author yeli.hl
@@ -13,10 +13,7 @@ public class CacheClient {
     private CacheFactory cacheFactory;
 
     public <T> T getProxy(T target, CacheConfig cacheConfig) {
-        Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CachedHandler h = new CachedHandler(target, cacheConfig, cacheFactory.getCache(cacheConfig.getArea()));
-        Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
-        return (T) o;
+        return CacheImplSupport.getProxy(target, cacheConfig, cacheFactory);
     }
 
     public <T> T getProxyByAnnotation(T target) {

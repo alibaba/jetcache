@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-11 17:21
  */
-package com.taobao.geek.cache;
+package com.taobao.geek.cache.impl;
 
 /**
  * @author yeli.hl

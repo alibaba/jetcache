@@ -1,7 +1,9 @@
 /**
  * Created on  13-09-09 15:59
  */
-package com.taobao.geek.cache;
+package com.taobao.geek.cache.impl;
+
+import com.taobao.geek.cache.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -35,7 +37,7 @@ class CachedHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (cacheConfig.isEnabled() || CacheContext.isEnabled()) {
+        if (cacheConfig.isEnabled() || CacheContextSupport.isEnabled()) {
             String key = cacheProvider.getKeyGenerator().getKey(method, args, cacheConfig.getVersion());
             GetCacheResult r = getFromCache(key);
             if (r.value != null) {

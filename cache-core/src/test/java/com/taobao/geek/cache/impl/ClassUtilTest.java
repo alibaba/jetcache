@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-09 15:46
  */
-package com.taobao.geek.cache;
+package com.taobao.geek.cache.impl;
 
 import com.taobao.geek.cache.objectweb.asm.Type;
 import org.junit.Assert;

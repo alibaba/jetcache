@@ -1,9 +1,10 @@
 /**
  * Created on  13-09-10 15:45
  */
-package com.taobao.geek.cache;
+package com.taobao.geek.cache.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.geek.cache.KeyGenerator;
 import com.taobao.geek.cache.objectweb.asm.Type;
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author yeli.hl
  */
-public class DefaultKeyGenerator implements KeyGenerator {
+class DefaultKeyGenerator implements KeyGenerator {
 
     private ConcurrentHashMap<Method, String> methodMap = new ConcurrentHashMap<Method, String>();
 

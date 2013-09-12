@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-09 17:20
  */
-package com.taobao.geek.cache;
+package com.taobao.geek.cache.impl;
 
 import java.util.HashSet;
 

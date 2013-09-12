@@ -3,6 +3,8 @@
  */
 package com.taobao.geek.cache;
 
+import com.taobao.geek.cache.impl.CacheImplSupport;
+
 /**
  * @author yeli.hl
  */
@@ -10,7 +12,7 @@ public class CacheProvider {
 
     private Cache remoteCache;
     private Cache localCache;
-    private KeyGenerator keyGenerator = new DefaultKeyGenerator();
+    private KeyGenerator keyGenerator = CacheImplSupport.getDefaultKeyGenerator();
 
     public Cache getRemoteCache() {
         return remoteCache;
