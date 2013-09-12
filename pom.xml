@@ -45,6 +45,8 @@
     </build>
     <modules>
         <module>cache-core</module>
+        <module>cache-tair</module>
+        <module>cache-local</module>
     </modules>
 
     <properties>
