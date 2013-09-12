@@ -7,13 +7,14 @@ package com.taobao.geek.cache;
  * @author yeli.hl
  */
 class CacheThreadLocal {
-    private boolean enabled;
 
-    boolean isEnabled() {
-        return enabled;
+    private int enabledCount = 0;
+
+    int getEnabledCount() {
+        return enabledCount;
     }
 
-    void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    void setEnabledCount(int enabledCount) {
+        this.enabledCount = enabledCount;
     }
 }
