@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.cache.impl;
 
+import java.lang.reflect.Method;
 import java.util.HashSet;
 
 /**
@@ -20,5 +21,9 @@ class ClassUtil {
             c = c.getSuperclass();
         } while (c != null);
         return s.toArray(new Class<?>[s.size()]);
+    }
+
+    public static String getMethodSig(Method m) {
+        return m.getName() + "_" + com.taobao.geek.cache.objectweb.asm.Type.getType(m).getDescriptor();
     }
 }

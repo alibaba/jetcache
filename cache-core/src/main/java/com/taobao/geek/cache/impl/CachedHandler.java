@@ -7,6 +7,7 @@ import com.taobao.geek.cache.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  * @author yeli.hl
@@ -14,11 +15,11 @@ import java.lang.reflect.Method;
 class CachedHandler implements InvocationHandler {
 
     private Object src;
-    private CacheConfig cacheConfig;
-    private CacheProvider cacheProvider;
+    private CacheFactory cacheFactory;
 
-    private Cache localCache;
-    private Cache remoteCache;
+    // 下面两个是二选一的
+    private CacheConfig cacheConfig;
+    private HashMap<String, CacheConfig> configMap;
 
     private static class GetCacheResult {
         boolean needUpdateLocal = false;
@@ -26,20 +27,35 @@ class CachedHandler implements InvocationHandler {
         Object value = null;
     }
 
-
-    public CachedHandler(Object src, CacheConfig cacheConfig, CacheProvider cacheProvider) {
+    public CachedHandler(Object src, CacheConfig cacheConfig, CacheFactory cacheFactory) {
         this.src = src;
         this.cacheConfig = cacheConfig;
-        this.cacheProvider = cacheProvider;
-        this.localCache = cacheProvider.getLocalCache();
-        this.remoteCache = cacheProvider.getRemoteCache();
+        this.cacheFactory = cacheFactory;
+    }
+
+    public CachedHandler(Object src, HashMap<String, CacheConfig> configMap, CacheFactory cacheFactory) {
+        this.src = src;
+        this.configMap = configMap;
+        this.cacheFactory = cacheFactory;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (cacheConfig.isEnabled() || CacheContextSupport.isEnabled()) {
-            String key = cacheProvider.getKeyGenerator().getKey(method, args, cacheConfig.getVersion());
-            GetCacheResult r = getFromCache(key);
+        CacheConfig cc = cacheConfig;
+        if (cc == null) {
+            String sig = ClassUtil.getMethodSig(method);
+            cc = configMap.get(sig);
+        }
+        if (cc == null) {
+            return method.invoke(src, args);
+        }
+
+        if (cc.isEnabled() || CacheContextSupport.isEnabled()) {
+            CacheProvider cacheProvider = cacheFactory.getCache(cc.getArea());
+            String key = cacheProvider.getKeyGenerator().getKey(method, args, cc.getVersion());
+            Cache localCache = cacheProvider.getLocalCache();
+            Cache remoteCache = cacheProvider.getRemoteCache();
+            GetCacheResult r = getFromCache(cacheConfig.getCacheType(), key, localCache, remoteCache);
             if (r.value != null) {
                 if (r.needUpdateLocal) {
                     localCache.put(key, r.value);
@@ -60,9 +76,9 @@ class CachedHandler implements InvocationHandler {
         }
     }
 
-    private GetCacheResult getFromCache(String key) {
+    private static GetCacheResult getFromCache(CacheType cacheType,String key, Cache localCache, Cache remoteCache) {
         GetCacheResult r = new GetCacheResult();
-        if (cacheConfig.getCacheType() == CacheType.REMOTE) {
+        if (cacheType == CacheType.REMOTE) {
             CacheResult result = remoteCache.get(key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
@@ -75,7 +91,7 @@ class CachedHandler implements InvocationHandler {
                 r.value = result.getValue();
             } else {
                 r.needUpdateLocal = true;
-                if (cacheConfig.getCacheType() == CacheType.BOTH) {
+                if (cacheType == CacheType.BOTH) {
                     result = remoteCache.get(key);
                     if (result.isSuccess()) {
                         r.value = result.getValue();

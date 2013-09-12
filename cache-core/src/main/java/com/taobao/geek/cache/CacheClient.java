@@ -17,7 +17,7 @@ public class CacheClient {
     }
 
     public <T> T getProxyByAnnotation(T target) {
-        return null;
+        return CacheImplSupport.getProxyByAnnotation(target, cacheFactory);
     }
 
     public void setCacheFactory(CacheFactory cacheFactory) {
