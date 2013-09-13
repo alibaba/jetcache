@@ -6,6 +6,7 @@ package com.taobao.geek.cache.impl;
 import com.taobao.geek.cache.*;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -51,48 +52,36 @@ class CachedHandler implements InvocationHandler {
         }
 
         if (cc.isEnabled() || CacheContextSupport.isEnabled()) {
-            CacheProvider cacheProvider = cacheFactory.getCache(cc.getArea());
-            String key = cacheProvider.getKeyGenerator().getKey(method, args, cc.getVersion());
-            Cache localCache = cacheProvider.getLocalCache();
-            Cache remoteCache = cacheProvider.getRemoteCache();
-            GetCacheResult r = getFromCache(cacheConfig.getCacheType(), key, localCache, remoteCache);
-            if (r.value != null) {
-                if (r.needUpdateLocal) {
-                    localCache.put(key, r.value);
-                }
-                return r.value;
-            } else {
-                Object value = method.invoke(src, args);
-                if (r.needUpdateLocal) {
-                    localCache.put(key, value);
-                }
-                if (r.needUpdateRemote) {
-                    remoteCache.put(key, value);
-                }
-                return value;
-            }
+            return getFromCache(src,cacheFactory,method, args, cc);
         } else {
             return method.invoke(src, args);
         }
     }
 
-    private static GetCacheResult getFromCache(CacheType cacheType,String key, Cache localCache, Cache remoteCache) {
+    private static Object getFromCache(Object src, CacheFactory cacheFactory,
+                                       Method method, Object[] args, CacheConfig cc)
+            throws IllegalAccessException, InvocationTargetException {
+        CacheProvider cacheProvider = cacheFactory.getCache(cc.getArea());
+        String subArea = SubAreaUtil.getSubArea(cc, method);
+        String key = cacheProvider.getKeyGenerator().getKey(cc, method, args, cc.getVersion());
+        Cache localCache = cacheProvider.getLocalCache();
+        Cache remoteCache = cacheProvider.getRemoteCache();
         GetCacheResult r = new GetCacheResult();
-        if (cacheType == CacheType.REMOTE) {
-            CacheResult result = remoteCache.get(key);
+        if (cc.getCacheType() == CacheType.REMOTE) {
+            CacheResult result = remoteCache.get(cc.getArea(), subArea, key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
             } else {
                 r.needUpdateRemote = true;
             }
         } else {
-            CacheResult result = localCache.get(key);
+            CacheResult result = localCache.get(cc.getArea(), subArea, key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
             } else {
                 r.needUpdateLocal = true;
-                if (cacheType == CacheType.BOTH) {
-                    result = remoteCache.get(key);
+                if (cc.getCacheType() == CacheType.BOTH) {
+                    result = remoteCache.get(cc.getArea(), subArea, key);
                     if (result.isSuccess()) {
                         r.value = result.getValue();
                     } else {
@@ -101,6 +90,23 @@ class CachedHandler implements InvocationHandler {
                 }
             }
         }
-        return r;
+
+
+        if (r.value != null) {
+            if (r.needUpdateLocal) {
+                localCache.put(cc.getArea(), subArea, key, r.value);
+            }
+            return r.value;
+        } else {
+            Object value = method.invoke(src, args);
+            if (r.needUpdateLocal) {
+                localCache.put(cc.getArea(), subArea, key, value);
+            }
+            if (r.needUpdateRemote) {
+                remoteCache.put(cc.getArea(), subArea, key, value);
+            }
+            return value;
+        }
     }
+
 }

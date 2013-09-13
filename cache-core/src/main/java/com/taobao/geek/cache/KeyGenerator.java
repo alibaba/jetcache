@@ -7,6 +7,6 @@ import java.lang.reflect.Method;
  */
 public interface KeyGenerator {
 
-    public String getKey(Method method, Object[] args,int version);
+    public String getKey(CacheConfig cacheConfig, Method method, Object[] args,int version);
 
 }

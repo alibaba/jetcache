@@ -4,6 +4,7 @@
 package com.taobao.geek.cache.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.taobao.geek.cache.CacheConfig;
 import com.taobao.geek.cache.KeyGenerator;
 import com.taobao.geek.cache.objectweb.asm.Type;
 
@@ -16,30 +17,16 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 class DefaultKeyGenerator implements KeyGenerator {
 
-    private ConcurrentHashMap<Method, String> methodMap = new ConcurrentHashMap<Method, String>();
-
     @Override
-    public String getKey(Method method, Object[] args, int version) {
-        // TODO 对参数的类型发生变化做出感知
+    public String getKey(CacheConfig cacheConfig, Method method, Object[] args, int version) {
         StringBuilder sb = new StringBuilder();
-        sb.append(version).append('_');
-
-        String prefix = methodMap.get(method);
-
-        if (prefix == null) {
-            sb.append(Type.getType(method.getClass()).getInternalName());
-            sb.append('.');
-            sb.append(Type.getType(method).getInternalName());
-            methodMap.put(method, sb.toString());
-        } else {
-            sb.append(prefix);
-        }
-
-        for (Object arg : args) {
-            sb.append(',');
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
             sb.append(JSON.toJSONString(arg));
+            if (i < args.length - 1) {
+                sb.append(',');
+            }
         }
-
         return sb.toString();
     }
 
