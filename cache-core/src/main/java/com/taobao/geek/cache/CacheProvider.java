@@ -4,6 +4,7 @@
 package com.taobao.geek.cache;
 
 import com.taobao.geek.cache.impl.CacheImplSupport;
+import com.taobao.geek.cache.local.LRUMapCache;
 
 /**
  * @author yeli.hl
@@ -11,7 +12,7 @@ import com.taobao.geek.cache.impl.CacheImplSupport;
 public class CacheProvider {
 
     private Cache remoteCache;
-    private Cache localCache;
+    private Cache localCache = new LRUMapCache();
     private KeyGenerator keyGenerator = CacheImplSupport.getDefaultKeyGenerator();
 
     public Cache getRemoteCache() {
