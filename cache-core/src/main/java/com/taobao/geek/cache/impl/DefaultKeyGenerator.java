@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 class DefaultKeyGenerator implements KeyGenerator {
 
     @Override
-    public String getKey(CacheConfig cacheConfig, Method method, Object[] args, int version) {
+    public String getKey(CacheConfig cacheConfig, Method method, Object[] args) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];
