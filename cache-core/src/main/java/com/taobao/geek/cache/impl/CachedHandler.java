@@ -68,20 +68,20 @@ class CachedHandler implements InvocationHandler {
         Cache remoteCache = cacheProvider.getRemoteCache();
         GetCacheResult r = new GetCacheResult();
         if (cc.getCacheType() == CacheType.REMOTE) {
-            CacheResult result = remoteCache.get(cc.getArea(), subArea, key);
+            CacheResult result = remoteCache.get(cc, subArea, key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
             } else {
                 r.needUpdateRemote = true;
             }
         } else {
-            CacheResult result = localCache.get(cc.getArea(), subArea, key);
+            CacheResult result = localCache.get(cc, subArea, key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
             } else {
                 r.needUpdateLocal = true;
                 if (cc.getCacheType() == CacheType.BOTH) {
-                    result = remoteCache.get(cc.getArea(), subArea, key);
+                    result = remoteCache.get(cc, subArea, key);
                     if (result.isSuccess()) {
                         r.value = result.getValue();
                     } else {
@@ -94,16 +94,16 @@ class CachedHandler implements InvocationHandler {
 
         if (r.value != null) {
             if (r.needUpdateLocal) {
-                localCache.put(cc.getArea(), subArea, key, r.value);
+                localCache.put(cc, subArea, key, r.value);
             }
             return r.value;
         } else {
             Object value = method.invoke(src, args);
             if (r.needUpdateLocal) {
-                localCache.put(cc.getArea(), subArea, key, value);
+                localCache.put(cc, subArea, key, value);
             }
             if (r.needUpdateRemote) {
-                remoteCache.put(cc.getArea(), subArea, key, value);
+                remoteCache.put(cc, subArea, key, value);
             }
             return value;
         }

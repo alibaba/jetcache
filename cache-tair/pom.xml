@@ -11,5 +11,28 @@
 
     <artifactId>cache-tair</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.taobao.geek.cache</groupId>
+            <artifactId>cache-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
 
+        <dependency>
+            <groupId>com.taobao.tair</groupId>
+            <artifactId>tair-mc-client</artifactId>
+            <version>1.0.4.14</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.tair</groupId>
+            <artifactId>tair-client</artifactId>
+            <version>2.3.4.37</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

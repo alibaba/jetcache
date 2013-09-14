@@ -44,6 +44,7 @@ public class LRUMapCache implements Cache {
                 }
             }
         } catch (Exception e) {
+            code = CacheResultCode.FAIL;
         }
         return new CacheResult(code, value);
     }
