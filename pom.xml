@@ -46,7 +46,7 @@
     <modules>
         <module>cache-core</module>
         <module>cache-tair</module>
-        <module>cache-local</module>
+        <module>cache-spring</module>
     </modules>
 
     <properties>
