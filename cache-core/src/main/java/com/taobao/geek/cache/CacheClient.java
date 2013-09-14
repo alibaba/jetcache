@@ -10,21 +10,21 @@ import com.taobao.geek.cache.impl.CacheImplSupport;
  */
 public class CacheClient {
 
-    private CacheFactory cacheFactory;
+    private CacheProviderFactory cacheProviderFactory;
 
     public <T> T getProxy(T target, CacheConfig cacheConfig) {
-        return CacheImplSupport.getProxy(target, cacheConfig, cacheFactory);
+        return CacheImplSupport.getProxy(target, cacheConfig, cacheProviderFactory);
     }
 
     public <T> T getProxyByAnnotation(T target) {
-        return CacheImplSupport.getProxyByAnnotation(target, cacheFactory);
+        return CacheImplSupport.getProxyByAnnotation(target, cacheProviderFactory);
     }
 
-    public void setCacheFactory(CacheFactory cacheFactory) {
-        this.cacheFactory = cacheFactory;
+    public void setCacheProviderFactory(CacheProviderFactory cacheProviderFactory) {
+        this.cacheProviderFactory = cacheProviderFactory;
     }
 
-    public CacheFactory getCacheFactory() {
-        return cacheFactory;
+    public CacheProviderFactory getCacheProviderFactory() {
+        return cacheProviderFactory;
     }
 }

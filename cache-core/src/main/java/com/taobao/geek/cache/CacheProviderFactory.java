@@ -8,11 +8,11 @@ import java.util.Map;
 /**
  * @author yeli.hl
  */
-public class CacheFactory {
+public class CacheProviderFactory {
 
     private final Map<String, CacheProvider> cacheMap;
 
-    public CacheFactory(Map<String, CacheProvider> cacheMap) {
+    public CacheProviderFactory(Map<String, CacheProvider> cacheMap) {
         this.cacheMap = cacheMap;
     }
 

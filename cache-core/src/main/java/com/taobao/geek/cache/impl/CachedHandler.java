@@ -16,7 +16,7 @@ import java.util.HashMap;
 class CachedHandler implements InvocationHandler {
 
     private Object src;
-    private CacheFactory cacheFactory;
+    private CacheProviderFactory cacheProviderFactory;
 
     // 下面两个是二选一的
     private CacheConfig cacheConfig;
@@ -28,16 +28,16 @@ class CachedHandler implements InvocationHandler {
         Object value = null;
     }
 
-    public CachedHandler(Object src, CacheConfig cacheConfig, CacheFactory cacheFactory) {
+    public CachedHandler(Object src, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
         this.src = src;
         this.cacheConfig = cacheConfig;
-        this.cacheFactory = cacheFactory;
+        this.cacheProviderFactory = cacheProviderFactory;
     }
 
-    public CachedHandler(Object src, HashMap<String, CacheConfig> configMap, CacheFactory cacheFactory) {
+    public CachedHandler(Object src, HashMap<String, CacheConfig> configMap, CacheProviderFactory cacheProviderFactory) {
         this.src = src;
         this.configMap = configMap;
-        this.cacheFactory = cacheFactory;
+        this.cacheProviderFactory = cacheProviderFactory;
     }
 
     @Override
@@ -52,16 +52,16 @@ class CachedHandler implements InvocationHandler {
         }
 
         if (cc.isEnabled() || CacheContextSupport.isEnabled()) {
-            return getFromCache(src,cacheFactory,method, args, cc);
+            return getFromCache(src, cacheProviderFactory,method, args, cc);
         } else {
             return method.invoke(src, args);
         }
     }
 
-    private static Object getFromCache(Object src, CacheFactory cacheFactory,
+    private static Object getFromCache(Object src, CacheProviderFactory cacheProviderFactory,
                                        Method method, Object[] args, CacheConfig cc)
             throws IllegalAccessException, InvocationTargetException {
-        CacheProvider cacheProvider = cacheFactory.getCache(cc.getArea());
+        CacheProvider cacheProvider = cacheProviderFactory.getCache(cc.getArea());
         String subArea = SubAreaUtil.getSubArea(cc, method);
         String key = cacheProvider.getKeyGenerator().getKey(cc, method, args, cc.getVersion());
         Cache localCache = cacheProvider.getLocalCache();
