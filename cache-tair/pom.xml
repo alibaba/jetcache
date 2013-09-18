@@ -3,18 +3,18 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>cache-parent</artifactId>
-        <groupId>com.taobao.geek.cache</groupId>
+        <artifactId>jetcache-parent</artifactId>
+        <groupId>com.taobao.geek.jetcache</groupId>
         <version>0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>cache-tair</artifactId>
+    <artifactId>jetcache-tair</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.taobao.geek.cache</groupId>
-            <artifactId>cache-core</artifactId>
+            <groupId>com.taobao.geek.jetcache</groupId>
+            <artifactId>jetcache-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

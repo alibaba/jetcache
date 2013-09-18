@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.taobao.geek.cache</groupId>
-    <artifactId>cache-parent</artifactId>
+    <groupId>com.taobao.geek.jetcache</groupId>
+    <artifactId>jetcache-parent</artifactId>
     <packaging>pom</packaging>
     <version>0.1-SNAPSHOT</version>
 
