@@ -44,9 +44,9 @@
         </plugins>
     </build>
     <modules>
-        <module>cache-core</module>
-        <module>cache-tair</module>
-        <module>cache-spring</module>
+        <module>jetcache-core</module>
+        <module>jetcache-tair</module>
+        <module>jetcache-spring</module>
     </modules>
 
     <properties>
