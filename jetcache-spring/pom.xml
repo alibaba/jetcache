@@ -19,7 +19,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-beans</artifactId>
+            <artifactId>spring-context</artifactId>
             <version>3.2.4.RELEASE</version>
             <scope>provided</scope>
         </dependency>

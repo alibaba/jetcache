@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.taobao.geek.jetcache.impl;
+package com.taobao.geek.jetcache.util;
 
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author yeli.hl
  */
 @SuppressWarnings("unchecked")
-class IdentityHashMap<K, V> {
+public class IdentityHashMap<K, V> {
 
     public static final int     DEFAULT_TABLE_SIZE = 1024;
 
