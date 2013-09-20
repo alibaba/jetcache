@@ -67,7 +67,7 @@ public class CacheImplSupport {
         }
     }
 
-    private static CacheConfig parseCacheConfig(Method m) {
+    public static CacheConfig parseCacheConfig(Method m) {
         Cached anno = m.getAnnotation(Cached.class);
         if (anno == null) {
             return null;

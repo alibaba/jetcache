@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring;
 
+import com.alibaba.fastjson.util.IdentityHashMap;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 
@@ -11,10 +12,17 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
  */
 public class JetCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
-    private Pointcut pointcut = new JetCachePointcut();
+    private JetCachePointcut pointcut = new JetCachePointcut();
+
+    private IdentityHashMap cacheConfigMap;
 
     @Override
     public Pointcut getPointcut() {
+        pointcut.setConfigMap(cacheConfigMap);
         return pointcut;
+    }
+
+    public void setCacheConfigMap(IdentityHashMap cacheConfigMap) {
+        this.cacheConfigMap = cacheConfigMap;
     }
 }

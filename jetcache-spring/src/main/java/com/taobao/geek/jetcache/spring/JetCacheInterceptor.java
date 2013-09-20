@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring;
 
+import com.alibaba.fastjson.util.IdentityHashMap;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -11,8 +12,14 @@ import org.aopalliance.intercept.MethodInvocation;
  */
 public class JetCacheInterceptor implements MethodInterceptor {
 
+    private IdentityHashMap cacheConfigMap;
+
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         return invocation.proceed();
+    }
+
+    public void setCacheConfigMap(IdentityHashMap cacheConfigMap) {
+        this.cacheConfigMap = cacheConfigMap;
     }
 }

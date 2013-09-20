@@ -3,9 +3,9 @@
  */
 package com.taobao.geek.jetcache.impl;
 
+import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.objectweb.asm.Type;
-import com.taobao.geek.jetcache.util.IdentityHashMap;
 
 import java.lang.reflect.Method;
 

@@ -24,6 +24,6 @@ class ClassUtil {
     }
 
     public static String getMethodSig(Method m) {
-        return m.getName() + "_" + com.taobao.geek.jetcache.objectweb.asm.Type.getType(m).getDescriptor();
+        return m.getName() + com.taobao.geek.jetcache.objectweb.asm.Type.getType(m).getDescriptor();
     }
 }

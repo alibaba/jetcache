@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring.beans;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -25,7 +26,7 @@ public class TestBean {
     }
 
 
-//    @Cacheable("books")
+    @Cacheable("books")
     public int foo() {
         return count++;
     }
