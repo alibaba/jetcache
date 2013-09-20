@@ -38,8 +38,7 @@ public class JetCacheAnnotationParser implements BeanDefinitionParser {
             RootBeanDefinition interceptorDef = new RootBeanDefinition(JetCacheInterceptor.class);
             interceptorDef.setSource(eleSource);
             interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-//            parseCacheManagerProperty(element, interceptorDef);
-//            CacheNamespaceHandler.parseKeyGenerator(element, interceptorDef);
+            interceptorDef.getPropertyValues().add("cacheProviderFactory",new RuntimeBeanReference("cacheProviderFactory"));
             interceptorDef.getPropertyValues().add("cacheConfigMap", new RuntimeBeanReference(configMapName));
             String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
