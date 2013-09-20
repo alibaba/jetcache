@@ -51,15 +51,20 @@ class CachedHandler implements InvocationHandler {
             return method.invoke(src, args);
         }
 
+        return invoke(src, method, args, cacheProviderFactory, cc);
+    }
+
+    public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
+                                 CacheConfig cc) throws Throwable {
         if (cc.isEnabled() || CacheContextSupport.isEnabled()) {
-            return getFromCache(src, cacheProviderFactory,method, args, cc);
+            return getFromCache(src, method, args, cacheProviderFactory, cc);
         } else {
             return method.invoke(src, args);
         }
     }
 
-    private static Object getFromCache(Object src, CacheProviderFactory cacheProviderFactory,
-                                       Method method, Object[] args, CacheConfig cc)
+    private static Object getFromCache(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
+                                       CacheConfig cc)
             throws IllegalAccessException, InvocationTargetException {
         CacheProvider cacheProvider = cacheProviderFactory.getCache(cc.getArea());
         String subArea = SubAreaUtil.getSubArea(cc, method);
