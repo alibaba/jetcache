@@ -52,6 +52,7 @@ public class JetCacheAnnotationParser implements BeanDefinitionParser {
 
             CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),
                     eleSource);
+            compositeDef.addNestedComponent(new BeanComponentDefinition(configMapDef, configMapName));
             compositeDef.addNestedComponent(new BeanComponentDefinition(interceptorDef, interceptorName));
             compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, CACHE_ADVISOR_BEAN_NAME));
             parserContext.registerComponent(compositeDef);

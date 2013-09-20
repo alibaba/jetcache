@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring.beans;
 
+import com.taobao.geek.jetcache.Cached;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceImpl implements Service, Foo {
     @Override
-    @Cacheable("books")
-    public int foo(){
+//    @Cacheable("books")
+    @Cached
+    public int bar(){
         return 0;
     }
 

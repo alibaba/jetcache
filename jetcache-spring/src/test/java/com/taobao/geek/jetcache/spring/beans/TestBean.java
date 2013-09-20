@@ -16,15 +16,7 @@ public class TestBean {
 
 
     public TestBean(){
-        System.out.println("-------------"+this);
-//        new Exception().printStackTrace();
     }
-
-//    @PostConstruct
-    public void init(){
-//        System.out.println("init"+this);
-    }
-
 
     @Cacheable("books")
     public int foo() {

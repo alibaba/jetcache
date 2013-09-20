@@ -20,7 +20,7 @@ public class SpringTest {
 
         Service service = context.getBean(Service.class);
         System.out.println(service.getClass());
-        service.foo();
-        service.foo();
+        service.bar();
+        service.bar();
     }
 }
