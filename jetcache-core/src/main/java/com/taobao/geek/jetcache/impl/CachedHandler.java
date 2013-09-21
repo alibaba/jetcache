@@ -53,8 +53,8 @@ class CachedHandler implements InvocationHandler {
         }
         if (cac == null) {
             return method.invoke(src, args);
-        } else{
-            if(cac.isEnableCacheContext()){
+        } else {
+            if (cac.isEnableCacheContext()) {
                 return CacheContextSupport.enableCache(new ReturnValueCallback<Object>() {
                     @Override
                     public Object execute() throws Exception {
@@ -79,8 +79,8 @@ class CachedHandler implements InvocationHandler {
     }
 
     public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
-                                 CacheConfig cc) throws Throwable {
-        if (cc.isEnabled() || CacheContextSupport.isEnabled()) {
+                                CacheConfig cc) throws Throwable {
+        if (cc != null && (cc.isEnabled() || CacheContextSupport.isEnabled())) {
             return getFromCache(src, method, args, cacheProviderFactory, cc);
         } else {
             return method.invoke(src, args);
