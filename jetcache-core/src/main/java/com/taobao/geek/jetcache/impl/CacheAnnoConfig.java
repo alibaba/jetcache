@@ -10,7 +10,7 @@ import com.taobao.geek.jetcache.CacheConfig;
  */
 public class CacheAnnoConfig {
     private CacheConfig cacheConfig;
-    private boolean enableCache;
+    private boolean enableCacheContext;
 
     private static final CacheAnnoConfig noCacheAnnoConfigInstance = new CacheAnnoConfig();
 
@@ -26,11 +26,11 @@ public class CacheAnnoConfig {
         this.cacheConfig = cacheConfig;
     }
 
-    public boolean isEnableCache() {
-        return enableCache;
+    public boolean isEnableCacheContext() {
+        return enableCacheContext;
     }
 
-    public void setEnableCache(boolean enableCache) {
-        this.enableCache = enableCache;
+    public void setEnableCacheContext(boolean enableCacheContext) {
+        this.enableCacheContext = enableCacheContext;
     }
 }

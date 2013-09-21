@@ -38,14 +38,6 @@ public class CacheImplSupport {
         return ProxyUtil.getProxyByAnnotation(target, cacheProviderFactory);
     }
 
-    public static CacheConfig parseCacheConfig(Method m) {
-        return CacheConfigUtil.parseCacheConfig(m);
-    }
-
-    public static boolean parseEnableCacheConfig(Method m){
-        return CacheConfigUtil.parseEnableCacheConfig(m);
-    }
-
     public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
                                 CacheConfig cc) throws Throwable {
         return CachedHandler.invoke(src, method, args, cacheProviderFactory, cc);

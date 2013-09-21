@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 /**
  * @author yeli.hl
  */
-class CacheConfigUtil {
+public class CacheConfigUtil {
     public static CacheConfig parseCacheConfig(Method m) {
         Cached anno = m.getAnnotation(Cached.class);
         if (anno == null) {
@@ -31,5 +31,16 @@ class CacheConfigUtil {
     public static boolean parseEnableCacheConfig(Method m) {
         EnableCache anno = m.getAnnotation(EnableCache.class);
         return anno != null;
+    }
+
+    public static void parse(CacheAnnoConfig cac, Method method) {
+        CacheConfig cc = parseCacheConfig(method);
+        if (cc != null) {
+            cac.setCacheConfig(cc);
+        }
+        boolean enable = parseEnableCacheConfig(method);
+        if (enable) {
+            cac.setEnableCacheContext(true);
+        }
     }
 }

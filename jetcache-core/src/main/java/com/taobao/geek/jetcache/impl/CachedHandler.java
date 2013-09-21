@@ -20,7 +20,7 @@ class CachedHandler implements InvocationHandler {
 
     // 下面两个是二选一的
     private CacheConfig cacheConfig;
-    private HashMap<String, CacheConfig> configMap;
+    private HashMap<String, CacheAnnoConfig> configMap;
 
     private static class GetCacheResult {
         boolean needUpdateLocal = false;
@@ -34,24 +34,48 @@ class CachedHandler implements InvocationHandler {
         this.cacheProviderFactory = cacheProviderFactory;
     }
 
-    public CachedHandler(Object src, HashMap<String, CacheConfig> configMap, CacheProviderFactory cacheProviderFactory) {
+    public CachedHandler(Object src, HashMap<String, CacheAnnoConfig> configMap, CacheProviderFactory cacheProviderFactory) {
         this.src = src;
         this.configMap = configMap;
         this.cacheProviderFactory = cacheProviderFactory;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheConfig cc = cacheConfig;
-        if (cc == null) {
+        final CacheAnnoConfig cac;
+        if (cc != null) {
+            cac = new CacheAnnoConfig();
+            cac.setCacheConfig(cc);
+        } else {
             String sig = ClassUtil.getMethodSig(method);
-            cc = configMap.get(sig);
+            cac = configMap.get(sig);
         }
-        if (cc == null) {
+        if (cac == null) {
             return method.invoke(src, args);
+        } else{
+            if(cac.isEnableCacheContext()){
+                return CacheContextSupport.enableCache(new ReturnValueCallback<Object>() {
+                    @Override
+                    public Object execute() throws Exception {
+                        try {
+                            return invoke(src, method, args, cacheProviderFactory, cac.getCacheConfig());
+                        } catch (Throwable e) {
+                            if (e instanceof Exception) {
+                                throw (Exception) e;
+                            } else if (e instanceof Error) {
+                                throw (Error) e;
+                            } else {
+                                throw new CacheException("", e);
+                            }
+                        }
+                    }
+                });
+            } else {
+                return invoke(src, method, args, cacheProviderFactory, cc);
+            }
         }
 
-        return invoke(src, method, args, cacheProviderFactory, cc);
     }
 
     public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,

@@ -6,6 +6,7 @@ package com.taobao.geek.jetcache.spring;
 import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
+import com.taobao.geek.jetcache.impl.CacheConfigUtil;
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
@@ -42,13 +43,13 @@ public class JetCachePointcut extends StaticMethodMatcherPointcut implements Cla
             return true;
         } else {
             cac = new CacheAnnoConfig();
-            parse(cac, method);
+            CacheConfigUtil.parse(cac, method);
 
             String name = method.getName();
             Class<?>[] paramTypes = method.getParameterTypes();
             parseByTargetClass(cac, targetClass, name, paramTypes);
 
-            if (!cac.isEnableCache() && cac.getCacheConfig() == null) {
+            if (!cac.isEnableCacheContext() && cac.getCacheConfig() == null) {
                 cacheConfigMap.put(method, CacheAnnoConfig.getNoCacheAnnoConfigInstance());
                 return false;
             } else {
@@ -58,21 +59,10 @@ public class JetCachePointcut extends StaticMethodMatcherPointcut implements Cla
         }
     }
 
-    private void parse(CacheAnnoConfig cac, Method method) {
-        CacheConfig cc = CacheImplSupport.parseCacheConfig(method);
-        if (cc != null) {
-            cac.setCacheConfig(cc);
-        }
-        boolean enable = CacheImplSupport.parseEnableCacheConfig(method);
-        if (enable) {
-            cac.setEnableCache(true);
-        }
-    }
-
     private void parseByTargetClass(CacheAnnoConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {
         try {
             Method method = clazz.getMethod(name, paramTypes);
-            parse(cac, method);
+            CacheConfigUtil.parse(cac, method);
         } catch (NoSuchMethodException e) {
             //TODO 这样效率太低
         }

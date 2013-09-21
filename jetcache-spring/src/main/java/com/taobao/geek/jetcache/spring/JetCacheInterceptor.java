@@ -26,7 +26,7 @@ public class JetCacheInterceptor implements MethodInterceptor {
         if (cc == null) {
             return invocation.proceed();
         }
-        if (cc.isEnableCache()) {
+        if (cc.isEnableCacheContext()) {
             return CacheContext.enableCache(new ReturnValueCallback<Object>() {
                 @Override
                 public Object execute() throws Exception {
