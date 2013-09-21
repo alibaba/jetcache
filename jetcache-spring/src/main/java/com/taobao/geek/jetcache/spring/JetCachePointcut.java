@@ -5,8 +5,8 @@ package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.CacheConfig;
+import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
-import com.taobao.geek.jetcache.impl.NoCacheConfig;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 
@@ -17,10 +17,10 @@ import java.lang.reflect.Method;
  */
 public class JetCachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 
-    private IdentityHashMap<Method, CacheConfig> configMap = new IdentityHashMap<Method, CacheConfig>();
+    private IdentityHashMap<Method, CacheAnnoConfig> cacheConfigMap = new IdentityHashMap<Method, CacheAnnoConfig>();
 
     public JetCachePointcut() {
-        //setClassFilter(this);
+        setClassFilter(this);
     }
 
     @Override
@@ -35,57 +35,57 @@ public class JetCachePointcut extends StaticMethodMatcherPointcut implements Cla
     }
 
     public boolean matches(Method method, Class<?> targetClass) {
-        CacheConfig cc = configMap.get(method);
-        if (cc == NoCacheConfig.instance()) {
+        CacheAnnoConfig cac = cacheConfigMap.get(method);
+        if (cac == CacheAnnoConfig.getNoCacheAnnoConfigInstance()) {
             return false;
-        } else if (cc != null) {
+        } else if (cac != null) {
             return true;
         } else {
-            cc = CacheImplSupport.parseCacheConfig(method);
-            if (cc != null) {
-                configMap.put(method, cc);
-                return true;
+            cac = new CacheAnnoConfig();
+            parse(cac, method);
+
+            String name = method.getName();
+            Class<?>[] paramTypes = method.getParameterTypes();
+            parseByTargetClass(cac, targetClass, name, paramTypes);
+
+            if (!cac.isEnableCache() && cac.getCacheConfig() == null) {
+                cacheConfigMap.put(method, CacheAnnoConfig.getNoCacheAnnoConfigInstance());
+                return false;
             } else {
-                String name = method.getName();
-                Class<?>[] paramTypes = method.getParameterTypes();
-                cc = getByTargetClass(targetClass, name, paramTypes);
-                if (cc != null) {
-                    configMap.put(method, cc);
-                    return true;
-                } else {
-                    configMap.put(method, NoCacheConfig.instance());
-                    return false;
-                }
+                cacheConfigMap.put(method, cac);
+                return true;
             }
         }
     }
 
-    private CacheConfig getByTargetClass(Class<?> clazz, String name, Class<?>[] paramTypes) {
+    private void parse(CacheAnnoConfig cac, Method method) {
+        CacheConfig cc = CacheImplSupport.parseCacheConfig(method);
+        if (cc != null) {
+            cac.setCacheConfig(cc);
+        }
+        boolean enable = CacheImplSupport.parseEnableCacheConfig(method);
+        if (enable) {
+            cac.setEnableCache(true);
+        }
+    }
+
+    private void parseByTargetClass(CacheAnnoConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {
         try {
             Method method = clazz.getMethod(name, paramTypes);
-            CacheConfig cc = CacheImplSupport.parseCacheConfig(method);
-            if (cc != null) {
-                return cc;
-            }
+            parse(cac, method);
         } catch (NoSuchMethodException e) {
+            //TODO 这样效率太低
         }
         if (!clazz.isInterface() && clazz.getSuperclass() != null) {
-            CacheConfig cc = getByTargetClass(clazz.getSuperclass(), name, paramTypes);
-            if (cc != null) {
-                return cc;
-            }
+            parseByTargetClass(cac, clazz.getSuperclass(), name, paramTypes);
         }
         Class<?>[] intfs = clazz.getInterfaces();
         for (Class<?> it : intfs) {
-            CacheConfig cc = getByTargetClass(it, name, paramTypes);
-            if (cc != null) {
-                return cc;
-            }
+            parseByTargetClass(cac, it, name, paramTypes);
         }
-        return null;
     }
 
-    public void setConfigMap(IdentityHashMap configMap) {
-        this.configMap = configMap;
+    public void setCacheConfigMap(IdentityHashMap cacheConfigMap) {
+        this.cacheConfigMap = cacheConfigMap;
     }
 }

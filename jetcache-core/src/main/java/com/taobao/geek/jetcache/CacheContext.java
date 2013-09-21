@@ -17,4 +17,12 @@ public class CacheContext {
         return CacheImplSupport.enableCache(target);
     }
 
+    public static void enableCache(Callback callback) throws Exception {
+        CacheImplSupport.enableCache(callback);
+    }
+
+    public static <T> T enableCache(ReturnValueCallback<T> callback) throws Exception {
+        return CacheImplSupport.enableCache(callback);
+    }
+
 }

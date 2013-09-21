@@ -3,10 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheProviderFactory;
-import com.taobao.geek.jetcache.Cached;
-import com.taobao.geek.jetcache.KeyGenerator;
+import com.taobao.geek.jetcache.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -25,6 +22,14 @@ public class CacheImplSupport {
         return CacheContextSupport.enableCache(target);
     }
 
+    public static void enableCache(Callback callback) throws Exception{
+        CacheContextSupport.enableCache(callback);
+    }
+
+    public static <T> T enableCache(ReturnValueCallback<T> callback) throws Exception {
+        return CacheContextSupport.enableCache(callback);
+    }
+
     public static <T> T getProxy(T target, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
         return ProxyUtil.getProxy(target, cacheConfig, cacheProviderFactory);
     }
@@ -35,6 +40,10 @@ public class CacheImplSupport {
 
     public static CacheConfig parseCacheConfig(Method m) {
         return CacheConfigUtil.parseCacheConfig(m);
+    }
+
+    public static boolean parseEnableCacheConfig(Method m){
+        return CacheConfigUtil.parseEnableCacheConfig(m);
     }
 
     public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,

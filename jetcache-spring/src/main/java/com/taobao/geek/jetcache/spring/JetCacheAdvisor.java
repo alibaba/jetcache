@@ -18,7 +18,7 @@ public class JetCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
     @Override
     public Pointcut getPointcut() {
-        pointcut.setConfigMap(cacheConfigMap);
+        pointcut.setCacheConfigMap(cacheConfigMap);
         return pointcut;
     }
 

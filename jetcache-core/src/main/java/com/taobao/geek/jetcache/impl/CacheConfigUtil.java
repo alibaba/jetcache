@@ -5,6 +5,7 @@ package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.Cached;
+import com.taobao.geek.jetcache.EnableCache;
 
 import java.lang.reflect.Method;
 
@@ -25,5 +26,10 @@ class CacheConfigUtil {
         cc.setLocalLimit(anno.localLimit());
         cc.setVersion(anno.version());
         return cc;
+    }
+
+    public static boolean parseEnableCacheConfig(Method m) {
+        EnableCache anno = m.getAnnotation(EnableCache.class);
+        return anno != null;
     }
 }
