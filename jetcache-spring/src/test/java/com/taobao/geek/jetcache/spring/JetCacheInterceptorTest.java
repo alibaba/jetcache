@@ -3,10 +3,13 @@
  */
 package com.taobao.geek.jetcache.spring;
 
+import org.junit.Ignore;
+
 /**
  * @author yeli.hl
  */
 //TODO 补充完整
+@Ignore
 public class JetCacheInterceptorTest {
 
 }

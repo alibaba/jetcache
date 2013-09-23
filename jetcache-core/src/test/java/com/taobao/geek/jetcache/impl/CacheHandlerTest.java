@@ -5,6 +5,7 @@ package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.CacheProviderFactory;
+import com.taobao.geek.jetcache.CacheType;
 import com.taobao.geek.jetcache.Callback;
 import com.taobao.geek.jetcache.support.CountClass;
 import com.taobao.geek.jetcache.support.DynamicQuery;
@@ -34,7 +35,7 @@ public class CacheHandlerTest {
 
     // 测试基本功能
     @Test
-    public void testStaticInvoke_Simple1() throws Throwable {
+    public void testStaticInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
 
@@ -47,7 +48,7 @@ public class CacheHandlerTest {
 
     // 测试基本功能
     @Test
-    public void testStaticInvoke_Simple2() throws Throwable {
+    public void testStaticInvoke2() throws Throwable {
         Method method = CountClass.class.getMethod("count", int.class);
         int x1, x2, x3, x4;
 
@@ -61,7 +62,7 @@ public class CacheHandlerTest {
 
     // 测试基本功能
     @Test
-    public void testStaticInvoke_Simple3() throws Throwable {
+    public void testStaticInvoke3() throws Throwable {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
         int x1, x2, x3, x4, x5, x6;
 
@@ -78,7 +79,7 @@ public class CacheHandlerTest {
 
     // 测试基本功能
     @Test
-    public void testStaticInvoke_Simple4() throws Throwable {
+    public void testStaticInvoke4() throws Throwable {
         DynamicQuery q1 = new DynamicQuery();
         DynamicQuery q2 = new DynamicQuery();
         q2.setId(1000);
@@ -161,17 +162,44 @@ public class CacheHandlerTest {
         });
     }
 
-    // 测试基本功能
     @Test
-    public void testStaticInvoke_() throws Throwable {
-        Method method = CountClass.class.getMethod("count");
-        int x1, x2, x3;
+    public void testStaticInvoke_BOTH() throws Throwable {
+        Method method = CountClass.class.getMethod("count", int.class);
 
-        x1 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
+        cacheConfig.setCacheType(CacheType.REMOTE);
+        //remote put
+        int x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{5}, cacheProviderFactory, cacheConfig);
+        cacheConfig.setCacheType(CacheType.LOCAL);
+        //local miss
+        int x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5}, cacheProviderFactory, cacheConfig);
+        Assert.assertNotEquals(x1, x2);
+        cacheConfig.setCacheType(CacheType.BOTH);
+        //local hit
+        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{5}, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
-        Assert.assertEquals(x1, x3);
+
+        cacheConfig.setCacheType(CacheType.REMOTE);
+        //remote put
+        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{500}, cacheProviderFactory, cacheConfig);
+        cacheConfig.setCacheType(CacheType.BOTH);
+        //local miss,remote hit
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{500}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(x1, x2);
+
+        cacheConfig.setCacheType(CacheType.BOTH);
+        //local put,remote put
+        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        //localhit
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(x1, x2);
+        cacheConfig.setCacheType(CacheType.LOCAL);
+        //local hit
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(x1, x2);
+        cacheConfig.setCacheType(CacheType.REMOTE);
+        //remote hit
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(x1, x2);
     }
 
 }

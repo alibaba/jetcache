@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class LRUMapCache implements Cache {
 
-    private HashMap<String, Map> areaMap; //copy on write
+    private HashMap<String, Map> areaMap = new HashMap<String, Map>(); //copy on write
 
     @Override
     public CacheResult get(CacheConfig cacheConfig, String subArea, String key) {
