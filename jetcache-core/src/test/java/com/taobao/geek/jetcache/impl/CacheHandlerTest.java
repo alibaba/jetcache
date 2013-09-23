@@ -168,37 +168,41 @@ public class CacheHandlerTest {
 
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote put
-        int x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{5}, cacheProviderFactory, cacheConfig);
+        int x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
         cacheConfig.setCacheType(CacheType.LOCAL);
         //local miss
-        int x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5}, cacheProviderFactory, cacheConfig);
+        int x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
         Assert.assertNotEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.BOTH);
         //local hit
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{5}, cacheProviderFactory, cacheConfig);
+        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
 
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote put
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{500}, cacheProviderFactory, cacheConfig);
+        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
         cacheConfig.setCacheType(CacheType.BOTH);
-        //local miss,remote hit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{500}, cacheProviderFactory, cacheConfig);
+        //local miss,remote hit,local put
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(x1, x2);
+        cacheConfig.setCacheType(CacheType.LOCAL);
+        //local hit
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
 
         cacheConfig.setCacheType(CacheType.BOTH);
         //local put,remote put
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
         //localhit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.LOCAL);
         //local hit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote hit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{5000}, cacheProviderFactory, cacheConfig);
+        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
     }
 
