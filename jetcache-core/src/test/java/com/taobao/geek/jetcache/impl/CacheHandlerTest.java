@@ -15,11 +15,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 
 /**
  * @author yeli.hl
  */
-//TODO 补充完整
 public class CacheHandlerTest {
 
     private CacheProviderFactory cacheProviderFactory;
@@ -44,25 +44,24 @@ public class CacheHandlerTest {
         x3 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
         Assert.assertEquals(x1, x2);
         Assert.assertEquals(x1, x3);
+
+        method = CountClass.class.getMethod("count", int.class);
+        int X1, X2, X3, X4;
+
+        X1 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
+        X2 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        X3 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
+        X4 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(X1, X3);
+        Assert.assertEquals(X2, X4);
+
+        Assert.assertNotEquals(x1, X1);
+        Assert.assertNotEquals(x1, X2);
     }
 
     // 测试基本功能
     @Test
     public void testStaticInvoke2() throws Throwable {
-        Method method = CountClass.class.getMethod("count", int.class);
-        int x1, x2, x3, x4;
-
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{10}, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{100}, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(count, method, new Object[]{10}, cacheProviderFactory, cacheConfig);
-        x4 = (Integer) CachedHandler.invoke(count, method, new Object[]{100}, cacheProviderFactory, cacheConfig);
-        Assert.assertEquals(x1, x3);
-        Assert.assertEquals(x2, x4);
-    }
-
-    // 测试基本功能
-    @Test
-    public void testStaticInvoke3() throws Throwable {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
         int x1, x2, x3, x4, x5, x6;
 
@@ -79,7 +78,7 @@ public class CacheHandlerTest {
 
     // 测试基本功能
     @Test
-    public void testStaticInvoke4() throws Throwable {
+    public void testStaticInvoke3() throws Throwable {
         DynamicQuery q1 = new DynamicQuery();
         DynamicQuery q2 = new DynamicQuery();
         q2.setId(1000);
@@ -203,6 +202,43 @@ public class CacheHandlerTest {
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote hit
         x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
+        Assert.assertEquals(x1, x2);
+    }
+
+    @Test
+    public void testInvoke1() throws Throwable {
+        Method method = CountClass.class.getMethod("count");
+        CachedHandler ch = new CachedHandler(count, cacheConfig, cacheProviderFactory);
+        int x1 = (Integer) ch.invoke(null, method, null);
+        int x2 = (Integer) ch.invoke(null, method, null);
+        Assert.assertEquals(x1, x2);
+    }
+
+    @Test
+    public void testInvoke2() throws Throwable {
+        Method method = CountClass.class.getMethod("count");
+        final CacheAnnoConfig cac = new CacheAnnoConfig();
+        cac.setCacheConfig(cacheConfig);
+        HashMap<String, CacheAnnoConfig> configMap = new HashMap<String, CacheAnnoConfig>(){
+            @Override
+            public CacheAnnoConfig get(Object key) {
+                return cac;
+            }
+        };
+        CachedHandler ch = new CachedHandler(count, configMap, cacheProviderFactory);
+
+        int x1 = (Integer) ch.invoke(null, method, null);
+        int x2 = (Integer) ch.invoke(null, method, null);
+        Assert.assertEquals(x1, x2);
+
+        cacheConfig.setEnabled(false);
+        x1 = (Integer) ch.invoke(null, method, null);
+        x2 = (Integer) ch.invoke(null, method, null);
+        Assert.assertNotEquals(x1, x2);
+
+        cac.setEnableCacheContext(true);
+        x1 = (Integer) ch.invoke(null, method, null);
+        x2 = (Integer) ch.invoke(null, method, null);
         Assert.assertEquals(x1, x2);
     }
 

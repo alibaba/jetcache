@@ -42,11 +42,10 @@ class CachedHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
-        CacheConfig cc = cacheConfig;
         final CacheAnnoConfig cac;
-        if (cc != null) {
+        if (cacheConfig != null) {
             cac = new CacheAnnoConfig();
-            cac.setCacheConfig(cc);
+            cac.setCacheConfig(cacheConfig);
         } else {
             String sig = ClassUtil.getMethodSig(method);
             cac = configMap.get(sig);
@@ -62,7 +61,7 @@ class CachedHandler implements InvocationHandler {
                     CacheContextSupport.disable();
                 }
             } else {
-                return invoke(src, method, args, cacheProviderFactory, cc);
+                return invoke(src, method, args, cacheProviderFactory, cac.getCacheConfig());
             }
         }
 
