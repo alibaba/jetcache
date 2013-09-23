@@ -27,22 +27,16 @@ public class JetCacheInterceptor implements MethodInterceptor {
             return invocation.proceed();
         }
         if (cc.isEnableCacheContext()) {
-            return CacheContext.enableCache(new ReturnValueCallback<Object>() {
-                @Override
-                public Object execute() throws Exception {
-                    try {
+            try{
+                return CacheContext.enableCache(new ReturnValueCallback<Object>() {
+                    @Override
+                    public Object execute() throws Throwable {
                         return invoke(invocation, cc);
-                    } catch (Throwable e) {
-                        if (e instanceof Exception) {
-                            throw (Exception) e;
-                        } else if (e instanceof Error) {
-                            throw (Error) e;
-                        } else {
-                            throw new CacheException("", e);
-                        }
                     }
-                }
-            });
+                });
+            } catch (CallbackException e) {
+                throw e.getCause();
+            }
         } else {
             return invoke(invocation, cc);
         }

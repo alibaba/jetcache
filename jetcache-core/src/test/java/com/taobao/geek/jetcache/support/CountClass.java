@@ -13,7 +13,7 @@ public class CountClass {
         return count++;
     }
 
-    public static int staticCount(){
-        return count++;
+    public int count(int p){
+        return count++ + p;
     }
 }

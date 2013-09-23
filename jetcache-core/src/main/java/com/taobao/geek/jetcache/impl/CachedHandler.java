@@ -55,22 +55,12 @@ class CachedHandler implements InvocationHandler {
             return method.invoke(src, args);
         } else {
             if (cac.isEnableCacheContext()) {
-                return CacheContextSupport.enableCache(new ReturnValueCallback<Object>() {
-                    @Override
-                    public Object execute() throws Exception {
-                        try {
-                            return invoke(src, method, args, cacheProviderFactory, cac.getCacheConfig());
-                        } catch (Throwable e) {
-                            if (e instanceof Exception) {
-                                throw (Exception) e;
-                            } else if (e instanceof Error) {
-                                throw (Error) e;
-                            } else {
-                                throw new CacheException("", e);
-                            }
-                        }
-                    }
-                });
+                try {
+                    CacheContextSupport.enable();
+                    return invoke(src, method, args, cacheProviderFactory, cac.getCacheConfig());
+                } finally {
+                    CacheContextSupport.disable();
+                }
             } else {
                 return invoke(src, method, args, cacheProviderFactory, cc);
             }

@@ -17,11 +17,11 @@ public class CacheContext {
         return CacheImplSupport.enableCache(target);
     }
 
-    public static void enableCache(Callback callback) throws Exception {
+    public static void enableCache(Callback callback) throws CallbackException{
         CacheImplSupport.enableCache(callback);
     }
 
-    public static <T> T enableCache(ReturnValueCallback<T> callback) throws Exception {
+    public static <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException {
         return CacheImplSupport.enableCache(callback);
     }
 

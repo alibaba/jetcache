@@ -22,11 +22,11 @@ public class CacheImplSupport {
         return CacheContextSupport.enableCache(target);
     }
 
-    public static void enableCache(Callback callback) throws Exception{
+    public static void enableCache(Callback callback) throws CallbackException {
         CacheContextSupport.enableCache(callback);
     }
 
-    public static <T> T enableCache(ReturnValueCallback<T> callback) throws Exception {
+    public static <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException {
         return CacheContextSupport.enableCache(callback);
     }
 

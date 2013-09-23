@@ -7,5 +7,5 @@ package com.taobao.geek.jetcache;
  * @author yeli.hl
  */
 public interface ReturnValueCallback<T> {
-    public T execute() throws Exception;
+    public T execute() throws Throwable;
 }

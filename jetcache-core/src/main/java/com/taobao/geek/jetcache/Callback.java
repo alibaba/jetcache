@@ -8,5 +8,5 @@ package com.taobao.geek.jetcache;
  */
 public interface Callback {
 
-    public void execute() throws Exception;
+    public void execute() throws Throwable;
 }
