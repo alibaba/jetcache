@@ -80,7 +80,7 @@ class CachedHandler implements InvocationHandler {
                                        CacheConfig cc)
             throws IllegalAccessException, InvocationTargetException {
         CacheProvider cacheProvider = cacheProviderFactory.getCache(cc.getArea());
-        String subArea = SubAreaUtil.getSubArea(cc, method);
+        String subArea = ClassUtil.getSubArea(cc, method);
         String key = cacheProvider.getKeyGenerator().getKey(cc, method, args);
         Cache localCache = cacheProvider.getLocalCache();
         Cache remoteCache = cacheProvider.getRemoteCache();
