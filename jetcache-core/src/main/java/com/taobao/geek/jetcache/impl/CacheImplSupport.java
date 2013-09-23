@@ -18,10 +18,6 @@ public class CacheImplSupport {
         return new DefaultKeyGenerator();
     }
 
-    public static <T> T enableCache(T target) {
-        return CacheContextSupport.enableCache(target);
-    }
-
     public static void enableCache(Callback callback) throws CallbackException {
         CacheContextSupport.enableCache(callback);
     }
