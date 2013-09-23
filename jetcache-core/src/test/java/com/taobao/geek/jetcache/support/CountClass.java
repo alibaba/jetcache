@@ -9,11 +9,20 @@ package com.taobao.geek.jetcache.support;
 public class CountClass {
     private static int count;
 
-    public int count(){
+    public int count() {
         return count++;
     }
 
-    public int count(int p){
+    public int count(int p) {
         return count++ + p;
     }
+
+    public int count(String s, int p) {
+        return s.hashCode() + p + count++;
+    }
+
+    public int count(DynamicQuery q, int p) {
+        return q.hashCode() + p + count++;
+    }
+
 }
