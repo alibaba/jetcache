@@ -22,7 +22,8 @@ public class CacheConfig {
         CacheConfig cc = (CacheConfig) obj;
         return equals(area, cc.area) &&
                 enabled == cc.enabled && expire == cc.expire
-                && equals(cacheType, cc.cacheType) && localLimit == cc.localLimit;
+                && equals(cacheType, cc.cacheType) && localLimit == cc.localLimit
+                && version == cc.version;
     }
 
     @Override
@@ -31,14 +32,16 @@ public class CacheConfig {
         if (area != null) {
             hash += area.hashCode();
         }
+        hash = hash << 8 + expire;
+        if (cacheType != null) {
+            hash = hash << 2 + cacheType.hashCode();
+        }
+        hash = hash << 8 + localLimit;
+        hash =  hash << 4 + version;
+
         if (enabled) {
             hash = ~hash;
         }
-        hash ^= expire;
-        if (cacheType != null) {
-            hash ^= cacheType.hashCode();
-        }
-        hash ^= localLimit;
         return hash;
     }
 
@@ -48,7 +51,6 @@ public class CacheConfig {
         } else {
             return o2 == null;
         }
-
     }
 
     public String getArea() {
