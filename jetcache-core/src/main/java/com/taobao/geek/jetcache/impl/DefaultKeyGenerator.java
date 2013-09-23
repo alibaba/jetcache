@@ -4,10 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.KeyGenerator;
-
-import java.lang.reflect.Method;
 
 /**
  * @author yeli.hl
@@ -15,7 +12,7 @@ import java.lang.reflect.Method;
 class DefaultKeyGenerator implements KeyGenerator {
 
     @Override
-    public String getKey(CacheConfig cacheConfig, Method method, Object[] args) {
+    public String getKey(Object[] args) {
         if (args == null || args.length == 0) {
             return "";
         }
