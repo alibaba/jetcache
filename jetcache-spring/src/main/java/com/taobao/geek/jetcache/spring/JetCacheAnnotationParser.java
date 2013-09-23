@@ -4,6 +4,7 @@
 package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
+import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -27,6 +28,7 @@ public class JetCacheAnnotationParser implements BeanDefinitionParser {
     }
 
     private synchronized void doParse(Element element, ParserContext parserContext) {
+        AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
         if (!parserContext.getRegistry().containsBeanDefinition(CACHE_ADVISOR_BEAN_NAME)) {
             Object eleSource = parserContext.extractSource(element);
 
