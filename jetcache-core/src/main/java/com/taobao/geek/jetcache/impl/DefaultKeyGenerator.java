@@ -16,6 +16,9 @@ class DefaultKeyGenerator implements KeyGenerator {
 
     @Override
     public String getKey(CacheConfig cacheConfig, Method method, Object[] args) {
+        if (args == null || args.length == 0) {
+            return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             Object arg = args[i];

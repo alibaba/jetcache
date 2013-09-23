@@ -7,5 +7,5 @@ package com.taobao.geek.jetcache.spring.beans;
  * @author yeli.hl
  */
 public interface Service {
-    int bar();
+    int emptyMethod();
 }

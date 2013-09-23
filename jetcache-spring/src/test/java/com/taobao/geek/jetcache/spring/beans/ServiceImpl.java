@@ -11,12 +11,13 @@ import org.springframework.stereotype.Component;
  * @author yeli.hl
  */
 @Component
-public class ServiceImpl implements Service, Foo {
-    @Override
-//    @Cacheable("books")
+public class ServiceImpl implements Service {
+
+    private static int count;
+
     @Cached
-    public int bar(){
-        return 0;
+    public int emptyMethod() {
+        return count++;
     }
 
 }

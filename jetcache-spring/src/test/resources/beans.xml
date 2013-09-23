@@ -1,26 +1,42 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:cache="http://www.springframework.org/schema/cache"
        xmlns:jetcache="http://www.alibaba.com/schema/jetcache"
+       xmlns:cache="http://www.springframework.org/schema/cache"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
-        http://www.springframework.org/schema/cache
+             http://www.springframework.org/schema/cache
         http://www.springframework.org/schema/cache/spring-cache.xsd
         http://www.alibaba.com/schema/jetcache
         http://www.alibaba.com/schema/jetcache/jetcache.xsd">
     <context:annotation-config/>
     <context:component-scan base-package="com.taobao.geek.jetcache"/>
-    <cache:annotation-driven />
 
-    <bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">
-        <property name="caches">
-            <set>
-                <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="default"/>
-                <bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="books"/>
-            </set>
+
+    <!--<cache:annotation-driven />-->
+
+    <!--<bean id="cacheManager" class="org.springframework.cache.support.SimpleCacheManager">-->
+        <!--<property name="caches">-->
+            <!--<set>-->
+                <!--<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="default"/>-->
+                <!--<bean class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean" name="books"/>-->
+            <!--</set>-->
+        <!--</property>-->
+    <!--</bean>-->
+
+    <jetcache:annotation-driven/>
+
+    <bean id="cacheProviderFactory" class="com.taobao.geek.jetcache.CacheProviderFactory">
+        <constructor-arg index="0">
+            <map>
+                <entry key="" value-ref="defaultCacheProvider"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="defaultCacheProvider" class="com.taobao.geek.jetcache.CacheProvider">
+        <property name="remoteCache">
+            <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
         </property>
     </bean>
-    <jetcache:annotation-driven/>
 </beans>

@@ -17,19 +17,21 @@ class SubAreaUtil {
 
     public static String getSubArea(CacheConfig cacheConfig, Method method){
         // TODO 对参数的类型发生变化做出感知
-        StringBuilder sb = new StringBuilder();
-        sb.append(cacheConfig.getVersion()).append('_');
 
         String prefix = methodMap.get(method);
 
         if (prefix == null) {
-            sb.append(Type.getType(method.getClass()).getInternalName());
+            StringBuilder sb = new StringBuilder();
+            sb.append(cacheConfig.getVersion()).append('_');
+            sb.append(Type.getType(method.getDeclaringClass()).getDescriptor());
             sb.append('.');
-            sb.append(Type.getType(method).getInternalName());
+            Type t = Type.getType(method);
+            sb.append(method.getName());
+            sb.append(t.getDescriptor());
             methodMap.put(method, sb.toString());
+            return sb.toString();
         } else {
-            sb.append(prefix);
+            return prefix;
         }
-        return prefix;
     }
 }

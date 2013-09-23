@@ -35,6 +35,7 @@ public class JetCachePointcut extends StaticMethodMatcherPointcut implements Cla
         return true;
     }
 
+    @Override
     public boolean matches(Method method, Class<?> targetClass) {
         CacheAnnoConfig cac = cacheConfigMap.get(method);
         if (cac == CacheAnnoConfig.getNoCacheAnnoConfigInstance()) {

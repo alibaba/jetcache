@@ -10,14 +10,14 @@ import java.util.Map;
  */
 public class CacheProviderFactory {
 
-    private final Map<String, CacheProvider> cacheMap;
+    private final Map<String, CacheProvider> providerMap;
 
-    public CacheProviderFactory(Map<String, CacheProvider> cacheMap) {
-        this.cacheMap = cacheMap;
+    public CacheProviderFactory(Map<String, CacheProvider> providerMap) {
+        this.providerMap = providerMap;
     }
 
     public CacheProvider getCache(String area) {
-        CacheProvider cw = cacheMap.get(area);
+        CacheProvider cw = providerMap.get(area);
         if (cw == null) {
             throw new CacheException("area " + area + " is not registered");
         }
