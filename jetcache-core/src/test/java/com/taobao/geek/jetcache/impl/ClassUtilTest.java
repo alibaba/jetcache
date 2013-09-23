@@ -3,11 +3,12 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.objectweb.asm.Type;
+import com.taobao.geek.jetcache.CacheConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 
 /**
  * @author yeli.hl
@@ -33,7 +34,44 @@ public class ClassUtilTest {
         Object obj = new C2();
         Class<?>[] is = ClassUtil.getAllInterfaces(obj);
         Assert.assertEquals(3, is.length);
-        System.out.println(Type.getType(ClassUtilTest.class).getDescriptor());
+    }
+
+    class C1 {
+        public void foo() {
+        }
+
+        public String foo(I1 p) {
+            return null;
+        }
+    }
+
+    @Test
+    public void testGetSubArea() throws Exception {
+        CacheConfig cc = new CacheConfig();
+        Method m1 = C1.class.getMethod("foo");
+        Method m2 = C1.class.getMethod("foo", I1.class);
+
+        String s1 = cc.getVersion() + "_" + C1.class.getName() + "." + m1.getName() + "()V";
+        String s2 = ClassUtil.getSubArea(cc, m1);
+        Assert.assertEquals(s1, s2);
+
+        s1 = cc.getVersion() + "_" + C1.class.getName() + "." + m1.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
+        s2 = ClassUtil.getSubArea(cc, m2);
+        Assert.assertEquals(s1, s2);
+    }
+
+    @Test
+    public void testGetMethodSig() throws Exception {
+        Method m1 = C1.class.getMethod("foo");
+        Method m2 = C1.class.getMethod("foo", I1.class);
+
+        String s1 = m1.getName() + "()V";
+        String s2 = ClassUtil.getMethodSig(m1);
+        Assert.assertEquals(s1, s2);
+
+        s1 = m1.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
+        s2 = ClassUtil.getMethodSig(m2);
+        Assert.assertEquals(s1, s2);
     }
 
 }

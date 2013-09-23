@@ -17,7 +17,7 @@ class ClassUtil {
 
     private static IdentityHashMap<Method, String> methodMap = new IdentityHashMap<Method, String>();
 
-    public static String getSubArea(CacheConfig cacheConfig, Method method){
+    public static String getSubArea(CacheConfig cacheConfig, Method method) {
         // TODO 对参数的类型发生变化做出感知
 
         String prefix = methodMap.get(method);
@@ -25,11 +25,9 @@ class ClassUtil {
         if (prefix == null) {
             StringBuilder sb = new StringBuilder();
             sb.append(cacheConfig.getVersion()).append('_');
-            sb.append(Type.getType(method.getDeclaringClass()).getDescriptor());
+            sb.append(method.getDeclaringClass().getName());
             sb.append('.');
-            Type t = Type.getType(method);
-            sb.append(method.getName());
-            sb.append(t.getDescriptor());
+            getMethodSig(sb, method);
             methodMap.put(method, sb.toString());
             return sb.toString();
         } else {
@@ -50,7 +48,14 @@ class ClassUtil {
         return s.toArray(new Class<?>[s.size()]);
     }
 
+    private static void getMethodSig(StringBuilder sb, Method m) {
+        sb.append(m.getName());
+        sb.append(Type.getType(m).getDescriptor());
+    }
+
     public static String getMethodSig(Method m) {
-        return m.getName() + com.taobao.geek.jetcache.objectweb.asm.Type.getType(m).getDescriptor();
+        StringBuilder sb = new StringBuilder();
+        getMethodSig(sb, m);
+        return sb.toString();
     }
 }
