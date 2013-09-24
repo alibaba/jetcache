@@ -6,7 +6,6 @@ package com.taobao.geek.jetcache.impl;
 import com.taobao.geek.jetcache.*;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 
@@ -56,29 +55,32 @@ class CachedHandler implements InvocationHandler {
             if (cac.isEnableCacheContext()) {
                 try {
                     CacheContextSupport.enable();
-                    return invoke(src, method, args, cacheProviderFactory, cac.getCacheConfig());
+                    return invoke(null, src, method, args, cacheProviderFactory, cac.getCacheConfig());
                 } finally {
                     CacheContextSupport.disable();
                 }
             } else {
-                return invoke(src, method, args, cacheProviderFactory, cac.getCacheConfig());
+                return invoke(null, src, method, args, cacheProviderFactory, cac.getCacheConfig());
             }
         }
-
     }
 
-    public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
+    public static Object invoke(Invoker invoker, Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
                                 CacheConfig cc) throws Throwable {
         if (cc != null && (cc.isEnabled() || CacheContextSupport.isEnabled())) {
-            return getFromCache(src, method, args, cacheProviderFactory, cc);
+            return getFromCache(invoker, src, method, args, cacheProviderFactory, cc);
         } else {
-            return method.invoke(src, args);
+            if (invoker == null) {
+                return method.invoke(src, args);
+            } else {
+                return invoker.invoke();
+            }
         }
     }
 
-    private static Object getFromCache(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
+    private static Object getFromCache(Invoker invoker, Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
                                        CacheConfig cc)
-            throws IllegalAccessException, InvocationTargetException {
+            throws Throwable {
         CacheProvider cacheProvider = cacheProviderFactory.getCache(cc.getArea());
         String subArea = ClassUtil.getSubArea(cc, method);
         String key = cacheProvider.getKeyGenerator().getKey(args);
@@ -116,7 +118,12 @@ class CachedHandler implements InvocationHandler {
             }
             return r.value;
         } else {
-            Object value = method.invoke(src, args);
+            Object value;
+            if (invoker == null) {
+                value = method.invoke(src, args);
+            } else {
+                value = invoker.invoke();
+            }
             if (r.needUpdateLocal) {
                 localCache.put(cc, subArea, key, value);
             }

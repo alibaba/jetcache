@@ -34,8 +34,8 @@ public class CacheImplSupport {
         return ProxyUtil.getProxyByAnnotation(target, cacheProviderFactory);
     }
 
-    public static Object invoke(Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
+    public static Object invoke(Invoker invoker, Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
                                 CacheConfig cc) throws Throwable {
-        return CachedHandler.invoke(src, method, args, cacheProviderFactory, cc);
+        return CachedHandler.invoke(invoker, src, method, args, cacheProviderFactory, cc);
     }
 }

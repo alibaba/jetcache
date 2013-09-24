@@ -7,6 +7,7 @@ import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.*;
 import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
+import com.taobao.geek.jetcache.impl.Invoker;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
@@ -43,9 +44,15 @@ public class CacheInterceptor implements MethodInterceptor {
 
     }
 
-    private Object invoke(MethodInvocation invocation, CacheAnnoConfig cc) throws Throwable {
+    private Object invoke(final MethodInvocation invocation, CacheAnnoConfig cc) throws Throwable {
         if (cc.getCacheConfig() != null) {
-            return CacheImplSupport.invoke(invocation.getThis(), invocation.getMethod(),
+            Invoker invoker = new Invoker() {
+                @Override
+                public Object invoke() throws Throwable {
+                    return invocation.proceed();
+                }
+            };
+            return CacheImplSupport.invoke(invoker, invocation.getThis(), invocation.getMethod(),
                     invocation.getArguments(), cacheProviderFactory, cc.getCacheConfig());
         } else {
             return invocation.proceed();

@@ -33,25 +33,29 @@ public class CacheHandlerTest {
         count = new CountClass();
     }
 
+    private int invoke(Method method, Object[] params) throws Throwable {
+        return (Integer) CachedHandler.invoke(null, count, method, params, cacheProviderFactory, cacheConfig);
+    }
+
     // 测试基本功能
     @Test
     public void testStaticInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
 
-        x1 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, null);
+        x2 = invoke(method, null);
+        x3 = invoke(method, null);
         Assert.assertEquals(x1, x2);
         Assert.assertEquals(x1, x3);
 
         method = CountClass.class.getMethod("count", int.class);
         int X1, X2, X3, X4;
 
-        X1 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
-        X2 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
-        X3 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
-        X4 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        X1 = invoke(method, new Object[]{1000});
+        X2 = invoke(method, new Object[]{2000});
+        X3 = invoke(method, new Object[]{1000});
+        X4 = invoke(method, new Object[]{2000});
         Assert.assertEquals(X1, X3);
         Assert.assertEquals(X2, X4);
 
@@ -65,12 +69,12 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
         int x1, x2, x3, x4, x5, x6;
 
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{"aaa", 10}, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{"bbb", 100}, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(count, method, new Object[]{"ccc", 10}, cacheProviderFactory, cacheConfig);
-        x4 = (Integer) CachedHandler.invoke(count, method, new Object[]{"aaa", 10}, cacheProviderFactory, cacheConfig);
-        x5 = (Integer) CachedHandler.invoke(count, method, new Object[]{"bbb", 100}, cacheProviderFactory, cacheConfig);
-        x6 = (Integer) CachedHandler.invoke(count, method, new Object[]{"ccc", 10}, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, new Object[]{"aaa", 10});
+        x2 = invoke(method, new Object[]{"bbb", 100});
+        x3 = invoke(method, new Object[]{"ccc", 10});
+        x4 = invoke(method, new Object[]{"aaa", 10});
+        x5 = invoke(method, new Object[]{"bbb", 100});
+        x6 = invoke(method, new Object[]{"ccc", 10});
         Assert.assertEquals(x1, x4);
         Assert.assertEquals(x2, x5);
         Assert.assertEquals(x3, x6);
@@ -119,16 +123,16 @@ public class CacheHandlerTest {
     private void assertEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{q1, 10}, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{q2, 10}, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, new Object[]{q1, 10});
+        x2 = invoke(method, new Object[]{q2, 10});
         Assert.assertEquals(x1, x2);
     }
 
     private void assertNotEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{q1, p1}, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{q2, p2}, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, new Object[]{q1, p1});
+        x2 = invoke(method, new Object[]{q2, p2});
         Assert.assertNotEquals(x1, x2);
     }
 
@@ -138,23 +142,23 @@ public class CacheHandlerTest {
         final Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
 
-        x1 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, null);
-        x2 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, null);
-        x3 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, null);
+        x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, null);
+        x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, null);
+        x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, null);
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
         cacheConfig.setEnabled(false);
-        x1 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, null);
+        x2 = invoke(method, null);
+        x3 = invoke(method, null);
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
         CacheContextSupport.enableCache(new Callback() {
             @Override
             public void execute() throws Throwable {
-                int x1 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-                int x2 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
-                int x3 = (Integer) CachedHandler.invoke(count, method, null, cacheProviderFactory, cacheConfig);
+                int x1 = invoke(method, null);
+                int x2 = invoke(method, null);
+                int x3 = invoke(method, null);
                 Assert.assertEquals(x1, x2);
                 Assert.assertEquals(x1, x3);
             }
@@ -167,41 +171,41 @@ public class CacheHandlerTest {
 
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote put
-        int x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
+        int x1 = invoke(method, new Object[]{1000});
         cacheConfig.setCacheType(CacheType.LOCAL);
         //local miss
-        int x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
+        int x2 = invoke(method, new Object[]{1000});
         Assert.assertNotEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.BOTH);
         //local hit
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{1000}, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, new Object[]{1000});
         Assert.assertEquals(x1, x2);
 
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote put
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, new Object[]{2000});
         cacheConfig.setCacheType(CacheType.BOTH);
         //local miss,remote hit,local put
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        x2 = invoke(method, new Object[]{2000});
         Assert.assertEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.LOCAL);
         //local hit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{2000}, cacheProviderFactory, cacheConfig);
+        x2 = invoke(method, new Object[]{2000});
         Assert.assertEquals(x1, x2);
 
         cacheConfig.setCacheType(CacheType.BOTH);
         //local put,remote put
-        x1 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
+        x1 = invoke(method, new Object[]{3000});
         //localhit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
+        x2 = invoke(method, new Object[]{3000});
         Assert.assertEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.LOCAL);
         //local hit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
+        x2 = invoke(method, new Object[]{3000});
         Assert.assertEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.REMOTE);
         //remote hit
-        x2 = (Integer) CachedHandler.invoke(count, method, new Object[]{3000}, cacheProviderFactory, cacheConfig);
+        x2 = invoke(method, new Object[]{3000});
         Assert.assertEquals(x1, x2);
     }
 
@@ -219,7 +223,7 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count");
         final CacheAnnoConfig cac = new CacheAnnoConfig();
         cac.setCacheConfig(cacheConfig);
-        HashMap<String, CacheAnnoConfig> configMap = new HashMap<String, CacheAnnoConfig>(){
+        HashMap<String, CacheAnnoConfig> configMap = new HashMap<String, CacheAnnoConfig>() {
             @Override
             public CacheAnnoConfig get(Object key) {
                 return cac;
