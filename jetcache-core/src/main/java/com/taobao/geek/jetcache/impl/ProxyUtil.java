@@ -8,6 +8,7 @@ import com.taobao.geek.jetcache.CacheProviderFactory;
 import com.taobao.geek.jetcache.Cached;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
@@ -38,9 +39,11 @@ class ProxyUtil {
         if (clazz.getName().startsWith("java")) {
             return;
         }
-        Method[] methods = clazz.getMethods();
+        Method[] methods = clazz.getDeclaredMethods();
         for (Method m : methods) {
-            processMethod(configMap, m);
+            if (Modifier.isPublic(m.getModifiers())) {
+                processMethod(configMap, m);
+            }
         }
 
         Class<?>[] interfaces = clazz.getInterfaces();

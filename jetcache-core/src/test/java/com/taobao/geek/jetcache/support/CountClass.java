@@ -6,8 +6,8 @@ package com.taobao.geek.jetcache.support;
 /**
  * @author yeli.hl
  */
-public class CountClass {
-    private static int count;
+public class CountClass implements Count{
+    private int count;
 
     public int count() {
         return count++;
@@ -24,5 +24,4 @@ public class CountClass {
     public int count(DynamicQuery q, int p) {
         return q.hashCode() + p + count++;
     }
-
 }
