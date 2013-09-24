@@ -35,7 +35,7 @@ public class LRUMapCache implements Cache {
                 if (cacheValue == null) {
                     code = CacheResultCode.NOT_EXISTS;
                 } else {
-                    if ((cacheValue.timestamp - System.currentTimeMillis()) / 1000 >= cacheConfig.getExpire()) {
+                    if ((System.currentTimeMillis() - cacheValue.timestamp) / 1000 >= cacheConfig.getExpire()) {
                         code = CacheResultCode.EXPIRED;
                     } else {
                         code = CacheResultCode.SUCCESS;
