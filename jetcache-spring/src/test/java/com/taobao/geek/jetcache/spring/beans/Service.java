@@ -3,9 +3,14 @@
  */
 package com.taobao.geek.jetcache.spring.beans;
 
+import com.taobao.geek.jetcache.Cached;
+
 /**
  * @author yeli.hl
  */
 public interface Service {
-    int emptyMethod();
+    int count();
+
+    @Cached
+    int countWithAnnoOnInterface();
 }

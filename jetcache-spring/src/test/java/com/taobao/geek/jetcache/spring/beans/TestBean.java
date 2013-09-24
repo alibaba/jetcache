@@ -3,7 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring.beans;
 
-import org.springframework.cache.annotation.Cacheable;
+import com.taobao.geek.jetcache.Cached;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,14 +12,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestBean {
 
-    static int count = 0;
+    private int count = 0;
 
 
-    public TestBean(){
+    public TestBean() {
     }
 
-    @Cacheable("books")
-    public int foo() {
+    @Cached
+    public int count() {
+        return count++;
+    }
+
+    @Cached(enabled = false)
+    public int countWithDisabledCache(){
+        return count++;
+    }
+
+    @Cached(area = "A1")
+    public int count(DynamicQuery q) {
         return count++;
     }
 

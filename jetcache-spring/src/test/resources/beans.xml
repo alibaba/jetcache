@@ -15,11 +15,17 @@
     <bean id="cacheProviderFactory" class="com.taobao.geek.jetcache.CacheProviderFactory">
         <constructor-arg index="0">
             <map>
-                <entry key="" value-ref="defaultCacheProvider"/>
+                <entry key="" value-ref="ccheProvider1"/>
+                <entry key="A1" value-ref="ccheProvider2"/>
             </map>
         </constructor-arg>
     </bean>
-    <bean id="defaultCacheProvider" class="com.taobao.geek.jetcache.CacheProvider">
+    <bean id="ccheProvider1" class="com.taobao.geek.jetcache.CacheProvider">
+        <property name="remoteCache">
+            <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
+        </property>
+    </bean>
+    <bean id="ccheProvider2" class="com.taobao.geek.jetcache.CacheProvider">
         <property name="remoteCache">
             <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
         </property>

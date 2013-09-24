@@ -13,10 +13,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceImpl implements Service {
 
-    private static int count;
+    private int count;
 
+    @Override
     @Cached
-    public int emptyMethod() {
+    public int count() {
+        return count++;
+    }
+
+    @Override
+    public int countWithAnnoOnInterface(){
         return count++;
     }
 
