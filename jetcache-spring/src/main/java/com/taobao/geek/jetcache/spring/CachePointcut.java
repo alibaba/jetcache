@@ -16,11 +16,11 @@ import java.lang.reflect.Method;
 /**
  * @author yeli.hl
  */
-public class JetCachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
+public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 
     private IdentityHashMap<Method, CacheAnnoConfig> cacheConfigMap = new IdentityHashMap<Method, CacheAnnoConfig>();
 
-    public JetCachePointcut() {
+    public CachePointcut() {
         setClassFilter(this);
     }
 

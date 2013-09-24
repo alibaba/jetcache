@@ -17,9 +17,9 @@ import org.w3c.dom.Element;
 /**
  * @author yeli.hl
  */
-public class JetCacheAnnotationParser implements BeanDefinitionParser {
+public class CacheAnnotationParser implements BeanDefinitionParser {
 
-    private static final String CACHE_ADVISOR_BEAN_NAME = JetCacheAnnotationParser.class.getPackage().getName() + ".internalCacheAdvisor";
+    private static final String CACHE_ADVISOR_BEAN_NAME = CacheAnnotationParser.class.getPackage().getName() + ".internalCacheAdvisor";
 
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
@@ -37,14 +37,14 @@ public class JetCacheAnnotationParser implements BeanDefinitionParser {
             configMapDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             String configMapName = parserContext.getReaderContext().registerWithGeneratedName(configMapDef);
 
-            RootBeanDefinition interceptorDef = new RootBeanDefinition(JetCacheInterceptor.class);
+            RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
             interceptorDef.setSource(eleSource);
             interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             interceptorDef.getPropertyValues().add("cacheProviderFactory",new RuntimeBeanReference("cacheProviderFactory"));
             interceptorDef.getPropertyValues().add("cacheConfigMap", new RuntimeBeanReference(configMapName));
             String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
-            RootBeanDefinition advisorDef = new RootBeanDefinition(JetCacheAdvisor.class);
+            RootBeanDefinition advisorDef = new RootBeanDefinition(CacheAdvisor.class);
             advisorDef.setSource(eleSource);
             advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             advisorDef.getPropertyValues().add("adviceBeanName", interceptorName);

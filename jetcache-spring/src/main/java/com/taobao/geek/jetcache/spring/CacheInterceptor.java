@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 /**
  * @author yeli.hl
  */
-public class JetCacheInterceptor implements MethodInterceptor {
+public class CacheInterceptor implements MethodInterceptor {
 
     private IdentityHashMap<Method, CacheAnnoConfig> cacheConfigMap;
     private CacheProviderFactory cacheProviderFactory;

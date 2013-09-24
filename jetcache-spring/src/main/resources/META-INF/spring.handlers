@@ -1,1 +1,1 @@
-http\://www.alibaba.com/schema/jetcache=com.taobao.geek.jetcache.spring.JetCacheNamespaceHandler
+http\://www.alibaba.com/schema/jetcache=com.taobao.geek.jetcache.spring.CacheNamespaceHandler

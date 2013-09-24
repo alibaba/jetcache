@@ -13,12 +13,12 @@ import org.junit.Test;
  * @author yeli.hl
  */
 //TODO 补充完整
-public class JetCachePointCutTest {
-    private JetCachePointcut pc;
+public class CachePointCutTest {
+    private CachePointcut pc;
 
     @Before
     public void setup(){
-        pc = new JetCachePointcut();
+        pc = new CachePointcut();
         pc.setCacheConfigMap(new IdentityHashMap());
     }
 

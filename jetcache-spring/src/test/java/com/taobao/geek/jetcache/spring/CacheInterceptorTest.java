@@ -10,6 +10,6 @@ import org.junit.Ignore;
  */
 //TODO 补充完整
 @Ignore
-public class JetCacheInterceptorTest {
+public class CacheInterceptorTest {
 
 }

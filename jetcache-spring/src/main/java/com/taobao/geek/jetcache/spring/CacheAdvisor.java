@@ -10,9 +10,9 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 /**
  * @author yeli.hl
  */
-public class JetCacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
+public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
-    private JetCachePointcut pointcut = new JetCachePointcut();
+    private CachePointcut pointcut = new CachePointcut();
 
     private IdentityHashMap cacheConfigMap;
 

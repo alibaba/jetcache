@@ -8,10 +8,10 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 /**
  * @author yeli.hl
  */
-public class JetCacheNamespaceHandler extends NamespaceHandlerSupport {
+public class CacheNamespaceHandler extends NamespaceHandlerSupport {
 
     @Override
     public void init() {
-        registerBeanDefinitionParser("annotation-driven", new JetCacheAnnotationParser());
+        registerBeanDefinitionParser("annotation-driven", new CacheAnnotationParser());
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.FactoryBean;
 /**
  * @author yeli.hl
  */
-public class JetCacheFactoryBean implements FactoryBean {
+public class CacheFactoryBean implements FactoryBean {
 
     private Object target;
     private CacheClient cacheClient;
