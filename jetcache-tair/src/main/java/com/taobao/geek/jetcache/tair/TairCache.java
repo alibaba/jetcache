@@ -33,8 +33,8 @@ public class TairCache implements Cache {
                 DataEntry dn = tairResult.getValue();
                 if (dn != null && dn.getValue() != null) {
                     code = CacheResultCode.SUCCESS;
-                    byte[] bytes = (byte[])dn.getValue();
-                    value = JSON.parse(bytes);
+                    byte[] bytes = (byte[]) dn.getValue();
+                    value = decode(bytes);
                 } else {
                     code = CacheResultCode.NOT_EXISTS;
                 }
@@ -58,7 +58,7 @@ public class TairCache implements Cache {
     public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value) {
         key = subArea + key;
         try {
-            byte[] bytes = JSON.toJSONBytes(value, SerializerFeature.WriteClassName);
+            byte[] bytes = encode(value);
             ResultCode tairCode = tairManager.put(namespace, key, bytes, 0, cacheConfig.getExpire());
             if (tairCode.getCode() == ResultCode.SUCCESS.getCode()) {
                 return CacheResultCode.SUCCESS;
@@ -68,6 +68,14 @@ public class TairCache implements Cache {
         } catch (Exception e) {
             return CacheResultCode.FAIL;
         }
+    }
+
+    byte[] encode(Object value) {
+        return JSON.toJSONBytes(value, SerializerFeature.WriteClassName);
+    }
+
+    Object decode(byte[] bytes) {
+        return JSON.parse(bytes);
     }
 
     public TairManager getTairManager() {
