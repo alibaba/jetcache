@@ -4,57 +4,118 @@
 package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
+import com.taobao.geek.jetcache.CacheType;
 import com.taobao.geek.jetcache.Cached;
+import com.taobao.geek.jetcache.EnableCache;
+import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
+
 /**
  * @author yeli.hl
  */
-//TODO 补充完整
 public class CachePointCutTest {
     private CachePointcut pc;
+    private IdentityHashMap<Method, CacheAnnoConfig> map;
 
     @Before
-    public void setup(){
+    public void setup() {
         pc = new CachePointcut();
-        pc.setCacheConfigMap(new IdentityHashMap());
+        map = new IdentityHashMap<Method, CacheAnnoConfig>();
+        pc.setCacheConfigMap(map);
     }
 
-    static interface I1 {
+    interface I1 {
         @Cached
         int foo();
     }
 
-    static class C1 implements I1{
-        public int foo(){
-           return 0;
+    class C1 implements I1 {
+        public int foo() {
+            return 0;
         }
     }
 
     @Test
     public void testMatches1() throws Exception {
-        Assert.assertTrue(pc.matches(I1.class.getMethod("foo"), C1.class));
-        Assert.assertTrue(pc.matches(C1.class.getMethod("foo"), C1.class));
+        Method m1 = I1.class.getMethod("foo");
+        Method m2 = C1.class.getMethod("foo");
+        Assert.assertTrue(pc.matches(m1, C1.class));
+        Assert.assertTrue(pc.matches(m2, C1.class));
+        Assert.assertTrue(pc.matches(m1, I1.class));
+        Assert.assertTrue(pc.matches(m2, I1.class));
+
+        Assert.assertFalse(map.get(m1).isEnableCacheContext());
+        Assert.assertFalse(map.get(m2).isEnableCacheContext());
+        Assert.assertNotNull(map.get(m1).getCacheConfig());
+        Assert.assertNotNull(map.get(m2).getCacheConfig());
     }
 
 
-    static interface I2 {
+    interface I2 {
         int foo();
     }
 
-    static class C2 implements I2{
+    class C2 implements I2 {
         @Cached
-        public int foo(){
+        public int foo() {
             return 0;
         }
     }
 
     @Test
     public void testMatches2() throws Exception {
-        Assert.assertTrue(pc.matches(I2.class.getMethod("foo"), C2.class));
-        Assert.assertTrue(pc.matches(C2.class.getMethod("foo"), C2.class));
+        Method m1 = I2.class.getMethod("foo");
+        Method m2 = C2.class.getMethod("foo");
+        Assert.assertTrue(pc.matches(m1, C2.class));
+        Assert.assertTrue(pc.matches(m2, C2.class));
+        Assert.assertTrue(pc.matches(m1, I2.class));
+        Assert.assertTrue(pc.matches(m2, I2.class));
+
+        Assert.assertFalse(map.get(m1).isEnableCacheContext());
+        Assert.assertFalse(map.get(m2).isEnableCacheContext());
+        Assert.assertNotNull(map.get(m1).getCacheConfig());
+        Assert.assertNotNull(map.get(m2).getCacheConfig());
+    }
+
+    interface I3_Parent {
+        @EnableCache
+        @Cached(enabled = false, area = "A1", expire = 1, cacheType = CacheType.BOTH, localLimit = 2, version = 10)
+        int foo();
+    }
+
+    interface I3 extends I3_Parent {
+        int foo();
+    }
+
+    class C3 implements I3 {
+        public int foo() {
+            return 0;
+        }
+    }
+
+    @Test
+    public void testMatches3() throws Exception {
+        Method m1 = I3_Parent.class.getMethod("foo");
+        Method m2 = I3.class.getMethod("foo");
+        Method m3 = C3.class.getMethod("foo");
+        Assert.assertTrue(pc.matches(m1, C3.class));
+        Assert.assertTrue(pc.matches(m2, C3.class));
+        Assert.assertTrue(pc.matches(m3, C3.class));
+
+        Assert.assertTrue(map.get(m1).isEnableCacheContext());
+        Assert.assertTrue(map.get(m2).isEnableCacheContext());
+        Assert.assertTrue(map.get(m3).isEnableCacheContext());
+        Assert.assertEquals("A1", map.get(m1).getCacheConfig().getArea());
+        Assert.assertEquals(false, map.get(m1).getCacheConfig().isEnabled());
+        Assert.assertEquals(1, map.get(m1).getCacheConfig().getExpire());
+        Assert.assertEquals(CacheType.BOTH, map.get(m1).getCacheConfig().getCacheType());
+        Assert.assertEquals(2, map.get(m1).getCacheConfig().getLocalLimit());
+        Assert.assertEquals(10, map.get(m1).getCacheConfig().getVersion());
+
     }
 
 }
