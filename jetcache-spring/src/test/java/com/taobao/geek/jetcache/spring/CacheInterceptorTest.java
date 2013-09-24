@@ -4,7 +4,6 @@
 package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
-import com.taobao.geek.jetcache.CacheClient;
 import com.taobao.geek.jetcache.CacheContext;
 import com.taobao.geek.jetcache.Cached;
 import com.taobao.geek.jetcache.Callback;
@@ -15,6 +14,7 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.*;
 
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 
 /**
  * @author yeli.hl
@@ -51,18 +51,18 @@ public class CacheInterceptorTest {
 
     @Test
     public void test1() throws Throwable {
-        final Method m1 = I1.class.getMethod("foo");
-        final C1 c1 = new C1();
-        pc.matches(m1, C1.class);
+        final Method m = I1.class.getMethod("foo");
+        final C1 c = new C1();
+        pc.matches(m, C1.class);
         final MethodInvocation mi = context.mock(MethodInvocation.class);
 
         context.checking(new Expectations() {
             {
                 try {
                     allowing(mi).getMethod();
-                    will(returnValue(m1));
+                    will(returnValue(m));
                     allowing(mi).getThis();
-                    will(returnValue(c1));
+                    will(returnValue(c));
                     allowing(mi).getArguments();
                     will(returnValue(null));
                     oneOf(mi).proceed();
@@ -123,5 +123,48 @@ public class CacheInterceptorTest {
                 interceptor.invoke(mi);
             }
         });
+    }
+
+    interface I3 {
+        @Cached
+        int foo() throws SQLException;
+    }
+
+    class C3 implements I3 {
+
+        public int foo() {
+            return 0;
+        }
+    }
+
+    @Test
+    public void test3() throws Throwable {
+        final Method m = I3.class.getMethod("foo");
+        final C3 c = new C3();
+        pc.matches(m, C3.class);
+        final MethodInvocation mi = context.mock(MethodInvocation.class);
+
+        context.checking(new Expectations() {
+            {
+                try {
+                    allowing(mi).getMethod();
+                    will(returnValue(m));
+                    allowing(mi).getThis();
+                    will(returnValue(c));
+                    allowing(mi).getArguments();
+                    will(returnValue(null));
+                    oneOf(mi).proceed();
+                    will(throwException(new SQLException()));
+                } catch (Throwable e) {
+                    Assert.fail();
+                }
+            }
+        });
+
+        try {
+            interceptor.invoke(mi);
+            Assert.fail();
+        } catch (SQLException e) {
+        }
     }
 }
