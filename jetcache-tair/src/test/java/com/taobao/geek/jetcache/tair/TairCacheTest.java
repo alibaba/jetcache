@@ -3,8 +3,6 @@
  */
 package com.taobao.geek.jetcache.tair;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.CacheResult;
 import com.taobao.geek.jetcache.CacheResultCode;
