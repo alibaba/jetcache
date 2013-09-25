@@ -9,6 +9,7 @@ package com.taobao.geek.jetcache;
 public class CacheResult {
     private CacheResultCode resultCode;
     private Object value;
+    private long expireTime;
 
     public CacheResult(CacheResultCode resultCode, Object value) {
         this.resultCode = resultCode;
@@ -33,5 +34,13 @@ public class CacheResult {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    public long getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(long expireTime) {
+        this.expireTime = expireTime;
     }
 }

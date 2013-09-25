@@ -32,9 +32,14 @@ public class TairCache implements Cache {
             if (tairResult.isSuccess()) {
                 DataEntry dn = tairResult.getValue();
                 if (dn != null && dn.getValue() != null) {
-                    code = CacheResultCode.SUCCESS;
                     byte[] bytes = (byte[]) dn.getValue();
-                    value = decode(bytes);
+                    TairValue tv = decode(bytes);
+                    if (System.currentTimeMillis() >= tv.e) {
+                        code = CacheResultCode.EXPIRED;
+                    } else {
+                        code = CacheResultCode.SUCCESS;
+                        value = tv.v;
+                    }
                 } else {
                     code = CacheResultCode.NOT_EXISTS;
                 }
@@ -58,7 +63,10 @@ public class TairCache implements Cache {
     public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value) {
         key = subArea + key;
         try {
-            byte[] bytes = encode(value);
+            TairValue tv = new TairValue();
+            tv.v = value;
+            tv.e = System.currentTimeMillis() + cacheConfig.getExpire() * 1000;
+            byte[] bytes = encode(tv);
             ResultCode tairCode = tairManager.put(namespace, key, bytes, 0, cacheConfig.getExpire());
             if (tairCode.getCode() == ResultCode.SUCCESS.getCode()) {
                 return CacheResultCode.SUCCESS;
@@ -70,12 +78,12 @@ public class TairCache implements Cache {
         }
     }
 
-    byte[] encode(Object value) {
+    byte[] encode(TairValue value) {
         return JSON.toJSONBytes(value, SerializerFeature.WriteClassName);
     }
 
-    Object decode(byte[] bytes) {
-        return JSON.parse(bytes);
+    TairValue decode(byte[] bytes) {
+        return (TairValue) JSON.parse(bytes);
     }
 
     public TairManager getTairManager() {

@@ -50,7 +50,11 @@ public class TairCacheTest {
                 oneOf(tairManager).get(20, "SA4K4");
                 will(throwException(new RuntimeException()));
                 oneOf(tairManager).get(20, "SA5K5");
-                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, new DataEntry(cache.encode("V")))));
+                DataEntry dn = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() + 100000, "V")));
+                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
+                oneOf(tairManager).get(20, "SA6K6");
+                DataEntry dn2 = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() -1, "V")));
+                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn2)));
             }
         });
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(null, "SA1", "K1").getResultCode());
@@ -60,6 +64,8 @@ public class TairCacheTest {
         CacheResult result = cache.get(null, "SA5", "K5");
         Assert.assertEquals(CacheResultCode.SUCCESS, result.getResultCode());
         Assert.assertEquals("V", result.getValue());
+
+        Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(null, "SA6", "K6").getResultCode());
     }
 
     @Test
@@ -68,9 +74,9 @@ public class TairCacheTest {
         cc.setExpire(200);
         context.checking(new Expectations() {
             {
-                oneOf(tairManager).put(20, "SA1K1", cache.encode("V1"), 0, cc.getExpire());
+                oneOf(tairManager).put(with(20), with("SA1K1"), with(any(byte[].class)), with(0), with(cc.getExpire()));
                 will(returnValue(ResultCode.SUCCESS));
-                oneOf(tairManager).put(20, "SA2K2", cache.encode("V2"), 0, cc.getExpire());
+                oneOf(tairManager).put(with(20), with("SA2K2"), with(any(byte[].class)), with(0), with(cc.getExpire()));
                 will(returnValue(ResultCode.CONNERROR));
             }
         });

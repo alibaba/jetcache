@@ -35,7 +35,7 @@ public class LRUMapCache implements Cache {
                 if (cacheValue == null) {
                     code = CacheResultCode.NOT_EXISTS;
                 } else {
-                    if ((System.currentTimeMillis() - cacheValue.timestamp) / 1000 >= cacheConfig.getExpire()) {
+                    if (System.currentTimeMillis() - cacheValue.expireTime >= 0) {
                         code = CacheResultCode.EXPIRED;
                     } else {
                         code = CacheResultCode.SUCCESS;
@@ -54,7 +54,7 @@ public class LRUMapCache implements Cache {
         Map<String, SoftReference<LRUMapCacheCacheObject>> map = getCacheMap(cacheConfig, subArea);
         LRUMapCacheCacheObject cacheValue = new LRUMapCacheCacheObject();
         cacheValue.value = value;
-        cacheValue.timestamp = System.currentTimeMillis();
+        cacheValue.expireTime = System.currentTimeMillis() + cacheConfig.getExpire() * 1000;
         SoftReference<LRUMapCacheCacheObject> ref = new SoftReference<LRUMapCacheCacheObject>(cacheValue);
         map.put(key, ref);
         return CacheResultCode.SUCCESS;
@@ -80,6 +80,6 @@ public class LRUMapCache implements Cache {
 
 class LRUMapCacheCacheObject {
     Object value;
-    long timestamp;
+    long expireTime;
 }
 
