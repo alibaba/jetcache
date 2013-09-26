@@ -15,7 +15,7 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CachePointCutTest {
     private CachePointcut pc;

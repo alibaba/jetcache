@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class LRUMapCache implements Cache {
 

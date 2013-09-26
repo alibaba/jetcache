@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache;
 import java.lang.annotation.*;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

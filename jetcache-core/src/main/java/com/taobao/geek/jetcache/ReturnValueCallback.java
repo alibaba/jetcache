@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface ReturnValueCallback<T> {
     public T execute() throws Throwable;

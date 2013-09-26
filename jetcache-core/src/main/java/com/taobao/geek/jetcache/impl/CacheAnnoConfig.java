@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache.impl;
 import com.taobao.geek.jetcache.CacheConfig;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheAnnoConfig {
     private CacheConfig cacheConfig;

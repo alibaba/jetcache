@@ -15,7 +15,7 @@ import com.taobao.tair.ResultCode;
 import com.taobao.tair.TairManager;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class TairCache implements Cache {
 

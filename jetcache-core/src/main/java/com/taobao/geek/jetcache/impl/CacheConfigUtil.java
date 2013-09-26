@@ -10,7 +10,7 @@ import com.taobao.geek.jetcache.EnableCache;
 import java.lang.reflect.Method;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheConfigUtil {
     public static CacheConfig parseCacheConfig(Method m) {

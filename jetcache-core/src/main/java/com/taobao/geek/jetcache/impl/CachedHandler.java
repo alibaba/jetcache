@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 class CachedHandler implements InvocationHandler {
 

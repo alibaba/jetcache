@@ -8,7 +8,7 @@ import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 

@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface Invoker {
     public Object invoke() throws Throwable;

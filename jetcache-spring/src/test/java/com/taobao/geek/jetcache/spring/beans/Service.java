@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache.spring.beans;
 import com.taobao.geek.jetcache.Cached;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface Service {
     int count();

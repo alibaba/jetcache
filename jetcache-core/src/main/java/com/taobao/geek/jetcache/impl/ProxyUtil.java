@@ -13,7 +13,7 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 class ProxyUtil {
     public static <T> T getProxy(T target, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {

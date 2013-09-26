@@ -7,7 +7,7 @@ import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.local.LRUMapCache;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheProvider {
 

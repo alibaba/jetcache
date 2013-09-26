@@ -18,7 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class TairCacheTest {
 

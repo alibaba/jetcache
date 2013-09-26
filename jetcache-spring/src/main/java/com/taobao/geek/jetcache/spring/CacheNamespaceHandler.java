@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache.spring;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheNamespaceHandler extends NamespaceHandlerSupport {
 

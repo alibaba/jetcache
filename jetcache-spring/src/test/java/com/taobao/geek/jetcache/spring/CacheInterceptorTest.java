@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import java.sql.SQLException;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @Ignore
 public class CacheInterceptorTest {

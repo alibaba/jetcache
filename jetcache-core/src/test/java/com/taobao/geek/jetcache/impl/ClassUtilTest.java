@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class ClassUtilTest {
 

@@ -7,7 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.taobao.geek.jetcache.KeyGenerator;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 class DefaultKeyGenerator implements KeyGenerator {
 

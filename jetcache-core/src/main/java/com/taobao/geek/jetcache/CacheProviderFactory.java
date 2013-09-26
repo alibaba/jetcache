@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache;
 import java.util.Map;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheProviderFactory {
 

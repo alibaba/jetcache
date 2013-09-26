@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache;
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheClient {
 

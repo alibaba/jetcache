@@ -14,7 +14,7 @@ import org.aopalliance.intercept.MethodInvocation;
 import java.lang.reflect.Method;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInterceptor implements MethodInterceptor {
 

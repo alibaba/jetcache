@@ -7,7 +7,7 @@ import com.taobao.geek.jetcache.CacheClient;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
- * @author yeli.hl
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheFactoryBean implements FactoryBean {
 
