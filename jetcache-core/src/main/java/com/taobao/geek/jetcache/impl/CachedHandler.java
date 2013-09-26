@@ -116,9 +116,10 @@ class CachedHandler implements InvocationHandler {
             cacheProviderFactory.getCacheMonitor().onGet(cc, subArea, key, r.localResult, r.remoteResult);
         }
 
+        boolean hit = r.localResult == CacheResultCode.SUCCESS || r.remoteResult == CacheResultCode.SUCCESS;
         r.localResult = null;
         r.remoteResult = null;
-        if (r.value != null) {
+        if (hit) {
             if (r.needUpdateLocal) {
                 r.localResult = cacheProvider.getLocalCache().put(cc, subArea, key, r.value);
             }
@@ -135,7 +136,7 @@ class CachedHandler implements InvocationHandler {
                 r.remoteResult = cacheProvider.getRemoteCache().put(cc, subArea, key, r.value);
             }
         }
-        if (cacheProviderFactory.getCacheMonitor() != null) {
+        if (cacheProviderFactory.getCacheMonitor() != null && (r.localResult != null || r.remoteResult != null)) {
             cacheProviderFactory.getCacheMonitor().onPut(cc, subArea, key, r.value, r.localResult, r.remoteResult);
         }
         return r.value;
