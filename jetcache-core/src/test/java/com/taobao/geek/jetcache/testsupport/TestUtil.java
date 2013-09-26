@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-23 09:36
  */
-package com.taobao.geek.jetcache.support;
+package com.taobao.geek.jetcache.testsupport;
 
 import com.taobao.geek.jetcache.CacheProvider;
 import com.taobao.geek.jetcache.CacheProviderFactory;

@@ -86,10 +86,13 @@ class CachedHandler implements InvocationHandler {
         Cache localCache = cacheProvider.getLocalCache();
         Cache remoteCache = cacheProvider.getRemoteCache();
         GetCacheResult r = new GetCacheResult();
+        boolean localHit = false;
+        boolean remoteHit = false;
         if (cc.getCacheType() == CacheType.REMOTE) {
             CacheResult result = remoteCache.get(cc, subArea, key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
+                remoteHit = true;
             } else {
                 r.needUpdateRemote = true;
             }
@@ -97,17 +100,22 @@ class CachedHandler implements InvocationHandler {
             CacheResult result = localCache.get(cc, subArea, key);
             if (result.isSuccess()) {
                 r.value = result.getValue();
+                localHit = true;
             } else {
                 r.needUpdateLocal = true;
                 if (cc.getCacheType() == CacheType.BOTH) {
                     result = remoteCache.get(cc, subArea, key);
                     if (result.isSuccess()) {
                         r.value = result.getValue();
+                        remoteHit = true;
                     } else {
                         r.needUpdateRemote = true;
                     }
                 }
             }
+        }
+        if (cacheProviderFactory.getCacheMonitor() != null) {
+            cacheProviderFactory.getCacheMonitor().onGet(cc, subArea, key, localHit, remoteHit);
         }
 
 

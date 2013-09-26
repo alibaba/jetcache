@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-22 16:54
  */
-package com.taobao.geek.jetcache.support;
+package com.taobao.geek.jetcache.testsupport;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;

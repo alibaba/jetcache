@@ -4,10 +4,9 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.*;
+import com.taobao.geek.jetcache.support.DefaultKeyGenerator;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.HashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

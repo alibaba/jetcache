@@ -11,6 +11,7 @@ import java.util.Map;
 public class CacheProviderFactory {
 
     private final Map<String, CacheProvider> providerMap;
+    private CacheMonitor cacheMonitor;
 
     public CacheProviderFactory(Map<String, CacheProvider> providerMap) {
         this.providerMap = providerMap;
@@ -24,4 +25,11 @@ public class CacheProviderFactory {
         return cw;
     }
 
+    public CacheMonitor getCacheMonitor() {
+        return cacheMonitor;
+    }
+
+    public void setCacheMonitor(CacheMonitor cacheMonitor) {
+        this.cacheMonitor = cacheMonitor;
+    }
 }

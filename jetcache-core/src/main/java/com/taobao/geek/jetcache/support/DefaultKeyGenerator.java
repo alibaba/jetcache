@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-10 15:45
  */
-package com.taobao.geek.jetcache.impl;
+package com.taobao.geek.jetcache.support;
 
 import com.alibaba.fastjson.JSON;
 import com.taobao.geek.jetcache.KeyGenerator;
@@ -9,7 +9,7 @@ import com.taobao.geek.jetcache.KeyGenerator;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class DefaultKeyGenerator implements KeyGenerator {
+public class DefaultKeyGenerator implements KeyGenerator {
 
     @Override
     public String getKey(Object[] args) {

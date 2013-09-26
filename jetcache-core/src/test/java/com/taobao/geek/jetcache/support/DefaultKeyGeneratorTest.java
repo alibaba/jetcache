@@ -1,9 +1,10 @@
 /**
  * Created on  13-09-23 17:02
  */
-package com.taobao.geek.jetcache.impl;
+package com.taobao.geek.jetcache.support;
 
-import com.taobao.geek.jetcache.support.DynamicQuery;
+import com.taobao.geek.jetcache.support.DefaultKeyGenerator;
+import com.taobao.geek.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;
 
