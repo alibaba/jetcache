@@ -120,6 +120,19 @@ public class CacheHandlerTest {
         }
     }
 
+    @Test
+    public void testStaticInvokeNull() throws Throwable {
+        Method method = CountClass.class.getMethod("countNull");
+        Integer x1, x2, x3;
+
+        x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        Assert.assertNull(x1);
+        Assert.assertNull(x2);
+        Assert.assertNull(x3);
+    }
+
     private void assertEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);

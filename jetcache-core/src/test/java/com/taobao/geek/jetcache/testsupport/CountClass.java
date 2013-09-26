@@ -6,7 +6,7 @@ package com.taobao.geek.jetcache.testsupport;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CountClass implements Count{
+public class CountClass implements Count {
     private int count;
 
     public int count() {
@@ -23,5 +23,12 @@ public class CountClass implements Count{
 
     public int count(DynamicQuery q, int p) {
         return q.hashCode() + p + count++;
+    }
+
+    private boolean returnNull = false;
+
+    public Integer countNull() {
+        returnNull = !returnNull;
+        return returnNull ? null : count++;
     }
 }

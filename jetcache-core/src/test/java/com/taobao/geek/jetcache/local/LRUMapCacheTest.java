@@ -41,8 +41,7 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    //测试淘汰
-    public void test2(){
+    public void testLRU1(){
         cc.setLocalLimit(2);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2"));
@@ -53,8 +52,7 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    //测试淘汰
-    public void test3(){
+    public void testLRU2(){
         cc.setLocalLimit(2);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2"));
@@ -66,12 +64,18 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    //测试淘汰
-    public void test4()throws Exception{
+    public void testLRU3()throws Exception{
         cc.setExpire(1);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
         Thread.sleep(1001);
         Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(cc, "S1", "K1").getResultCode());
+    }
+
+    @Test
+    public void testNull(){
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", null));
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
+        Assert.assertNull(cache.get(cc, "S1", "K1").getValue());
     }
 }

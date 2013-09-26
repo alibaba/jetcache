@@ -51,7 +51,7 @@ public class TairCacheTest {
                 DataEntry dn = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() + 100000, "V")));
                 will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
                 oneOf(tairManager).get(20, "SA6K6");
-                DataEntry dn2 = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() -1, "V")));
+                DataEntry dn2 = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() - 1, "V")));
                 will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn2)));
             }
         });
@@ -69,7 +69,6 @@ public class TairCacheTest {
     @Test
     public void testPut() {
         final CacheConfig cc = new CacheConfig();
-        cc.setExpire(200);
         context.checking(new Expectations() {
             {
                 oneOf(tairManager).put(with(20), with("SA1K1"), with(any(byte[].class)), with(0), with(cc.getExpire()));
@@ -81,4 +80,23 @@ public class TairCacheTest {
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "SA1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.FAIL, cache.put(cc, "SA2", "K2", "V2"));
     }
+
+    @Test
+    public void testNull() {
+        final CacheConfig cc = new CacheConfig();
+        context.checking(new Expectations() {
+            {
+                oneOf(tairManager).put(with(20), with("SA1K1"), with(any(byte[].class)), with(0), with(cc.getExpire()));
+                will(returnValue(ResultCode.SUCCESS));
+                oneOf(tairManager).get(20, "SA1K1");
+                DataEntry dn = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() + 100000, null)));
+                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
+            }
+        });
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "SA1", "K1", null));
+        CacheResult cr = cache.get(cc, "SA1", "K1");
+        Assert.assertEquals(CacheResultCode.SUCCESS, cr.getResultCode());
+        Assert.assertNull(cr.getValue());
+    }
+
 }
