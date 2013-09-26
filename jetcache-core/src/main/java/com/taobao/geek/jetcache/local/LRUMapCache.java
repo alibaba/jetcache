@@ -7,6 +7,7 @@ import com.taobao.geek.jetcache.Cache;
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.CacheResult;
 import com.taobao.geek.jetcache.CacheResultCode;
+import com.taobao.geek.jetcache.support.CopyOnWriteHashMap;
 import org.apache.commons.collections.map.LRUMap;
 
 import java.lang.ref.SoftReference;
@@ -19,7 +20,7 @@ import java.util.Map;
  */
 public class LRUMapCache implements Cache {
 
-    private HashMap<String, Map> areaMap = new HashMap<String, Map>(); //copy on write
+    private CopyOnWriteHashMap<String, Map> areaMap = new CopyOnWriteHashMap<String, Map>();
 
     @Override
     public CacheResult get(CacheConfig cacheConfig, String subArea, String key) {
@@ -69,9 +70,7 @@ public class LRUMapCache implements Cache {
         Map<String, SoftReference<LRUMapCacheCacheObject>> map = areaMap.get(areaKey);
         if (map == null) {
             map = Collections.synchronizedMap(new LRUMap(cacheConfig.getLocalLimit()));
-            HashMap<String, Map> areaMapCopy = (HashMap<String, Map>) areaMap.clone();
-            areaMapCopy.put(areaKey, map);
-            areaMap = areaMapCopy;
+            areaMap.put(areaKey, map);
         }
         return map;
     }

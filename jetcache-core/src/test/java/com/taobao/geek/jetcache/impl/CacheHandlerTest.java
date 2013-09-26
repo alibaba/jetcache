@@ -7,9 +7,11 @@ import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.CacheProviderFactory;
 import com.taobao.geek.jetcache.CacheType;
 import com.taobao.geek.jetcache.Callback;
+import com.taobao.geek.jetcache.support.DefaultCacheMonitor;
 import com.taobao.geek.jetcache.testsupport.CountClass;
 import com.taobao.geek.jetcache.testsupport.DynamicQuery;
 import com.taobao.geek.jetcache.testsupport.TestUtil;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,12 +27,20 @@ public class CacheHandlerTest {
     private CacheProviderFactory cacheProviderFactory;
     private CacheConfig cacheConfig;
     private CountClass count;
+    private DefaultCacheMonitor monitor;
 
     @Before
     public void setup() {
         cacheProviderFactory = TestUtil.getCacheProviderFactory();
         cacheConfig = new CacheConfig();
         count = new CountClass();
+        monitor = new DefaultCacheMonitor();
+        cacheProviderFactory.setCacheMonitor(monitor);
+    }
+
+    @After
+    public void close(){
+        System.out.println(monitor.getStatText());
     }
 
     private int invoke(Method method, Object[] params) throws Throwable {
