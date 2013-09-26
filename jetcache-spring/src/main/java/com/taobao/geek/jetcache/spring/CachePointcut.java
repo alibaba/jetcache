@@ -62,10 +62,10 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
 
     private void parseByTargetClass(CacheAnnoConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {
         try {
-            Method method = clazz.getMethod(name, paramTypes);
+            Method method = clazz.getDeclaredMethod(name, paramTypes);
             CacheConfigUtil.parse(cac, method);
         } catch (NoSuchMethodException e) {
-            //TODO 这样效率太低
+            //TODO optimize it
         }
         if (!clazz.isInterface() && clazz.getSuperclass() != null) {
             parseByTargetClass(cac, clazz.getSuperclass(), name, paramTypes);
