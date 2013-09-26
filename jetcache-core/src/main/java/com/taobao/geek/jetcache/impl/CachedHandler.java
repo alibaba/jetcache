@@ -17,7 +17,6 @@ class CachedHandler implements InvocationHandler {
     private Object src;
     private CacheProviderFactory cacheProviderFactory;
 
-    // 下面两个是二选一的
     private CacheConfig cacheConfig;
     private HashMap<String, CacheAnnoConfig> configMap;
 

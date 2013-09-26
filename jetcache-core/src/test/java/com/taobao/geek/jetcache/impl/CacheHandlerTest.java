@@ -37,7 +37,7 @@ public class CacheHandlerTest {
         return (Integer) CachedHandler.invoke(null, count, method, params, cacheProviderFactory, cacheConfig);
     }
 
-    // 测试基本功能
+    // basic test
     @Test
     public void testStaticInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
@@ -63,7 +63,7 @@ public class CacheHandlerTest {
         Assert.assertNotEquals(x1, X2);
     }
 
-    // 测试基本功能
+    // basic test
     @Test
     public void testStaticInvoke2() throws Throwable {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
@@ -80,7 +80,7 @@ public class CacheHandlerTest {
         Assert.assertEquals(x3, x6);
     }
 
-    // 测试基本功能
+    // basic test
     @Test
     public void testStaticInvoke3() throws Throwable {
         DynamicQuery q1 = new DynamicQuery();
@@ -136,7 +136,7 @@ public class CacheHandlerTest {
         Assert.assertNotEquals(x1, x2);
     }
 
-    // 测试线程上的enableCache开关
+    // test enableCache
     @Test
     public void testStaticInvoke_CacheContext() throws Throwable {
         final Method method = CountClass.class.getMethod("count");

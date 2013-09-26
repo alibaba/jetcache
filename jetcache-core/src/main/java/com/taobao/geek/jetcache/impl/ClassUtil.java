@@ -18,7 +18,7 @@ class ClassUtil {
     private static IdentityHashMap<Method, String> methodMap = new IdentityHashMap<Method, String>();
 
     public static String getSubArea(CacheConfig cacheConfig, Method method) {
-        // TODO 对参数的类型发生变化做出感知
+        // TODO invalid cache when param type changed
 
         String prefix = methodMap.get(method);
 

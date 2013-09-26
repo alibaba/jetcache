@@ -212,7 +212,7 @@ public class ProxyUtilTest {
     }
 
     @Test
-    //enabled=false+EnableCache（在调用者上enable）
+    //enabled=false+EnableCache（enable in caller）
     public void testGetProxyByAnnotation7() {
         I7_1 c1_1 = new C7_1();
         I7_1 c1_2 = ProxyUtil.getProxyByAnnotation(c1_1, cacheProviderFactory);
