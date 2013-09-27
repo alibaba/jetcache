@@ -12,10 +12,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Cached {
-    public abstract String area() default CacheConsts.DEFAULT_AREA;
-    public abstract boolean enabled() default CacheConsts.DEFAULT_ENABLED;
-    public abstract int expire() default CacheConsts.DEFAULT_EXPIRE;
+    public abstract String area() default CacheConfig.DEFAULT_AREA;
+    public abstract boolean enabled() default CacheConfig.DEFAULT_ENABLED;
+    public abstract int expire() default CacheConfig.DEFAULT_EXPIRE;
     public abstract CacheType cacheType() default CacheType.REMOTE;
-    public abstract int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
-    public abstract int version() default 1;
+    public abstract int localLimit() default CacheConfig.DEFAULT_LOCAL_LIMIT;
+    public abstract int version() default CacheConfig.DEFAULT_VERSION;
+    public abstract boolean cacheNullValue() default CacheConfig.DEFAULT_CACHE_NULL_VALUE;
 }

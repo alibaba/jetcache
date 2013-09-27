@@ -91,8 +91,6 @@ class CachedHandler implements InvocationHandler {
             r.remoteResult = result.getResultCode();
             if (result.isSuccess()) {
                 r.value = result.getValue();
-            } else {
-                r.needUpdateRemote = true;
             }
         } else {
             CacheResult result = cacheProvider.getLocalCache().get(cc, subArea, key);
@@ -100,14 +98,11 @@ class CachedHandler implements InvocationHandler {
             if (result.isSuccess()) {
                 r.value = result.getValue();
             } else {
-                r.needUpdateLocal = true;
                 if (cc.getCacheType() == CacheType.BOTH) {
                     result = cacheProvider.getRemoteCache().get(cc, subArea, key);
                     r.remoteResult = result.getResultCode();
                     if (result.isSuccess()) {
                         r.value = result.getValue();
-                    } else {
-                        r.needUpdateRemote = true;
                     }
                 }
             }
@@ -117,29 +112,39 @@ class CachedHandler implements InvocationHandler {
         }
 
         boolean hit = r.localResult == CacheResultCode.SUCCESS || r.remoteResult == CacheResultCode.SUCCESS;
+
+        if (!hit) {
+            r.value = invoke(invoker, method, src, args);
+            r.needUpdateLocal = r.localResult != null && (r.localResult == CacheResultCode.NOT_EXISTS || r.localResult == CacheResultCode.EXPIRED);
+            r.needUpdateRemote = r.remoteResult != null && (r.remoteResult == CacheResultCode.NOT_EXISTS || r.remoteResult == CacheResultCode.EXPIRED);
+        } else if (r.value == null && !cc.isCacheNullValue()) {
+            r.value = invoke(invoker, method, src, args);
+            r.needUpdateLocal = r.localResult != null;
+            r.needUpdateRemote = r.remoteResult != null;
+        } else {
+            r.needUpdateLocal = r.localResult != null;
+        }
         r.localResult = null;
         r.remoteResult = null;
-        if (hit) {
-            if (r.needUpdateLocal) {
-                r.localResult = cacheProvider.getLocalCache().put(cc, subArea, key, r.value);
-            }
-        } else {
-            if (invoker == null) {
-                r.value = method.invoke(src, args);
-            } else {
-                r.value = invoker.invoke();
-            }
-            if (r.needUpdateLocal) {
-                r.localResult = cacheProvider.getLocalCache().put(cc, subArea, key, r.value);
-            }
-            if (r.needUpdateRemote) {
-                r.remoteResult = cacheProvider.getRemoteCache().put(cc, subArea, key, r.value);
-            }
+        if (r.needUpdateLocal) {
+            r.localResult = cacheProvider.getLocalCache().put(cc, subArea, key, r.value);
+        }
+        if (r.needUpdateRemote) {
+            r.remoteResult = cacheProvider.getRemoteCache().put(cc, subArea, key, r.value);
         }
         if (cacheProviderFactory.getCacheMonitor() != null && (r.localResult != null || r.remoteResult != null)) {
             cacheProviderFactory.getCacheMonitor().onPut(cc, subArea, key, r.value, r.localResult, r.remoteResult);
         }
         return r.value;
     }
+
+    private static Object invoke(Invoker invoker, Method method, Object src, Object[] args) throws Throwable {
+        if (invoker == null) {
+            return method.invoke(src, args);
+        } else {
+            return invoker.invoke();
+        }
+    }
+
 
 }

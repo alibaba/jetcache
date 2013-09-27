@@ -25,6 +25,7 @@ public class CacheConfigUtil {
         cc.setExpire(anno.expire());
         cc.setLocalLimit(anno.localLimit());
         cc.setVersion(anno.version());
+        cc.setCacheNullValue(anno.cacheNullValue());
         return cc;
     }
 

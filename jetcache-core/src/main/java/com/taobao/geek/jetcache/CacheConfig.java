@@ -7,12 +7,22 @@ package com.taobao.geek.jetcache;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheConfig {
-    private String area = CacheConsts.DEFAULT_AREA;
-    private boolean enabled = CacheConsts.DEFAULT_ENABLED;
-    private int expire = CacheConsts.DEFAULT_EXPIRE;
-    private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
-    private int localLimit = CacheConsts.DEFAULT_LOCAL_LIMIT;
-    private int version = CacheConsts.DEFAULT_VERSION;
+
+    public static final String DEFAULT_AREA = "";
+    public static final boolean DEFAULT_ENABLED = true;
+    public static final int DEFAULT_EXPIRE = 600;
+    public static final CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;
+    public static final int DEFAULT_LOCAL_LIMIT = 100;
+    public static final int DEFAULT_VERSION = 1;
+    public static final boolean DEFAULT_CACHE_NULL_VALUE = false;
+
+    private String area = DEFAULT_AREA;
+    private boolean enabled = DEFAULT_ENABLED;
+    private int expire = DEFAULT_EXPIRE;
+    private CacheType cacheType = DEFAULT_CACHE_TYPE;
+    private int localLimit = DEFAULT_LOCAL_LIMIT;
+    private int version = DEFAULT_VERSION;
+    private boolean cacheNullValue = DEFAULT_CACHE_NULL_VALUE;
 
     @Override
     public boolean equals(Object obj) {
@@ -23,7 +33,7 @@ public class CacheConfig {
         return equals(area, cc.area) &&
                 enabled == cc.enabled && expire == cc.expire
                 && equals(cacheType, cc.cacheType) && localLimit == cc.localLimit
-                && version == cc.version;
+                && version == cc.version && cacheNullValue == cc.cacheNullValue;
     }
 
     @Override
@@ -40,7 +50,10 @@ public class CacheConfig {
         hash =  hash << 4 + version;
 
         if (enabled) {
-            hash = ~hash;
+            hash += 11;
+        }
+        if(cacheNullValue){
+            hash += 101;
         }
         return hash;
     }
@@ -99,5 +112,13 @@ public class CacheConfig {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public boolean isCacheNullValue() {
+        return cacheNullValue;
+    }
+
+    public void setCacheNullValue(boolean cacheNullValue) {
+        this.cacheNullValue = cacheNullValue;
     }
 }

@@ -40,7 +40,7 @@ public class CacheHandlerTest {
 
     @After
     public void close(){
-        System.out.println(monitor.getStatText());
+        //System.out.println(monitor.getStatText());
     }
 
     private int invoke(Method method, Object[] params) throws Throwable {
@@ -50,6 +50,16 @@ public class CacheHandlerTest {
     // basic test
     @Test
     public void testStaticInvoke1() throws Throwable {
+        cacheConfig.setCacheType(CacheType.REMOTE);
+        testStaticInvoke1_impl();
+        setup();
+        cacheConfig.setCacheType(CacheType.LOCAL);
+        testStaticInvoke1_impl();
+        setup();
+        cacheConfig.setCacheType(CacheType.BOTH);
+        testStaticInvoke1_impl();
+    }
+    private void testStaticInvoke1_impl() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
 
@@ -76,6 +86,16 @@ public class CacheHandlerTest {
     // basic test
     @Test
     public void testStaticInvoke2() throws Throwable {
+        cacheConfig.setCacheType(CacheType.REMOTE);
+        testStaticInvoke2_impl();
+        setup();
+        cacheConfig.setCacheType(CacheType.LOCAL);
+        testStaticInvoke2_impl();
+        setup();
+        cacheConfig.setCacheType(CacheType.BOTH);
+        testStaticInvoke2_impl();
+    }
+    private void testStaticInvoke2_impl() throws Throwable {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
         int x1, x2, x3, x4, x5, x6;
 
@@ -93,6 +113,16 @@ public class CacheHandlerTest {
     // basic test
     @Test
     public void testStaticInvoke3() throws Throwable {
+        cacheConfig.setCacheType(CacheType.REMOTE);
+        testStaticInvoke3_impl();
+        setup();
+        cacheConfig.setCacheType(CacheType.LOCAL);
+        testStaticInvoke3_impl();
+        setup();
+        cacheConfig.setCacheType(CacheType.BOTH);
+        testStaticInvoke3_impl();
+    }
+    private void testStaticInvoke3_impl() throws Throwable {
         DynamicQuery q1 = new DynamicQuery();
         DynamicQuery q2 = new DynamicQuery();
         q2.setId(1000);
@@ -129,16 +159,23 @@ public class CacheHandlerTest {
             }
         }
     }
-
     @Test
     public void testStaticInvokeNull() throws Throwable {
         Method method = CountClass.class.getMethod("countNull");
         Integer x1, x2, x3;
-
         x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
         x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
         x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
-        Assert.assertNull(x1);
+        Assert.assertNull(x1);//null, not cached
+        Assert.assertNotNull(x2);
+        Assert.assertNotNull(x3);//cached
+
+        setup();
+        cacheConfig.setCacheNullValue(true);
+        x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        Assert.assertNull(x1);//null,cached
         Assert.assertNull(x2);
         Assert.assertNull(x3);
     }
