@@ -19,51 +19,51 @@ class CacheInvokeContext {
     CacheProviderFactory cacheProviderFactory;
     CacheConfig cacheConfig;
 
-    Invoker getInvoker() {
+    public Invoker getInvoker() {
         return invoker;
     }
 
-    void setInvoker(Invoker invoker) {
+    public void setInvoker(Invoker invoker) {
         this.invoker = invoker;
     }
 
-    Object getSrc() {
+    public Object getSrc() {
         return src;
     }
 
-    void setSrc(Object src) {
+    public void setSrc(Object src) {
         this.src = src;
     }
 
-    Method getMethod() {
+    public Method getMethod() {
         return method;
     }
 
-    void setMethod(Method method) {
+    public void setMethod(Method method) {
         this.method = method;
     }
 
-    Object[] getArgs() {
+    public Object[] getArgs() {
         return args;
     }
 
-    void setArgs(Object[] args) {
+    public void setArgs(Object[] args) {
         this.args = args;
     }
 
-    CacheProviderFactory getCacheProviderFactory() {
+    public CacheProviderFactory getCacheProviderFactory() {
         return cacheProviderFactory;
     }
 
-    void setCacheProviderFactory(CacheProviderFactory cacheProviderFactory) {
+    public void setCacheProviderFactory(CacheProviderFactory cacheProviderFactory) {
         this.cacheProviderFactory = cacheProviderFactory;
     }
 
-    CacheConfig getCacheConfig() {
+    public CacheConfig getCacheConfig() {
         return cacheConfig;
     }
 
-    void setCacheConfig(CacheConfig cacheConfig) {
+    public void setCacheConfig(CacheConfig cacheConfig) {
         this.cacheConfig = cacheConfig;
     }
 }
