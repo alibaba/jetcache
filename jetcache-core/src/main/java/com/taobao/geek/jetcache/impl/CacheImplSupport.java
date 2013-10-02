@@ -37,7 +37,7 @@ public class CacheImplSupport {
                                 CacheConfig cc) throws Throwable {
         CacheInvokeContext context = new CacheInvokeContext();
         context.invoker = invoker;
-        context.src = src;
+        context.target = src;
         context.method = method;
         context.args = args;
         context.cacheProviderFactory = cacheProviderFactory;

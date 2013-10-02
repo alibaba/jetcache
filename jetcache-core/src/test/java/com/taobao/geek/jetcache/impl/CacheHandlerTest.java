@@ -45,7 +45,7 @@ public class CacheHandlerTest {
 
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
         CacheInvokeContext c = new CacheInvokeContext();
-        c.src = count;
+        c.target = count;
         c.cacheProviderFactory = cacheProviderFactory;
         c.cacheConfig = cacheConfig;
         c.invoker = invoker;

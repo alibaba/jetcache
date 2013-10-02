@@ -55,7 +55,7 @@ class CacheHandler implements InvocationHandler {
             context.args = args;
             context.cacheProviderFactory = cacheProviderFactory;
             context.method = method;
-            context.src = src;
+            context.target = src;
 
             if (enableCacheFlag) {
                 try {
@@ -176,7 +176,7 @@ class CacheHandler implements InvocationHandler {
 
     private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {
         if (context.invoker == null) {
-            return context.method.invoke(context.src, context.args);
+            return context.method.invoke(context.target, context.args);
         } else {
             return context.invoker.invoke();
         }

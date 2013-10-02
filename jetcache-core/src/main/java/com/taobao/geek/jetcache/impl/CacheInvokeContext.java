@@ -14,7 +14,7 @@ import java.lang.reflect.Method;
  */
 class CacheInvokeContext {
     Invoker invoker;
-    Object src;
+    Object target;
     Method method;
     Object[] args;
     CacheProviderFactory cacheProviderFactory;
@@ -35,12 +35,12 @@ class CacheInvokeContext {
         this.invoker = invoker;
     }
 
-    public Object getSrc() {
-        return src;
+    public Object getTarget() {
+        return target;
     }
 
-    public void setSrc(Object src) {
-        this.src = src;
+    public void setTarget(Object target) {
+        this.target = target;
     }
 
     public Method getMethod() {
