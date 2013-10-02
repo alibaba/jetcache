@@ -43,18 +43,18 @@ class CachedHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheInvokeContext context = null;
-        boolean enableCacheInContext = false;
+        boolean enableCacheFlag = false;
         if (cacheConfig != null) {
             context = new CacheInvokeContext();
             context.cacheConfig = cacheConfig;
-            enableCacheInContext = false;
+            enableCacheFlag = false;
         } else {
             String sig = ClassUtil.getMethodSig(method);
             CacheAnnoConfig cac = configMap.get(sig);
             if (cac != null) {
                 context = new CacheInvokeContext();
                 context.cacheConfig = cac.getCacheConfig();
-                enableCacheInContext = cac.isEnableCacheContext();
+                enableCacheFlag = cac.isEnableCacheContext();
             }
         }
         if (context == null) {
@@ -65,7 +65,7 @@ class CachedHandler implements InvocationHandler {
             context.method = method;
             context.src = src;
 
-            if (enableCacheInContext) {
+            if (enableCacheFlag) {
                 try {
                     CacheContextSupport.enable();
                     return invoke(context);
@@ -82,11 +82,7 @@ class CachedHandler implements InvocationHandler {
         if (context.cacheConfig != null && (context.cacheConfig.isEnabled() || CacheContextSupport.isEnabled())) {
             return getFromCache(context);
         } else {
-            if (context.invoker == null) {
-                return context.method.invoke(context.src, context.args);
-            } else {
-                return context.invoker.invoke();
-            }
+            return invokeOrigin(context);
         }
     }
 
@@ -124,11 +120,11 @@ class CachedHandler implements InvocationHandler {
         boolean hit = r.localResult == CacheResultCode.SUCCESS || r.remoteResult == CacheResultCode.SUCCESS;
 
         if (!hit) {
-            r.value = invoke(context.invoker, context.method, context.src, context.args);
+            r.value = invokeOrigin(context);
             r.needUpdateLocal = r.localResult != null && (r.localResult == CacheResultCode.NOT_EXISTS || r.localResult == CacheResultCode.EXPIRED);
             r.needUpdateRemote = r.remoteResult != null && (r.remoteResult == CacheResultCode.NOT_EXISTS || r.remoteResult == CacheResultCode.EXPIRED);
         } else if (r.value == null && !context.cacheConfig.isCacheNullValue()) {
-            r.value = invoke(context.invoker, context.method, context.src, context.args);
+            r.value = invokeOrigin(context);
             r.needUpdateLocal = r.localResult != null;
             r.needUpdateRemote = r.remoteResult != null;
         } else {
@@ -148,11 +144,11 @@ class CachedHandler implements InvocationHandler {
         return r.value;
     }
 
-    private static Object invoke(Invoker invoker, Method method, Object src, Object[] args) throws Throwable {
-        if (invoker == null) {
-            return method.invoke(src, args);
+    private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {
+        if (context.invoker == null) {
+            return context.method.invoke(context.src, context.args);
         } else {
-            return invoker.invoke();
+            return context.invoker.invoke();
         }
     }
 
