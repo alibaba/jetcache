@@ -5,7 +5,6 @@ package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.CacheProviderFactory;
-import com.taobao.geek.jetcache.Cached;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -18,7 +17,7 @@ import java.util.HashMap;
 class ProxyUtil {
     public static <T> T getProxy(T target, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CachedHandler h = new CachedHandler(target, cacheConfig, cacheProviderFactory);
+        CacheHandler h = new CacheHandler(target, cacheConfig, cacheProviderFactory);
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
@@ -27,7 +26,7 @@ class ProxyUtil {
         final HashMap<String, CacheAnnoConfig> configMap = new HashMap<String, CacheAnnoConfig>();
         processType(configMap, target.getClass());
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CachedHandler h = new CachedHandler(target, configMap, cacheProviderFactory);
+        CacheHandler h = new CacheHandler(target, configMap, cacheProviderFactory);
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }

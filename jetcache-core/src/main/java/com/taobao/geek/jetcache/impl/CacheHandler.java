@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class CachedHandler implements InvocationHandler {
+class CacheHandler implements InvocationHandler {
 
     private Object src;
     private CacheProviderFactory cacheProviderFactory;
@@ -20,21 +20,13 @@ class CachedHandler implements InvocationHandler {
     private CacheConfig cacheConfig;
     private HashMap<String, CacheAnnoConfig> configMap;
 
-    private static class GetCacheResult {
-        boolean needUpdateLocal = false;
-        boolean needUpdateRemote = false;
-        CacheResultCode localResult = null;
-        CacheResultCode remoteResult = null;
-        Object value = null;
-    }
-
-    public CachedHandler(Object src, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
+    public CacheHandler(Object src, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
         this.src = src;
         this.cacheConfig = cacheConfig;
         this.cacheProviderFactory = cacheProviderFactory;
     }
 
-    public CachedHandler(Object src, HashMap<String, CacheAnnoConfig> configMap, CacheProviderFactory cacheProviderFactory) {
+    public CacheHandler(Object src, HashMap<String, CacheAnnoConfig> configMap, CacheProviderFactory cacheProviderFactory) {
         this.src = src;
         this.configMap = configMap;
         this.cacheProviderFactory = cacheProviderFactory;
@@ -80,68 +72,97 @@ class CachedHandler implements InvocationHandler {
 
     public static Object invoke(CacheInvokeContext context) throws Throwable {
         if (context.cacheConfig != null && (context.cacheConfig.isEnabled() || CacheContextSupport.isEnabled())) {
-            return getFromCache(context);
+            return invokeWithCache(context);
         } else {
             return invokeOrigin(context);
         }
     }
 
-    private static Object getFromCache(CacheInvokeContext context)
+    private static Object invokeWithCache(CacheInvokeContext context)
             throws Throwable {
+        if (!ExpressionUtil.evalCondition(context)) {
+            return invokeOrigin(context);
+        }
+
         CacheProvider cacheProvider = context.cacheProviderFactory.getCache(context.cacheConfig.getArea());
         String subArea = ClassUtil.getSubArea(context.cacheConfig, context.method);
         String key = cacheProvider.getKeyGenerator().getKey(context.args);
-        GetCacheResult r = new GetCacheResult();
         if (context.cacheConfig.getCacheType() == CacheType.REMOTE) {
             CacheResult result = cacheProvider.getRemoteCache().get(context.cacheConfig, subArea, key);
-            r.remoteResult = result.getResultCode();
+            context.remoteResult = result.getResultCode();
             if (result.isSuccess()) {
-                r.value = result.getValue();
+                context.result = result.getValue();
             }
         } else {
             CacheResult result = cacheProvider.getLocalCache().get(context.cacheConfig, subArea, key);
-            r.localResult = result.getResultCode();
+            context.localResult = result.getResultCode();
             if (result.isSuccess()) {
-                r.value = result.getValue();
+                context.result = result.getValue();
             } else {
                 if (context.cacheConfig.getCacheType() == CacheType.BOTH) {
                     result = cacheProvider.getRemoteCache().get(context.cacheConfig, subArea, key);
-                    r.remoteResult = result.getResultCode();
+                    context.remoteResult = result.getResultCode();
                     if (result.isSuccess()) {
-                        r.value = result.getValue();
+                        context.result = result.getValue();
                     }
                 }
             }
         }
         if (context.cacheProviderFactory.getCacheMonitor() != null) {
-            context.cacheProviderFactory.getCacheMonitor().onGet(context.cacheConfig, subArea, key, r.localResult, r.remoteResult);
+            context.cacheProviderFactory.getCacheMonitor().onGet(context.cacheConfig, subArea, key, context.localResult, context.remoteResult);
         }
 
-        boolean hit = r.localResult == CacheResultCode.SUCCESS || r.remoteResult == CacheResultCode.SUCCESS;
+        boolean hit = context.localResult == CacheResultCode.SUCCESS || context.remoteResult == CacheResultCode.SUCCESS;
+        context.needUpdateLocal = false;
+        context.needUpdateRemote = false;
 
         if (!hit) {
-            r.value = invokeOrigin(context);
-            r.needUpdateLocal = r.localResult != null && (r.localResult == CacheResultCode.NOT_EXISTS || r.localResult == CacheResultCode.EXPIRED);
-            r.needUpdateRemote = r.remoteResult != null && (r.remoteResult == CacheResultCode.NOT_EXISTS || r.remoteResult == CacheResultCode.EXPIRED);
-        } else if (r.value == null && !context.cacheConfig.isCacheNullValue()) {
-            r.value = invokeOrigin(context);
-            r.needUpdateLocal = r.localResult != null;
-            r.needUpdateRemote = r.remoteResult != null;
+            context.result = invokeOrigin(context);
+            if (ExpressionUtil.evalUnless(context)) {
+                context.needUpdateLocal = needUpdate(context.localResult);
+                context.needUpdateRemote = needUpdate(context.remoteResult);
+            } else {
+                return context.result;
+            }
+        } else if (context.result == null && !context.cacheConfig.isCacheNullValue()) {
+            context.result = invokeOrigin(context);
+            if (ExpressionUtil.evalUnless(context)) {
+                context.needUpdateLocal = context.localResult != null && context.localResult != CacheResultCode.FAIL;
+                context.needUpdateRemote = context.remoteResult != null && context.remoteResult != CacheResultCode.FAIL;
+            } else {
+                return context.result;
+            }
         } else {
-            r.needUpdateLocal = r.localResult != null;
+            if (ExpressionUtil.evalUnless(context)) {
+                context.needUpdateLocal = needUpdate(context.localResult);
+                context.needUpdateRemote = false;
+            } else {
+                context.result = invokeOrigin(context);
+                if (ExpressionUtil.evalUnless(context)) {
+                    context.needUpdateLocal = context.localResult != null;
+                    context.needUpdateRemote = context.remoteResult != null;
+                } else {
+                    return context.result;
+                }
+            }
         }
-        r.localResult = null;
-        r.remoteResult = null;
-        if (r.needUpdateLocal) {
-            r.localResult = cacheProvider.getLocalCache().put(context.cacheConfig, subArea, key, r.value);
+
+        context.localResult = null;
+        context.remoteResult = null;
+        if (context.needUpdateLocal) {
+            context.localResult = cacheProvider.getLocalCache().put(context.cacheConfig, subArea, key, context.result);
         }
-        if (r.needUpdateRemote) {
-            r.remoteResult = cacheProvider.getRemoteCache().put(context.cacheConfig, subArea, key, r.value);
+        if (context.needUpdateRemote) {
+            context.remoteResult = cacheProvider.getRemoteCache().put(context.cacheConfig, subArea, key, context.result);
         }
-        if (context.cacheProviderFactory.getCacheMonitor() != null && (r.localResult != null || r.remoteResult != null)) {
-            context.cacheProviderFactory.getCacheMonitor().onPut(context.cacheConfig, subArea, key, r.value, r.localResult, r.remoteResult);
+        if (context.cacheProviderFactory.getCacheMonitor() != null && (context.localResult != null || context.remoteResult != null)) {
+            context.cacheProviderFactory.getCacheMonitor().onPut(context.cacheConfig, subArea, key, context.result, context.localResult, context.remoteResult);
         }
-        return r.value;
+        return context.result;
+    }
+
+    private static boolean needUpdate(CacheResultCode code) {
+        return code != null && (code == CacheResultCode.NOT_EXISTS || code == CacheResultCode.EXPIRED);
     }
 
     private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {

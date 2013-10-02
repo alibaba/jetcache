@@ -42,6 +42,6 @@ public class CacheImplSupport {
         context.args = args;
         context.cacheProviderFactory = cacheProviderFactory;
         context.cacheConfig = cc;
-        return CachedHandler.invoke(context);
+        return CacheHandler.invoke(context);
     }
 }

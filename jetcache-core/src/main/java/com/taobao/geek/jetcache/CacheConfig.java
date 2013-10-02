@@ -25,8 +25,8 @@ public class CacheConfig {
     private int localLimit = DEFAULT_LOCAL_LIMIT;
     private int version = DEFAULT_VERSION;
     private boolean cacheNullValue = DEFAULT_CACHE_NULL_VALUE;
-    private String condition;
-    private String unless;
+    private String condition = DEFAULT_CONDITION;
+    private String unless = DEFAULT_UNLESS;
 
     public String getArea() {
         return area;
