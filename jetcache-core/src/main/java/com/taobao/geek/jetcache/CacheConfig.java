@@ -15,6 +15,8 @@ public class CacheConfig {
     public static final int DEFAULT_LOCAL_LIMIT = 100;
     public static final int DEFAULT_VERSION = 1;
     public static final boolean DEFAULT_CACHE_NULL_VALUE = false;
+    public static final String DEFAULT_CONDITION = "";
+    public static final String DEFAULT_UNLESS = "";
 
     private String area = DEFAULT_AREA;
     private boolean enabled = DEFAULT_ENABLED;
@@ -23,48 +25,8 @@ public class CacheConfig {
     private int localLimit = DEFAULT_LOCAL_LIMIT;
     private int version = DEFAULT_VERSION;
     private boolean cacheNullValue = DEFAULT_CACHE_NULL_VALUE;
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof CacheConfig)) {
-            return false;
-        }
-        CacheConfig cc = (CacheConfig) obj;
-        return equals(area, cc.area) &&
-                enabled == cc.enabled && expire == cc.expire
-                && equals(cacheType, cc.cacheType) && localLimit == cc.localLimit
-                && version == cc.version && cacheNullValue == cc.cacheNullValue;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        if (area != null) {
-            hash += area.hashCode();
-        }
-        hash = hash << 8 + expire;
-        if (cacheType != null) {
-            hash = hash << 2 + cacheType.hashCode();
-        }
-        hash = hash << 8 + localLimit;
-        hash =  hash << 4 + version;
-
-        if (enabled) {
-            hash += 11;
-        }
-        if(cacheNullValue){
-            hash += 101;
-        }
-        return hash;
-    }
-
-    private boolean equals(Object o1, Object o2) {
-        if (o1 != null) {
-            return o1.equals(o2);
-        } else {
-            return o2 == null;
-        }
-    }
+    private String condition;
+    private String unless;
 
     public String getArea() {
         return area;
@@ -120,5 +82,21 @@ public class CacheConfig {
 
     public void setCacheNullValue(boolean cacheNullValue) {
         this.cacheNullValue = cacheNullValue;
+    }
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    public String getUnless() {
+        return unless;
+    }
+
+    public void setUnless(String unless) {
+        this.unless = unless;
     }
 }

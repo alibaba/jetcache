@@ -63,6 +63,14 @@ public class DefaultCacheMonitor implements CacheMonitor {
                       Object value, CacheResultCode localResult, CacheResultCode remoteResult) {
     }
 
+    @Override
+    public void warn(String message) {
+    }
+
+    @Override
+    public void error(String message) {
+    }
+
     public StringBuilder getStatText() {
         StringBuilder sb = new StringBuilder(512);
         sb.append("-----------------------------------------------\n");

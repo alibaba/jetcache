@@ -35,6 +35,13 @@ public class CacheImplSupport {
 
     public static Object invoke(Invoker invoker, Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
                                 CacheConfig cc) throws Throwable {
-        return CachedHandler.invoke(invoker, src, method, args, cacheProviderFactory, cc);
+        CacheInvokeContext context = new CacheInvokeContext();
+        context.invoker = invoker;
+        context.src = src;
+        context.method = method;
+        context.args = args;
+        context.cacheProviderFactory = cacheProviderFactory;
+        context.cacheConfig = cc;
+        return CachedHandler.invoke(context);
     }
 }

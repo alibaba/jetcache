@@ -39,12 +39,23 @@ public class CacheHandlerTest {
     }
 
     @After
-    public void close(){
+    public void close() {
         //System.out.println(monitor.getStatText());
     }
 
+    private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
+        CacheInvokeContext c = new CacheInvokeContext();
+        c.src = count;
+        c.cacheProviderFactory = cacheProviderFactory;
+        c.cacheConfig = cacheConfig;
+        c.invoker = invoker;
+        c.method = method;
+        c.args = args;
+        return c;
+    }
+
     private int invoke(Method method, Object[] params) throws Throwable {
-        return (Integer) CachedHandler.invoke(null, count, method, params, cacheProviderFactory, cacheConfig);
+        return (Integer) CachedHandler.invoke(createContext(null, method, params));
     }
 
     // basic test
@@ -59,6 +70,7 @@ public class CacheHandlerTest {
         cacheConfig.setCacheType(CacheType.BOTH);
         testStaticInvoke1_impl();
     }
+
     private void testStaticInvoke1_impl() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
@@ -95,6 +107,7 @@ public class CacheHandlerTest {
         cacheConfig.setCacheType(CacheType.BOTH);
         testStaticInvoke2_impl();
     }
+
     private void testStaticInvoke2_impl() throws Throwable {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
         int x1, x2, x3, x4, x5, x6;
@@ -122,6 +135,7 @@ public class CacheHandlerTest {
         cacheConfig.setCacheType(CacheType.BOTH);
         testStaticInvoke3_impl();
     }
+
     private void testStaticInvoke3_impl() throws Throwable {
         DynamicQuery q1 = new DynamicQuery();
         DynamicQuery q2 = new DynamicQuery();
@@ -159,22 +173,23 @@ public class CacheHandlerTest {
             }
         }
     }
+
     @Test
     public void testStaticInvokeNull() throws Throwable {
         Method method = CountClass.class.getMethod("countNull");
         Integer x1, x2, x3;
-        x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        x1 = (Integer) CachedHandler.invoke(createContext(null, method, null));
+        x2 = (Integer) CachedHandler.invoke(createContext(null, method, null));
+        x3 = (Integer) CachedHandler.invoke(createContext(null, method, null));
         Assert.assertNull(x1);//null, not cached
         Assert.assertNotNull(x2);
         Assert.assertNotNull(x3);//cached
 
         setup();
         cacheConfig.setCacheNullValue(true);
-        x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
-        x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
-        x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, cacheConfig);
+        x1 = (Integer) CachedHandler.invoke(createContext(null, method, null));
+        x2 = (Integer) CachedHandler.invoke(createContext(null, method, null));
+        x3 = (Integer) CachedHandler.invoke(createContext(null, method, null));
         Assert.assertNull(x1);//null,cached
         Assert.assertNull(x2);
         Assert.assertNull(x3);
@@ -202,9 +217,15 @@ public class CacheHandlerTest {
         final Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
 
-        x1 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, null);
-        x2 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, null);
-        x3 = (Integer) CachedHandler.invoke(null, count, method, null, cacheProviderFactory, null);
+        CacheInvokeContext context = createContext(null, method, null);
+        context.cacheConfig = null;
+        x1 = (Integer) CachedHandler.invoke(context);
+        context = createContext(null, method, null);
+        context.cacheConfig = null;
+        x2 = (Integer) CachedHandler.invoke(context);
+        context = createContext(null, method, null);
+        context.cacheConfig = null;
+        x3 = (Integer) CachedHandler.invoke(context);
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
         cacheConfig.setEnabled(false);
