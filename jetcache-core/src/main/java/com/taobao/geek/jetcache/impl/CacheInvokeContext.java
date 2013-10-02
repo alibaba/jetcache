@@ -3,7 +3,6 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
 import com.taobao.geek.jetcache.CacheProviderFactory;
 import com.taobao.geek.jetcache.CacheResultCode;
 
@@ -18,14 +17,16 @@ class CacheInvokeContext {
     Method method;
     Object[] args;
     CacheProviderFactory cacheProviderFactory;
-    CacheConfig cacheConfig;
+    CacheInvokeConfig cacheInvokeConfig;
+
+    Object result = null;
 
     //status, without getter and setter
     boolean needUpdateLocal = false;
     boolean needUpdateRemote = false;
     CacheResultCode localResult = null;
     CacheResultCode remoteResult = null;
-    Object result = null;//this property has getter and setter
+
 
     public Invoker getInvoker() {
         return invoker;
@@ -67,19 +68,19 @@ class CacheInvokeContext {
         this.cacheProviderFactory = cacheProviderFactory;
     }
 
-    public CacheConfig getCacheConfig() {
-        return cacheConfig;
-    }
-
-    public void setCacheConfig(CacheConfig cacheConfig) {
-        this.cacheConfig = cacheConfig;
-    }
-
     public Object getResult() {
         return result;
     }
 
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    public CacheInvokeConfig getCacheInvokeConfig() {
+        return cacheInvokeConfig;
+    }
+
+    public void setCacheInvokeConfig(CacheInvokeConfig cacheInvokeConfig) {
+        this.cacheInvokeConfig = cacheInvokeConfig;
     }
 }

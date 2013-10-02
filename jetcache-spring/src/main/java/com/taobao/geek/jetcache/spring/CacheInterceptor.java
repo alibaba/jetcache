@@ -5,7 +5,7 @@ package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.*;
-import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
+import com.taobao.geek.jetcache.impl.CacheInvokeConfig;
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.impl.Invoker;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -18,48 +18,26 @@ import java.lang.reflect.Method;
  */
 public class CacheInterceptor implements MethodInterceptor {
 
-    private IdentityHashMap<Method, CacheAnnoConfig> cacheConfigMap;
+    private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap;
     private CacheProviderFactory cacheProviderFactory;
 
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
-        final CacheAnnoConfig cc = cacheConfigMap.get(invocation.getMethod());
-        if (cc == null) {
+        final CacheInvokeConfig cac = cacheConfigMap.get(invocation.getMethod());
+        if (cac == null) {
             return invocation.proceed();
         }
-        if (cc.isEnableCacheContext()) {
-            try{
-                return CacheContext.enableCache(new ReturnValueCallback<Object>() {
-                    @Override
-                    public Object execute() throws Throwable {
-                        return invoke(invocation, cc);
-                    }
-                });
-            } catch (CallbackException e) {
-                throw e.getCause();
+        Invoker invoker = new Invoker() {
+            @Override
+            public Object invoke() throws Throwable {
+                return invocation.proceed();
             }
-        } else {
-            return invoke(invocation, cc);
-        }
-
+        };
+        return CacheImplSupport.invoke(invoker, invocation.getThis(), invocation.getMethod(),
+                invocation.getArguments(), cacheProviderFactory, cac);
     }
 
-    private Object invoke(final MethodInvocation invocation, CacheAnnoConfig cc) throws Throwable {
-        if (cc.getCacheConfig() != null) {
-            Invoker invoker = new Invoker() {
-                @Override
-                public Object invoke() throws Throwable {
-                    return invocation.proceed();
-                }
-            };
-            return CacheImplSupport.invoke(invoker, invocation.getThis(), invocation.getMethod(),
-                    invocation.getArguments(), cacheProviderFactory, cc.getCacheConfig());
-        } else {
-            return invocation.proceed();
-        }
-    }
-
-    public void setCacheConfigMap(IdentityHashMap<Method, CacheAnnoConfig> cacheConfigMap) {
+    public void setCacheConfigMap(IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 

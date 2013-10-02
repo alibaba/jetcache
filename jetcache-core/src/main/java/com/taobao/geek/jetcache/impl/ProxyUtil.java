@@ -23,7 +23,7 @@ class ProxyUtil {
     }
 
     public static <T> T getProxyByAnnotation(T target, CacheProviderFactory cacheProviderFactory) {
-        final HashMap<String, CacheAnnoConfig> configMap = new HashMap<String, CacheAnnoConfig>();
+        final HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>();
         processType(configMap, target.getClass());
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap, cacheProviderFactory);
@@ -31,7 +31,7 @@ class ProxyUtil {
         return (T) o;
     }
 
-    private static void processType(HashMap<String, CacheAnnoConfig> configMap, Class<?> clazz) {
+    private static void processType(HashMap<String, CacheInvokeConfig> configMap, Class<?> clazz) {
         if (clazz.isAnnotation() || clazz.isArray() || clazz.isEnum() || clazz.isPrimitive()) {
             throw new IllegalArgumentException(clazz.getName());
         }
@@ -57,16 +57,12 @@ class ProxyUtil {
         }
     }
 
-    private static void processMethod(HashMap<String, CacheAnnoConfig> configMap, Method m) {
+    private static void processMethod(HashMap<String, CacheInvokeConfig> configMap, Method m) {
         String sig = ClassUtil.getMethodSig(m);
-        CacheAnnoConfig cac = configMap.get(sig);
+        CacheInvokeConfig cac = configMap.get(sig);
         if (cac == null) {
-            CacheConfig cc = CacheConfigUtil.parseCacheConfig(m);
-            boolean enable = CacheConfigUtil.parseEnableCacheConfig(m);
-            if (cc != null || enable) {
-                cac = new CacheAnnoConfig();
-                cac.setCacheConfig(cc);
-                cac.setEnableCacheContext(enable);
+            cac = new CacheInvokeConfig();
+            if (CacheConfigUtil.parse(cac, m)) {
                 configMap.put(sig, cac);
             }
         } else {

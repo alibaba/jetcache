@@ -7,7 +7,7 @@ import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.CacheType;
 import com.taobao.geek.jetcache.Cached;
 import com.taobao.geek.jetcache.EnableCache;
-import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
+import com.taobao.geek.jetcache.impl.CacheInvokeConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,12 +19,12 @@ import java.lang.reflect.Method;
  */
 public class CachePointCutTest {
     private CachePointcut pc;
-    private IdentityHashMap<Method, CacheAnnoConfig> map;
+    private IdentityHashMap<Method, CacheInvokeConfig> map;
 
     @Before
     public void setup() {
         pc = new CachePointcut();
-        map = new IdentityHashMap<Method, CacheAnnoConfig>();
+        map = new IdentityHashMap<Method, CacheInvokeConfig>();
         pc.setCacheConfigMap(map);
     }
 

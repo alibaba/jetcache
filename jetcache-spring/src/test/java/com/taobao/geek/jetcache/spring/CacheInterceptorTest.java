@@ -7,7 +7,7 @@ import com.alibaba.fastjson.util.IdentityHashMap;
 import com.taobao.geek.jetcache.CacheContext;
 import com.taobao.geek.jetcache.Cached;
 import com.taobao.geek.jetcache.Callback;
-import com.taobao.geek.jetcache.impl.CacheAnnoConfig;
+import com.taobao.geek.jetcache.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -22,7 +22,7 @@ import java.sql.SQLException;
 @Ignore
 public class CacheInterceptorTest {
     private CachePointcut pc;
-    private IdentityHashMap<Method, CacheAnnoConfig> map;
+    private IdentityHashMap<Method, CacheInvokeConfig> map;
     private CacheInterceptor interceptor;
 
     @Rule
@@ -31,7 +31,7 @@ public class CacheInterceptorTest {
     @Before
     public void setup() {
         pc = new CachePointcut();
-        map = new IdentityHashMap<Method, CacheAnnoConfig>();
+        map = new IdentityHashMap<Method, CacheInvokeConfig>();
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);

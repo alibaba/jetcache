@@ -47,7 +47,8 @@ public class CacheHandlerTest {
         CacheInvokeContext c = new CacheInvokeContext();
         c.target = count;
         c.cacheProviderFactory = cacheProviderFactory;
-        c.cacheConfig = cacheConfig;
+        c.cacheInvokeConfig = new CacheInvokeConfig();
+        c.cacheInvokeConfig.cacheConfig = cacheConfig;
         c.invoker = invoker;
         c.method = method;
         c.args = args;
@@ -264,13 +265,13 @@ public class CacheHandlerTest {
         int x1, x2, x3;
 
         CacheInvokeContext context = createContext(null, method, null);
-        context.cacheConfig = null;
+        context.cacheInvokeConfig.cacheConfig = null;
         x1 = (Integer) CacheHandler.invoke(context);
         context = createContext(null, method, null);
-        context.cacheConfig = null;
+        context.cacheInvokeConfig.cacheConfig = null;
         x2 = (Integer) CacheHandler.invoke(context);
         context = createContext(null, method, null);
-        context.cacheConfig = null;
+        context.cacheInvokeConfig.cacheConfig = null;
         x3 = (Integer) CacheHandler.invoke(context);
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
@@ -348,11 +349,11 @@ public class CacheHandlerTest {
     @Test
     public void testInvoke2() throws Throwable {
         Method method = CountClass.class.getMethod("count");
-        final CacheAnnoConfig cac = new CacheAnnoConfig();
+        final CacheInvokeConfig cac = new CacheInvokeConfig();
         cac.setCacheConfig(cacheConfig);
-        HashMap<String, CacheAnnoConfig> configMap = new HashMap<String, CacheAnnoConfig>() {
+        HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>() {
             @Override
-            public CacheAnnoConfig get(Object key) {
+            public CacheInvokeConfig get(Object key) {
                 return cac;
             }
         };

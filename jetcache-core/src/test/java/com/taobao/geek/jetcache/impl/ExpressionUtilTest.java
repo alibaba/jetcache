@@ -16,28 +16,31 @@ import java.util.HashMap;
  */
 public class ExpressionUtilTest {
     private CacheInvokeContext context;
+    private CacheConfig cacheConfig;
 
     @Before
     public void setup() {
         context = new CacheInvokeContext();
-        context.cacheConfig = new CacheConfig();
+        cacheConfig = new CacheConfig();
+        context.cacheInvokeConfig = new CacheInvokeConfig();
+        context.cacheInvokeConfig.cacheConfig = cacheConfig;
         context.cacheProviderFactory = new CacheProviderFactory(new HashMap());
     }
 
     @Test
     public void testCondition() {
-        context.cacheConfig.setCondition("args[0]==null");
+        cacheConfig.setCondition("args[0]==null");
         Assert.assertFalse(ExpressionUtil.evalCondition(context));
         context.args = new Object[1];
         Assert.assertTrue(ExpressionUtil.evalCondition(context));
         context.args = new Object[]{"1234"};
-        context.cacheConfig.setCondition("args[0].length()==4");
+        cacheConfig.setCondition("args[0].length()==4");
         Assert.assertTrue(ExpressionUtil.evalCondition(context));
     }
 
     @Test
     public void testUnless() {
-        context.cacheConfig.setUnless("result==null");
+        cacheConfig.setUnless("result==null");
         Assert.assertFalse(ExpressionUtil.evalUnless(context));
     }
 

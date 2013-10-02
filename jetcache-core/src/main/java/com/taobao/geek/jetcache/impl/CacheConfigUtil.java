@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheConfigUtil {
-    public static CacheConfig parseCacheConfig(Method m) {
+    private static CacheConfig parseCacheConfig(Method m) {
         Cached anno = m.getAnnotation(Cached.class);
         if (anno == null) {
             return null;
@@ -31,19 +31,22 @@ public class CacheConfigUtil {
         return cc;
     }
 
-    public static boolean parseEnableCacheConfig(Method m) {
+    private static boolean parseEnableCacheConfig(Method m) {
         EnableCache anno = m.getAnnotation(EnableCache.class);
         return anno != null;
     }
 
-    public static void parse(CacheAnnoConfig cac, Method method) {
+    public static boolean parse(CacheInvokeConfig cac, Method method) {
         CacheConfig cc = parseCacheConfig(method);
         if (cc != null) {
             cac.setCacheConfig(cc);
+            cac.setConditionEL(ExpressionUtil.parseEL(cc.getCondition()));
+            cac.setUnlessEL(ExpressionUtil.parseEL(cc.getUnless()));
         }
         boolean enable = parseEnableCacheConfig(method);
         if (enable) {
             cac.setEnableCacheContext(true);
         }
+        return cc !=null || enable;
     }
 }
