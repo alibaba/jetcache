@@ -87,32 +87,8 @@ class CacheHandler implements InvocationHandler {
         CacheProvider cacheProvider = context.cacheProviderFactory.getCache(context.cacheConfig.getArea());
         String subArea = ClassUtil.getSubArea(context.cacheConfig, context.method);
         String key = cacheProvider.getKeyGenerator().getKey(context.args);
-        if (context.cacheConfig.getCacheType() == CacheType.REMOTE) {
-            CacheResult result = cacheProvider.getRemoteCache().get(context.cacheConfig, subArea, key);
-            context.remoteResult = result.getResultCode();
-            if (result.isSuccess()) {
-                context.result = result.getValue();
-            }
-        } else {
-            CacheResult result = cacheProvider.getLocalCache().get(context.cacheConfig, subArea, key);
-            context.localResult = result.getResultCode();
-            if (result.isSuccess()) {
-                context.result = result.getValue();
-            } else {
-                if (context.cacheConfig.getCacheType() == CacheType.BOTH) {
-                    result = cacheProvider.getRemoteCache().get(context.cacheConfig, subArea, key);
-                    context.remoteResult = result.getResultCode();
-                    if (result.isSuccess()) {
-                        context.result = result.getValue();
-                    }
-                }
-            }
-        }
-        if (context.cacheProviderFactory.getCacheMonitor() != null) {
-            context.cacheProviderFactory.getCacheMonitor().onGet(context.cacheConfig, subArea, key, context.localResult, context.remoteResult);
-        }
+        boolean hit = getFromCache(context, cacheProvider, subArea, key);
 
-        boolean hit = context.localResult == CacheResultCode.SUCCESS || context.remoteResult == CacheResultCode.SUCCESS;
         context.needUpdateLocal = false;
         context.needUpdateRemote = false;
 
@@ -147,6 +123,11 @@ class CacheHandler implements InvocationHandler {
             }
         }
 
+        updateCache(context, cacheProvider, subArea, key);
+        return context.result;
+    }
+
+    private static void updateCache(CacheInvokeContext context, CacheProvider cacheProvider, String subArea, String key) {
         context.localResult = null;
         context.remoteResult = null;
         if (context.needUpdateLocal) {
@@ -158,7 +139,35 @@ class CacheHandler implements InvocationHandler {
         if (context.cacheProviderFactory.getCacheMonitor() != null && (context.localResult != null || context.remoteResult != null)) {
             context.cacheProviderFactory.getCacheMonitor().onPut(context.cacheConfig, subArea, key, context.result, context.localResult, context.remoteResult);
         }
-        return context.result;
+    }
+
+    private static boolean getFromCache(CacheInvokeContext context, CacheProvider cacheProvider, String subArea, String key) {
+        if (context.cacheConfig.getCacheType() == CacheType.REMOTE) {
+            CacheResult result = cacheProvider.getRemoteCache().get(context.cacheConfig, subArea, key);
+            context.remoteResult = result.getResultCode();
+            if (result.isSuccess()) {
+                context.result = result.getValue();
+            }
+        } else {
+            CacheResult result = cacheProvider.getLocalCache().get(context.cacheConfig, subArea, key);
+            context.localResult = result.getResultCode();
+            if (result.isSuccess()) {
+                context.result = result.getValue();
+            } else {
+                if (context.cacheConfig.getCacheType() == CacheType.BOTH) {
+                    result = cacheProvider.getRemoteCache().get(context.cacheConfig, subArea, key);
+                    context.remoteResult = result.getResultCode();
+                    if (result.isSuccess()) {
+                        context.result = result.getValue();
+                    }
+                }
+            }
+        }
+        if (context.cacheProviderFactory.getCacheMonitor() != null) {
+            context.cacheProviderFactory.getCacheMonitor().onGet(context.cacheConfig, subArea, key, context.localResult, context.remoteResult);
+        }
+
+        return context.localResult == CacheResultCode.SUCCESS || context.remoteResult == CacheResultCode.SUCCESS;
     }
 
     private static boolean needUpdate(CacheResultCode code) {

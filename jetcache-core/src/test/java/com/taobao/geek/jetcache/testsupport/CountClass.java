@@ -27,6 +27,9 @@ public class CountClass implements Count {
 
     private boolean returnNull = false;
 
+    /**
+     * first invoke return null.
+     */
     public Integer countNull() {
         returnNull = !returnNull;
         return returnNull ? null : count++;

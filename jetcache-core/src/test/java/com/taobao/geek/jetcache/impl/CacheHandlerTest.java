@@ -178,21 +178,67 @@ public class CacheHandlerTest {
     public void testStaticInvokeNull() throws Throwable {
         Method method = CountClass.class.getMethod("countNull");
         Integer x1, x2, x3;
-        x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));
-        x2 = (Integer) CacheHandler.invoke(createContext(null, method, null));
-        x3 = (Integer) CacheHandler.invoke(createContext(null, method, null));
-        Assert.assertNull(x1);//null, not cached
+        x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));//null, not cached
+        x2 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cached
+        x3 = (Integer) CacheHandler.invoke(createContext(null, method, null));//hit cache
+        Assert.assertNull(x1);
         Assert.assertNotNull(x2);
-        Assert.assertNotNull(x3);//cached
+        Assert.assertNotNull(x3);
+        Assert.assertEquals(x2, x3);
 
         setup();
         cacheConfig.setCacheNullValue(true);
-        x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));
+        x1 = (Integer) CacheHandler.invoke(createContext(null, method, null)); //null,cached
         x2 = (Integer) CacheHandler.invoke(createContext(null, method, null));
         x3 = (Integer) CacheHandler.invoke(createContext(null, method, null));
-        Assert.assertNull(x1);//null,cached
+        Assert.assertNull(x1);
         Assert.assertNull(x2);
         Assert.assertNull(x3);
+
+        cacheConfig.setCacheNullValue(false);
+        x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cached value is null, invoke, cached
+        x2 = (Integer) CacheHandler.invoke(createContext(null, method, null));
+        x3 = (Integer) CacheHandler.invoke(createContext(null, method, null));
+        Assert.assertNotNull(x1);
+        Assert.assertNotNull(x2);
+        Assert.assertNotNull(x3);
+        Assert.assertEquals(x1, x2);
+        Assert.assertEquals(x2, x3);
+
+    }
+
+    @Test
+    public void testStaticInvokeCondition() throws Throwable{
+        Method method = CountClass.class.getMethod("count",int.class);
+        int x1,x2;
+        cacheConfig.setCondition("args[0]>10");
+        x1 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{10}));
+        x2 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{10}));
+        Assert.assertNotEquals(x1, x2);
+        x1 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{11}));
+        x2 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{11}));
+        Assert.assertEquals(x1, x2);
+    }
+
+    @Test
+    public void testStaticInvokeUnless() throws Throwable{
+        Method method = CountClass.class.getMethod("count");
+        int x1,x2,x3,x4;
+        cacheConfig.setUnless("result%2==1");
+        x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));//return 0
+        x2 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cache hit(0),unless=false
+        Assert.assertEquals(x1, x2);
+        cacheConfig.setUnless("result%2==0");
+        x3 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cache hit(0),unless=true,invoke and return 1
+        x4 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cache hit(1)
+        Assert.assertNotNull(x3);
+        Assert.assertEquals(x3, x4);
+        Assert.assertNotEquals(x3, x1);
+    }
+
+    @Test
+    public void testStaticInvokeUnlessAndNull() throws Throwable{
+
     }
 
     private void assertEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
