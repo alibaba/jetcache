@@ -40,7 +40,7 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
             RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
             interceptorDef.setSource(eleSource);
             interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            interceptorDef.getPropertyValues().add("cacheProviderFactory",new RuntimeBeanReference("cacheProviderFactory"));
+            interceptorDef.getPropertyValues().add("globalCacheConfig",new RuntimeBeanReference("globalCacheConfig"));
             interceptorDef.getPropertyValues().add("cacheConfigMap", new RuntimeBeanReference(configMapName));
             String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 

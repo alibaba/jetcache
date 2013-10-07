@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheProviderFactory;
+import com.taobao.geek.jetcache.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -15,18 +15,18 @@ import java.util.HashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 class ProxyUtil {
-    public static <T> T getProxy(T target, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
+    public static <T> T getProxy(T target, CacheConfig cacheConfig, GlobalCacheConfig globalCacheConfig) {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CacheHandler h = new CacheHandler(target, cacheConfig, cacheProviderFactory);
+        CacheHandler h = new CacheHandler(target, cacheConfig, globalCacheConfig);
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
 
-    public static <T> T getProxyByAnnotation(T target, CacheProviderFactory cacheProviderFactory) {
+    public static <T> T getProxyByAnnotation(T target, GlobalCacheConfig globalCacheConfig) {
         final HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>();
         processType(configMap, target.getClass());
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CacheHandler h = new CacheHandler(target, configMap, cacheProviderFactory);
+        CacheHandler h = new CacheHandler(target, configMap, globalCacheConfig);
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }

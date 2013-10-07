@@ -33,7 +33,7 @@ class ExpressionUtil {
         try {
             return eval(context.cacheInvokeConfig.conditionScript, context, context.cacheInvokeConfig.conditionEL);
         } catch (Exception e) {
-            CacheMonitor cm = context.cacheProviderFactory.getCacheMonitor();
+            CacheMonitor cm = context.globalCacheConfig.getCacheMonitor();
             if (cm != null) {
                 cm.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             }
@@ -49,7 +49,7 @@ class ExpressionUtil {
         try {
             return !eval(context.cacheInvokeConfig.unlessScript, context, context.cacheInvokeConfig.unlessEL);
         } catch (Exception e) {
-            CacheMonitor cm = context.cacheProviderFactory.getCacheMonitor();
+            CacheMonitor cm = context.globalCacheConfig.getCacheMonitor();
             if (cm != null) {
                 cm.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             }

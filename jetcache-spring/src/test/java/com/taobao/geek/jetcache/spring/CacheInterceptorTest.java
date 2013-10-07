@@ -35,7 +35,7 @@ public class CacheInterceptorTest {
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);
-        interceptor.setCacheProviderFactory(TestUtil.getCacheProviderFactory());
+        interceptor.setGlobalCacheConfig(TestUtil.getCacheProviderFactory());
     }
 
     interface I1 {

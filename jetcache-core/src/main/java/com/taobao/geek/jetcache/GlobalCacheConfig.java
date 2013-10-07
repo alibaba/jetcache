@@ -8,12 +8,12 @@ import java.util.Map;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheProviderFactory {
+public class GlobalCacheConfig {
 
     private final Map<String, CacheProvider> providerMap;
     private CacheMonitor cacheMonitor;
 
-    public CacheProviderFactory(Map<String, CacheProvider> providerMap) {
+    public GlobalCacheConfig(Map<String, CacheProvider> providerMap) {
         this.providerMap = providerMap;
     }
 

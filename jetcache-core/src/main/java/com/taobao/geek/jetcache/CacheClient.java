@@ -10,21 +10,21 @@ import com.taobao.geek.jetcache.impl.CacheImplSupport;
  */
 public class CacheClient {
 
-    private CacheProviderFactory cacheProviderFactory;
+    private GlobalCacheConfig globalCacheConfig;
 
     public <T> T getProxy(T target, CacheConfig cacheConfig) {
-        return CacheImplSupport.getProxy(target, cacheConfig, cacheProviderFactory);
+        return CacheImplSupport.getProxy(target, cacheConfig, globalCacheConfig);
     }
 
     public <T> T getProxyByAnnotation(T target) {
-        return CacheImplSupport.getProxyByAnnotation(target, cacheProviderFactory);
+        return CacheImplSupport.getProxyByAnnotation(target, globalCacheConfig);
     }
 
-    public void setCacheProviderFactory(CacheProviderFactory cacheProviderFactory) {
-        this.cacheProviderFactory = cacheProviderFactory;
+    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
+        this.globalCacheConfig = globalCacheConfig;
     }
 
-    public CacheProviderFactory getCacheProviderFactory() {
-        return cacheProviderFactory;
+    public GlobalCacheConfig getGlobalCacheConfig() {
+        return globalCacheConfig;
     }
 }

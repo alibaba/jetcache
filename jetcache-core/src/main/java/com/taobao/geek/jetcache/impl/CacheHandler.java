@@ -15,23 +15,23 @@ import java.util.HashMap;
 class CacheHandler implements InvocationHandler {
 
     private Object src;
-    private CacheProviderFactory cacheProviderFactory;
+    private GlobalCacheConfig globalCacheConfig;
 
     private CacheInvokeConfig cacheInvokeConfig;
     private HashMap<String, CacheInvokeConfig> configMap;
 
-    public CacheHandler(Object src, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
+    public CacheHandler(Object src, CacheConfig cacheConfig, GlobalCacheConfig globalCacheConfig) {
         this.src = src;
         cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.cacheConfig = cacheConfig;
         cacheInvokeConfig.init();
-        this.cacheProviderFactory = cacheProviderFactory;
+        this.globalCacheConfig = globalCacheConfig;
     }
 
-    public CacheHandler(Object src, HashMap<String, CacheInvokeConfig> configMap, CacheProviderFactory cacheProviderFactory) {
+    public CacheHandler(Object src, HashMap<String, CacheInvokeConfig> configMap, GlobalCacheConfig globalCacheConfig) {
         this.src = src;
         this.configMap = configMap;
-        this.cacheProviderFactory = cacheProviderFactory;
+        this.globalCacheConfig = globalCacheConfig;
     }
 
     @Override
@@ -52,7 +52,7 @@ class CacheHandler implements InvocationHandler {
             return method.invoke(src, args);
         } else {
             context.args = args;
-            context.cacheProviderFactory = cacheProviderFactory;
+            context.globalCacheConfig = globalCacheConfig;
             context.method = method;
             context.target = src;
             return invoke(context);
@@ -89,7 +89,7 @@ class CacheHandler implements InvocationHandler {
 
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
 
-        CacheProvider cacheProvider = context.cacheProviderFactory.getCache(cacheConfig.getArea());
+        CacheProvider cacheProvider = context.globalCacheConfig.getCache(cacheConfig.getArea());
         String subArea = ClassUtil.getSubArea(cacheConfig, context.method);
         String key = cacheProvider.getKeyGenerator().getKey(context.args);
         boolean hit = getFromCache(context, cacheProvider, subArea, key);
@@ -142,8 +142,8 @@ class CacheHandler implements InvocationHandler {
         if (context.needUpdateRemote) {
             context.remoteResult = cacheProvider.getRemoteCache().put(cacheConfig, subArea, key, context.result);
         }
-        if (context.cacheProviderFactory.getCacheMonitor() != null && (context.localResult != null || context.remoteResult != null)) {
-            context.cacheProviderFactory.getCacheMonitor().onPut(cacheConfig, subArea, key, context.result, context.localResult, context.remoteResult);
+        if (context.globalCacheConfig.getCacheMonitor() != null && (context.localResult != null || context.remoteResult != null)) {
+            context.globalCacheConfig.getCacheMonitor().onPut(cacheConfig, subArea, key, context.result, context.localResult, context.remoteResult);
         }
     }
 
@@ -170,8 +170,8 @@ class CacheHandler implements InvocationHandler {
                 }
             }
         }
-        if (context.cacheProviderFactory.getCacheMonitor() != null) {
-            context.cacheProviderFactory.getCacheMonitor().onGet(cacheConfig, subArea, key, context.localResult, context.remoteResult);
+        if (context.globalCacheConfig.getCacheMonitor() != null) {
+            context.globalCacheConfig.getCacheMonitor().onGet(cacheConfig, subArea, key, context.localResult, context.remoteResult);
         }
 
         return context.localResult == CacheResultCode.SUCCESS || context.remoteResult == CacheResultCode.SUCCESS;

@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 public class CacheInterceptor implements MethodInterceptor, ApplicationContextAware {
 
     private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap;
-    private CacheProviderFactory cacheProviderFactory;
+    private GlobalCacheConfig globalCacheConfig;
     private ApplicationContext applicationContext;
 
     @Override
@@ -46,7 +46,7 @@ public class CacheInterceptor implements MethodInterceptor, ApplicationContextAw
         context.setTarget(invocation.getThis());
         context.setMethod(invocation.getMethod());
         context.setArgs(invocation.getArguments());
-        context.setCacheProviderFactory(cacheProviderFactory);
+        context.setGlobalCacheConfig(globalCacheConfig);
         context.setCacheInvokeConfig(cac);
         return CacheImplSupport.invoke(context);
     }
@@ -55,7 +55,7 @@ public class CacheInterceptor implements MethodInterceptor, ApplicationContextAw
         this.cacheConfigMap = cacheConfigMap;
     }
 
-    public void setCacheProviderFactory(CacheProviderFactory cacheProviderFactory) {
-        this.cacheProviderFactory = cacheProviderFactory;
+    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
+        this.globalCacheConfig = globalCacheConfig;
     }
 }

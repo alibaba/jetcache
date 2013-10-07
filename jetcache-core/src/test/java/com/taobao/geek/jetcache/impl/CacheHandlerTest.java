@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheProviderFactory;
+import com.taobao.geek.jetcache.GlobalCacheConfig;
 import com.taobao.geek.jetcache.CacheType;
 import com.taobao.geek.jetcache.Callback;
 import com.taobao.geek.jetcache.support.DefaultCacheMonitor;
@@ -24,7 +24,7 @@ import java.util.HashMap;
  */
 public class CacheHandlerTest {
 
-    private CacheProviderFactory cacheProviderFactory;
+    private GlobalCacheConfig globalCacheConfig;
     private CacheConfig cacheConfig;
     private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
@@ -32,13 +32,13 @@ public class CacheHandlerTest {
 
     @Before
     public void setup() {
-        cacheProviderFactory = TestUtil.getCacheProviderFactory();
+        globalCacheConfig = TestUtil.getCacheProviderFactory();
         cacheConfig = new CacheConfig();
         cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.cacheConfig = cacheConfig;
         count = new CountClass();
         monitor = new DefaultCacheMonitor();
-        cacheProviderFactory.setCacheMonitor(monitor);
+        globalCacheConfig.setCacheMonitor(monitor);
     }
 
     @After
@@ -49,7 +49,7 @@ public class CacheHandlerTest {
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
         CacheInvokeContext c = new CacheInvokeContext();
         c.target = count;
-        c.cacheProviderFactory = cacheProviderFactory;
+        c.globalCacheConfig = globalCacheConfig;
         c.cacheInvokeConfig = cacheInvokeConfig;
         cacheInvokeConfig.cacheConfig = cacheConfig;
         c.invoker = invoker;
@@ -355,7 +355,7 @@ public class CacheHandlerTest {
     @Test
     public void testInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
-        CacheHandler ch = new CacheHandler(count, cacheConfig, cacheProviderFactory);
+        CacheHandler ch = new CacheHandler(count, cacheConfig, globalCacheConfig);
         int x1 = (Integer) ch.invoke(null, method, null);
         int x2 = (Integer) ch.invoke(null, method, null);
         Assert.assertEquals(x1, x2);
@@ -372,7 +372,7 @@ public class CacheHandlerTest {
                 return cac;
             }
         };
-        CacheHandler ch = new CacheHandler(count, configMap, cacheProviderFactory);
+        CacheHandler ch = new CacheHandler(count, configMap, globalCacheConfig);
 
         int x1 = (Integer) ch.invoke(null, method, null);
         int x2 = (Integer) ch.invoke(null, method, null);

@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheProviderFactory;
+import com.taobao.geek.jetcache.GlobalCacheConfig;
 import com.taobao.geek.jetcache.Cached;
 import com.taobao.geek.jetcache.EnableCache;
 import com.taobao.geek.jetcache.testsupport.Count;
@@ -20,19 +20,19 @@ import org.junit.Test;
  */
 public class ProxyUtilTest {
 
-    private CacheProviderFactory cacheProviderFactory;
+    private GlobalCacheConfig globalCacheConfig;
     private CacheConfig cacheConfig;
 
     @Before
     public void setup() {
-        cacheProviderFactory = TestUtil.getCacheProviderFactory();
+        globalCacheConfig = TestUtil.getCacheProviderFactory();
         cacheConfig = new CacheConfig();
     }
 
     @Test
     public void testGetProxy() {
         Count c1 = new CountClass();
-        Count c2 = ProxyUtil.getProxy(c1, cacheConfig, cacheProviderFactory);
+        Count c2 = ProxyUtil.getProxy(c1, cacheConfig, globalCacheConfig);
 
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
@@ -60,7 +60,7 @@ public class ProxyUtilTest {
     //注解在类上
     public void testGetProxyByAnnotation1() {
         I1 c1 = new C1();
-        I1 c2 = ProxyUtil.getProxyByAnnotation(c1, cacheProviderFactory);
+        I1 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
     }
@@ -82,7 +82,7 @@ public class ProxyUtilTest {
     //注解在接口上
     public void testGetProxyByAnnotation2() {
         I2 c1 = new C2();
-        I2 c2 = ProxyUtil.getProxyByAnnotation(c1, cacheProviderFactory);
+        I2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
     }
@@ -110,7 +110,7 @@ public class ProxyUtilTest {
     //注解在超接口上
     public void testGetProxyByAnnotation3() {
         I3_2 c1 = new C3();
-        I3_2 c2 = ProxyUtil.getProxyByAnnotation(c1, cacheProviderFactory);
+        I3_2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
     }
@@ -136,7 +136,7 @@ public class ProxyUtilTest {
     //有超接口的情况
     public void testGetProxyByAnnotation4() {
         I4_1 c1 = new C4();
-        I4_1 c2 = ProxyUtil.getProxyByAnnotation(c1, cacheProviderFactory);
+        I4_1 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
     }
@@ -158,7 +158,7 @@ public class ProxyUtilTest {
     //enabled=false
     public void testGetProxyByAnnotation5() {
         I5 c1 = new C5();
-        I5 c2 = ProxyUtil.getProxyByAnnotation(c1, cacheProviderFactory);
+        I5 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertNotEquals(c2.count(), c2.count());
     }
@@ -181,7 +181,7 @@ public class ProxyUtilTest {
     //enabled=false+EnableCache
     public void testGetProxyByAnnotation6() {
         I6 c1 = new C6();
-        I6 c2 = ProxyUtil.getProxyByAnnotation(c1, cacheProviderFactory);
+        I6 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
     }
@@ -215,11 +215,11 @@ public class ProxyUtilTest {
     //enabled=false+EnableCache（enable in caller）
     public void testGetProxyByAnnotation7() {
         I7_1 c1_1 = new C7_1();
-        I7_1 c1_2 = ProxyUtil.getProxyByAnnotation(c1_1, cacheProviderFactory);
+        I7_1 c1_2 = ProxyUtil.getProxyByAnnotation(c1_1, globalCacheConfig);
 
         C7_2 c2_1 = new C7_2();
         c2_1.service = c1_2;
-        I7_2 c2_2 = ProxyUtil.getProxyByAnnotation(c2_1, cacheProviderFactory);
+        I7_2 c2_2 = ProxyUtil.getProxyByAnnotation(c2_1, globalCacheConfig);
         Assert.assertNotEquals(c2_1.foo(), c2_1.foo());
         Assert.assertEquals(c2_2.foo(), c2_2.foo());
     }

@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheProviderFactory;
+import com.taobao.geek.jetcache.GlobalCacheConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class ExpressionUtilTest {
         context.cacheInvokeConfig = new CacheInvokeConfig();
         context.cacheInvokeConfig.cacheConfig = cacheConfig;
 
-        context.cacheProviderFactory = new CacheProviderFactory(new HashMap());
+        context.globalCacheConfig = new GlobalCacheConfig(new HashMap());
     }
 
     @Test

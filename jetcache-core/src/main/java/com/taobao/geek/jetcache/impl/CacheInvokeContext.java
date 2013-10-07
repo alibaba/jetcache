@@ -3,7 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheProviderFactory;
+import com.taobao.geek.jetcache.GlobalCacheConfig;
 import com.taobao.geek.jetcache.CacheResultCode;
 
 import java.lang.reflect.Method;
@@ -16,7 +16,7 @@ public class CacheInvokeContext {
     Object target;
     Method method;
     Object[] args;
-    CacheProviderFactory cacheProviderFactory;
+    GlobalCacheConfig globalCacheConfig;
     CacheInvokeConfig cacheInvokeConfig;
 
     Object result = null;
@@ -26,6 +26,9 @@ public class CacheInvokeContext {
     boolean needUpdateRemote = false;
     CacheResultCode localResult = null;
     CacheResultCode remoteResult = null;
+
+    public CacheInvokeContext(){
+    }
 
 
     public Invoker getInvoker() {
@@ -60,12 +63,12 @@ public class CacheInvokeContext {
         this.args = args;
     }
 
-    public CacheProviderFactory getCacheProviderFactory() {
-        return cacheProviderFactory;
+    public GlobalCacheConfig getGlobalCacheConfig() {
+        return globalCacheConfig;
     }
 
-    public void setCacheProviderFactory(CacheProviderFactory cacheProviderFactory) {
-        this.cacheProviderFactory = cacheProviderFactory;
+    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
+        this.globalCacheConfig = globalCacheConfig;
     }
 
     public Object getResult() {

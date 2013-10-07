@@ -23,12 +23,12 @@ public class CacheImplSupport {
         return CacheContextSupport.enableCache(callback);
     }
 
-    public static <T> T getProxy(T target, CacheConfig cacheConfig, CacheProviderFactory cacheProviderFactory) {
-        return ProxyUtil.getProxy(target, cacheConfig, cacheProviderFactory);
+    public static <T> T getProxy(T target, CacheConfig cacheConfig, GlobalCacheConfig globalCacheConfig) {
+        return ProxyUtil.getProxy(target, cacheConfig, globalCacheConfig);
     }
 
-    public static <T> T getProxyByAnnotation(T target, CacheProviderFactory cacheProviderFactory) {
-        return ProxyUtil.getProxyByAnnotation(target, cacheProviderFactory);
+    public static <T> T getProxyByAnnotation(T target, GlobalCacheConfig globalCacheConfig) {
+        return ProxyUtil.getProxyByAnnotation(target, globalCacheConfig);
     }
 
     public static Object invoke(CacheInvokeContext context) throws Throwable {
