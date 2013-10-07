@@ -40,13 +40,12 @@ public class CacheConfigUtil {
         CacheConfig cc = parseCacheConfig(method);
         if (cc != null) {
             cac.setCacheConfig(cc);
-            cac.setConditionEL(ExpressionUtil.parseEL(cc.getCondition()));
-            cac.setUnlessEL(ExpressionUtil.parseEL(cc.getUnless()));
+            cac.init();
         }
         boolean enable = parseEnableCacheConfig(method);
         if (enable) {
             cac.setEnableCacheContext(true);
         }
-        return cc !=null || enable;
+        return cc != null || enable;
     }
 }

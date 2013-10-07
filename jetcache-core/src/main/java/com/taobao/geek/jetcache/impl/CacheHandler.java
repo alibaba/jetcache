@@ -24,8 +24,7 @@ class CacheHandler implements InvocationHandler {
         this.src = src;
         cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.cacheConfig = cacheConfig;
-        cacheInvokeConfig.conditionEL = ExpressionUtil.parseEL(cacheConfig.getCondition());
-        cacheInvokeConfig.unlessEL = ExpressionUtil.parseEL(cacheConfig.getUnless());
+        cacheInvokeConfig.init();
         this.cacheProviderFactory = cacheProviderFactory;
     }
 
@@ -57,8 +56,6 @@ class CacheHandler implements InvocationHandler {
             context.method = method;
             context.target = src;
             return invoke(context);
-
-
         }
     }
 

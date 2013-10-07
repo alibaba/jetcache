@@ -6,8 +6,6 @@ package com.taobao.geek.jetcache.impl;
 import com.taobao.geek.jetcache.*;
 import com.taobao.geek.jetcache.support.DefaultKeyGenerator;
 
-import java.lang.reflect.Method;
-
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -33,15 +31,7 @@ public class CacheImplSupport {
         return ProxyUtil.getProxyByAnnotation(target, cacheProviderFactory);
     }
 
-    public static Object invoke(Invoker invoker, Object src, Method method, Object[] args, CacheProviderFactory cacheProviderFactory,
-                                CacheInvokeConfig cac) throws Throwable {
-        CacheInvokeContext context = new CacheInvokeContext();
-        context.invoker = invoker;
-        context.target = src;
-        context.method = method;
-        context.args = args;
-        context.cacheProviderFactory = cacheProviderFactory;
-        context.cacheInvokeConfig = cac;
+    public static Object invoke(CacheInvokeContext context) throws Throwable {
         return CacheHandler.invoke(context);
     }
 }

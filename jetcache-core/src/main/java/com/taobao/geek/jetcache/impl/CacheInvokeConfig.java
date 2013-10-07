@@ -13,12 +13,33 @@ public class CacheInvokeConfig {
     boolean enableCacheContext;
 
     EL conditionEL;
+    String conditionScript;
     EL unlessEL;
+    String unlessScript;
 
     private static final CacheInvokeConfig noCacheInvokeConfigInstance = new CacheInvokeConfig();
 
     public static CacheInvokeConfig getNoCacheInvokeConfigInstance() {
         return noCacheInvokeConfigInstance;
+    }
+
+    public void init() {
+        Object[] tmp = ExpressionUtil.parseEL(cacheConfig.getCondition());
+        if (tmp != null) {
+            conditionEL = (EL) tmp[0];
+            conditionScript = (String) tmp[1];
+        } else {
+            conditionEL = null;
+            conditionScript = null;
+        }
+        tmp = ExpressionUtil.parseEL(cacheConfig.getUnless());
+        if (tmp != null) {
+            unlessEL = (EL) tmp[0];
+            unlessScript = (String) tmp[1];
+        } else {
+            unlessEL = null;
+            unlessScript = null;
+        }
     }
 
     public CacheConfig getCacheConfig() {

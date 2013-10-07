@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class CacheInvokeContext {
+public class CacheInvokeContext {
     Invoker invoker;
     Object target;
     Method method;

@@ -24,23 +24,27 @@ public class ExpressionUtilTest {
         cacheConfig = new CacheConfig();
         context.cacheInvokeConfig = new CacheInvokeConfig();
         context.cacheInvokeConfig.cacheConfig = cacheConfig;
+
         context.cacheProviderFactory = new CacheProviderFactory(new HashMap());
     }
 
     @Test
     public void testCondition() {
-        cacheConfig.setCondition("args[0]==null");
+        cacheConfig.setCondition("mvel{args[0]==null}");
+        context.cacheInvokeConfig.init();
         Assert.assertFalse(ExpressionUtil.evalCondition(context));
         context.args = new Object[1];
         Assert.assertTrue(ExpressionUtil.evalCondition(context));
         context.args = new Object[]{"1234"};
-        cacheConfig.setCondition("args[0].length()==4");
+        cacheConfig.setCondition("mvel{args[0].length()==4}");
+        context.cacheInvokeConfig.init();
         Assert.assertTrue(ExpressionUtil.evalCondition(context));
     }
 
     @Test
     public void testUnless() {
-        cacheConfig.setUnless("result==null");
+        cacheConfig.setUnless("mvel{result==null}");
+        context.cacheInvokeConfig.init();
         Assert.assertFalse(ExpressionUtil.evalUnless(context));
     }
 

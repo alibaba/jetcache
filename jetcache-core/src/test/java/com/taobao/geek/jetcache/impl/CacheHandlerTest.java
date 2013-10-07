@@ -26,6 +26,7 @@ public class CacheHandlerTest {
 
     private CacheProviderFactory cacheProviderFactory;
     private CacheConfig cacheConfig;
+    private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
     private DefaultCacheMonitor monitor;
 
@@ -33,6 +34,8 @@ public class CacheHandlerTest {
     public void setup() {
         cacheProviderFactory = TestUtil.getCacheProviderFactory();
         cacheConfig = new CacheConfig();
+        cacheInvokeConfig = new CacheInvokeConfig();
+        cacheInvokeConfig.cacheConfig = cacheConfig;
         count = new CountClass();
         monitor = new DefaultCacheMonitor();
         cacheProviderFactory.setCacheMonitor(monitor);
@@ -47,8 +50,8 @@ public class CacheHandlerTest {
         CacheInvokeContext c = new CacheInvokeContext();
         c.target = count;
         c.cacheProviderFactory = cacheProviderFactory;
-        c.cacheInvokeConfig = new CacheInvokeConfig();
-        c.cacheInvokeConfig.cacheConfig = cacheConfig;
+        c.cacheInvokeConfig = cacheInvokeConfig;
+        cacheInvokeConfig.cacheConfig = cacheConfig;
         c.invoker = invoker;
         c.method = method;
         c.args = args;
@@ -212,7 +215,8 @@ public class CacheHandlerTest {
     public void testStaticInvokeCondition() throws Throwable{
         Method method = CountClass.class.getMethod("count",int.class);
         int x1,x2;
-        cacheConfig.setCondition("args[0]>10");
+        cacheConfig.setCondition("mvel{args[0]>10}");
+        cacheInvokeConfig.init();
         x1 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{10}));
         x2 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{10}));
         Assert.assertNotEquals(x1, x2);
@@ -225,11 +229,13 @@ public class CacheHandlerTest {
     public void testStaticInvokeUnless() throws Throwable{
         Method method = CountClass.class.getMethod("count");
         int x1,x2,x3,x4;
-        cacheConfig.setUnless("result%2==1");
+        cacheConfig.setUnless("mvel{result%2==1}");
+        cacheInvokeConfig.init();
         x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));//return 0
         x2 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cache hit(0),unless=false
         Assert.assertEquals(x1, x2);
-        cacheConfig.setUnless("result%2==0");
+        cacheConfig.setUnless("mvel{result%2==0}");
+        cacheInvokeConfig.init();
         x3 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cache hit(0),unless=true,invoke and return 1
         x4 = (Integer) CacheHandler.invoke(createContext(null, method, null));//cache hit(1)
         Assert.assertNotNull(x3);
@@ -281,6 +287,7 @@ public class CacheHandlerTest {
         x3 = invoke(method, null);
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
+        cacheConfig.setEnabled(false);
         CacheContextSupport.enableCache(new Callback() {
             @Override
             public void execute() throws Throwable {
@@ -291,6 +298,14 @@ public class CacheHandlerTest {
                 Assert.assertEquals(x1, x3);
             }
         });
+
+        cacheConfig.setEnabled(false);
+        cacheInvokeConfig.enableCacheContext = true;
+        x1 = invoke(method, null);
+        x2 = invoke(method, null);
+        x3 = invoke(method, null);
+        Assert.assertEquals(x1, x2);
+        Assert.assertEquals(x1, x3);
     }
 
     @Test
