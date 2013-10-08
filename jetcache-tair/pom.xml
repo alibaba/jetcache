@@ -35,6 +35,7 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- artifacts for test list below-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

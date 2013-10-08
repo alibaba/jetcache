@@ -24,6 +24,7 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- artifacts for test list below-->
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
