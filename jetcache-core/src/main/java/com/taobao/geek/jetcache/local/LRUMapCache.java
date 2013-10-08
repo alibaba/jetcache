@@ -76,8 +76,3 @@ public class LRUMapCache implements Cache {
 
 }
 
-class LRUMapCacheCacheObject {
-    Object value;
-    long expireTime;
-}
-
