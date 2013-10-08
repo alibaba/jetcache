@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-04 15:34
  */
-package com.taobao.geek.jetcache.impl;
+package com.taobao.geek.jetcache;
 
 import com.taobao.geek.jetcache.Callback;
 import com.taobao.geek.jetcache.CallbackException;
@@ -14,7 +14,7 @@ import java.lang.reflect.Proxy;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class CacheContextSupport {
+public class CacheContextSupport {
 
     private static ThreadLocal<CacheThreadLocal> cacheThreadLocal = new ThreadLocal<CacheThreadLocal>() {
         @Override
@@ -23,10 +23,10 @@ class CacheContextSupport {
         }
     };
 
-    private CacheContextSupport() {
+    public CacheContextSupport() {
     }
 
-    public static void enableCache(Callback callback) throws CallbackException {
+    protected void enableCache(Callback callback) throws CallbackException {
         CacheThreadLocal var = cacheThreadLocal.get();
         try {
             var.setEnabledCount(var.getEnabledCount() + 1);
@@ -38,7 +38,7 @@ class CacheContextSupport {
         }
     }
 
-    public static <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException{
+    protected <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException{
         CacheThreadLocal var = cacheThreadLocal.get();
         try {
             var.setEnabledCount(var.getEnabledCount() + 1);
@@ -50,17 +50,17 @@ class CacheContextSupport {
         }
     }
 
-    static void enable(){
+    protected void enable(){
         CacheThreadLocal var = cacheThreadLocal.get();
         var.setEnabledCount(var.getEnabledCount() + 1);
     }
 
-    static void disable(){
+    protected void disable(){
         CacheThreadLocal var = cacheThreadLocal.get();
         var.setEnabledCount(var.getEnabledCount() - 1);
     }
 
-    public static boolean isEnabled() {
+    protected boolean isEnabled() {
         return cacheThreadLocal.get().getEnabledCount() > 0;
     }
 

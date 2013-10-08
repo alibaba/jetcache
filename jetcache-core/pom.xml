@@ -13,6 +13,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.taobao.geek.jetcache</groupId>
+            <artifactId>jetcache-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>

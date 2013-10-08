@@ -12,19 +12,19 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Cached {
-    String area() default CacheConfig.DEFAULT_AREA;
-    boolean enabled() default CacheConfig.DEFAULT_ENABLED;
-    int expire() default CacheConfig.DEFAULT_EXPIRE;
+    String area() default CacheConsts.DEFAULT_AREA;
+    boolean enabled() default CacheConsts.DEFAULT_ENABLED;
+    int expire() default CacheConsts.DEFAULT_EXPIRE;
     CacheType cacheType() default CacheType.REMOTE;
-    int localLimit() default CacheConfig.DEFAULT_LOCAL_LIMIT;
-    int version() default CacheConfig.DEFAULT_VERSION;
-    boolean cacheNullValue() default CacheConfig.DEFAULT_CACHE_NULL_VALUE;
+    int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
+    int version() default CacheConsts.DEFAULT_VERSION;
+    boolean cacheNullValue() default CacheConsts.DEFAULT_CACHE_NULL_VALUE;
 
     /**
      * Expression attribute used for conditioning the method caching.
      * <p>Default is "", meaning the method is always cached.
      */
-    String condition() default CacheConfig.DEFAULT_CONDITION;
+    String condition() default CacheConsts.DEFAULT_CONDITION;
 
     /**
      * Expression attribute used to veto method caching.
@@ -32,5 +32,5 @@ public @interface Cached {
      * has been called and can therefore refer to the {@code result}. Default is "",
      * meaning that caching is never vetoed.
      */
-    String unless() default CacheConfig.DEFAULT_UNLESS;
+    String unless() default CacheConsts.DEFAULT_UNLESS;
 }

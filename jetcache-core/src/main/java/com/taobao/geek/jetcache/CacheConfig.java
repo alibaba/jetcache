@@ -8,25 +8,15 @@ package com.taobao.geek.jetcache;
  */
 public class CacheConfig {
 
-    public static final String DEFAULT_AREA = "";
-    public static final boolean DEFAULT_ENABLED = true;
-    public static final int DEFAULT_EXPIRE = 600;
-    public static final CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;
-    public static final int DEFAULT_LOCAL_LIMIT = 100;
-    public static final int DEFAULT_VERSION = 1;
-    public static final boolean DEFAULT_CACHE_NULL_VALUE = false;
-    public static final String DEFAULT_CONDITION = "";
-    public static final String DEFAULT_UNLESS = "";
-
-    private String area = DEFAULT_AREA;
-    private boolean enabled = DEFAULT_ENABLED;
-    private int expire = DEFAULT_EXPIRE;
-    private CacheType cacheType = DEFAULT_CACHE_TYPE;
-    private int localLimit = DEFAULT_LOCAL_LIMIT;
-    private int version = DEFAULT_VERSION;
-    private boolean cacheNullValue = DEFAULT_CACHE_NULL_VALUE;
-    private String condition = DEFAULT_CONDITION;
-    private String unless = DEFAULT_UNLESS;
+    private String area = CacheConsts.DEFAULT_AREA;
+    private boolean enabled = CacheConsts.DEFAULT_ENABLED;
+    private int expire = CacheConsts.DEFAULT_EXPIRE;
+    private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
+    private int localLimit = CacheConsts.DEFAULT_LOCAL_LIMIT;
+    private int version = CacheConsts.DEFAULT_VERSION;
+    private boolean cacheNullValue = CacheConsts.DEFAULT_CACHE_NULL_VALUE;
+    private String condition = CacheConsts.DEFAULT_CONDITION;
+    private String unless = CacheConsts.DEFAULT_UNLESS;
 
     public String getArea() {
         return area;

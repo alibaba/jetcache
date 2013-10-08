@@ -3,10 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.GlobalCacheConfig;
-import com.taobao.geek.jetcache.CacheType;
-import com.taobao.geek.jetcache.Callback;
+import com.taobao.geek.jetcache.*;
 import com.taobao.geek.jetcache.support.DefaultCacheMonitor;
 import com.taobao.geek.jetcache.testsupport.CountClass;
 import com.taobao.geek.jetcache.testsupport.DynamicQuery;
@@ -288,7 +285,7 @@ public class CacheHandlerTest {
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
         cacheConfig.setEnabled(false);
-        CacheContextSupport.enableCache(new Callback() {
+        CacheContext.enableCache(new Callback() {
             @Override
             public void execute() throws Throwable {
                 int x1 = invoke(method, null);

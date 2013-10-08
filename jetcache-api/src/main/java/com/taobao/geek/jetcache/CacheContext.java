@@ -3,12 +3,12 @@
  */
 package com.taobao.geek.jetcache;
 
-import com.taobao.geek.jetcache.impl.CacheImplSupport;
-
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheContext {
+
+    private static CacheContextSupport support = new CacheContextSupport();
 
     private CacheContext() {
     }
@@ -21,7 +21,7 @@ public class CacheContext {
      * @see EnableCache
      */
     public static void enableCache(Callback callback) throws CallbackException {
-        CacheImplSupport.enableCache(callback);
+        support.enableCache(callback);
     }
 
     /**
@@ -33,7 +33,7 @@ public class CacheContext {
      * @see EnableCache
      */
     public static <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException {
-        return CacheImplSupport.enableCache(callback);
+        return support.enableCache(callback);
     }
 
 }

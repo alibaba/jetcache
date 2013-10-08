@@ -15,14 +15,6 @@ public class CacheImplSupport {
         return new DefaultKeyGenerator();
     }
 
-    public static void enableCache(Callback callback) throws CallbackException {
-        CacheContextSupport.enableCache(callback);
-    }
-
-    public static <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException {
-        return CacheContextSupport.enableCache(callback);
-    }
-
     public static <T> T getProxy(T target, CacheConfig cacheConfig, GlobalCacheConfig globalCacheConfig) {
         return ProxyUtil.getProxy(target, cacheConfig, globalCacheConfig);
     }

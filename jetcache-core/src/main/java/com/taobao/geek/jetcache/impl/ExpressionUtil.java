@@ -3,10 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheConfigException;
-import com.taobao.geek.jetcache.CacheException;
-import com.taobao.geek.jetcache.CacheMonitor;
+import com.taobao.geek.jetcache.*;
 import org.mvel2.MVEL;
 
 import java.util.regex.Matcher;
@@ -27,7 +24,7 @@ class ExpressionUtil {
 
     public static boolean evalCondition(CacheInvokeContext context) {
         String condition = context.cacheInvokeConfig.cacheConfig.getCondition();
-        if (CacheConfig.DEFAULT_CONDITION.equals(condition)) {
+        if (CacheConsts.DEFAULT_CONDITION.equals(condition)) {
             return true;
         }
         try {
@@ -43,7 +40,7 @@ class ExpressionUtil {
 
     public static boolean evalUnless(CacheInvokeContext context) {
         String unless = context.cacheInvokeConfig.cacheConfig.getUnless();
-        if (CacheConfig.DEFAULT_UNLESS.equals(unless)) {
+        if (CacheConsts.DEFAULT_UNLESS.equals(unless)) {
             return true;
         }
         try {
