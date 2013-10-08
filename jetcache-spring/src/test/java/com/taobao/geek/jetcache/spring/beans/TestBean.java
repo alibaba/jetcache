@@ -33,12 +33,12 @@ public class TestBean {
         return count++;
     }
 
-    @Cached(condition = "mvel{bean(\"configBean\").returnTrue()}")
+    @Cached(condition = "mvel{bean('configBean').trueProp}")
     public int countEnabledWithConfigBean(){
         return count++;
     }
 
-    @Cached(condition = "mvel{bean(\"configBean\").returnFalse()}")
+    @Cached(condition = "mvel{bean('configBean').falseProp}")
     public int countDisabledWithConfigBean(){
         return count++;
     }

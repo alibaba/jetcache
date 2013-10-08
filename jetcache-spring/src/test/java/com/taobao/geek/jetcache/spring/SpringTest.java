@@ -70,14 +70,13 @@ public class SpringTest {
         Assert.assertNotEquals(x1, x2);
         Assert.assertEquals(x1, x3);
 
-        //TODO spring bean support in el
-//        x1 = bean.countEnabledWithConfigBean();
-//        x2 = bean.countEnabledWithConfigBean();
-//        Assert.assertEquals(x1, x2);
-//
-//        x1 = bean.countDisabledWithConfigBean();
-//        x2 = bean.countDisabledWithConfigBean();
-//        Assert.assertNotEquals(x1, x2);
+        x1 = bean.countEnabledWithConfigBean();
+        x2 = bean.countEnabledWithConfigBean();
+        Assert.assertEquals(x1, x2);
+
+        x1 = bean.countDisabledWithConfigBean();
+        x2 = bean.countDisabledWithConfigBean();
+        Assert.assertNotEquals(x1, x2);
     }
 
     @Component

@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ConfigBean {
-    public boolean returnTrue() {
+    public boolean isTrueProp() {
          return true;
     }
 
-    public boolean returnFalse() {
+    public boolean isFalseProp() {
         return false;
     }
 }
