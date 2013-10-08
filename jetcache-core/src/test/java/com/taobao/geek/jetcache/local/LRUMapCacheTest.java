@@ -4,6 +4,7 @@
 package com.taobao.geek.jetcache.local;
 
 import com.taobao.geek.jetcache.support.CacheConfig;
+import com.taobao.geek.jetcache.support.CacheResult;
 import com.taobao.geek.jetcache.support.CacheResultCode;
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    public void testLRU1(){
+    public void testLRU1() {
         cc.setLocalLimit(2);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2"));
@@ -52,7 +53,7 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    public void testLRU2(){
+    public void testLRU2() {
         cc.setLocalLimit(2);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2"));
@@ -64,7 +65,7 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    public void testLRU3()throws Exception{
+    public void testLRU3() throws Exception {
         cc.setExpire(1);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
@@ -73,9 +74,73 @@ public class LRUMapCacheTest {
     }
 
     @Test
-    public void testNull(){
+    public void testNull() {
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", null));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
         Assert.assertNull(cache.get(cc, "S1", "K1").getValue());
+    }
+
+    @Test
+    public void testConcurrent() throws Exception {
+        cc.setLocalLimit(2000);
+        class Status {
+            boolean fail = false;
+        }
+        final Status s = new Status();
+        class T extends Thread {
+            String keyPrefix;
+            private String subArea;
+            transient boolean stop;
+
+            T(String keyPrefix, String subArea) {
+                this.keyPrefix = keyPrefix;
+                this.subArea = subArea;
+            }
+
+            @Override
+            public void run() {
+                try {
+                    int i = 0;
+                    while (!stop) {
+                        i++;
+                        if (i >= 1000) {
+                            i = 0;
+                        }
+                        String key = keyPrefix + i;
+                        String value = i + "";
+                        cache.put(cc, subArea, key, value);
+                        CacheResult result = cache.get(cc, subArea, key);
+                        if (result == null || result.getResultCode()!=CacheResultCode.SUCCESS) {
+                            s.fail = true;
+                        } else if (!result.getValue().equals(value)) {
+                            s.fail = true;
+                        }
+                    }
+                } catch (Throwable e) {
+                    e.printStackTrace();
+                    s.fail = true;
+                }
+
+            }
+        }
+
+        T t1 = new T("K1", "S1");
+        T t2 = new T("K2", "S1");
+        T t3 = new T("K3", "S2");
+        T t4 = new T("K4", "S2");
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+
+        Thread.sleep(1000);
+        t1.stop = true;
+        t2.stop = true;
+        t3.stop = true;
+        t4.stop = true;
+
+        if (s.fail) {
+            Assert.fail();
+        }
     }
 }

@@ -68,7 +68,8 @@ public class LRUMapCache implements Cache {
         String areaKey = sb.toString();
         Map<String, SoftReference<LRUMapCacheCacheObject>> map = areaMap.get(areaKey);
         if (map == null) {
-            map = Collections.synchronizedMap(new LRUMap(cacheConfig.getLocalLimit()));
+            map = new LRUMap(cacheConfig.getLocalLimit());
+            map = Collections.synchronizedMap(map);
             areaMap.put(areaKey, map);
         }
         return map;
