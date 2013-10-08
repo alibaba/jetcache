@@ -3,9 +3,9 @@
  */
 package com.taobao.geek.jetcache.tair;
 
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheResult;
-import com.taobao.geek.jetcache.CacheResultCode;
+import com.taobao.geek.jetcache.support.CacheConfig;
+import com.taobao.geek.jetcache.support.CacheResult;
+import com.taobao.geek.jetcache.support.CacheResultCode;
 import com.taobao.tair.DataEntry;
 import com.taobao.tair.Result;
 import com.taobao.tair.ResultCode;

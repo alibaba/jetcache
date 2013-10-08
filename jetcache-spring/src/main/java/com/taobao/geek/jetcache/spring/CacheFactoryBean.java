@@ -3,7 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring;
 
-import com.taobao.geek.jetcache.CacheClient;
+import com.taobao.geek.jetcache.support.CacheClient;
 import org.springframework.beans.factory.FactoryBean;
 
 /**

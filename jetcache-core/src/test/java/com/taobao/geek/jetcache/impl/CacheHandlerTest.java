@@ -4,7 +4,9 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.*;
+import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.DefaultCacheMonitor;
+import com.taobao.geek.jetcache.support.GlobalCacheConfig;
 import com.taobao.geek.jetcache.testsupport.CountClass;
 import com.taobao.geek.jetcache.testsupport.DynamicQuery;
 import com.taobao.geek.jetcache.testsupport.TestUtil;

@@ -4,6 +4,7 @@
 package com.taobao.geek.jetcache.impl;
 
 import com.taobao.geek.jetcache.*;
+import com.taobao.geek.jetcache.support.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

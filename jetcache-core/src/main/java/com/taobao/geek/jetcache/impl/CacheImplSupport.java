@@ -3,8 +3,10 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.*;
+import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.DefaultKeyGenerator;
+import com.taobao.geek.jetcache.support.GlobalCacheConfig;
+import com.taobao.geek.jetcache.support.KeyGenerator;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

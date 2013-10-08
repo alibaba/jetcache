@@ -4,7 +4,6 @@
 package com.taobao.geek.jetcache.support;
 
 import com.alibaba.fastjson.JSON;
-import com.taobao.geek.jetcache.KeyGenerator;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

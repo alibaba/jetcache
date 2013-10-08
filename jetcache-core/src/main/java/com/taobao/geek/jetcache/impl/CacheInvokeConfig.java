@@ -3,7 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
+import com.taobao.geek.jetcache.support.CacheConfig;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

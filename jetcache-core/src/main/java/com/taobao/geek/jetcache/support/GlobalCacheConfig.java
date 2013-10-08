@@ -1,8 +1,9 @@
 /**
  * Created on  13-09-09 17:29
  */
-package com.taobao.geek.jetcache;
+package com.taobao.geek.jetcache.support;
 
+import com.taobao.geek.jetcache.CacheException;
 import com.taobao.geek.jetcache.impl.CacheInvokeContext;
 
 import java.util.Map;

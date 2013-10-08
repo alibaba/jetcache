@@ -20,12 +20,12 @@
             </map>
         </constructor-arg>
     </bean>
-    <bean id="ccheProvider1" class="com.taobao.geek.jetcache.CacheProvider">
+    <bean id="ccheProvider1" class="com.taobao.geek.jetcache.support.CacheProvider">
         <property name="remoteCache">
             <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
         </property>
     </bean>
-    <bean id="ccheProvider2" class="com.taobao.geek.jetcache.CacheProvider">
+    <bean id="ccheProvider2" class="com.taobao.geek.jetcache.support.CacheProvider">
         <property name="remoteCache">
             <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
         </property>

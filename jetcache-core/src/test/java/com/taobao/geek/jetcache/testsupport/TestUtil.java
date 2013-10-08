@@ -3,8 +3,8 @@
  */
 package com.taobao.geek.jetcache.testsupport;
 
-import com.taobao.geek.jetcache.CacheProvider;
-import com.taobao.geek.jetcache.GlobalCacheConfig;
+import com.taobao.geek.jetcache.support.CacheProvider;
+import com.taobao.geek.jetcache.support.GlobalCacheConfig;
 
 import java.util.HashMap;
 import java.util.Map;

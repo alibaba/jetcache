@@ -3,16 +3,15 @@
  */
 package com.taobao.geek.jetcache.local;
 
-import com.taobao.geek.jetcache.Cache;
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheResult;
-import com.taobao.geek.jetcache.CacheResultCode;
-import com.taobao.geek.jetcache.support.CopyOnWriteHashMap;
+import com.taobao.geek.jetcache.support.Cache;
+import com.taobao.geek.jetcache.support.CacheConfig;
+import com.taobao.geek.jetcache.support.CacheResult;
+import com.taobao.geek.jetcache.support.CacheResultCode;
+import com.taobao.geek.jetcache.util.CopyOnWriteHashMap;
 import org.apache.commons.collections.map.LRUMap;
 
 import java.lang.ref.SoftReference;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

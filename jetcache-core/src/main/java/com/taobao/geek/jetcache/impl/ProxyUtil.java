@@ -3,8 +3,8 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.GlobalCacheConfig;
+import com.taobao.geek.jetcache.support.CacheConfig;
+import com.taobao.geek.jetcache.support.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

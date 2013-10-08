@@ -1,7 +1,10 @@
 /**
  * Created on  13-09-10 10:33
  */
-package com.taobao.geek.jetcache;
+package com.taobao.geek.jetcache.support;
+
+import com.taobao.geek.jetcache.CacheConsts;
+import com.taobao.geek.jetcache.CacheType;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

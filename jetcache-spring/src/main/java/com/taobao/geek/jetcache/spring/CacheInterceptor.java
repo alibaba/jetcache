@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
-import com.taobao.geek.jetcache.GlobalCacheConfig;
+import com.taobao.geek.jetcache.support.GlobalCacheConfig;
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.impl.CacheInvokeConfig;
 import com.taobao.geek.jetcache.impl.CacheInvokeContext;

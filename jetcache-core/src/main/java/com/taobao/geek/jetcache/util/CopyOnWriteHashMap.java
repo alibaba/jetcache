@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-26 16:02
  */
-package com.taobao.geek.jetcache.support;
+package com.taobao.geek.jetcache.util;
 
 import java.util.HashMap;
 import java.util.Map;

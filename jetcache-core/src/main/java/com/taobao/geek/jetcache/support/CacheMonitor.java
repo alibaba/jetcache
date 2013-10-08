@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-26 09:42
  */
-package com.taobao.geek.jetcache;
+package com.taobao.geek.jetcache.support;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

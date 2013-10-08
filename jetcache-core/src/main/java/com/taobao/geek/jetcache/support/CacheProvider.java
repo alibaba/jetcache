@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-10 14:42
  */
-package com.taobao.geek.jetcache;
+package com.taobao.geek.jetcache.support;
 
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.local.LRUMapCache;

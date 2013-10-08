@@ -3,9 +3,7 @@
  */
 package com.taobao.geek.jetcache.support;
 
-import com.taobao.geek.jetcache.CacheConfig;
-import com.taobao.geek.jetcache.CacheMonitor;
-import com.taobao.geek.jetcache.CacheResultCode;
+import com.taobao.geek.jetcache.util.CopyOnWriteHashMap;
 
 import java.util.Map;
 import java.util.Set;

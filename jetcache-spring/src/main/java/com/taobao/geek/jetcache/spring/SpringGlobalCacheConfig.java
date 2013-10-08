@@ -3,8 +3,8 @@
  */
 package com.taobao.geek.jetcache.spring;
 
-import com.taobao.geek.jetcache.CacheProvider;
-import com.taobao.geek.jetcache.GlobalCacheConfig;
+import com.taobao.geek.jetcache.support.CacheProvider;
+import com.taobao.geek.jetcache.support.GlobalCacheConfig;
 import com.taobao.geek.jetcache.impl.CacheInvokeContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

@@ -3,7 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
-import com.taobao.geek.jetcache.CacheConfig;
+import com.taobao.geek.jetcache.support.CacheConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
