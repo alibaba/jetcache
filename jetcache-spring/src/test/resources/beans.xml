@@ -12,7 +12,7 @@
 
     <jetcache:annotation-driven/>
 
-    <bean id="globalCacheConfig" class="com.taobao.geek.jetcache.GlobalCacheConfig">
+    <bean id="globalCacheConfig" class="com.taobao.geek.jetcache.spring.SpringGlobalCacheConfig">
         <constructor-arg index="0">
             <map>
                 <entry key="" value-ref="ccheProvider1"/>

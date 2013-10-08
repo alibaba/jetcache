@@ -38,13 +38,13 @@ class CacheHandler implements InvocationHandler {
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheInvokeContext context = null;
         if (cacheInvokeConfig != null) {
-            context = new CacheInvokeContext();
+            context = globalCacheConfig.createCacheInvokeContext();
             context.cacheInvokeConfig = cacheInvokeConfig;
         } else {
             String sig = ClassUtil.getMethodSig(method);
             CacheInvokeConfig cac = configMap.get(sig);
             if (cac != null) {
-                context = new CacheInvokeContext();
+                context = globalCacheConfig.createCacheInvokeContext();
                 context.cacheInvokeConfig = cac;
             }
         }

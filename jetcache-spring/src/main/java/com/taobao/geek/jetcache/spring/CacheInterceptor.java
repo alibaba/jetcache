@@ -4,29 +4,23 @@
 package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
-import com.taobao.geek.jetcache.*;
-import com.taobao.geek.jetcache.impl.*;
+import com.taobao.geek.jetcache.GlobalCacheConfig;
+import com.taobao.geek.jetcache.impl.CacheImplSupport;
+import com.taobao.geek.jetcache.impl.CacheInvokeConfig;
+import com.taobao.geek.jetcache.impl.CacheInvokeContext;
+import com.taobao.geek.jetcache.impl.Invoker;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Method;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheInterceptor implements MethodInterceptor, ApplicationContextAware {
+public class CacheInterceptor implements MethodInterceptor {
 
     private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap;
     private GlobalCacheConfig globalCacheConfig;
-    private ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
 
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -41,7 +35,7 @@ public class CacheInterceptor implements MethodInterceptor, ApplicationContextAw
             }
         };
 
-        CacheInvokeContext context = new CacheInvokeContext();
+        CacheInvokeContext context = globalCacheConfig.createCacheInvokeContext();
         context.setInvoker(invoker);
         context.setTarget(invocation.getThis());
         context.setMethod(invocation.getMethod());

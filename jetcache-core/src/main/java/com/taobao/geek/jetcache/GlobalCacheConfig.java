@@ -3,6 +3,8 @@
  */
 package com.taobao.geek.jetcache;
 
+import com.taobao.geek.jetcache.impl.CacheInvokeContext;
+
 import java.util.Map;
 
 /**
@@ -31,5 +33,9 @@ public class GlobalCacheConfig {
 
     public void setCacheMonitor(CacheMonitor cacheMonitor) {
         this.cacheMonitor = cacheMonitor;
+    }
+
+    public CacheInvokeContext createCacheInvokeContext(){
+        return new CacheInvokeContext();
     }
 }
