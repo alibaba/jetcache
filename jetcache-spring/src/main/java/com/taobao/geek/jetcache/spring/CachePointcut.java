@@ -10,6 +10,7 @@ import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -69,12 +70,14 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         if (exclude(clazz)) {
             return;
         }
-        try {
-            Method method = clazz.getDeclaredMethod(name, paramTypes);
-            CacheConfigUtil.parse(cac, method);
-        } catch (NoSuchMethodException e) {
-            //TODO optimize it
+        Method[] methods = clazz.getDeclaredMethods();
+        for (Method method : methods) {
+            if (methodMatch(name, method, paramTypes)) {
+                CacheConfigUtil.parse(cac, method);
+                break;
+            }
         }
+
         if (!clazz.isInterface() && clazz.getSuperclass() != null) {
             parseByTargetClass(cac, clazz.getSuperclass(), name, paramTypes);
         }
@@ -83,6 +86,26 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             parseByTargetClass(cac, it, name, paramTypes);
         }
     }
+
+    private boolean methodMatch(String name, Method method, Class<?>[] paramTypes) {
+        if (!Modifier.isPublic(method.getModifiers())) {
+            return false;
+        }
+        if (!name.equals(method.getName())) {
+            return false;
+        }
+        Class<?>[] ps = method.getParameterTypes();
+        if (ps.length != paramTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < ps.length; i++) {
+            if (!ps[i].equals(paramTypes[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     public void setCacheConfigMap(IdentityHashMap cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
