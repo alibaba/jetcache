@@ -24,13 +24,20 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
 
     @Override
     public boolean matches(Class<?> clazz) {
-        if (clazz.getName().startsWith("java")) {
-            return false;
-        }
-        if (clazz.getName().startsWith("org.springframework")) {
+        if (exclude(clazz)) {
             return false;
         }
         return true;
+    }
+
+    public boolean exclude(Class<?> clazz) {
+        if (clazz.getName().startsWith("java")) {
+            return true;
+        }
+        if (clazz.getName().startsWith("org.springframework")) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -59,6 +66,9 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     private void parseByTargetClass(CacheInvokeConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {
+        if (exclude(clazz)) {
+            return;
+        }
         try {
             Method method = clazz.getDeclaredMethod(name, paramTypes);
             CacheConfigUtil.parse(cac, method);
