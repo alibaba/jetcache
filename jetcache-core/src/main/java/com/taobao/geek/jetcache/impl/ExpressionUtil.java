@@ -56,7 +56,7 @@ class ExpressionUtil {
     }
 
 
-    private static final Pattern pattern = Pattern.compile("\\s*(\\w+)\\{(.+)\\}\\s*");
+    private static final Pattern pattern = Pattern.compile("\\s*(\\w+)\\s*\\{(.+)\\}\\s*");
 
     public static Object[] parseEL(String script) {
         if (script == null || script.trim().equals("")) {
