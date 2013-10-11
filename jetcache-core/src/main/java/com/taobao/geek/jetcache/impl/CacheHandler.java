@@ -91,7 +91,7 @@ class CacheHandler implements InvocationHandler {
         }
     }
 
-    public static Object doInvoke(CacheInvokeContext context) throws Throwable{
+    private static Object doInvoke(CacheInvokeContext context) throws Throwable{
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
         if (cacheConfig != null && (cacheConfig.isEnabled() || cacheContextSupport.isEnabled())) {
             return invokeWithCache(context);
