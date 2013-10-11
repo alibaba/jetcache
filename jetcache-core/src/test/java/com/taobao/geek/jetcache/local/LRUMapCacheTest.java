@@ -34,6 +34,7 @@ public class LRUMapCacheTest {
         Assert.assertEquals("V2", cache.get(cc, "S1", "K1").getValue());
 
         cc.setArea("A2");
+        cc.setExpire(30 * 24 * 3600);
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());

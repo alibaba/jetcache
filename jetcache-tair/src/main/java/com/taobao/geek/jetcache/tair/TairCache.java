@@ -65,7 +65,7 @@ public class TairCache implements Cache {
         try {
             TairValue tv = new TairValue();
             tv.v = value;
-            tv.e = System.currentTimeMillis() + cacheConfig.getExpire() * 1000;
+            tv.e = System.currentTimeMillis() + cacheConfig.getExpire() * 1000L;
             byte[] bytes = encode(tv);
             ResultCode tairCode = tairManager.put(namespace, key, bytes, 0, cacheConfig.getExpire());
             if (tairCode.getCode() == ResultCode.SUCCESS.getCode()) {
