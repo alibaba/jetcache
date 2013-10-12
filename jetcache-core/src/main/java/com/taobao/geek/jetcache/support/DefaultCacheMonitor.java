@@ -72,7 +72,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
     public StringBuilder getStatText() {
         StringBuilder sb = new StringBuilder(512);
         sb.append("-----------------------------------------------\n");
-        sb.append("hit/get\tlocal hit/local get/local fail\tremote hit/remote get/remote fail\n");
+        sb.append("hit/get\tlocalhit/localget/localfail\tremotehit/remoteget/remotefail\n");
         Set<Map.Entry<String, CopyOnWriteHashMap<String, Stat>>> entries = map.entrySet();
         for (Map.Entry<String, CopyOnWriteHashMap<String, Stat>> entry : entries) {
             Set<Map.Entry<String, Stat>> areaMapEntries = entry.getValue().entrySet();
