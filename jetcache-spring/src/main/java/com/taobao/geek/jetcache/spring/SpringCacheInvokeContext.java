@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContext;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class SpringCacheInvokeContext extends CacheInvokeContext {
-    private ApplicationContext context;
+    protected ApplicationContext context;
 
     public SpringCacheInvokeContext(ApplicationContext context) {
         this.context = context;
