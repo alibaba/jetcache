@@ -83,7 +83,6 @@ public class LRUMapCacheTest {
 
     @Test
     public void testConcurrent() throws Exception {
-        cc.setLocalLimit(2000);
         class Status {
             boolean fail = false;
         }
@@ -112,8 +111,14 @@ public class LRUMapCacheTest {
                         cache.put(cc, subArea, key, value);
                         CacheResult result = cache.get(cc, subArea, key);
                         if (result == null || result.getResultCode()!=CacheResultCode.SUCCESS) {
+                            if (result == null) {
+                                System.out.println("result is null");
+                            } else {
+                                System.out.println("code:" + result.getResultCode());
+                            }
                             s.fail = true;
                         } else if (!result.getValue().equals(value)) {
+                            System.out.println("value:" + result.getValue());
                             s.fail = true;
                         }
                     }
@@ -125,20 +130,19 @@ public class LRUMapCacheTest {
             }
         }
 
-        T t1 = new T("K1", "S1");
-        T t2 = new T("K2", "S1");
-        T t3 = new T("K3", "S2");
-        T t4 = new T("K4", "S2");
-        t1.start();
-        t2.start();
-        t3.start();
-        t4.start();
+        int threadCount = 10;
+        cc.setLocalLimit(threadCount * 1000);
 
-        Thread.sleep(1000);
-        t1.stop = true;
-        t2.stop = true;
-        t3.stop = true;
-        t4.stop = true;
+        T[] t = new T[threadCount];
+        for (int i = 0; i < threadCount; i++) {
+            t[i] = new T("K" + i, "S" + i);
+            t[i].start();
+        }
+
+        Thread.sleep(10000);
+        for (int i = 0; i < threadCount; i++) {
+            t[i].stop = true;
+        }
 
         if (s.fail) {
             Assert.fail();
