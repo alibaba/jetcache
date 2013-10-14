@@ -88,8 +88,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
 
     private void append(StringBuilder sb, Stat stat) {
         DecimalFormat df = new DecimalFormat("#.0%");
-        sb.append(stat.area).append('\t').append(stat.subArea).append('\n');
-        sb.append(stat.hitCount).append('/').append(stat.getCount).append(df.format(1.0 * stat.hitCount / stat.getCount));
+        sb.append(stat.area).append('/').append(stat.subArea).append('\n');
+        sb.append(stat.hitCount).append('/').append(stat.getCount).append('/').append(df.format(1.0 * stat.hitCount / stat.getCount));
         sb.append('\t');
         sb.append(stat.localHitCount).append('/').append(stat.localGetCount).append('/').append(stat.localFailCount);
         sb.append('\t');
