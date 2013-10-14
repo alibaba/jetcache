@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class SpringGlobalCacheConfig extends GlobalCacheConfig implements ApplicationContextAware {
 
-    private ApplicationContext applicationContext;
+    protected ApplicationContext applicationContext;
 
     public SpringGlobalCacheConfig(Map<String, CacheProvider> providerMap) {
         super(providerMap);
