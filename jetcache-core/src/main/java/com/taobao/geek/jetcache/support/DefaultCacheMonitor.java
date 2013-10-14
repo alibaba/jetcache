@@ -5,6 +5,7 @@ package com.taobao.geek.jetcache.support;
 
 import com.taobao.geek.jetcache.util.CopyOnWriteHashMap;
 
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Set;
 
@@ -72,7 +73,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
     public StringBuilder getStatText() {
         StringBuilder sb = new StringBuilder(512);
         sb.append("-----------------------------------------------\n");
-        sb.append("hit/get\tlocalhit/localget/localfail\tremotehit/remoteget/remotefail\n");
+        sb.append("hit/get/rate\tlocalhit/localget/localfail\tremotehit/remoteget/remotefail\n");
         Set<Map.Entry<String, CopyOnWriteHashMap<String, Stat>>> entries = map.entrySet();
         for (Map.Entry<String, CopyOnWriteHashMap<String, Stat>> entry : entries) {
             Set<Map.Entry<String, Stat>> areaMapEntries = entry.getValue().entrySet();
@@ -86,8 +87,9 @@ public class DefaultCacheMonitor implements CacheMonitor {
     }
 
     private void append(StringBuilder sb, Stat stat) {
-        sb.append(stat.area).append('/').append(stat.subArea).append('\n');
-        sb.append(stat.hitCount).append('/').append(stat.getCount);
+        DecimalFormat df = new DecimalFormat("#.0%");
+        sb.append(stat.area).append('\t').append(stat.subArea).append('\n');
+        sb.append(stat.hitCount).append('/').append(stat.getCount).append(df.format(1.0 * stat.hitCount / stat.getCount));
         sb.append('\t');
         sb.append(stat.localHitCount).append('/').append(stat.localGetCount).append('/').append(stat.localFailCount);
         sb.append('\t');
