@@ -42,4 +42,9 @@ public class TestBean {
     public int countDisabledWithConfigBean(){
         return count++;
     }
+
+    @Cached(condition = "mvel{args[0]}")
+    public int count(boolean useCache){
+        return count++;
+    }
 }

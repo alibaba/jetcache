@@ -77,6 +77,9 @@ public class SpringTest {
         x1 = bean.countDisabledWithConfigBean();
         x2 = bean.countDisabledWithConfigBean();
         Assert.assertNotEquals(x1, x2);
+
+        Assert.assertEquals(bean.count(true), bean.count(true));
+        Assert.assertNotEquals(bean.count(false), bean.count(false));
     }
 
     @Component
