@@ -8,10 +8,10 @@ import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.CacheResult;
 import com.taobao.geek.jetcache.support.CacheResultCode;
 import com.taobao.geek.jetcache.util.CopyOnWriteHashMap;
-import org.apache.commons.collections.map.LRUMap;
 
 import java.lang.ref.SoftReference;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -69,12 +69,28 @@ public class LRUMapCache implements Cache {
         String areaKey = sb.toString();
         Map<String, SoftReference<LRUMapCacheCacheObject>> map = areaMap.get(areaKey);
         if (map == null) {
-            map = new LRUMap(cacheConfig.getLocalLimit());
+            map = new LRUMap(cacheConfig.getLocalLimit(), (int)(cacheConfig.getLocalLimit() * 1.5f), 0.75f);
             map = Collections.synchronizedMap(map);
             areaMap.put(areaKey, map);
         }
         return map;
     }
+
+    private static class LRUMap extends LinkedHashMap {
+
+        private final int max;
+
+        public LRUMap(int max, int initialCapacity, float loadFactor) {
+            super(initialCapacity, loadFactor, true);
+            this.max = max;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry eldest) {
+            return size() > max;
+        }
+    }
+
 
 }
 
