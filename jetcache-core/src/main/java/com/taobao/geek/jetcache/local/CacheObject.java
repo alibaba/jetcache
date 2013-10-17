@@ -3,10 +3,12 @@
  */
 package com.taobao.geek.jetcache.local;
 
+import java.lang.ref.SoftReference;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class LRUMapCacheCacheObject {
+class CacheObject {
     Object value;
     long expireTime;
 }

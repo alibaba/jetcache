@@ -15,13 +15,11 @@ public class CopyOnWriteHashMapTest {
     CopyOnWriteHashMap<String, String> map = new CopyOnWriteHashMap<String, String>();
 //    HashMap<String, String> map = new HashMap<String, String>();
 
+
+    private volatile boolean fail;
+
     @Test
     public void test() throws Exception {
-
-        class Status {
-            boolean fail = false;
-        }
-        final Status s = new Status();
         class T extends Thread {
             String keyPrefix;
             transient boolean stop;
@@ -43,13 +41,13 @@ public class CopyOnWriteHashMapTest {
                         String value = i + "";
                         map.put(key, value);
                         if (map.get(key) == null) {
-                            s.fail = true;
+                            fail = true;
                         } else if (!map.get(key).equals(value)) {
-                            s.fail = true;
+                            fail = true;
                         }
                     }
                 } catch (Throwable e) {
-                    s.fail = true;
+                    fail = true;
                 }
 
             }
@@ -70,7 +68,7 @@ public class CopyOnWriteHashMapTest {
         t3.stop = true;
         t4.stop = true;
 
-        if (s.fail) {
+        if (fail) {
             Assert.fail();
         }
     }

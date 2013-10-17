@@ -4,7 +4,7 @@
 package com.taobao.geek.jetcache.support;
 
 import com.taobao.geek.jetcache.impl.CacheImplSupport;
-import com.taobao.geek.jetcache.local.LRUMapCache;
+import com.taobao.geek.jetcache.local.LinkedHashMapCache;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -12,7 +12,7 @@ import com.taobao.geek.jetcache.local.LRUMapCache;
 public class CacheProvider {
 
     private Cache remoteCache;
-    private Cache localCache = new LRUMapCache();
+    private Cache localCache = new LinkedHashMapCache();
     private KeyGenerator keyGenerator = CacheImplSupport.getDefaultKeyGenerator();
 
     public Cache getRemoteCache() {
