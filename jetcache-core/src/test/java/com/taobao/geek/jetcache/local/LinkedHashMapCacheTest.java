@@ -161,7 +161,7 @@ public class LinkedHashMapCacheTest {
             t[i].start();
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(1000);
         for (int i = 0; i < threadCount; i++) {
             t[i].stop = true;
         }
