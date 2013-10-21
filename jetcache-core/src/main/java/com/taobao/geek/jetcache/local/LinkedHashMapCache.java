@@ -21,18 +21,8 @@ public class LinkedHashMapCache extends AbstractLocalCache {
     }
 
     @Override
-    protected AreaCache getCacheMap(CacheConfig cacheConfig, String subArea) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(cacheConfig.getArea());
-        sb.append('_');
-        sb.append(subArea);
-        String areaKey = sb.toString();
-        AreaCache areaCache = areaMap.get(areaKey);
-        if (areaCache == null) {
-            areaCache = new LRUMap(cacheConfig.getLocalLimit());
-            areaMap.put(areaKey, areaCache);
-        }
-        return areaCache;
+    protected AreaCache createAreaCache(int localLimit){
+        return new LRUMap(localLimit);
     }
 
     private static final class LRUMap extends LinkedHashMap implements AreaCache {

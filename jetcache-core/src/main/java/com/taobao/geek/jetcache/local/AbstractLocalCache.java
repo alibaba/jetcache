@@ -16,9 +16,9 @@ import java.lang.ref.SoftReference;
  */
 public abstract class AbstractLocalCache implements Cache {
     protected boolean useSoftRef = false;
-    protected CopyOnWriteHashMap<String, AreaCache> areaMap = new CopyOnWriteHashMap<String, AreaCache>();
+    private CopyOnWriteHashMap<String, AreaCache> areaMap = new CopyOnWriteHashMap<String, AreaCache>();
 
-    protected abstract AreaCache getCacheMap(CacheConfig cacheConfig, String subArea);
+    protected abstract AreaCache createAreaCache(int localLimit);
 
     public AbstractLocalCache(){
     }
@@ -85,6 +85,20 @@ public abstract class AbstractLocalCache implements Cache {
             map.putValue(key, cacheObject);
         }
         return CacheResultCode.SUCCESS;
+    }
+
+    protected AreaCache getCacheMap(CacheConfig cacheConfig, String subArea) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(cacheConfig.getArea());
+        sb.append('_');
+        sb.append(subArea);
+        String areaKey = sb.toString();
+        AreaCache areaCache = areaMap.get(areaKey);
+        if (areaCache == null) {
+            areaCache = createAreaCache(cacheConfig.getLocalLimit());
+            areaMap.put(areaKey, areaCache);
+        }
+        return areaCache;
     }
 
     public boolean isUseSoftRef() {

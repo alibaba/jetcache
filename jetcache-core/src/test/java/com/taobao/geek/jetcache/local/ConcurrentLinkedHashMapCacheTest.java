@@ -3,22 +3,16 @@
  */
 package com.taobao.geek.jetcache.local;
 
-import com.taobao.geek.jetcache.support.Cache;
 import com.taobao.geek.jetcache.support.CacheConfig;
-import com.taobao.geek.jetcache.support.CacheResult;
-import com.taobao.geek.jetcache.support.CacheResultCode;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LinkedHashMapCacheTest extends AbstractLocalCacheTest {
-
+public class ConcurrentLinkedHashMapCacheTest extends AbstractLocalCacheTest {
     @Override
     protected void setup(boolean useSofeRef) {
-        cache = new LinkedHashMapCache(useSofeRef);
+        cache = new ConcurrentLinkedHashMapCache(useSofeRef);
         cc = new CacheConfig();
     }
 
