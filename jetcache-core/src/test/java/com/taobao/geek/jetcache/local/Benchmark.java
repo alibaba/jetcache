@@ -37,8 +37,8 @@ public class Benchmark {
         cc.setLocalLimit(CACHE_LIMIT);
         cc.setArea("");
 
-//        Cache cache = new ConcurrentLinkedHashMapCache(false);
-        Cache cache = new LinkedHashMapCache(false);
+        Cache cache = new ConcurrentLinkedHashMapCache(false);
+//        Cache cache = new LinkedHashMapCache(false);
 
         CountDownLatch doneSignal = new CountDownLatch(THREAD_COUNT);
 
@@ -46,6 +46,7 @@ public class Benchmark {
         T[] threads = new T[THREAD_COUNT];
         for (int i = 0; i < THREAD_COUNT; i++) {
             threads[i] = new T(data[i], cache, cc, doneSignal);
+            threads[i].setName("T" + i);
             threads[i].start();
         }
 
@@ -75,11 +76,12 @@ public class Benchmark {
         CacheConfig cacheConfig;
         CountDownLatch doneSignal;
 
-        long startTime;
-        long endTime;
+        volatile long startTime;
+        volatile long endTime;
 
-        long getCount;
-        long hitCount;
+        volatile long getCount;
+        volatile long hitCount;
+        volatile long nothitCount;
 
         public T(String data[], Cache cache, CacheConfig cacheConfig, CountDownLatch doneSignal) {
             this.data = data;
@@ -95,19 +97,21 @@ public class Benchmark {
                 getCount++;
                 CacheResult result = cache.get(cacheConfig, "S1", userId);
                 if (result.getResultCode() != CacheResultCode.SUCCESS) {
-                    cache.put(cacheConfig, "S1", userId, VALUE);
+                    cache.put(cacheConfig, "S1", userId, Integer.parseInt(userId));
+                    nothitCount++;
                 } else {
                     hitCount++;
                 }
             }
             endTime = System.currentTimeMillis();
+            System.out.println(Thread.currentThread().getName() + " " + hitCount + "/" + nothitCount + "/" + getCount);
             doneSignal.countDown();
         }
     }
 
     public static String[][] readData() throws Exception {
-        int rowsPerThread = LINE_COUNT / 20;
-        String[][] data = new String[20][rowsPerThread];
+        int rowsPerThread = LINE_COUNT / THREAD_COUNT;
+        String[][] data = new String[THREAD_COUNT][rowsPerThread];
         FileInputStream fis = new FileInputStream(FILE);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis, "GBK"));
         String line = null;
