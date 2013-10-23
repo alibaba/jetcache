@@ -15,7 +15,7 @@ import java.lang.ref.SoftReference;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public abstract class AbstractLocalCache implements Cache {
-    protected boolean useSoftRef = false;
+    protected boolean useSoftRef = true;
     private CopyOnWriteHashMap<String, AreaCache> areaMap = new CopyOnWriteHashMap<String, AreaCache>();
 
     protected abstract AreaCache createAreaCache(int localLimit);

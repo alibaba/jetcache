@@ -29,6 +29,7 @@ public class ConcurrentLinkedHashMapCache extends AbstractLocalCache {
         ConcurrentAreaCache(int limit) {
             cache = new ConcurrentLinkedHashMap.Builder<String, Object>()
                     .maximumWeightedCapacity(limit)
+                    .initialCapacity(limit)
                     .build();
         }
 
