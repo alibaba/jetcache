@@ -97,7 +97,7 @@ public class Benchmark {
                 getCount++;
                 CacheResult result = cache.get(cacheConfig, "S1", userId);
                 if (result.getResultCode() != CacheResultCode.SUCCESS) {
-                    cache.put(cacheConfig, "S1", userId, Integer.parseInt(userId));
+                    cache.put(cacheConfig, "S1", userId, VALUE);
                     nothitCount++;
                 } else {
                     hitCount++;
