@@ -12,6 +12,8 @@
 
     <jetcache:annotation-driven/>
 
+    <bean id="factoryBeanTarget" class="com.taobao.geek.jetcache.spring.beans.MyFactoryBean"/>
+
     <bean id="globalCacheConfig" class="com.taobao.geek.jetcache.spring.SpringGlobalCacheConfig">
         <constructor-arg index="0">
             <map>

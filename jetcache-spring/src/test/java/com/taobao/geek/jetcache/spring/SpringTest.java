@@ -6,6 +6,7 @@ package com.taobao.geek.jetcache.spring;
 import com.taobao.geek.jetcache.CacheContext;
 import com.taobao.geek.jetcache.EnableCache;
 import com.taobao.geek.jetcache.spring.beans.DynamicQuery;
+import com.taobao.geek.jetcache.spring.beans.FactoryBeanTarget;
 import com.taobao.geek.jetcache.spring.beans.Service;
 import com.taobao.geek.jetcache.spring.beans.TestBean;
 import org.junit.Assert;
@@ -80,6 +81,9 @@ public class SpringTest {
 
         Assert.assertEquals(bean.count(true), bean.count(true));
         Assert.assertNotEquals(bean.count(false), bean.count(false));
+
+        FactoryBeanTarget target = (FactoryBeanTarget) context.getBean("factoryBeanTarget");
+        Assert.assertEquals(target.count(), target.count());
     }
 
     @Component
