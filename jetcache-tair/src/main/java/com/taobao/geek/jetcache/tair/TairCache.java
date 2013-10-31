@@ -5,6 +5,7 @@ package com.taobao.geek.jetcache.tair;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.support.Cache;
 import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.CacheResult;
@@ -33,7 +34,7 @@ public class TairCache implements Cache {
                 DataEntry dn = tairResult.getValue();
                 if (dn != null && dn.getValue() != null) {
                     byte[] bytes = (byte[]) dn.getValue();
-                    TairValue tv = decode(bytes);
+                    TairValue tv = (TairValue) CacheImplSupport.decodeValue(bytes);
                     if (System.currentTimeMillis() >= tv.e) {
                         code = CacheResultCode.EXPIRED;
                     } else {
@@ -66,7 +67,7 @@ public class TairCache implements Cache {
             TairValue tv = new TairValue();
             tv.v = value;
             tv.e = System.currentTimeMillis() + cacheConfig.getExpire() * 1000L;
-            byte[] bytes = encode(tv);
+            byte[] bytes = CacheImplSupport.encodeValue(tv, cacheConfig.getSerialPolicy());
             ResultCode tairCode = tairManager.put(namespace, key, bytes, 0, cacheConfig.getExpire());
             if (tairCode.getCode() == ResultCode.SUCCESS.getCode()) {
                 return CacheResultCode.SUCCESS;
@@ -76,14 +77,6 @@ public class TairCache implements Cache {
         } catch (Exception e) {
             return CacheResultCode.FAIL;
         }
-    }
-
-    byte[] encode(TairValue value) {
-        return JSON.toJSONBytes(value, SerializerFeature.WriteClassName);
-    }
-
-    TairValue decode(byte[] bytes) {
-        return (TairValue) JSON.parse(bytes);
     }
 
     public TairManager getTairManager() {

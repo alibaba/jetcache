@@ -5,6 +5,7 @@ package com.taobao.geek.jetcache.support;
 
 import com.taobao.geek.jetcache.CacheConsts;
 import com.taobao.geek.jetcache.CacheType;
+import com.taobao.geek.jetcache.SerialPolicy;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -20,6 +21,7 @@ public class CacheConfig {
     private boolean cacheNullValue = CacheConsts.DEFAULT_CACHE_NULL_VALUE;
     private String condition = CacheConsts.DEFAULT_CONDITION;
     private String unless = CacheConsts.DEFAULT_UNLESS;
+    private SerialPolicy serialPolicy = CacheConsts.DEFAULT_SERIAL_POLICY;
 
     public String getArea() {
         return area;
@@ -91,5 +93,13 @@ public class CacheConfig {
 
     public void setUnless(String unless) {
         this.unless = unless;
+    }
+
+    public SerialPolicy getSerialPolicy() {
+        return serialPolicy;
+    }
+
+    public void setSerialPolicy(SerialPolicy serialPolicy) {
+        this.serialPolicy = serialPolicy;
     }
 }

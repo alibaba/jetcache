@@ -19,6 +19,7 @@ public @interface Cached {
     int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
     int version() default CacheConsts.DEFAULT_VERSION;
     boolean cacheNullValue() default CacheConsts.DEFAULT_CACHE_NULL_VALUE;
+    SerialPolicy serialPolicy() default SerialPolicy.KRYO;
 
     /**
      * Expression attribute used for conditioning the method caching.

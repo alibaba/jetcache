@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.impl;
 
+import com.taobao.geek.jetcache.SerialPolicy;
 import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.DefaultKeyGenerator;
 import com.taobao.geek.jetcache.support.GlobalCacheConfig;
@@ -27,5 +28,13 @@ public class CacheImplSupport {
 
     public static Object invoke(CacheInvokeContext context) throws Throwable {
         return CacheHandler.invoke(context);
+    }
+
+    public static byte[] encodeValue(Object value, SerialPolicy serialPolicy) throws Exception {
+        return SerializeUtil.encode(value, serialPolicy);
+    }
+
+    public static Object decodeValue(byte[] buffer) throws Exception {
+        return SerializeUtil.decode(buffer);
     }
 }

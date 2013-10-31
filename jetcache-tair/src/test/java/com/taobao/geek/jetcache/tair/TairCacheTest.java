@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.tair;
 
+import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.CacheResult;
 import com.taobao.geek.jetcache.support.CacheResultCode;
@@ -26,6 +27,7 @@ public class TairCacheTest {
     public JUnitRuleMockery context = new JUnitRuleMockery();
     private TairCache cache;
     private TairManager tairManager;
+    private CacheConfig cc;
 
     @Before
     public void setup() {
@@ -33,37 +35,46 @@ public class TairCacheTest {
         cache = new TairCache();
         cache.setNamespace(20);
         cache.setTairManager(tairManager);
+        cc = new CacheConfig();
     }
 
     @Test
     public void testGet() {
         context.checking(new Expectations() {
             {
-                oneOf(tairManager).get(20, "SA1K1");
-                will(returnValue(new Result(ResultCode.DATANOTEXSITS)));
-                oneOf(tairManager).get(20, "SA2K2");
-                will(returnValue(new Result(ResultCode.DATAEXPIRED)));
-                oneOf(tairManager).get(20, "SA3K3");
-                will(returnValue(new Result(ResultCode.PARTSUCC)));
-                oneOf(tairManager).get(20, "SA4K4");
-                will(throwException(new RuntimeException()));
-                oneOf(tairManager).get(20, "SA5K5");
-                DataEntry dn = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() + 100000, "V")));
-                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
-                oneOf(tairManager).get(20, "SA6K6");
-                DataEntry dn2 = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() - 1, "V")));
-                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn2)));
+                try {
+                    oneOf(tairManager).get(20, "SA1K1");
+                    will(returnValue(new Result(ResultCode.DATANOTEXSITS)));
+                    oneOf(tairManager).get(20, "SA2K2");
+                    will(returnValue(new Result(ResultCode.DATAEXPIRED)));
+                    oneOf(tairManager).get(20, "SA3K3");
+                    will(returnValue(new Result(ResultCode.PARTSUCC)));
+                    oneOf(tairManager).get(20, "SA4K4");
+                    will(throwException(new RuntimeException()));
+                    oneOf(tairManager).get(20, "SA5K5");
+                    byte[] bs = CacheImplSupport.encodeValue(new TairValue(System.currentTimeMillis() + 100000, "V"),
+                            cc.getSerialPolicy());
+                    DataEntry dn = new DataEntry(bs);
+                    will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
+                    oneOf(tairManager).get(20, "SA6K6");
+                    bs = CacheImplSupport.encodeValue(new TairValue(System.currentTimeMillis() - 1, "V"),
+                            cc.getSerialPolicy());
+                    DataEntry dn2 = new DataEntry(bs);
+                    will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn2)));
+                } catch (Exception e) {
+                    Assert.fail();
+                }
             }
         });
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(null, "SA1", "K1").getResultCode());
-        Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(null, "SA2", "K2").getResultCode());
-        Assert.assertEquals(CacheResultCode.FAIL, cache.get(null, "SA3", "K3").getResultCode());
-        Assert.assertEquals(CacheResultCode.FAIL, cache.get(null, "SA4", "K4").getResultCode());
+        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "SA1", "K1").getResultCode());
+        Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(cc, "SA2", "K2").getResultCode());
+        Assert.assertEquals(CacheResultCode.FAIL, cache.get(cc, "SA3", "K3").getResultCode());
+        Assert.assertEquals(CacheResultCode.FAIL, cache.get(cc, "SA4", "K4").getResultCode());
         CacheResult result = cache.get(null, "SA5", "K5");
         Assert.assertEquals(CacheResultCode.SUCCESS, result.getResultCode());
         Assert.assertEquals("V", result.getValue());
 
-        Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(null, "SA6", "K6").getResultCode());
+        Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(cc, "SA6", "K6").getResultCode());
     }
 
     @Test
@@ -86,11 +97,17 @@ public class TairCacheTest {
         final CacheConfig cc = new CacheConfig();
         context.checking(new Expectations() {
             {
-                oneOf(tairManager).put(with(20), with("SA1K1"), with(any(byte[].class)), with(0), with(cc.getExpire()));
-                will(returnValue(ResultCode.SUCCESS));
-                oneOf(tairManager).get(20, "SA1K1");
-                DataEntry dn = new DataEntry(cache.encode(new TairValue(System.currentTimeMillis() + 100000, null)));
-                will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
+                try {
+                    oneOf(tairManager).put(with(20), with("SA1K1"), with(any(byte[].class)), with(0), with(cc.getExpire()));
+                    will(returnValue(ResultCode.SUCCESS));
+                    oneOf(tairManager).get(20, "SA1K1");
+                    byte[] bs = CacheImplSupport.encodeValue(new TairValue(System.currentTimeMillis() + 100000, null),
+                            cc.getSerialPolicy());
+                    DataEntry dn = new DataEntry(bs);
+                    will(returnValue(new Result<DataEntry>(ResultCode.SUCCESS, dn)));
+                } catch (Exception e) {
+                    Assert.fail();
+                }
             }
         });
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "SA1", "K1", null));

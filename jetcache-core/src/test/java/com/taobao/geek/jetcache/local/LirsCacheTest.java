@@ -5,11 +5,13 @@ package com.taobao.geek.jetcache.local;
 
 import com.taobao.geek.jetcache.support.CacheConfig;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
+@Ignore
 public class LirsCacheTest extends AbstractLocalCacheTest {
 
     @Override

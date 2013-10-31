@@ -28,6 +28,7 @@ public class CacheConfigUtil {
         cc.setCacheNullValue(anno.cacheNullValue());
         cc.setCondition(anno.condition());
         cc.setUnless(anno.unless());
+        cc.setSerialPolicy(anno.serialPolicy());
         return cc;
     }
 

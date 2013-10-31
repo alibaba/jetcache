@@ -25,6 +25,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.esotericsoftware.kryo</groupId>
+            <artifactId>kryo</artifactId>
+            <version>2.22</version>
+        </dependency>
 
         <dependency>
             <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
@@ -32,7 +37,6 @@
             <version>1.4</version>
             <optional>true</optional>
         </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
