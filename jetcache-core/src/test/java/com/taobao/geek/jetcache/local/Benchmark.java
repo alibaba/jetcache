@@ -38,7 +38,8 @@ public class Benchmark {
         cc.setArea("");
 
         //Cache cache = new ConcurrentLinkedHashMapCache(false);
-        Cache cache = new LinkedHashMapCache(false);
+//        Cache cache = new LinkedHashMapCache(false);
+        Cache cache = new LirsCache(false);
 
         CountDownLatch doneSignal = new CountDownLatch(THREAD_COUNT);
 
