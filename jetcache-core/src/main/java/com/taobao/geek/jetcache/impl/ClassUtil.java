@@ -15,12 +15,13 @@ import java.util.HashSet;
  */
 class ClassUtil {
 
-    private static IdentityHashMap<Method, String> methodMap = new IdentityHashMap<Method, String>();
+    private static IdentityHashMap<Method, String> subAreaMap = new IdentityHashMap<Method, String>();
+    private static IdentityHashMap<Method, String> methodSigMap = new IdentityHashMap<Method, String>();
 
     public static String getSubArea(CacheConfig cacheConfig, Method method) {
         // TODO invalid cache when param type changed
 
-        String prefix = methodMap.get(method);
+        String prefix = subAreaMap.get(method);
 
         if (prefix == null) {
             StringBuilder sb = new StringBuilder();
@@ -28,7 +29,7 @@ class ClassUtil {
             sb.append(method.getDeclaringClass().getName());
             sb.append('.');
             getMethodSig(sb, method);
-            methodMap.put(method, sb.toString());
+            subAreaMap.put(method, sb.toString());
             return sb.toString();
         } else {
             return prefix;
@@ -54,8 +55,15 @@ class ClassUtil {
     }
 
     public static String getMethodSig(Method m) {
-        StringBuilder sb = new StringBuilder();
-        getMethodSig(sb, m);
-        return sb.toString();
+        String sig = methodSigMap.get(m);
+        if (sig != null) {
+            return sig;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            getMethodSig(sb, m);
+            sig = sb.toString();
+            methodSigMap.put(m, sig);
+            return sig;
+        }
     }
 }
