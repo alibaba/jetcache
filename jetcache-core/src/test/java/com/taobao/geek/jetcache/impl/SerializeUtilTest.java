@@ -81,6 +81,28 @@ public class SerializeUtilTest {
         test(SerialPolicy.KRYO);
     }
 
+//    @Test
+    public void testPerformance() throws Exception {
+        int count = 500000;
+        long t = System.currentTimeMillis();
+        for (int i = 0; i < count; i++) {
+            testPerformance(SerialPolicy.JAVA);
+        }
+        System.out.println((System.currentTimeMillis() - t));
+    }
+
+    private void testPerformance(SerialPolicy p) throws Exception{
+        A a = new A();
+        B b = new B();
+        a.b = b;
+        b.a = a;
+        a.map.put("a", a);
+        a.map.put("b", b);
+
+        byte[] bs1 = SerializeUtil.encode(a, p);
+        A a2 = (A) SerializeUtil.decode(bs1);
+    }
+
     private void test(SerialPolicy p) throws Exception {
         A a = new A();
         B b = new B();
@@ -89,8 +111,11 @@ public class SerializeUtilTest {
         a.map.put("a", a);
         a.map.put("b", b);
 
-        A a2 = (A) SerializeUtil.decode(SerializeUtil.encode(a, p));
-        B b2 = (B) SerializeUtil.decode(SerializeUtil.encode(b, p));
+        byte[] bs1 = SerializeUtil.encode(a, p);
+        byte[] bs2 = SerializeUtil.encode(b, p);
+
+        A a2 = (A) SerializeUtil.decode(bs1);
+        B b2 = (B) SerializeUtil.decode(bs2);
 
         Assert.assertEquals(a.f1, a2.f1);
         Assert.assertNotNull(a2.b);

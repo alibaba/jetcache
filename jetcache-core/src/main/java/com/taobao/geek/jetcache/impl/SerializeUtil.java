@@ -22,6 +22,15 @@ class SerializeUtil {
     private static final byte FASTJSON_HEAD = 'F';
     private static final byte KRYO_HEAD = 'K';
 
+    private static ThreadLocal<Kryo> kryoThreadLocal = new ThreadLocal<Kryo>(){
+        @Override
+        protected Kryo initialValue() {
+            Kryo kryo = new Kryo();
+            kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+            return kryo;
+        }
+    };
+
     public static byte[] encode(Object value, SerialPolicy serialPolicy) throws Exception {
         switch (serialPolicy) {
             case FASTJSON: {
@@ -43,8 +52,7 @@ class SerializeUtil {
                 return bs2;
             }
             case KRYO: {
-                Kryo kryo = new Kryo();
-                kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+                Kryo kryo = kryoThreadLocal.get();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream(128);
                 Output output = new Output(bos);
                 output.write(KRYO_HEAD);
@@ -72,8 +80,7 @@ class SerializeUtil {
             case KRYO_HEAD: {
                 ByteArrayInputStream in = new ByteArrayInputStream(buffer, 1, buffer.length - 1);
                 Input input = new Input(in);
-                Kryo kryo = new Kryo();
-                kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+                Kryo kryo = kryoThreadLocal.get();
                 return kryo.readClassAndObject(input);
             }
             default:
