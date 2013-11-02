@@ -45,7 +45,7 @@
     </build>
     <modules>
         <module>jetcache-core</module>
-        <module>jetcache-tair</module>
+        <module>jetcache-ali</module>
         <module>jetcache-spring</module>
         <module>jetcache-api</module>
     </modules>
