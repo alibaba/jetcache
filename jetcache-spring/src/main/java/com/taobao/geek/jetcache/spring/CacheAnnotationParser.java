@@ -5,6 +5,7 @@ package com.taobao.geek.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
 import org.springframework.aop.config.AopNamespaceUtils;
+import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -40,15 +41,15 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
             RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
             interceptorDef.setSource(eleSource);
             interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            interceptorDef.getPropertyValues().add("globalCacheConfig",new RuntimeBeanReference("globalCacheConfig"));
-            interceptorDef.getPropertyValues().add("cacheConfigMap", new RuntimeBeanReference(configMapName));
+            interceptorDef.getPropertyValues().addPropertyValue(new PropertyValue("globalCacheConfig", new RuntimeBeanReference("globalCacheConfig")));
+            interceptorDef.getPropertyValues().addPropertyValue(new PropertyValue("cacheConfigMap", new RuntimeBeanReference(configMapName)));
             String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
             RootBeanDefinition advisorDef = new RootBeanDefinition(CacheAdvisor.class);
             advisorDef.setSource(eleSource);
             advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
-            advisorDef.getPropertyValues().add("adviceBeanName", interceptorName);
-            advisorDef.getPropertyValues().add("cacheConfigMap", new RuntimeBeanReference(configMapName));
+            advisorDef.getPropertyValues().addPropertyValue(new PropertyValue("adviceBeanName", interceptorName));
+            advisorDef.getPropertyValues().addPropertyValue(new PropertyValue("cacheConfigMap", new RuntimeBeanReference(configMapName)));
             parserContext.getRegistry().registerBeanDefinition(CACHE_ADVISOR_BEAN_NAME, advisorDef);
 
             CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),

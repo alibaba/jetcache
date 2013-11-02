@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-@Component
+@Component("testBean")
 public class TestBean {
 
     private int count = 0;

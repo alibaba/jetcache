@@ -4,13 +4,12 @@
 package com.taobao.geek.jetcache.spring.beans;
 
 import com.taobao.geek.jetcache.Cached;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-@Component
+@Component("service")
 public class ServiceImpl implements Service {
 
     private int count;

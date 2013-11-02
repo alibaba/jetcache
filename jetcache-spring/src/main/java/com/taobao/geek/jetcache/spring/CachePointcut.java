@@ -24,7 +24,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     @Override
-    public boolean matches(Class<?> clazz) {
+    public boolean matches(Class clazz) {
         if (exclude(clazz)) {
             return false;
         }
@@ -42,7 +42,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     @Override
-    public boolean matches(Method method, Class<?> targetClass) {
+    public boolean matches(Method method, Class targetClass) {
         CacheInvokeConfig cac = cacheConfigMap.get(method);
         if (cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
             return false;
