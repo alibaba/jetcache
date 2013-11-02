@@ -15,9 +15,14 @@ public class GlobalCacheConfig {
 
     private final Map<String, CacheProvider> providerMap;
     private CacheMonitor cacheMonitor;
+    private String[] hidePackages;
 
     public GlobalCacheConfig(Map<String, CacheProvider> providerMap) {
         this.providerMap = providerMap;
+    }
+
+    public CacheInvokeContext createCacheInvokeContext(){
+        return new CacheInvokeContext();
     }
 
     public CacheProvider getCache(String area) {
@@ -36,7 +41,11 @@ public class GlobalCacheConfig {
         this.cacheMonitor = cacheMonitor;
     }
 
-    public CacheInvokeContext createCacheInvokeContext(){
-        return new CacheInvokeContext();
+    public String[] getHidePackages() {
+        return hidePackages;
+    }
+
+    public void setHidePackages(String[] hidePackages) {
+        this.hidePackages = hidePackages;
     }
 }

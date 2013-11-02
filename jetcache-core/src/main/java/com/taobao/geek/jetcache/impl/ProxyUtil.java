@@ -24,14 +24,14 @@ class ProxyUtil {
 
     public static <T> T getProxyByAnnotation(T target, GlobalCacheConfig globalCacheConfig) {
         final HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>();
-        processType(configMap, target.getClass());
+        processType(configMap, target.getClass(), globalCacheConfig);
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap, globalCacheConfig);
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
 
-    private static void processType(HashMap<String, CacheInvokeConfig> configMap, Class<?> clazz) {
+    private static void processType(HashMap<String, CacheInvokeConfig> configMap, Class<?> clazz, GlobalCacheConfig gcc) {
         if (clazz.isAnnotation() || clazz.isArray() || clazz.isEnum() || clazz.isPrimitive()) {
             throw new IllegalArgumentException(clazz.getName());
         }
@@ -41,24 +41,24 @@ class ProxyUtil {
         Method[] methods = clazz.getDeclaredMethods();
         for (Method m : methods) {
             if (Modifier.isPublic(m.getModifiers())) {
-                processMethod(configMap, m);
+                processMethod(configMap, m, gcc);
             }
         }
 
         Class<?>[] interfaces = clazz.getInterfaces();
         for (Class<?> it : interfaces) {
-            processType(configMap, it);
+            processType(configMap, it, gcc);
         }
 
         if (!clazz.isInterface()) {
             if (clazz.getSuperclass() != null) {
-                processType(configMap, clazz.getSuperclass());
+                processType(configMap, clazz.getSuperclass(), gcc);
             }
         }
     }
 
-    private static void processMethod(HashMap<String, CacheInvokeConfig> configMap, Method m) {
-        String sig = ClassUtil.getMethodSig(m);
+    private static void processMethod(HashMap<String, CacheInvokeConfig> configMap, Method m, GlobalCacheConfig gcc) {
+        String sig = ClassUtil.getMethodSig(m, gcc.getHidePackages());
         CacheInvokeConfig cac = configMap.get(sig);
         if (cac == null) {
             cac = new CacheInvokeConfig();

@@ -60,7 +60,7 @@ class CacheHandler implements InvocationHandler {
             context = globalCacheConfig.createCacheInvokeContext();
             context.cacheInvokeConfig = cacheInvokeConfig;
         } else {
-            String sig = ClassUtil.getMethodSig(method);
+            String sig = ClassUtil.getMethodSig(method, globalCacheConfig.getHidePackages());
             CacheInvokeConfig cac = configMap.get(sig);
             if (cac != null) {
                 context = globalCacheConfig.createCacheInvokeContext();
@@ -109,7 +109,7 @@ class CacheHandler implements InvocationHandler {
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
 
         CacheProvider cacheProvider = context.globalCacheConfig.getCache(cacheConfig.getArea());
-        String subArea = ClassUtil.getSubArea(cacheConfig, context.method);
+        String subArea = ClassUtil.getSubArea(cacheConfig, context.method, context.globalCacheConfig.getHidePackages());
         String key = cacheProvider.getKeyGenerator().getKey(context.args);
         boolean hit = getFromCache(context, cacheProvider, subArea, key);
 

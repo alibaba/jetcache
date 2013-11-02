@@ -18,7 +18,7 @@ class ClassUtil {
     private static IdentityHashMap<Method, String> subAreaMap = new IdentityHashMap<Method, String>();
     private static IdentityHashMap<Method, String> methodSigMap = new IdentityHashMap<Method, String>();
 
-    public static String getSubArea(CacheConfig cacheConfig, Method method) {
+    public static String getSubArea(CacheConfig cacheConfig, Method method, String[] hidePackages) {
         // TODO invalid cache when param type changed
 
         String prefix = subAreaMap.get(method);
@@ -29,11 +29,23 @@ class ClassUtil {
             sb.append(method.getDeclaringClass().getName());
             sb.append('.');
             getMethodSig(sb, method);
-            subAreaMap.put(method, sb.toString());
-            return sb.toString();
+            String str = replace(hidePackages, sb);
+            subAreaMap.put(method, str);
+            return str;
         } else {
             return prefix;
         }
+    }
+
+    private static String replace(String[] hidePackages, StringBuilder sb) {
+        String str = sb.toString();
+        if (hidePackages != null) {
+            for (String p : hidePackages) {
+                str = str.replace(p + ".", "");
+                str = str.replace((p + ".").replace('.', '/'), "");
+            }
+        }
+        return str;
     }
 
     public static Class<?>[] getAllInterfaces(Object obj) {
@@ -54,14 +66,14 @@ class ClassUtil {
         sb.append(Type.getType(m).getDescriptor());
     }
 
-    public static String getMethodSig(Method m) {
+    public static String getMethodSig(Method m, String[] hidePackages) {
         String sig = methodSigMap.get(m);
         if (sig != null) {
             return sig;
         } else {
             StringBuilder sb = new StringBuilder();
             getMethodSig(sb, m);
-            sig = sb.toString();
+            sig = replace(hidePackages, sb);
             methodSigMap.put(m, sig);
             return sig;
         }
