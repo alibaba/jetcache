@@ -43,6 +43,11 @@ public class TestBean {
         return count++;
     }
 
+    @Cached(condition = "mvel{xxx('configBean').trueProp}")
+    public int countWithWrongCondition(){
+        return count++;
+    }
+
     @Cached(condition = "mvel{args[0]}")
     public int count(boolean useCache){
         return count++;
