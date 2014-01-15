@@ -12,7 +12,7 @@
     <groupId>com.taobao.geek.jetcache</groupId>
     <artifactId>jetcache-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.3</version>
+    <version>0.9.4</version>
 
     <build>
         <plugins>
