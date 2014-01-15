@@ -22,12 +22,18 @@ public class SpringTest {
 
     private static ClassPathXmlApplicationContext context;
 
-    @BeforeClass
-    public static void setup() {
-        context = new ClassPathXmlApplicationContext("beans.xml");
-    }
+//    @Test
+//    public void test3_X(){
+//        context = new ClassPathXmlApplicationContext("beans3.0.xml");
+//        test1();
+//    }
 
     @Test
+    public void test2_5(){
+        context = new ClassPathXmlApplicationContext("beans2.5.xml");
+        test1();
+    }
+
     public void test1() {
         int x1, x2, x3;
 

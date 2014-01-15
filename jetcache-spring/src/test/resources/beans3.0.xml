@@ -1,0 +1,35 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jetcache="http://www.alibaba.com/schema/jetcache"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.alibaba.com/schema/jetcache
+        http://www.alibaba.com/schema/jetcache/jetcache.xsd">
+    <context:annotation-config/>
+    <context:component-scan base-package="com.taobao.geek.jetcache"/>
+
+    <jetcache:annotation-driven/>
+
+    <bean id="factoryBeanTarget" class="com.taobao.geek.jetcache.spring.beans.MyFactoryBean"/>
+
+    <bean id="globalCacheConfig" class="com.taobao.geek.jetcache.spring.SpringGlobalCacheConfig">
+        <constructor-arg index="0">
+            <map>
+                <entry key="" value-ref="ccheProvider1"/>
+                <entry key="A1" value-ref="ccheProvider2"/>
+            </map>
+        </constructor-arg>
+    </bean>
+    <bean id="ccheProvider1" class="com.taobao.geek.jetcache.support.CacheProvider">
+        <property name="remoteCache">
+            <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
+        </property>
+    </bean>
+    <bean id="ccheProvider2" class="com.taobao.geek.jetcache.support.CacheProvider">
+        <property name="remoteCache">
+            <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
+        </property>
+    </bean>
+</beans>
