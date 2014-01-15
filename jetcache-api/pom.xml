@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jetcache-parent</artifactId>
         <groupId>com.taobao.geek.jetcache</groupId>
-        <version>0.9.3-SNAPSHOT</version>
+        <version>0.9.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
