@@ -45,6 +45,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
             stat.localHitCount++;
         } else if (localResult == CacheResultCode.FAIL) {
             stat.localFailCount++;
+        } else if(localResult == CacheResultCode.EXPIRED) {
+            stat.localExpireCount++;
         }
 
         if (remoteResult != null) {
@@ -54,6 +56,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
             stat.remoteHitCount++;
         } else if (remoteResult == CacheResultCode.FAIL) {
             stat.remoteFailCount++;
+        } else if(remoteResult == CacheResultCode.EXPIRED) {
+            stat.remoteExpireCount++;
         }
     }
 
@@ -73,7 +77,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
     public StringBuilder getStatText() {
         StringBuilder sb = new StringBuilder(512);
         sb.append("-----------------------------------------------\n");
-        sb.append("hit/get/rate\tlocalhit/localget/localfail\tremotehit/remoteget/remotefail\n");
+        sb.append("hit/get/rate\tlocalHit/localGet/localExpire/localFail\tremoteHit/remoteGet/remoteExpire/remoteFail\n");
         Set<Map.Entry<String, CopyOnWriteHashMap<String, Stat>>> entries = map.entrySet();
         for (Map.Entry<String, CopyOnWriteHashMap<String, Stat>> entry : entries) {
             Set<Map.Entry<String, Stat>> areaMapEntries = entry.getValue().entrySet();
@@ -91,9 +95,9 @@ public class DefaultCacheMonitor implements CacheMonitor {
         sb.append(stat.area).append('/').append(stat.subArea).append('\n');
         sb.append(stat.hitCount).append('/').append(stat.getCount).append('/').append(df.format(1.0 * stat.hitCount / stat.getCount));
         sb.append('\t');
-        sb.append(stat.localHitCount).append('/').append(stat.localGetCount).append('/').append(stat.localFailCount);
+        sb.append(stat.localHitCount).append('/').append(stat.localGetCount).append('/').append(stat.localExpireCount).append('/').append(stat.localFailCount);
         sb.append('\t');
-        sb.append(stat.remoteHitCount).append('/').append(stat.remoteGetCount).append('/').append(stat.remoteFailCount);
+        sb.append(stat.remoteHitCount).append('/').append(stat.remoteGetCount).append('/').append(stat.remoteExpireCount).append('/').append(stat.remoteFailCount);
         sb.append('\n');
     }
 
@@ -107,6 +111,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
         long remoteGetCount;
         long localHitCount;
         long remoteHitCount;
+        long localExpireCount;
+        long remoteExpireCount;
         long localFailCount;
         long remoteFailCount;
     }
