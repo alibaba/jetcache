@@ -41,8 +41,9 @@ class ClassUtil {
         String str = sb.toString();
         if (hidePackages != null) {
             for (String p : hidePackages) {
-                str = str.replace(p + ".", "");
-                str = str.replace((p + ".").replace('.', '/'), "");
+                String pWithDot = p + ".";
+                str = str.replace(pWithDot, "");
+                str = str.replace(pWithDot.replace('.', '/'), "");
             }
         }
         return str;
