@@ -95,8 +95,13 @@ public abstract class AbstractLocalCache implements Cache {
         String areaKey = sb.toString();
         AreaCache areaCache = areaMap.get(areaKey);
         if (areaCache == null) {
-            areaCache = createAreaCache(cacheConfig.getLocalLimit());
-            areaMap.put(areaKey, areaCache);
+            synchronized (this) {
+                areaCache = areaMap.get(areaKey);
+                if (areaCache == null) {
+                    areaCache = createAreaCache(cacheConfig.getLocalLimit());
+                    areaMap.put(areaKey, areaCache);
+                }
+            }
         }
         return areaCache;
     }
