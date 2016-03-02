@@ -19,7 +19,6 @@ import java.sql.SQLException;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-@Ignore
 public class CacheInterceptorTest {
     private CachePointcut pc;
     private IdentityHashMap<Method, CacheInvokeConfig> map;
@@ -30,7 +29,7 @@ public class CacheInterceptorTest {
 
     @Before
     public void setup() {
-        pc = new CachePointcut();
+        pc = new CachePointcut(new String[]{"com.taobao.geek.jetcache"});
         map = new IdentityHashMap<Method, CacheInvokeConfig>();
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();

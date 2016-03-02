@@ -11,8 +11,11 @@ import com.taobao.geek.jetcache.impl.CacheInvokeConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import otherpackage.OtherService;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -23,7 +26,7 @@ public class CachePointCutTest {
 
     @Before
     public void setup() {
-        pc = new CachePointcut();
+        pc = new CachePointcut(new String[]{"com.taobao.geek.jetcache"});
         map = new IdentityHashMap<Method, CacheInvokeConfig>();
         pc.setCacheConfigMap(map);
     }
@@ -39,19 +42,51 @@ public class CachePointCutTest {
         }
     }
 
+    class C1_2 implements OtherService {
+        @Override
+        public int bar() {
+            return 0;
+        }
+
+        @Cached
+        public int bar2(){
+            return 0;
+        }
+    }
+
     @Test
     public void testMatches1() throws Exception {
+        Assert.assertTrue(pc.matches(C1.class));
+        Assert.assertTrue(pc.matches(I1.class));
+        Assert.assertTrue(pc.matches(C1_2.class));
         Method m1 = I1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo");
+        Method m3 = OtherService.class.getMethod("bar");
+        Method m4 = C1_2.class.getMethod("bar");
         Assert.assertTrue(pc.matches(m1, C1.class));
         Assert.assertTrue(pc.matches(m2, C1.class));
         Assert.assertTrue(pc.matches(m1, I1.class));
         Assert.assertTrue(pc.matches(m2, I1.class));
+        Assert.assertFalse(pc.matches(m3, OtherService.class));
+        Assert.assertFalse(pc.matches(m4, OtherService.class));
+        Assert.assertFalse(pc.matches(m3, C1_2.class));
+        Assert.assertFalse(pc.matches(m4, C1_2.class));
+        Assert.assertTrue(pc.matches(C1_2.class.getMethod("bar2"), C1_2.class));
 
         Assert.assertFalse(map.get(m1).isEnableCacheContext());
         Assert.assertFalse(map.get(m2).isEnableCacheContext());
         Assert.assertNotNull(map.get(m1).getCacheConfig());
         Assert.assertNotNull(map.get(m2).getCacheConfig());
+
+        Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, new InvocationHandler() {
+            @Override
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                return null;
+            }
+        });
+        Assert.assertTrue(pc.matches(m1, o1.getClass()));
+        Assert.assertTrue(pc.matches(m2, o1.getClass()));
+        Assert.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));
     }
 
 
@@ -118,4 +153,34 @@ public class CachePointCutTest {
 
     }
 
+
+    interface I4 {
+        @Cached
+        int foo();
+    }
+
+    interface I4_Sub extends I4{
+    }
+
+    class C4 implements I4_Sub {
+        public int foo() {
+            return 0;
+        }
+    }
+
+    @Test
+    public void testMatches4() throws Exception {
+        Method m1 = I4.class.getMethod("foo");
+        Method m2 = C4.class.getMethod("foo");
+        Assert.assertTrue(pc.matches(m1, C4.class));
+        Assert.assertTrue(pc.matches(m2, C4.class));
+        Assert.assertTrue(pc.matches(m1, I4.class));
+        Assert.assertTrue(pc.matches(m2, I4.class));
+
+        Assert.assertFalse(map.get(m1).isEnableCacheContext());
+        Assert.assertFalse(map.get(m2).isEnableCacheContext());
+        Assert.assertNotNull(map.get(m1).getCacheConfig());
+        Assert.assertNotNull(map.get(m2).getCacheConfig());
+
+    }
 }

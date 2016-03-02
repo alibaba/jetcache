@@ -18,24 +18,63 @@ import java.lang.reflect.Modifier;
 public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 
     private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap = new IdentityHashMap<Method, CacheInvokeConfig>();
+    private String[] basePackages;
 
-    public CachePointcut() {
+    public CachePointcut(String[] basePackages) {
         setClassFilter(this);
+        this.basePackages = basePackages;
     }
 
     @Override
     public boolean matches(Class clazz) {
-        if (exclude(clazz)) {
-            return false;
-        }
-        return true;
-    }
-
-    public boolean exclude(Class<?> clazz) {
-        if (clazz.getName().startsWith("java")) {
+        if (matchesThis(clazz)) {
             return true;
         }
-        if (clazz.getName().startsWith("org.springframework")) {
+        Class[] cs = clazz.getInterfaces();
+        if (cs != null) {
+            for (Class c : cs) {
+                if (matches(c)) {
+                    return true;
+                }
+            }
+        }
+        if (!clazz.isInterface()) {
+            Class sp = clazz.getSuperclass();
+            if(sp != null && matches(sp)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean matchesThis(Class clazz) {
+        String name = clazz.getName();
+        if (exclude(name)) {
+            return false;
+        }
+        if(include(name)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private boolean include(String name) {
+        if (basePackages != null) {
+            for (String p : basePackages) {
+                if (name.startsWith(p)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean exclude(String name) {
+        if (name.startsWith("java")) {
+            return true;
+        }
+        if (name.startsWith("org.springframework")) {
             return true;
         }
         return false;
@@ -50,7 +89,9 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             return true;
         } else {
             cac = new CacheInvokeConfig();
-            CacheConfigUtil.parse(cac, method);
+            if (matchesThis(method.getClass())) {
+                CacheConfigUtil.parse(cac, method);
+            }
 
             String name = method.getName();
             Class<?>[] paramTypes = method.getParameterTypes();
@@ -67,14 +108,14 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     private void parseByTargetClass(CacheInvokeConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {
-        if (exclude(clazz)) {
-            return;
-        }
-        Method[] methods = clazz.getDeclaredMethods();
-        for (Method method : methods) {
-            if (methodMatch(name, method, paramTypes)) {
-                CacheConfigUtil.parse(cac, method);
-                break;
+        boolean matchThis = matchesThis(clazz);
+        if (matchThis) {
+            Method[] methods = clazz.getDeclaredMethods();
+            for (Method method : methods) {
+                if (methodMatch(name, method, paramTypes)) {
+                    CacheConfigUtil.parse(cac, method);
+                    break;
+                }
             }
         }
 

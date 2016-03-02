@@ -9,6 +9,15 @@
     <xsd:import namespace="http://www.springframework.org/schema/beans"/>
 
     <xsd:element name="annotation-driven">
+        <xsd:complexType>
+            <xsd:attribute name="base-package" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+	The comma-separated list of packages to scan for annotated components.
+					]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
     </xsd:element>
 
 </xsd:schema>
