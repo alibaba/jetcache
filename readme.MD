@@ -1,9 +1,3 @@
-# test
-
-标签（空格分隔）： 未分类
-
----
-
 ## 简介
 JetCache是一个和Spring Cache类似的，基于超时的通用缓存框架，当数据更新时，不处理缓存的update/delete，靠超时淘汰。
 
