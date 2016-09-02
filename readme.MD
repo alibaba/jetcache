@@ -133,7 +133,7 @@ TODO：如果value的结构发生变更，比如增加了字段，缓存应该�
 ## 高级
 ### 命中率统计
 通过stat-jetcache.log，使用tlog收集，可以统计每个区的命中率情况，例如
-![stat](docs/images/jetcache_stat.png)
+![stat](docs/images/Jetcache_stat.png)
 
 ### 由调用者决定是否打开服务方提供的缓存
 服务方配置缓存但是默认并不启用：
