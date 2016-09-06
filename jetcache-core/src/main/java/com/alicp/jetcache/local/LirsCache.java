@@ -64,7 +64,6 @@ public class LirsCache extends AbstractLocalCache {
             qListHeader.qBefore = qListHeader.qAfter = qListHeader;
         }
 
-        @Override
         public synchronized Object getValue(String key) {
             ValueEntry valueEntry = m.get(key);
             if (valueEntry == null || valueEntry.value == null) {
@@ -206,7 +205,6 @@ public class LirsCache extends AbstractLocalCache {
             }
         }
 
-        @Override
         public synchronized Object putValue(String key, Object value) {
             ValueEntry valueEntry = m.get(key);
             Object oldValue = null;
@@ -230,7 +228,6 @@ public class LirsCache extends AbstractLocalCache {
             return oldValue;
         }
 
-        @Override
         public synchronized Object removeValue(String key) {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }

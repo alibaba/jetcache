@@ -53,7 +53,6 @@ class CacheHandler implements InvocationHandler {
         this.globalCacheConfig = globalCacheConfig;
     }
 
-    @Override
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheInvokeContext context = null;
         if (cacheInvokeConfig != null) {

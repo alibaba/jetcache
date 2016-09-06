@@ -17,7 +17,6 @@ import java.util.HashMap;
 public class MockRemoteCache implements Cache {
     private HashMap<String, Value> data = new HashMap<String, Value>();
 
-    @Override
     public CacheResult get(CacheConfig cacheConfig, String subArea, String key) {
         key = subArea + key;
         CacheResultCode code;
@@ -42,7 +41,6 @@ public class MockRemoteCache implements Cache {
         return new CacheResult(code, value, expireTime);
     }
 
-    @Override
     public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value, long expireTime) {
         key = subArea + key;
         try {

@@ -27,7 +27,6 @@ public abstract class AbstractLocalCache implements Cache {
         this.useSoftRef = useSoftRef;
     }
 
-    @Override
     public CacheResult get(CacheConfig cacheConfig, String subArea, String key) {
         CacheResultCode code = CacheResultCode.FAIL;
         Object value = null;
@@ -75,7 +74,6 @@ public abstract class AbstractLocalCache implements Cache {
         return new CacheResult(code, value, expireTime);
     }
 
-    @Override
     public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key,
                                Object value, long expireTime) {
         AreaCache map = getCacheMap(cacheConfig, subArea);

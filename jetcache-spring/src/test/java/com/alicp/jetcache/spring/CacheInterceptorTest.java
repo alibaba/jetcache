@@ -116,7 +116,6 @@ public class CacheInterceptorTest {
         interceptor.invoke(mi);
         interceptor.invoke(mi);
         CacheContext.enableCache(new Callback() {
-            @Override
             public void execute() throws Throwable {
                 interceptor.invoke(mi);
                 interceptor.invoke(mi);

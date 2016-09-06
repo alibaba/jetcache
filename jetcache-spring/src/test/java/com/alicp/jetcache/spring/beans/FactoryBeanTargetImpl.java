@@ -10,7 +10,6 @@ public class FactoryBeanTargetImpl implements FactoryBeanTarget {
 
     int count;
 
-    @Override
     public int count() {
         return count++;
     }

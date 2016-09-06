@@ -290,7 +290,6 @@ public class CacheHandlerTest {
 
         cacheConfig.setEnabled(false);
         CacheContext.enableCache(new Callback() {
-            @Override
             public void execute() throws Throwable {
                 int x1 = invoke(method, null);
                 int x2 = invoke(method, null);

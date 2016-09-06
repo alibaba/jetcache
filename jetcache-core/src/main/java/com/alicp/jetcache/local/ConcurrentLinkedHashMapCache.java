@@ -33,17 +33,14 @@ public class ConcurrentLinkedHashMapCache extends AbstractLocalCache {
                     .build();
         }
 
-        @Override
         public Object getValue(String key) {
             return cache.get(key);
         }
 
-        @Override
         public Object putValue(String key, Object value) {
             return cache.put(key, value);
         }
 
-        @Override
         public Object removeValue(String key) {
             return cache.remove(key);
         }

@@ -17,7 +17,6 @@ public class DefaultCacheMonitor implements CacheMonitor {
     private CopyOnWriteHashMap<String, CopyOnWriteHashMap<String, Stat>> map
             = new CopyOnWriteHashMap<String, CopyOnWriteHashMap<String, Stat>>();
 
-    @Override
     public void onGet(CacheConfig cacheConfig, String subArea, String key,
                       CacheResultCode localResult, CacheResultCode remoteResult) {
         CopyOnWriteHashMap<String, Stat> areaStat = map.get(cacheConfig.getArea());
@@ -61,16 +60,13 @@ public class DefaultCacheMonitor implements CacheMonitor {
         }
     }
 
-    @Override
     public void onPut(CacheConfig cacheConfig, String subArea, String key,
                       Object value, CacheResultCode localResult, CacheResultCode remoteResult) {
     }
 
-    @Override
     public void warn(String message) {
     }
 
-    @Override
     public void error(String message) {
     }
 

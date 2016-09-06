@@ -14,13 +14,11 @@ public class ServiceImpl implements Service {
 
     private int count;
 
-    @Override
     @Cached
     public int count() {
         return count++;
     }
 
-    @Override
     public int countWithAnnoOnInterface(){
         return count++;
     }

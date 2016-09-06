@@ -39,17 +39,14 @@ public class LinkedHashMapCache extends AbstractLocalCache {
             return size() > max;
         }
 
-        @Override
         public synchronized Object getValue(String key) {
             return get(key);
         }
 
-        @Override
         public synchronized Object putValue(String key, Object value) {
             return put(key, value);
         }
 
-        @Override
         public synchronized Object removeValue(String key) {
             return remove(key);
         }

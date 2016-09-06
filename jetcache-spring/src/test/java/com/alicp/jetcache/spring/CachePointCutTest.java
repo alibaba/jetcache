@@ -43,7 +43,6 @@ public class CachePointCutTest {
     }
 
     class C1_2 implements OtherService {
-        @Override
         public int bar() {
             return 0;
         }
@@ -79,7 +78,6 @@ public class CachePointCutTest {
         Assert.assertNotNull(map.get(m2).getCacheConfig());
 
         Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, new InvocationHandler() {
-            @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 return null;
             }

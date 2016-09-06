@@ -10,7 +10,6 @@ import com.alibaba.fastjson.JSON;
  */
 public class DefaultKeyGenerator implements KeyGenerator {
 
-    @Override
     public String getKey(Object[] args) {
         if (args == null || args.length == 0) {
             return "";
