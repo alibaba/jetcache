@@ -44,13 +44,13 @@ public abstract class AbstractLocalCache implements Cache {
                     if (cacheObject == null) {
                         code = CacheResultCode.NOT_EXISTS;
                     } else {
-                        expireTime = cacheObject.expireTime;
                         if (System.currentTimeMillis() - cacheObject.expireTime >= 0) {
                             map.removeValue(key);
                             code = CacheResultCode.EXPIRED;
                         } else {
                             code = CacheResultCode.SUCCESS;
                             value = cacheObject.value;
+                            expireTime = cacheObject.expireTime;
                         }
                     }
                 }
@@ -59,13 +59,13 @@ public abstract class AbstractLocalCache implements Cache {
                 if (cacheObject == null) {
                     code = CacheResultCode.NOT_EXISTS;
                 } else {
-                    expireTime = cacheObject.expireTime;
                     if (System.currentTimeMillis() - cacheObject.expireTime >= 0) {
                         map.removeValue(key);
                         code = CacheResultCode.EXPIRED;
                     } else {
                         code = CacheResultCode.SUCCESS;
                         value = cacheObject.value;
+                        expireTime = cacheObject.expireTime;
                     }
                 }
             }

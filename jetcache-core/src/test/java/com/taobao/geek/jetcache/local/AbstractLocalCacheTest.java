@@ -81,7 +81,7 @@ public abstract class AbstractLocalCacheTest {
             result = cache.get(cc, "S1", "K1");
             Assert.assertEquals(CacheResultCode.EXPIRED, result.getResultCode());
             Assert.assertNull(result.getValue());
-            Assert.assertEquals(expireTime, result.getExpireTime());
+            Assert.assertEquals(0, result.getExpireTime());
         }
     }
 
