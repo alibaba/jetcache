@@ -34,10 +34,10 @@ Spring致力于提供一个通用的缓存抽象，而jetcache只定位在一个
 ```
 | groupId | artifactId | 最新版本 | 描述 |
 | --- | --- | --- | --- |
-| com.taobao.geek.jetcache | jetcache-api | 1.0.1 | 注解等api，无传递性依赖 |
-| com.taobao.geek.jetcache | jetcache-core | 1.0.1 | 核心类库和默认的LocalCache实现。依赖jetcache-api、fastjson（K、V生成）、mvel（条件表达式）、KRYO（默认Value序列化方式） |
-| com.taobao.geek.jetcache | jetcache-spring | 1.0.1 | spring集成，依赖jetcache-core、spring（provided） |
-| com.taobao.geek.jetcache | jetcache-ali | 1.0.1 | 集成阿里内部组件，依赖jetcache-core、tair（provided） |
+| com.taobao.geek.jetcache | jetcache-api | 1.0.2 | 注解等api，无传递性依赖 |
+| com.taobao.geek.jetcache | jetcache-core | 1.0.2 | 核心类库和默认的LocalCache实现。依赖jetcache-api、fastjson（K、V生成）、mvel（条件表达式）、KRYO（默认Value序列化方式） |
+| com.taobao.geek.jetcache | jetcache-spring | 1.0.2 | spring集成，依赖jetcache-core、spring（provided） |
+| com.taobao.geek.jetcache | jetcache-ali | 1.0.2 | 集成阿里内部组件，依赖jetcache-core、tair（provided） |
 ### 基本使用
 ```java
  public interface UserService{
