@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jetcache-parent</artifactId>
         <groupId>com.taobao.geek.jetcache</groupId>
-        <version>1.0.2</version>
+        <version>2.0.0-M1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -24,21 +24,6 @@
             <version>3.2.16.RELEASE</version>
             <scope>provided</scope>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring</artifactId>
-            <version>2.5.6.SEC03</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>2.1_3</version>
-            <scope>provided</scope>
-        </dependency>
-        -->
 
         <!-- artifacts for test list below-->
         <dependency>
