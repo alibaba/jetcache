@@ -36,8 +36,8 @@ public class ConcurrentLinkedHashMapCacheTest extends AbstractLocalCacheTest {
 
     @Override
     @Test
-    public void testLRU3() throws Exception {
-        super.testLRU3();
+    public void testExpire() throws Exception {
+        super.testExpire();
     }
 
     @Override

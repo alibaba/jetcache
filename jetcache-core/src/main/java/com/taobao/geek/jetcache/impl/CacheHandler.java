@@ -155,11 +155,16 @@ class CacheHandler implements InvocationHandler {
         context.localResult = null;
         context.remoteResult = null;
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
+        long expireTime = System.currentTimeMillis() + 1000L * context.getCacheInvokeConfig().cacheConfig.getExpire();
         if (context.needUpdateLocal) {
-            context.localResult = cacheProvider.getLocalCache().put(cacheConfig, subArea, key, context.result);
+            long localCacheExpireTime = expireTime;
+            if (context.expireTimeGetFromRemote > 0) {
+                localCacheExpireTime = context.expireTimeGetFromRemote;
+            }
+            context.localResult = cacheProvider.getLocalCache().put(cacheConfig, subArea, key, context.result, localCacheExpireTime);
         }
         if (context.needUpdateRemote) {
-            context.remoteResult = cacheProvider.getRemoteCache().put(cacheConfig, subArea, key, context.result);
+            context.remoteResult = cacheProvider.getRemoteCache().put(cacheConfig, subArea, key, context.result, expireTime);
         }
         if (context.globalCacheConfig.getCacheMonitor() != null && (context.localResult != null || context.remoteResult != null)) {
             context.globalCacheConfig.getCacheMonitor().onPut(cacheConfig, subArea, key, context.result, context.localResult, context.remoteResult);
@@ -185,6 +190,7 @@ class CacheHandler implements InvocationHandler {
                     context.remoteResult = result.getResultCode();
                     if (result.isSuccess()) {
                         context.result = result.getValue();
+                        context.expireTimeGetFromRemote = result.getExpireTime();
                     }
                 }
             }

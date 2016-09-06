@@ -31,6 +31,7 @@ public abstract class AbstractLocalCache implements Cache {
     public CacheResult get(CacheConfig cacheConfig, String subArea, String key) {
         CacheResultCode code = CacheResultCode.FAIL;
         Object value = null;
+        long expireTime = 0;
         try {
             AreaCache map = getCacheMap(cacheConfig, subArea);
 
@@ -43,6 +44,7 @@ public abstract class AbstractLocalCache implements Cache {
                     if (cacheObject == null) {
                         code = CacheResultCode.NOT_EXISTS;
                     } else {
+                        expireTime = cacheObject.expireTime;
                         if (System.currentTimeMillis() - cacheObject.expireTime >= 0) {
                             map.removeValue(key);
                             code = CacheResultCode.EXPIRED;
@@ -57,6 +59,7 @@ public abstract class AbstractLocalCache implements Cache {
                 if (cacheObject == null) {
                     code = CacheResultCode.NOT_EXISTS;
                 } else {
+                    expireTime = cacheObject.expireTime;
                     if (System.currentTimeMillis() - cacheObject.expireTime >= 0) {
                         map.removeValue(key);
                         code = CacheResultCode.EXPIRED;
@@ -69,15 +72,16 @@ public abstract class AbstractLocalCache implements Cache {
         } catch (Exception e) {
             code = CacheResultCode.FAIL;
         }
-        return new CacheResult(code, value);
+        return new CacheResult(code, value, expireTime);
     }
 
     @Override
-    public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value) {
+    public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key,
+                               Object value, long expireTime) {
         AreaCache map = getCacheMap(cacheConfig, subArea);
         CacheObject cacheObject = new CacheObject();
         cacheObject.value = value;
-        cacheObject.expireTime = System.currentTimeMillis() + cacheConfig.getExpire() * 1000L;
+        cacheObject.expireTime = expireTime;
         if (useSoftRef) {
             SoftReference<CacheObject> ref = new SoftReference<CacheObject>(cacheObject);
             map.putValue(key, ref);

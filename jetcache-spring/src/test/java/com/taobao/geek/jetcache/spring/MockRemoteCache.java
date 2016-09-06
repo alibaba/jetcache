@@ -3,8 +3,7 @@
  */
 package com.taobao.geek.jetcache.spring;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.taobao.geek.jetcache.impl.CacheImplSupport;
 import com.taobao.geek.jetcache.support.Cache;
 import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.CacheResult;
@@ -23,14 +22,16 @@ public class MockRemoteCache implements Cache {
         key = subArea + key;
         CacheResultCode code;
         Object value = null;
+        long expireTime = 0;
         try {
             Value cacheValue = data.get(key);
             if (cacheValue != null) {
-                if (System.currentTimeMillis() - cacheValue.gmtCreate > cacheConfig.getExpire() * 1000) {
+                expireTime = cacheValue.expireTime;
+                if (System.currentTimeMillis() > cacheValue.expireTime) {
                     code = CacheResultCode.EXPIRED;
                 } else {
                     code = CacheResultCode.SUCCESS;
-                    value = JSON.parse(cacheValue.bytes);
+                    value = CacheImplSupport.decodeValue(cacheValue.bytes);
                 }
             } else {
                 code = CacheResultCode.NOT_EXISTS;
@@ -38,17 +39,17 @@ public class MockRemoteCache implements Cache {
         } catch (Exception e) {
             code = CacheResultCode.FAIL;
         }
-        return new CacheResult(code, value);
+        return new CacheResult(code, value, expireTime);
     }
 
     @Override
-    public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value) {
+    public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value, long expireTime) {
         key = subArea + key;
         try {
-            byte[] bytes = JSON.toJSONBytes(value, SerializerFeature.WriteClassName);
+            byte[] bytes = CacheImplSupport.encodeValue(value, cacheConfig.getSerialPolicy());
             Value v = new Value();
             v.bytes = bytes;
-            v.gmtCreate = System.currentTimeMillis();
+            v.expireTime = expireTime;
             data.put(key, v);
             return CacheResultCode.SUCCESS;
         } catch (Exception e) {
@@ -58,7 +59,7 @@ public class MockRemoteCache implements Cache {
 
     private static class Value {
         byte[] bytes;
-        long gmtCreate;
+        long expireTime;
     }
 
 }

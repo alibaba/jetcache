@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.local;
 
+import com.taobao.geek.jetcache.CacheConsts;
 import com.taobao.geek.jetcache.support.Cache;
 import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.CacheResult;
@@ -23,17 +24,16 @@ public abstract class AbstractLocalCacheTest {
         for (int i = 0; i < 2; i++) {
             setup(i == 0);
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
             Assert.assertEquals("V1", cache.get(cc, "S1", "K1").getValue());
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S2", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V2"));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V2", System.currentTimeMillis() +1000));
             Assert.assertEquals("V2", cache.get(cc, "S1", "K1").getValue());
 
             cc.setArea("A2");
-            cc.setExpire(30 * 24 * 3600);
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
             Assert.assertEquals("V1", cache.get(cc, "S1", "K1").getValue());
         }
@@ -43,9 +43,9 @@ public abstract class AbstractLocalCacheTest {
         for (int i = 0; i < 2; i++) {
             setup(i == 0);
             cc.setLocalLimit(2);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2"));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K3", "V3"));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2", System.currentTimeMillis() +1000));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K3", "V3", System.currentTimeMillis() +1000));
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K2").getResultCode());
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K3").getResultCode());
@@ -56,31 +56,39 @@ public abstract class AbstractLocalCacheTest {
         for (int i = 0; i < 2; i++) {
             setup(i == 0);
             cc.setLocalLimit(2);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2"));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2", System.currentTimeMillis() +1000));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K3", "V3"));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K3", "V3", System.currentTimeMillis() +1000));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K2").getResultCode());
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K3").getResultCode());
         }
     }
 
-    public void testLRU3() throws Exception {
+    public void testExpire() throws Exception {
         for (int i = 0; i < 2; i++) {
             setup(i == 0);
-            cc.setExpire(1);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1"));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Thread.sleep(1001);
-            Assert.assertEquals(CacheResultCode.EXPIRED, cache.get(cc, "S1", "K1").getResultCode());
+            long expireTime = System.currentTimeMillis() +100;
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", expireTime));
+
+            CacheResult result = cache.get(cc, "S1", "K1");
+            Assert.assertEquals(CacheResultCode.SUCCESS, result.getResultCode());
+            Assert.assertEquals("V1", result.getValue());
+            Assert.assertEquals(expireTime, result.getExpireTime());
+
+            Thread.sleep(101);
+            result = cache.get(cc, "S1", "K1");
+            Assert.assertEquals(CacheResultCode.EXPIRED, result.getResultCode());
+            Assert.assertNull(result.getValue());
+            Assert.assertEquals(expireTime, result.getExpireTime());
         }
     }
 
     public void testNull() {
         for (int i = 0; i < 2; i++) {
             setup(i == 0);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", null));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", null, System.currentTimeMillis() + 1000));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
             Assert.assertNull(cache.get(cc, "S1", "K1").getValue());
         }
@@ -115,7 +123,7 @@ public abstract class AbstractLocalCacheTest {
                         }
                         String key = keyPrefix + i;
                         String value = i + "";
-                        cache.put(cc, subArea, key, value);
+                        cache.put(cc, subArea, key, value, System.currentTimeMillis() + CacheConsts.DEFAULT_EXPIRE * 1000);
                         CacheResult result = cache.get(cc, subArea, key);
                         if (result == null || result.getResultCode() != CacheResultCode.SUCCESS) {
                             if (result == null) {

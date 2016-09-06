@@ -3,6 +3,7 @@
  */
 package com.taobao.geek.jetcache.local;
 
+import com.taobao.geek.jetcache.CacheConsts;
 import com.taobao.geek.jetcache.support.Cache;
 import com.taobao.geek.jetcache.support.CacheConfig;
 import com.taobao.geek.jetcache.support.CacheResult;
@@ -98,7 +99,7 @@ public class Benchmark {
                 getCount++;
                 CacheResult result = cache.get(cacheConfig, "S1", userId);
                 if (result.getResultCode() != CacheResultCode.SUCCESS) {
-                    cache.put(cacheConfig, "S1", userId, VALUE);
+                    cache.put(cacheConfig, "S1", userId, VALUE, System.currentTimeMillis() + CacheConsts.DEFAULT_EXPIRE * 1000);
                     nothitCount++;
                 } else {
                     hitCount++;
