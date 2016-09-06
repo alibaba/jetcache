@@ -1,6 +1,6 @@
 package otherpackage;
 
-import com.taobao.geek.jetcache.Cached;
+import com.alicp.jetcache.Cached;
 
 /**
  * Created by huangli on 16/3/2.

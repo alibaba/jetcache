@@ -8,13 +8,13 @@
         http://www.alibaba.com/schema/jetcache
         http://www.alibaba.com/schema/jetcache/jetcache.xsd">
     <context:annotation-config/>
-    <context:component-scan base-package="com.taobao.geek.jetcache"/>
+    <context:component-scan base-package="com.alicp.jetcache"/>
 
-    <jetcache:annotation-driven base-package="com.taobao.geek.jetcache"/>
+    <jetcache:annotation-driven base-package="com.alicp.jetcache"/>
 
-    <bean id="factoryBeanTarget" class="com.taobao.geek.jetcache.spring.beans.MyFactoryBean"/>
+    <bean id="factoryBeanTarget" class="com.alicp.jetcache.spring.beans.MyFactoryBean"/>
 
-    <bean id="globalCacheConfig" class="com.taobao.geek.jetcache.spring.SpringGlobalCacheConfig">
+    <bean id="globalCacheConfig" class="com.alicp.jetcache.spring.SpringGlobalCacheConfig">
         <constructor-arg index="0">
             <map>
                 <entry key="" value-ref="ccheProvider1"/>
@@ -22,14 +22,14 @@
             </map>
         </constructor-arg>
     </bean>
-    <bean id="ccheProvider1" class="com.taobao.geek.jetcache.support.CacheProvider">
+    <bean id="ccheProvider1" class="com.alicp.jetcache.support.CacheProvider">
         <property name="remoteCache">
-            <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
+            <bean class="com.alicp.jetcache.spring.MockRemoteCache"/>
         </property>
     </bean>
-    <bean id="ccheProvider2" class="com.taobao.geek.jetcache.support.CacheProvider">
+    <bean id="ccheProvider2" class="com.alicp.jetcache.support.CacheProvider">
         <property name="remoteCache">
-            <bean class="com.taobao.geek.jetcache.spring.MockRemoteCache"/>
+            <bean class="com.alicp.jetcache.spring.MockRemoteCache"/>
         </property>
     </bean>
 </beans>
