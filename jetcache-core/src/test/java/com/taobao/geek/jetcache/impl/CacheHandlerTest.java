@@ -79,7 +79,9 @@ public class CacheHandlerTest {
         int x1, x2, x3;
 
         x1 = invoke(method, null);
+        Thread.sleep(10);
         x2 = invoke(method, null);
+        Thread.sleep(10);
         x3 = invoke(method, null);
         Assert.assertEquals(x1, x2);
         Assert.assertEquals(x1, x3);
@@ -250,8 +252,8 @@ public class CacheHandlerTest {
     private void assertEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);
-        x1 = invoke(method, new Object[]{q1, 10});
-        x2 = invoke(method, new Object[]{q2, 10});
+        x1 = invoke(method, new Object[]{q1, p1});
+        x2 = invoke(method, new Object[]{q2, p2});
         Assert.assertEquals(x1, x2);
     }
 
