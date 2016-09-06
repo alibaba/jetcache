@@ -23,7 +23,6 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
 
     private static final String CACHE_ADVISOR_BEAN_NAME = CacheAnnotationParser.class.getPackage().getName() + ".internalCacheAdvisor";
 
-    @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         doParse(element, parserContext);
         return null;

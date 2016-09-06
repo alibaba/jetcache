@@ -22,14 +22,12 @@ public class CacheInterceptor implements MethodInterceptor {
     private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap;
     private GlobalCacheConfig globalCacheConfig;
 
-    @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         final CacheInvokeConfig cac = cacheConfigMap.get(invocation.getMethod());
         if (cac == null) {
             return invocation.proceed();
         }
         Invoker invoker = new Invoker() {
-            @Override
             public Object invoke() throws Throwable {
                 return invocation.proceed();
             }

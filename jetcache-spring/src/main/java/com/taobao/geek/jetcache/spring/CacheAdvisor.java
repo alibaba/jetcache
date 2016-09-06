@@ -18,7 +18,6 @@ public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
     private String[] basePackages;
 
-    @Override
     public Pointcut getPointcut() {
         pointcut = new CachePointcut(basePackages);
         pointcut.setCacheConfigMap(cacheConfigMap);

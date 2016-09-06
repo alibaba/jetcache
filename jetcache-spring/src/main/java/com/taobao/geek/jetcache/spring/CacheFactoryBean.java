@@ -14,17 +14,14 @@ public class CacheFactoryBean implements FactoryBean {
     private Object target;
     private CacheClient cacheClient;
 
-    @Override
     public Object getObject() throws Exception {
         return cacheClient.getProxyByAnnotation(target);
     }
 
-    @Override
     public Class<?> getObjectType() {
         return null;
     }
 
-    @Override
     public boolean isSingleton() {
         return true;
     }
