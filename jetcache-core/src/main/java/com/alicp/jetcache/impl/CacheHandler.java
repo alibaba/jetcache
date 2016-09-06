@@ -21,23 +21,20 @@ class CacheHandler implements InvocationHandler {
     private CacheInvokeConfig cacheInvokeConfig;
     private HashMap<String, CacheInvokeConfig> configMap;
 
-    private static class PublicCacheContextSupport extends CacheContextSupport{
-        @Override
-        public boolean isEnabled() {
-            return super.isEnabled();
+    private static class CacheContextSupport extends CacheContext {
+        void _enable(){
+            CacheContext.enable();
         }
 
-        @Override
-        public void enable() {
-            super.enable();
+        void _disable(){
+            CacheContext.disable();
         }
 
-        @Override
-        public void disable() {
-            super.disable();
+        boolean _isEnabled(){
+            return CacheContext.isEnabled();
         }
-    };
-    private static PublicCacheContextSupport cacheContextSupport = new PublicCacheContextSupport();
+    }
+    private static CacheContextSupport cacheContextSupport = new CacheContextSupport();
 
     public CacheHandler(Object src, CacheConfig cacheConfig, GlobalCacheConfig globalCacheConfig) {
         this.src = src;
@@ -80,10 +77,10 @@ class CacheHandler implements InvocationHandler {
     public static Object invoke(CacheInvokeContext context) throws Throwable {
         if (context.cacheInvokeConfig.enableCacheContext) {
             try {
-                cacheContextSupport.enable();
+                cacheContextSupport._enable();
                 return doInvoke(context);
             } finally {
-                cacheContextSupport.disable();
+                cacheContextSupport._disable();
             }
         } else {
             return doInvoke(context);
@@ -92,7 +89,7 @@ class CacheHandler implements InvocationHandler {
 
     private static Object doInvoke(CacheInvokeContext context) throws Throwable{
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
-        if (cacheConfig != null && (cacheConfig.isEnabled() || cacheContextSupport.isEnabled())) {
+        if (cacheConfig != null && (cacheConfig.isEnabled() || cacheContextSupport._isEnabled())) {
             return invokeWithCache(context);
         } else {
             return invokeOrigin(context);

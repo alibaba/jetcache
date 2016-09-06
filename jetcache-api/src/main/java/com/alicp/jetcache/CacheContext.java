@@ -8,9 +8,14 @@ package com.alicp.jetcache;
  */
 public class CacheContext {
 
-    private static CacheContextSupport support = new CacheContextSupport();
+    private static ThreadLocal<CacheThreadLocal> cacheThreadLocal = new ThreadLocal<CacheThreadLocal>() {
+        @Override
+        protected CacheThreadLocal initialValue() {
+            return new CacheThreadLocal();
+        }
+    };
 
-    private CacheContext() {
+    protected CacheContext() {
     }
 
     /**
@@ -21,7 +26,15 @@ public class CacheContext {
      * @see EnableCache
      */
     public static void enableCache(Callback callback) throws CallbackException {
-        support.enableCache(callback);
+        CacheThreadLocal var = cacheThreadLocal.get();
+        try {
+            var.setEnabledCount(var.getEnabledCount() + 1);
+            callback.execute();
+        } catch (Throwable e) {
+            throw new CallbackException(e);
+        } finally {
+            var.setEnabledCount(var.getEnabledCount() - 1);
+        }
     }
 
     /**
@@ -33,7 +46,29 @@ public class CacheContext {
      * @see EnableCache
      */
     public static <T> T enableCache(ReturnValueCallback<T> callback) throws CallbackException {
-        return support.enableCache(callback);
+        CacheThreadLocal var = cacheThreadLocal.get();
+        try {
+            var.setEnabledCount(var.getEnabledCount() + 1);
+            return callback.execute();
+        } catch (Throwable e) {
+            throw new CallbackException(e);
+        } finally {
+            var.setEnabledCount(var.getEnabledCount() - 1);
+        }
+    }
+
+    protected static void enable(){
+        CacheThreadLocal var = cacheThreadLocal.get();
+        var.setEnabledCount(var.getEnabledCount() + 1);
+    }
+
+    protected static void disable(){
+        CacheThreadLocal var = cacheThreadLocal.get();
+        var.setEnabledCount(var.getEnabledCount() - 1);
+    }
+
+    protected static boolean isEnabled() {
+        return cacheThreadLocal.get().getEnabledCount() > 0;
     }
 
 }

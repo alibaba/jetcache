@@ -3,9 +3,6 @@
  */
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.CacheContextSupport;
-import com.alicp.jetcache.Callback;
-import com.alicp.jetcache.ReturnValueCallback;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -15,49 +12,44 @@ import org.junit.Test;
 public class CacheContextSupportTest {
     @Test
     public void test(){
-        final CacheContextSupport c = new CacheContextSupport();
-        c.enable();
-        Assert.assertTrue(c.isEnabled());
-        c.disable();
-        Assert.assertFalse(c.isEnabled());
+        CacheContext.enable();
+        Assert.assertTrue(CacheContext.isEnabled());
+        CacheContext.disable();
+        Assert.assertFalse(CacheContext.isEnabled());
 
-        Assert.assertFalse(c.isEnabled());
-        c.enableCache(new Callback() {
-            @Override
+        Assert.assertFalse(CacheContext.isEnabled());
+        CacheContext.enableCache(new Callback() {
             public void execute() throws Throwable {
-                Assert.assertTrue(c.isEnabled());
+                Assert.assertTrue(CacheContext.isEnabled());
             }
         });
-        Assert.assertFalse(c.isEnabled());
+        Assert.assertFalse(CacheContext.isEnabled());
 
-        Assert.assertFalse(c.isEnabled());
-        c.enableCache(new ReturnValueCallback<Object>() {
-            @Override
+        Assert.assertFalse(CacheContext.isEnabled());
+        CacheContext.enableCache(new ReturnValueCallback<Object>() {
             public Object execute() throws Throwable {
-                Assert.assertTrue(c.isEnabled());
+                Assert.assertTrue(CacheContext.isEnabled());
                 return null;
             }
         });
-        Assert.assertFalse(c.isEnabled());
+        Assert.assertFalse(CacheContext.isEnabled());
 
         // 嵌套
-        Assert.assertFalse(c.isEnabled());
-        c.enableCache(new Callback() {
-            @Override
+        Assert.assertFalse(CacheContext.isEnabled());
+        CacheContext.enableCache(new Callback() {
             public void execute() throws Throwable {
-                Assert.assertTrue(c.isEnabled());
-                c.enableCache(new ReturnValueCallback<Object>() {
-                    @Override
+                Assert.assertTrue(CacheContext.isEnabled());
+                CacheContext.enableCache(new ReturnValueCallback<Object>() {
                     public Object execute() throws Throwable {
-                        Assert.assertTrue(c.isEnabled());
-                        c.enable();
-                        c.disable();
+                        Assert.assertTrue(CacheContext.isEnabled());
+                        CacheContext.enable();
+                        CacheContext.disable();
                         return null;
                     }
                 });
-                Assert.assertTrue(c.isEnabled());
+                Assert.assertTrue(CacheContext.isEnabled());
             }
         });
-        Assert.assertFalse(c.isEnabled());
+        Assert.assertFalse(CacheContext.isEnabled());
     }
 }
