@@ -3,31 +3,33 @@
  */
 package com.alicp.jetcache.support;
 
+import com.alicp.jetcache.cache.CacheManager;
 import com.alicp.jetcache.impl.CacheImplSupport;
-import com.alicp.jetcache.local.LinkedHashMapCache;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheProvider {
 
-    private Cache remoteCache;
-    private Cache localCache = new LinkedHashMapCache();
+    //TODO fix it
+    private CacheManager remoteCache = CacheManager.defaultInstance();
+    private CacheManager localCache = CacheManager.defaultInstance();
+
     private KeyGenerator keyGenerator = CacheImplSupport.getDefaultKeyGenerator();
 
-    public Cache getRemoteCache() {
+    public CacheManager getRemoteCache() {
         return remoteCache;
     }
 
-    public void setRemoteCache(Cache remoteCache) {
+    public void setRemoteCache(CacheManager remoteCache) {
         this.remoteCache = remoteCache;
     }
 
-    public Cache getLocalCache() {
+    public CacheManager getLocalCache() {
         return localCache;
     }
 
-    public void setLocalCache(Cache localCache) {
+    public void setLocalCache(CacheManager localCache) {
         this.localCache = localCache;
     }
 

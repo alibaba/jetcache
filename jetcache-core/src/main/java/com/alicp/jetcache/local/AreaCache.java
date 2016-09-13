@@ -9,9 +9,9 @@ import java.lang.ref.SoftReference;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface AreaCache {
-    public Object getValue(String key);
+    public Object getValue(Object key);
 
-    public Object putValue(String key, Object value);
+    public Object putValue(Object key, Object value);
 
-    public Object removeValue(String key);
+    public Object removeValue(Object key);
 }

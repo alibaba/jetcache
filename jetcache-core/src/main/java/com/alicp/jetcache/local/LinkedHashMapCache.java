@@ -13,16 +13,13 @@ import java.util.Map;
  */
 public class LinkedHashMapCache extends AbstractLocalCache {
 
-    public LinkedHashMapCache(){
-    }
-
-    public LinkedHashMapCache(boolean useSoftRef){
-        super(useSoftRef);
+    public LinkedHashMapCache(LocalCacheConfig config){
+        super(config);
     }
 
     @Override
-    protected AreaCache createAreaCache(int localLimit){
-        return new LRUMap(localLimit);
+    protected AreaCache createAreaCache(){
+        return new LRUMap(config.getLimit());
     }
 
     private static final class LRUMap extends LinkedHashMap implements AreaCache {
@@ -39,15 +36,15 @@ public class LinkedHashMapCache extends AbstractLocalCache {
             return size() > max;
         }
 
-        public synchronized Object getValue(String key) {
+        public synchronized Object getValue(Object key) {
             return get(key);
         }
 
-        public synchronized Object putValue(String key, Object value) {
+        public synchronized Object putValue(Object key, Object value) {
             return put(key, value);
         }
 
-        public synchronized Object removeValue(String key) {
+        public synchronized Object removeValue(Object key) {
             return remove(key);
         }
     }

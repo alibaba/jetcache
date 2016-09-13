@@ -3,9 +3,9 @@
  */
 package com.alicp.jetcache.testsupport;
 
+import com.alicp.jetcache.CacheConsts;
+import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.impl.CacheImplSupport;
-import com.alicp.jetcache.support.Cache;
-import com.alicp.jetcache.support.CacheConfig;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 
@@ -14,23 +14,27 @@ import java.util.HashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MockRemoteCache implements Cache {
-    private HashMap<String, Value> data = new HashMap<String, Value>();
+public class MockRemoteCache<K, V> implements Cache<K, V> {
+    private HashMap<K, ValueHolder> data = new HashMap();
 
-    public CacheResult get(CacheConfig cacheConfig, String subArea, String key) {
-        key = subArea + key;
+    @Override
+    public String getSubArea() {
+        return "mock";
+    }
+
+    public CacheResult<V> GET(K key) {
         CacheResultCode code;
-        Object value = null;
+        V value = null;
         long expireTime = 0;
         try {
-            Value cacheValue = data.get(key);
-            if (cacheValue != null) {
-                expireTime = cacheValue.expireTime;
-                if (System.currentTimeMillis() > cacheValue.expireTime) {
+            ValueHolder holder = data.get(key);
+            if (holder != null) {
+                expireTime = holder.expireTime;
+                if (System.currentTimeMillis() > holder.expireTime) {
                     code = CacheResultCode.EXPIRED;
                 } else {
                     code = CacheResultCode.SUCCESS;
-                    value = CacheImplSupport.decodeValue(cacheValue.bytes);
+                    value = (V)CacheImplSupport.decodeValue(holder.bytes);
                 }
             } else {
                 code = CacheResultCode.NOT_EXISTS;
@@ -38,14 +42,18 @@ public class MockRemoteCache implements Cache {
         } catch (Exception e) {
             code = CacheResultCode.FAIL;
         }
-        return new CacheResult(code, value, expireTime);
+        return new CacheResult(code, value);
     }
 
-    public CacheResultCode put(CacheConfig cacheConfig, String subArea, String key, Object value, long expireTime) {
-        key = subArea + key;
+    @Override
+    public void put(K key, V value) {
+        PUT(key, value, CacheConsts.DEFAULT_EXPIRE);
+    }
+
+    public CacheResultCode PUT(K key, V value, int expireTime) {
         try {
-            byte[] bytes = CacheImplSupport.encodeValue(value, cacheConfig.getSerialPolicy());
-            Value v = new Value();
+            byte[] bytes = CacheImplSupport.encodeValue(value, CacheConsts.DEFAULT_SERIAL_POLICY);
+            ValueHolder v = new ValueHolder();
             v.bytes = bytes;
             v.expireTime = expireTime;
             data.put(key, v);
@@ -55,7 +63,13 @@ public class MockRemoteCache implements Cache {
         }
     }
 
-    private static class Value {
+    @Override
+    public CacheResultCode INVALIDATE(K key) {
+        data.remove(key);
+        return CacheResultCode.SUCCESS;
+    }
+
+    private static class ValueHolder {
         byte[] bytes;
         long expireTime;
     }

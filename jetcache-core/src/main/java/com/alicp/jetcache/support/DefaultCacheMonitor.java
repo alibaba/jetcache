@@ -3,25 +3,24 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.util.CopyOnWriteHashMap;
-
 import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class DefaultCacheMonitor implements CacheMonitor {
 
-    private CopyOnWriteHashMap<String, CopyOnWriteHashMap<String, Stat>> map
-            = new CopyOnWriteHashMap<String, CopyOnWriteHashMap<String, Stat>>();
+    private ConcurrentHashMap<String, ConcurrentHashMap<String, Stat>> map
+            = new ConcurrentHashMap();
 
     public void onGet(CacheConfig cacheConfig, String subArea, String key,
                       CacheResultCode localResult, CacheResultCode remoteResult) {
-        CopyOnWriteHashMap<String, Stat> areaStat = map.get(cacheConfig.getArea());
+        ConcurrentHashMap<String, Stat> areaStat = map.get(cacheConfig.getArea());
         if (areaStat == null) {
-            areaStat = new CopyOnWriteHashMap<String, Stat>();
+            areaStat = new ConcurrentHashMap();
             map.put(cacheConfig.getArea(), areaStat);
         }
         Stat stat = areaStat.get(subArea);
@@ -74,8 +73,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
         StringBuilder sb = new StringBuilder(512);
         sb.append("-----------------------------------------------\n");
         sb.append("hit/get/rate\tlocalHit/localGet/localExpire/localFail\tremoteHit/remoteGet/remoteExpire/remoteFail\n");
-        Set<Map.Entry<String, CopyOnWriteHashMap<String, Stat>>> entries = map.entrySet();
-        for (Map.Entry<String, CopyOnWriteHashMap<String, Stat>> entry : entries) {
+        Set<Map.Entry<String, ConcurrentHashMap<String, Stat>>> entries = map.entrySet();
+        for (Map.Entry<String, ConcurrentHashMap<String, Stat>> entry : entries) {
             Set<Map.Entry<String, Stat>> areaMapEntries = entry.getValue().entrySet();
             for (Map.Entry<String, Stat> areaMapEntry : areaMapEntries) {
                 Stat stat = areaMapEntry.getValue();

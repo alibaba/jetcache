@@ -26,7 +26,6 @@ public class CacheInvokeContext {
     boolean needUpdateRemote = false;
     CacheResultCode localResult = null;
     CacheResultCode remoteResult = null;
-    long expireTimeGetFromRemote = 0;
 
     public CacheInvokeContext(){
     }

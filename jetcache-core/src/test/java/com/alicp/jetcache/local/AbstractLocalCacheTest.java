@@ -3,113 +3,103 @@
  */
 package com.alicp.jetcache.local;
 
-import com.alicp.jetcache.CacheConsts;
-import com.alicp.jetcache.support.Cache;
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.cache.Cache;
+import com.alicp.jetcache.cache.CacheBuilderConfig;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 import org.junit.Assert;
-import org.junit.Test;
+
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public abstract class AbstractLocalCacheTest {
-    protected Cache cache;
-    protected CacheConfig cc;
+    protected Cache<String,String> cache;
 
-    protected abstract void setup(boolean useSofeRef);
+    protected abstract Function<CacheBuilderConfig, Cache> getBuildFunc();
+
+    protected void setup(boolean useSofeRef, int limit){
+        cache = LocalCacheBuilder.createLocalCacheBuilder().withSubArea("test").withLimit(limit)
+                .withUseSoftRef(useSofeRef).withBuildFunc(getBuildFunc()).build();
+    }
 
     public void test1() throws Exception {
         for (int i = 0; i < 2; i++) {
-            setup(i == 0);
-            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals("V1", cache.get(cc, "S1", "K1").getValue());
-            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S2", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V2", System.currentTimeMillis() +1000));
-            Assert.assertEquals("V2", cache.get(cc, "S1", "K1").getValue());
-
-            cc.setArea("A2");
-            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals("V1", cache.get(cc, "S1", "K1").getValue());
+            setup(i == 0, 100);
+            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
+            Assert.assertEquals("V1", cache.GET("K1").getValue());
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V2", 1));
+            Assert.assertEquals("V2", cache.GET("K1").getValue());
         }
     }
 
     public void testLRU1() {
         for (int i = 0; i < 2; i++) {
-            setup(i == 0);
-            cc.setLocalLimit(2);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K3", "V3", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K2").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K3").getResultCode());
+            setup(i == 0, 2);
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1));
+            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K2").getResultCode());
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
         }
     }
 
     public void testLRU2() {
         for (int i = 0; i < 2; i++) {
-            setup(i == 0);
-            cc.setLocalLimit(2);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K2", "V2", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K3", "V3", System.currentTimeMillis() +1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.get(cc, "S1", "K2").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K3").getResultCode());
+            setup(i == 0, 2);
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
+            Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K2").getResultCode());
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
         }
     }
 
     public void testExpire() throws Exception {
         for (int i = 0; i < 2; i++) {
-            setup(i == 0);
-            long expireTime = System.currentTimeMillis() +100;
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", "V1", expireTime));
+            setup(i == 0, 100);
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
 
-            CacheResult result = cache.get(cc, "S1", "K1");
+            CacheResult result = cache.GET("K1");
             Assert.assertEquals(CacheResultCode.SUCCESS, result.getResultCode());
             Assert.assertEquals("V1", result.getValue());
-            Assert.assertEquals(expireTime, result.getExpireTime());
 
-            Thread.sleep(101);
-            result = cache.get(cc, "S1", "K1");
+            Thread.sleep(1001);
+            result = cache.GET("K1");
             Assert.assertEquals(CacheResultCode.EXPIRED, result.getResultCode());
             Assert.assertNull(result.getValue());
-            Assert.assertEquals(0, result.getExpireTime());
         }
     }
 
     public void testNull() {
         for (int i = 0; i < 2; i++) {
-            setup(i == 0);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.put(cc, "S1", "K1", null, System.currentTimeMillis() + 1000));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.get(cc, "S1", "K1").getResultCode());
-            Assert.assertNull(cache.get(cc, "S1", "K1").getValue());
+            setup(i == 0, 100);
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", null, 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
+            Assert.assertNull(cache.GET("K1").getValue());
         }
     }
 
     public void testConcurrent() throws Exception {
-        setup(false);
-        testConcurrentImpl();
+        testConcurrentImpl(10, 100);
     }
 
     private volatile boolean cocurrentFail = false;
 
-    private void testConcurrentImpl() throws Exception {
+    private void testConcurrentImpl(int threadCount, int count) throws Exception {
+        setup(false, threadCount * count);
         class T extends Thread {
-            String keyPrefix;
-            private String subArea;
-            transient boolean stop;
+            private String keyPrefix;
+            private transient boolean stop;
 
-            T(String keyPrefix, String subArea) {
+            private T(String keyPrefix) {
                 this.keyPrefix = keyPrefix;
-                this.subArea = subArea;
             }
 
             @Override
@@ -118,22 +108,22 @@ public abstract class AbstractLocalCacheTest {
                     int i = 0;
                     while (!stop) {
                         i++;
-                        if (i >= 1000) {
+                        if (i >= count) {
                             i = 0;
                         }
                         String key = keyPrefix + i;
                         String value = i + "";
-                        cache.put(cc, subArea, key, value, System.currentTimeMillis() + CacheConsts.DEFAULT_EXPIRE * 1000);
-                        CacheResult result = cache.get(cc, subArea, key);
+                        cache.PUT(key, value, 10000);
+                        CacheResult result = cache.GET(key);
                         if (result == null || result.getResultCode() != CacheResultCode.SUCCESS) {
                             if (result == null) {
-                                System.out.println("subArea:" + subArea + ",key:" + key + ",result is null");
+                                System.out.println("key:" + key + ",result is null");
                             } else {
-                                System.out.println("subArea:" + subArea + ",key:" + key + ",code:" + result.getResultCode());
+                                System.out.println("key:" + key + ",code:" + result.getResultCode());
                             }
                             cocurrentFail = true;
                         } else if (!result.getValue().equals(value)) {
-                            System.out.println("subArea:" + subArea + ",key:" + key + ",value:" + result.getValue());
+                            System.out.println("key:" + key + ",value:" + result.getValue());
                             cocurrentFail = true;
                         }
                     }
@@ -145,12 +135,9 @@ public abstract class AbstractLocalCacheTest {
             }
         }
 
-        int threadCount = 10;
-        cc.setLocalLimit(threadCount * 1000 / 2);
-
         T[] t = new T[threadCount];
         for (int i = 0; i < threadCount; i++) {
-            t[i] = new T("T" + i + "_", "S" + (i % 2));
+            t[i] = new T("T" + i + "_");
             t[i].setName("ConTest" + i);
             t[i].start();
         }

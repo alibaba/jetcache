@@ -3,13 +3,11 @@
  */
 package com.alicp.jetcache.local;
 
-import com.alicp.jetcache.support.Cache;
-import com.alicp.jetcache.support.CacheConfig;
-import com.alicp.jetcache.support.CacheResult;
-import com.alicp.jetcache.support.CacheResultCode;
-import org.junit.Assert;
-import org.junit.Before;
+import com.alicp.jetcache.cache.Cache;
+import com.alicp.jetcache.cache.CacheBuilderConfig;
 import org.junit.Test;
+
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -17,9 +15,8 @@ import org.junit.Test;
 public class LinkedHashMapCacheTest extends AbstractLocalCacheTest {
 
     @Override
-    protected void setup(boolean useSofeRef) {
-        cache = new LinkedHashMapCache(useSofeRef);
-        cc = new CacheConfig();
+    protected Function<CacheBuilderConfig, Cache> getBuildFunc() {
+        return (c) -> new LinkedHashMapCache((LocalCacheConfig) c);
     }
 
     @Override

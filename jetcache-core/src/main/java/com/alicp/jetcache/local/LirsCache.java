@@ -12,15 +12,12 @@ import java.util.HashMap;
 //TODO BUGFIX
 public class LirsCache extends AbstractLocalCache {
 
-    public LirsCache(){
+    public LirsCache(LocalCacheConfig config){
+        super(config);
     }
 
-    public LirsCache(boolean useSoftRef){
-        super(useSoftRef);
-    }
-
-    @Override
-    protected AreaCache createAreaCache(int localLimit) {
+    protected AreaCache createAreaCache() {
+        int localLimit = config.getLimit();
         int maxHirSize;
         if (localLimit <= 2) {
             throw new IllegalArgumentException("localLimit must greater than 2");
@@ -31,7 +28,7 @@ public class LirsCache extends AbstractLocalCache {
         } else {
             maxHirSize = (int) (localLimit * 0.1);
         }
-        return new LirsAreaCache(localLimit - maxHirSize, maxHirSize, localLimit * 2, useSoftRef);
+        return new LirsAreaCache(localLimit - maxHirSize, maxHirSize, localLimit * 2, config.isUseSoftRef());
     }
 
     static class LirsAreaCache implements AreaCache {
@@ -46,7 +43,7 @@ public class LirsCache extends AbstractLocalCache {
         private int hirSize;
         private int stackSize;
 
-        private HashMap<String, ValueEntry> m;
+        private HashMap<Object, ValueEntry> m;
 
         private ValueEntry sStackHeader;
         private ValueEntry qListHeader;
@@ -57,14 +54,14 @@ public class LirsCache extends AbstractLocalCache {
             MAX_STACK_S_SIZE = sizeOfStackS;
             this.useSoftRef = useSoftRef;
             int initCapacity = (int) (1.5f * (MAX_LIR_SIZE + MAX_HIR_SIZE));
-            m = new HashMap<String, ValueEntry>(initCapacity, 0.75f);
+            m = new HashMap(initCapacity, 0.75f);
             sStackHeader = new ValueEntry();
             sStackHeader.sBefore = sStackHeader.sAfter = sStackHeader;
             qListHeader = new ValueEntry();
             qListHeader.qBefore = qListHeader.qAfter = qListHeader;
         }
 
-        public synchronized Object getValue(String key) {
+        public synchronized Object getValue(Object key) {
             ValueEntry valueEntry = m.get(key);
             if (valueEntry == null || valueEntry.value == null) {
                 return null;
@@ -111,7 +108,7 @@ public class LirsCache extends AbstractLocalCache {
             }
         }
 
-        private void onMiss(ValueEntry valueEntry, String key, Object value) {
+        private void onMiss(ValueEntry valueEntry, Object key, Object value) {
             if (!inited) {
                 valueEntry = new ValueEntry();
                 valueEntry.key = key;
@@ -205,7 +202,7 @@ public class LirsCache extends AbstractLocalCache {
             }
         }
 
-        public synchronized Object putValue(String key, Object value) {
+        public synchronized Object putValue(Object key, Object value) {
             ValueEntry valueEntry = m.get(key);
             Object oldValue = null;
             if (valueEntry != null && valueEntry.value != null) {
@@ -228,7 +225,7 @@ public class LirsCache extends AbstractLocalCache {
             return oldValue;
         }
 
-        public synchronized Object removeValue(String key) {
+        public synchronized Object removeValue(Object key) {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
     }
@@ -239,7 +236,7 @@ public class LirsCache extends AbstractLocalCache {
         ValueEntry sAfter;
         ValueEntry qBefore;
         ValueEntry qAfter;
-        String key;
+        Object key;
         Object value;
     }
 

@@ -4,8 +4,7 @@
 package com.alicp.jetcache.local;
 
 import com.alicp.jetcache.CacheConsts;
-import com.alicp.jetcache.support.Cache;
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 import org.junit.Ignore;
@@ -27,27 +26,27 @@ public class Benchmark {
     private static final int LINE_COUNT = 2733824;
     private static final int CACHE_LIMIT = 10000;
 
-    private static final Object VALUE = new Object();
+    private static final String VALUE = new String();
 
     public static void main(String[] args) throws Exception {
         String[][] data = readData();
         System.out.println("thead : " + THREAD_COUNT);
         System.out.println("data per thread : " + data[0].length);
 
-        CacheConfig cc = new CacheConfig();
-        cc.setLocalLimit(CACHE_LIMIT);
-        cc.setArea("");
+        LocalCacheBuilder builder = LocalCacheBuilder.createLocalCacheBuilder()
+                .withLimit(CACHE_LIMIT).withSubArea("test");
 
-        //Cache cache = new ConcurrentLinkedHashMapCache(false);
-//        Cache cache = new LinkedHashMapCache(false);
-        Cache cache = new LirsCache(false);
+//        Cache cache = builder.build((c) -> new ConcurrentLinkedHashMapCache((LocalCacheConfig) c));
+//        Cache cache = builder.build((c) -> new LinkedHashMapCache((LocalCacheConfig) c));
+        builder.withBuildFunc((c) -> new LirsCache((LocalCacheConfig) c));
+        Cache<String, String> cache = builder.build();
 
         CountDownLatch doneSignal = new CountDownLatch(THREAD_COUNT);
 
         System.out.println("start ...");
         T[] threads = new T[THREAD_COUNT];
         for (int i = 0; i < THREAD_COUNT; i++) {
-            threads[i] = new T(data[i], cache, cc, doneSignal);
+            threads[i] = new T(data[i], cache, doneSignal);
             threads[i].setName("T" + i);
             threads[i].start();
         }
@@ -74,8 +73,7 @@ public class Benchmark {
     static class T extends Thread {
 
         String[] data;
-        Cache cache;
-        CacheConfig cacheConfig;
+        Cache<String, String> cache;
         CountDownLatch doneSignal;
 
         volatile long startTime;
@@ -83,12 +81,11 @@ public class Benchmark {
 
         volatile long getCount;
         volatile long hitCount;
-        volatile long nothitCount;
+        volatile long missCount;
 
-        public T(String data[], Cache cache, CacheConfig cacheConfig, CountDownLatch doneSignal) {
+        public T(String data[], Cache<String, String> cache, CountDownLatch doneSignal) {
             this.data = data;
             this.cache = cache;
-            this.cacheConfig = cacheConfig;
             this.doneSignal = doneSignal;
         }
 
@@ -97,16 +94,16 @@ public class Benchmark {
             startTime = System.currentTimeMillis();
             for (String userId : data) {
                 getCount++;
-                CacheResult result = cache.get(cacheConfig, "S1", userId);
+                CacheResult result = cache.GET(userId);
                 if (result.getResultCode() != CacheResultCode.SUCCESS) {
-                    cache.put(cacheConfig, "S1", userId, VALUE, System.currentTimeMillis() + CacheConsts.DEFAULT_EXPIRE * 1000);
-                    nothitCount++;
+                    cache.PUT(userId, VALUE, CacheConsts.DEFAULT_EXPIRE);
+                    missCount++;
                 } else {
                     hitCount++;
                 }
             }
             endTime = System.currentTimeMillis();
-            System.out.println(Thread.currentThread().getName() + " " + hitCount + "/" + nothitCount + "/" + getCount);
+            System.out.println(Thread.currentThread().getName() + " " + hitCount + "/" + missCount + "/" + getCount);
             doneSignal.countDown();
         }
     }

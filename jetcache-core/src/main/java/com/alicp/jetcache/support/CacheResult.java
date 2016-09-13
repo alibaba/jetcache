@@ -6,15 +6,13 @@ package com.alicp.jetcache.support;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheResult {
+public class CacheResult<V> {
     private CacheResultCode resultCode;
-    private Object value;
-    private long expireTime;
+    private V value;
 
-    public CacheResult(CacheResultCode resultCode, Object value, long expireTime) {
+    public CacheResult(CacheResultCode resultCode, V value) {
         this.resultCode = resultCode;
         this.value = value;
-        this.expireTime = expireTime;
     }
 
     public boolean isSuccess() {
@@ -25,7 +23,7 @@ public class CacheResult {
         return resultCode;
     }
 
-    public Object getValue() {
+    public V getValue() {
         return value;
     }
 
@@ -33,15 +31,8 @@ public class CacheResult {
         this.resultCode = resultCode;
     }
 
-    public void setValue(Object value) {
+    public void setValue(V value) {
         this.value = value;
     }
 
-    public long getExpireTime() {
-        return expireTime;
-    }
-
-    public void setExpireTime(long expireTime) {
-        this.expireTime = expireTime;
-    }
 }

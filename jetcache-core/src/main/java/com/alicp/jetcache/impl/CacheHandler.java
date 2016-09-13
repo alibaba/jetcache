@@ -4,6 +4,7 @@
 package com.alicp.jetcache.impl;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.support.*;
 
 import java.lang.reflect.InvocationHandler;
@@ -107,7 +108,12 @@ class CacheHandler implements InvocationHandler {
         CacheProvider cacheProvider = context.globalCacheConfig.getCache(cacheConfig.getArea());
         String subArea = ClassUtil.getSubArea(cacheConfig, context.method, context.globalCacheConfig.getHidePackages());
         String key = cacheProvider.getKeyGenerator().getKey(context.args);
-        boolean hit = getFromCache(context, cacheProvider, subArea, key);
+
+        Cache localCache = cacheConfig.getCacheType() == CacheType.LOCAL ? cacheProvider.getLocalCache().getCache(subArea) : null;
+        Cache remoteCache = cacheConfig.getCacheType() != CacheType.LOCAL ? cacheProvider.getRemoteCache().getCache(subArea) : null;
+
+
+        boolean hit = getFromCache(context, subArea, localCache, remoteCache, key);
 
         context.needUpdateLocal = false;
         context.needUpdateRemote = false;
@@ -143,50 +149,45 @@ class CacheHandler implements InvocationHandler {
             }
         }
 
-        updateCache(context, cacheProvider, subArea, key);
+        updateCache(context, subArea, localCache ,remoteCache, key);
         return context.result;
     }
 
-    private static void updateCache(CacheInvokeContext context, CacheProvider cacheProvider, String subArea, String key) {
+    private static void updateCache(CacheInvokeContext context,String subArea, Cache localCache, Cache remoteCache, String key) {
         context.localResult = null;
         context.remoteResult = null;
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
-        long expireTime = System.currentTimeMillis() + 1000L * context.getCacheInvokeConfig().cacheConfig.getExpire();
+        int expire = context.getCacheInvokeConfig().cacheConfig.getExpire();
         if (context.needUpdateLocal) {
-            long localCacheExpireTime = expireTime;
-            if (context.expireTimeGetFromRemote > 0) {
-                localCacheExpireTime = context.expireTimeGetFromRemote;
-            }
-            context.localResult = cacheProvider.getLocalCache().put(cacheConfig, subArea, key, context.result, localCacheExpireTime);
+            context.localResult = localCache.PUT(key, context.result, expire);
         }
         if (context.needUpdateRemote) {
-            context.remoteResult = cacheProvider.getRemoteCache().put(cacheConfig, subArea, key, context.result, expireTime);
+            context.remoteResult = remoteCache.PUT(key, context.result, expire);
         }
         if (context.globalCacheConfig.getCacheMonitor() != null && (context.localResult != null || context.remoteResult != null)) {
             context.globalCacheConfig.getCacheMonitor().onPut(cacheConfig, subArea, key, context.result, context.localResult, context.remoteResult);
         }
     }
 
-    private static boolean getFromCache(CacheInvokeContext context, CacheProvider cacheProvider, String subArea, String key) {
+    private static boolean getFromCache(CacheInvokeContext context, String subArea, Cache localCache, Cache remoteCache, String key) {
         CacheConfig cacheConfig = context.cacheInvokeConfig.cacheConfig;
         if (cacheConfig.getCacheType() == CacheType.REMOTE) {
-            CacheResult result = cacheProvider.getRemoteCache().get(cacheConfig, subArea, key);
+            CacheResult result = remoteCache.GET(key);
             context.remoteResult = result.getResultCode();
             if (result.isSuccess()) {
                 context.result = result.getValue();
             }
         } else {
-            CacheResult result = cacheProvider.getLocalCache().get(cacheConfig, subArea, key);
+            CacheResult result = localCache.GET(key);
             context.localResult = result.getResultCode();
             if (result.isSuccess()) {
                 context.result = result.getValue();
             } else {
                 if (cacheConfig.getCacheType() == CacheType.BOTH) {
-                    result = cacheProvider.getRemoteCache().get(cacheConfig, subArea, key);
+                    result = localCache.GET(key);
                     context.remoteResult = result.getResultCode();
                     if (result.isSuccess()) {
                         context.result = result.getValue();
-                        context.expireTimeGetFromRemote = result.getExpireTime();
                     }
                 }
             }

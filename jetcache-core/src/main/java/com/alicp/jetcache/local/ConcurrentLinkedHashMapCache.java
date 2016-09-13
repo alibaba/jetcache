@@ -11,37 +11,35 @@ import java.util.concurrent.ConcurrentMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class ConcurrentLinkedHashMapCache extends AbstractLocalCache {
-    public ConcurrentLinkedHashMapCache(){
-    }
 
-    public ConcurrentLinkedHashMapCache(boolean useSoftRef){
-        super(useSoftRef);
+    public ConcurrentLinkedHashMapCache(LocalCacheConfig config){
+        super(config);
     }
 
     @Override
-    protected AreaCache createAreaCache(int localLimit) {
-        return new ConcurrentAreaCache(localLimit);
+    protected AreaCache createAreaCache() {
+        return new ConcurrentAreaCache(config.getLimit());
     }
 
     private static class ConcurrentAreaCache implements AreaCache {
-        ConcurrentMap<String, Object> cache;
+        ConcurrentMap<Object, Object> cache;
 
         ConcurrentAreaCache(int limit) {
-            cache = new ConcurrentLinkedHashMap.Builder<String, Object>()
+            cache = new ConcurrentLinkedHashMap.Builder()
                     .maximumWeightedCapacity(limit)
                     .initialCapacity(limit)
                     .build();
         }
 
-        public Object getValue(String key) {
+        public Object getValue(Object key) {
             return cache.get(key);
         }
 
-        public Object putValue(String key, Object value) {
+        public Object putValue(Object key, Object value) {
             return cache.put(key, value);
         }
 
-        public Object removeValue(String key) {
+        public Object removeValue(Object key) {
             return cache.remove(key);
         }
     }

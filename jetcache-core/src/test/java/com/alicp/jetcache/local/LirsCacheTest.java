@@ -3,10 +3,14 @@
  */
 package com.alicp.jetcache.local;
 
+import com.alicp.jetcache.cache.Cache;
+import com.alicp.jetcache.cache.CacheBuilderConfig;
 import com.alicp.jetcache.support.CacheConfig;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -15,9 +19,8 @@ import org.junit.Test;
 public class LirsCacheTest extends AbstractLocalCacheTest {
 
     @Override
-    protected void setup(boolean useSofeRef) {
-        cache = new LirsCache(useSofeRef);
-        cc = new CacheConfig();
+    protected Function<CacheBuilderConfig, Cache> getBuildFunc() {
+        return (c) -> new LirsCache((LocalCacheConfig) c);
     }
 
     @Override
