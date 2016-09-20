@@ -5,9 +5,9 @@ package com.alicp.jetcache.impl;
 
 import com.alicp.jetcache.SerialPolicy;
 import com.alicp.jetcache.support.CacheConfig;
-import com.alicp.jetcache.support.DefaultKeyGenerator;
+import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.support.GlobalCacheConfig;
-import com.alicp.jetcache.support.KeyGenerator;
+import com.alicp.jetcache.cache.KeyGenerator;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -15,7 +15,7 @@ import com.alicp.jetcache.support.KeyGenerator;
 public class CacheImplSupport {
 
     public static KeyGenerator getDefaultKeyGenerator() {
-        return new DefaultKeyGenerator();
+        return new FastjsonKeyGenerator();
     }
 
     public static <T> T getProxy(T target, CacheConfig cacheConfig, GlobalCacheConfig globalCacheConfig) {

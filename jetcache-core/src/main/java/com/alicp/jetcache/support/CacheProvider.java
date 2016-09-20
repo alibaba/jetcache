@@ -4,6 +4,7 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.cache.CacheManager;
+import com.alicp.jetcache.cache.KeyGenerator;
 import com.alicp.jetcache.impl.CacheImplSupport;
 
 /**

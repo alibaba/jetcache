@@ -3,6 +3,8 @@ package com.alicp.jetcache.cache;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 
+import java.util.function.Function;
+
 /**
  * Created on 16/9/7.
  *
@@ -22,6 +24,18 @@ public interface Cache<K, V> {
     }
 
     CacheResult<V> GET(K key);
+
+    /**
+     * Compute value use a loader when miss.
+     */
+    default V computeIfAbsent(K key, Function<K, V> loader) {
+        CacheResult<V> r = GET(key);
+        if (r.isSuccess()) {
+            return r.getValue();
+        } else {
+            return loader.apply(key);
+        }
+    }
 
     void put(K key, V value);
 

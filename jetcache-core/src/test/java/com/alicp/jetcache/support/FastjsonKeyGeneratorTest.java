@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.support.DefaultKeyGenerator;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,7 +10,7 @@ import org.junit.Test;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class DefaultKeyGeneratorTest {
+public class FastjsonKeyGeneratorTest {
     static class C extends DynamicQuery {
         private C mate;
 
@@ -26,7 +25,7 @@ public class DefaultKeyGeneratorTest {
 
     @Test
     public void test() {
-        DefaultKeyGenerator g = new DefaultKeyGenerator();
+        FastjsonKeyGenerator g = new FastjsonKeyGenerator();
         String k1, k2, k3;
 
         k1 = g.getKey(new Object[]{10, 20, 10});

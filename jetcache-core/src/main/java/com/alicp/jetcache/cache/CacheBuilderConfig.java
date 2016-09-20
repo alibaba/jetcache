@@ -11,6 +11,7 @@ public class CacheBuilderConfig {
     private boolean cacheNullValue;
     private int defaultTtlInSeconds = CacheConsts.DEFAULT_EXPIRE;
     private String subArea;
+    private KeyGenerator keyGenerator;
 
     public boolean isCacheNullValue() {
         return cacheNullValue;
@@ -34,5 +35,13 @@ public class CacheBuilderConfig {
 
     public void setSubArea(String subArea) {
         this.subArea = subArea;
+    }
+
+    public KeyGenerator getKeyGenerator() {
+        return keyGenerator;
+    }
+
+    public void setKeyGenerator(KeyGenerator keyGenerator) {
+        this.keyGenerator = keyGenerator;
     }
 }
