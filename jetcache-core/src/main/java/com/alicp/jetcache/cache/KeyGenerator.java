@@ -5,6 +5,6 @@ package com.alicp.jetcache.cache;
  */
 public interface KeyGenerator {
 
-    Object getKey(Object originalKey);
+    Object getKey(Object... originalKey);
 
 }

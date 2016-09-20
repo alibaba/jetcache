@@ -1,6 +1,6 @@
 package com.alicp.jetcache.cache;
 
-import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.CacheConfigException;
 
 import java.util.function.Function;
 
@@ -40,13 +40,17 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return self();
     }
 
+    protected void beforeBuild(){
+    }
+
     public final Cache build() {
         if (getConfig().getSubArea() == null) {
-            throw new CacheException("no subArea");
+            throw new CacheConfigException("no subArea");
         }
         if (buildFunc == null) {
-            throw new CacheException("no buildFunc");
+            throw new CacheConfigException("no buildFunc");
         }
+        beforeBuild();
         return buildFunc.apply(config);
     }
 
