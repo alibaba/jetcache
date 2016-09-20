@@ -12,7 +12,7 @@ import com.alicp.jetcache.cache.KeyGenerator;
 public class FastjsonKeyGenerator implements KeyGenerator {
 
 
-    public String getKey(Object... originalKey) {
+    public String generateKey(Object... originalKey) {
         return JSON.toJSONString(originalKey);
     }
 

@@ -107,7 +107,7 @@ class CacheHandler implements InvocationHandler {
 
         CacheProvider cacheProvider = context.globalCacheConfig.getCache(cacheConfig.getArea());
         String subArea = ClassUtil.getSubArea(cacheConfig, context.method, context.globalCacheConfig.getHidePackages());
-        String key = (String) cacheProvider.getKeyGenerator().getKey(context.args);
+        String key = (String) cacheProvider.getKeyGenerator().generateKey(context.args);
 
         Cache localCache = cacheConfig.getCacheType() == CacheType.LOCAL ? cacheProvider.getLocalCache().getCache(subArea) : null;
         Cache remoteCache = cacheConfig.getCacheType() != CacheType.LOCAL ? cacheProvider.getRemoteCache().getCache(subArea) : null;

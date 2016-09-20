@@ -28,37 +28,37 @@ public class FastjsonKeyGeneratorTest {
         FastjsonKeyGenerator g = new FastjsonKeyGenerator();
         String k1, k2, k3;
 
-        k1 = g.getKey(new Object[]{10, 20, 10});
-        k2 = g.getKey(new Object[]{10, 20, 10});
-        k3 = g.getKey(new Object[]{20, 10, 10});
+        k1 = g.generateKey(new Object[]{10, 20, 10});
+        k2 = g.generateKey(new Object[]{10, 20, 10});
+        k3 = g.generateKey(new Object[]{20, 10, 10});
         Assert.assertEquals(k1, k2);
         Assert.assertNotEquals(k1, k3);
 
-        k1 = g.getKey(new Object[]{10, null});
-        k2 = g.getKey(new Object[]{10, ""});
+        k1 = g.generateKey(new Object[]{10, null});
+        k2 = g.generateKey(new Object[]{10, ""});
         Assert.assertNotEquals(k1, k2);
 
         C q1 = new C();
         C q2 = new C();
-        Assert.assertEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
 
         q1.setId(10000);
         q2.setId(10000);
         q1.setName("N1");
-        Assert.assertNotEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertNotEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
         q2.setName("N1");
-        Assert.assertEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
 
         q1.setMate(q2);
-        Assert.assertNotEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertNotEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
         q2.setMate(q1);
-        Assert.assertEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
 
         C q3 = new C();
         q3.setId(20);
         q1.setMate(q3);
-        Assert.assertNotEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertNotEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
         q2.setMate(q3);
-        Assert.assertEquals(g.getKey(new Object[]{q1}), g.getKey(new Object[]{q2}));
+        Assert.assertEquals(g.generateKey(new Object[]{q1}), g.generateKey(new Object[]{q2}));
     }
 }
