@@ -25,8 +25,8 @@ public class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends Cac
         return (ExternalCacheConfig) config;
     }
 
-    public T withSerialPolicy(SerialPolicy serialPolicy){
-        getConfig().setSerialPolicy(serialPolicy);
+    public T withValueSerialPolicy(SerialPolicy serialPolicy){
+        getConfig().setValueSerialPolicy(serialPolicy);
         return self();
     }
 
