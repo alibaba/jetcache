@@ -11,8 +11,8 @@ import java.util.function.Function;
  */
 public abstract class CacheBuilder<T extends CacheBuilder<T>> {
 
-    protected CacheBuilderConfig config;
-    private Function<CacheBuilderConfig, Cache> buildFunc;
+    protected CacheConfig config;
+    private Function<CacheConfig, Cache> buildFunc;
 
     public static class CacheBuilderImpl extends CacheBuilder<CacheBuilderImpl>{
     }
@@ -24,9 +24,9 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
     protected CacheBuilder() {
     }
 
-    protected CacheBuilderConfig getConfig() {
+    protected CacheConfig getConfig() {
         if (config == null) {
-            return new CacheBuilderConfig();
+            return new CacheConfig();
         }
         return config;
     }
@@ -35,7 +35,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return (T) this;
     }
 
-    public T withBuildFunc(Function<CacheBuilderConfig, Cache> buildFunc){
+    public T withBuildFunc(Function<CacheConfig, Cache> buildFunc){
         this.buildFunc = buildFunc;
         return self();
     }

@@ -10,12 +10,12 @@ import com.alicp.jetcache.support.CacheResultCode;
  */
 public class CompoundCache<K, V> implements Cache<K, V> {
 
-    private CacheBuilderConfig config;
+    private CacheConfig config;
     private Cache<K, CacheValueHolder<V>> l1Cache;
     private Cache<K, CacheValueHolder<V>> l2Cache;
 
     @SuppressWarnings("unchecked")
-    public CompoundCache(CacheBuilderConfig config, Cache l1Cache, Cache l2Cache) {
+    public CompoundCache(CacheConfig config, Cache l1Cache, Cache l2Cache) {
         this.config = config;
         this.l1Cache = l1Cache;
         this.l2Cache = l2Cache;
