@@ -4,6 +4,7 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
+import com.alicp.jetcache.cache.CacheValueHolder;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 
@@ -34,34 +35,34 @@ public abstract class AbstractLocalCache<K, V> implements Cache<K, V> {
         Object value = null;
         try {
             if (config.isUseSoftRef()) {
-                SoftReference<CacheObject> ref = (SoftReference<CacheObject>) areaCache.getValue(key);
+                SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) areaCache.getValue(key);
                 if (ref == null) {
                     code = CacheResultCode.NOT_EXISTS;
                 } else {
-                    CacheObject cacheObject = ref.get();
+                    CacheValueHolder<V> cacheObject = ref.get();
                     if (cacheObject == null) {
                         code = CacheResultCode.NOT_EXISTS;
                     } else {
-                        if (System.currentTimeMillis() - cacheObject.expireTime >= 0) {
+                        if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
                             areaCache.removeValue(key);
                             code = CacheResultCode.EXPIRED;
                         } else {
                             code = CacheResultCode.SUCCESS;
-                            value = cacheObject.value;
+                            value = cacheObject.getValue();
                         }
                     }
                 }
             } else {
-                CacheObject cacheObject = (CacheObject) areaCache.getValue(key);
+                CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) areaCache.getValue(key);
                 if (cacheObject == null) {
                     code = CacheResultCode.NOT_EXISTS;
                 } else {
-                    if (System.currentTimeMillis() - cacheObject.expireTime >= 0) {
+                    if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
                         areaCache.removeValue(key);
                         code = CacheResultCode.EXPIRED;
                     } else {
                         code = CacheResultCode.SUCCESS;
-                        value = cacheObject.value;
+                        value = cacheObject.getValue();
                     }
                 }
             }
@@ -78,11 +79,18 @@ public abstract class AbstractLocalCache<K, V> implements Cache<K, V> {
 
     @Override
     public CacheResultCode PUT(K key, V value, int expire) {
-        CacheObject cacheObject = new CacheObject();
-        cacheObject.value = value;
-        cacheObject.expireTime = 1000 * expire + System.currentTimeMillis();
+        CacheValueHolder<V> cacheObject = null;
+        if (value instanceof CacheValueHolder) {
+            cacheObject = (CacheValueHolder<V>) value;
+        } else {
+            cacheObject = new CacheValueHolder<V>();
+            cacheObject.setValue(value);
+            long now = System.currentTimeMillis();
+            cacheObject.setExpireTime(1000 * expire + now);
+            cacheObject.setCreateTime(now);
+        }
         if (config.isUseSoftRef()) {
-            SoftReference<CacheObject> ref = new SoftReference(cacheObject);
+            SoftReference<CacheValueHolder<V>> ref = new SoftReference(cacheObject);
             areaCache.putValue(key, ref);
         } else {
             areaCache.putValue(key, cacheObject);
