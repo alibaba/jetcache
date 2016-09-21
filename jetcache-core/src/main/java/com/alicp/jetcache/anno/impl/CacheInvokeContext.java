@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-02 16:10
  */
-package com.alicp.jetcache.impl;
+package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.support.GlobalCacheConfig;
 import com.alicp.jetcache.support.CacheResultCode;

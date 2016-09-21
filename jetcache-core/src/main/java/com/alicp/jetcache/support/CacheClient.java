@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.impl.CacheImplSupport;
+import com.alicp.jetcache.anno.impl.CacheImplSupport;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

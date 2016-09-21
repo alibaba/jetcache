@@ -7,7 +7,7 @@ import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.CacheContext;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.Callback;
-import com.alicp.jetcache.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;

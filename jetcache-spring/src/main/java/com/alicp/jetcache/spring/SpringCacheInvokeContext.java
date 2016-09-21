@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.spring;
 
-import com.alicp.jetcache.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import org.springframework.context.ApplicationContext;
 
 /**

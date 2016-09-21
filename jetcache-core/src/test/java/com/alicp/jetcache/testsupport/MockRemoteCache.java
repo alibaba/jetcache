@@ -5,7 +5,7 @@ package com.alicp.jetcache.testsupport;
 
 import com.alicp.jetcache.CacheConsts;
 import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.impl.CacheImplSupport;
+import com.alicp.jetcache.anno.impl.CacheImplSupport;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 

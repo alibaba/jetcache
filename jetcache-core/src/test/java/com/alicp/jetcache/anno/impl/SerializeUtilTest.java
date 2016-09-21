@@ -1,7 +1,7 @@
 /**
  * Created on  13-11-01 10:53
  */
-package com.alicp.jetcache.impl;
+package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.Assert;

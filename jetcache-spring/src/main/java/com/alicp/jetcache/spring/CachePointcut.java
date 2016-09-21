@@ -4,8 +4,8 @@
 package com.alicp.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
-import com.alicp.jetcache.impl.CacheInvokeConfig;
-import com.alicp.jetcache.impl.CacheConfigUtil;
+import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.impl.CacheConfigUtil;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 

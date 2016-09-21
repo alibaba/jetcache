@@ -4,7 +4,7 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheException;
-import com.alicp.jetcache.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 
 import java.util.Map;
 

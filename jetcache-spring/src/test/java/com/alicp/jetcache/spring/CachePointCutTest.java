@@ -7,7 +7,7 @@ import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

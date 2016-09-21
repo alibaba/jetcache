@@ -5,7 +5,7 @@ package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.cache.CacheManager;
 import com.alicp.jetcache.cache.KeyGenerator;
-import com.alicp.jetcache.impl.CacheImplSupport;
+import com.alicp.jetcache.anno.impl.CacheImplSupport;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

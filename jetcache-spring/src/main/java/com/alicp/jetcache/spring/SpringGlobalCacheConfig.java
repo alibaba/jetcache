@@ -5,7 +5,7 @@ package com.alicp.jetcache.spring;
 
 import com.alicp.jetcache.support.CacheProvider;
 import com.alicp.jetcache.support.GlobalCacheConfig;
-import com.alicp.jetcache.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
