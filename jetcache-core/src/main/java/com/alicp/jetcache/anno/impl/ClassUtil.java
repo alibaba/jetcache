@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.support.CacheAnnoConfig;
 import com.alicp.jetcache.objectweb.asm.Type;
 
 import java.lang.reflect.Method;
@@ -18,14 +18,14 @@ class ClassUtil {
     private static IdentityHashMap<Method, String> subAreaMap = new IdentityHashMap<Method, String>();
     private static IdentityHashMap<Method, String> methodSigMap = new IdentityHashMap<Method, String>();
 
-    public static String getSubArea(CacheConfig cacheConfig, Method method, String[] hidePackages) {
+    public static String getSubArea(CacheAnnoConfig cacheAnnoConfig, Method method, String[] hidePackages) {
         // TODO invalid cache when param type changed
 
         String prefix = subAreaMap.get(method);
 
         if (prefix == null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(cacheConfig.getVersion()).append('_');
+            sb.append(cacheAnnoConfig.getVersion()).append('_');
             sb.append(method.getDeclaringClass().getName());
             sb.append('.');
             getMethodSig(sb, method);

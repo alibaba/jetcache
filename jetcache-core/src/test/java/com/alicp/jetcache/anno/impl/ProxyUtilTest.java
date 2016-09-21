@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.support.CacheAnnoConfig;
 import com.alicp.jetcache.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
@@ -21,18 +21,18 @@ import org.junit.Test;
 public class ProxyUtilTest {
 
     private GlobalCacheConfig globalCacheConfig;
-    private CacheConfig cacheConfig;
+    private CacheAnnoConfig cacheAnnoConfig;
 
     @Before
     public void setup() {
         globalCacheConfig = TestUtil.getCacheProviderFactory();
-        cacheConfig = new CacheConfig();
+        cacheAnnoConfig = new CacheAnnoConfig();
     }
 
     @Test
     public void testGetProxy() {
         Count c1 = new CountClass();
-        Count c2 = ProxyUtil.getProxy(c1, cacheConfig, globalCacheConfig);
+        Count c2 = ProxyUtil.getProxy(c1, cacheAnnoConfig, globalCacheConfig);
 
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());

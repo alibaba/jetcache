@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.support.CacheAnnoConfig;
 import com.alicp.jetcache.support.GlobalCacheConfig;
 import org.junit.Assert;
 import org.junit.Before;
@@ -16,34 +16,34 @@ import java.util.HashMap;
  */
 public class ExpressionUtilTest {
     private CacheInvokeContext context;
-    private CacheConfig cacheConfig;
+    private CacheAnnoConfig cacheAnnoConfig;
 
     @Before
     public void setup() {
         context = new CacheInvokeContext();
-        cacheConfig = new CacheConfig();
+        cacheAnnoConfig = new CacheAnnoConfig();
         context.cacheInvokeConfig = new CacheInvokeConfig();
-        context.cacheInvokeConfig.cacheConfig = cacheConfig;
+        context.cacheInvokeConfig.cacheAnnoConfig = cacheAnnoConfig;
 
         context.globalCacheConfig = new GlobalCacheConfig(new HashMap());
     }
 
     @Test
     public void testCondition() {
-        cacheConfig.setCondition("mvel{args[0]==null}");
+        cacheAnnoConfig.setCondition("mvel{args[0]==null}");
         context.cacheInvokeConfig.init();
         Assert.assertFalse(ExpressionUtil.evalCondition(context));
         context.args = new Object[1];
         Assert.assertTrue(ExpressionUtil.evalCondition(context));
         context.args = new Object[]{"1234"};
-        cacheConfig.setCondition("mvel{args[0].length()==4}");
+        cacheAnnoConfig.setCondition("mvel{args[0].length()==4}");
         context.cacheInvokeConfig.init();
         Assert.assertTrue(ExpressionUtil.evalCondition(context));
     }
 
     @Test
     public void testUnless() {
-        cacheConfig.setUnless("mvel{result==null}");
+        cacheAnnoConfig.setUnless("mvel{result==null}");
         context.cacheInvokeConfig.init();
         Assert.assertFalse(ExpressionUtil.evalUnless(context));
     }

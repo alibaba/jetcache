@@ -16,17 +16,17 @@ public class DefaultCacheMonitor implements CacheMonitor {
     private ConcurrentHashMap<String, ConcurrentHashMap<String, Stat>> map
             = new ConcurrentHashMap();
 
-    public void onGet(CacheConfig cacheConfig, String subArea, String key,
+    public void onGet(CacheAnnoConfig cacheAnnoConfig, String subArea, String key,
                       CacheResultCode localResult, CacheResultCode remoteResult) {
-        ConcurrentHashMap<String, Stat> areaStat = map.get(cacheConfig.getArea());
+        ConcurrentHashMap<String, Stat> areaStat = map.get(cacheAnnoConfig.getArea());
         if (areaStat == null) {
             areaStat = new ConcurrentHashMap();
-            map.put(cacheConfig.getArea(), areaStat);
+            map.put(cacheAnnoConfig.getArea(), areaStat);
         }
         Stat stat = areaStat.get(subArea);
         if (stat == null) {
             stat = new Stat();
-            stat.area = cacheConfig.getArea();
+            stat.area = cacheAnnoConfig.getArea();
             stat.subArea = subArea;
             areaStat.put(subArea, stat);
         }
@@ -59,7 +59,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
         }
     }
 
-    public void onPut(CacheConfig cacheConfig, String subArea, String key,
+    public void onPut(CacheAnnoConfig cacheAnnoConfig, String subArea, String key,
                       Object value, CacheResultCode localResult, CacheResultCode remoteResult) {
     }
 

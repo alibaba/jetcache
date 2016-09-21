@@ -12,8 +12,8 @@ public class CacheClient {
 
     private GlobalCacheConfig globalCacheConfig;
 
-    public <T> T getProxy(T target, CacheConfig cacheConfig) {
-        return CacheImplSupport.getProxy(target, cacheConfig, globalCacheConfig);
+    public <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig) {
+        return CacheImplSupport.getProxy(target, cacheAnnoConfig, globalCacheConfig);
     }
 
     public <T> T getProxyByAnnotation(T target) {

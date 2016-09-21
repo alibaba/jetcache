@@ -95,7 +95,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             Class<?>[] paramTypes = method.getParameterTypes();
             parseByTargetClass(cac, targetClass, name, paramTypes);
 
-            if (!cac.isEnableCacheContext() && cac.getCacheConfig() == null) {
+            if (!cac.isEnableCacheContext() && cac.getCacheAnnoConfig() == null) {
                 cacheConfigMap.put(method, CacheInvokeConfig.getNoCacheInvokeConfigInstance());
                 return false;
             } else {

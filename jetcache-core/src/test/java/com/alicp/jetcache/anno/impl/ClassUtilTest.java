@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.support.CacheAnnoConfig;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,7 +53,7 @@ public class ClassUtilTest {
 
     @Test
     public void testGetSubArea() throws Exception {
-        CacheConfig cc = new CacheConfig();
+        CacheAnnoConfig cc = new CacheAnnoConfig();
         Method m1 = C1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo", I1.class);
         Method m3 = C1.class.getMethod("foo2", I1.class);

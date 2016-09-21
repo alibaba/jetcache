@@ -24,7 +24,7 @@ class ExpressionUtil {
     }
 
     public static boolean evalCondition(CacheInvokeContext context) {
-        String condition = context.cacheInvokeConfig.cacheConfig.getCondition();
+        String condition = context.cacheInvokeConfig.cacheAnnoConfig.getCondition();
         if (CacheConsts.DEFAULT_CONDITION.equals(condition)) {
             return true;
         }
@@ -40,7 +40,7 @@ class ExpressionUtil {
     }
 
     public static boolean evalUnless(CacheInvokeContext context) {
-        String unless = context.cacheInvokeConfig.cacheConfig.getUnless();
+        String unless = context.cacheInvokeConfig.cacheAnnoConfig.getUnless();
         if (CacheConsts.DEFAULT_UNLESS.equals(unless)) {
             return true;
         }

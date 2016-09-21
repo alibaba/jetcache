@@ -10,7 +10,7 @@ import com.alicp.jetcache.anno.SerialPolicy;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheConfig {
+public class CacheAnnoConfig {
 
     private String area = CacheConsts.DEFAULT_AREA;
     private boolean enabled = CacheConsts.DEFAULT_ENABLED;

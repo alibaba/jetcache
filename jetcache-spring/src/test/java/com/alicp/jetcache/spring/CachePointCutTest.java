@@ -74,8 +74,8 @@ public class CachePointCutTest {
 
         Assert.assertFalse(map.get(m1).isEnableCacheContext());
         Assert.assertFalse(map.get(m2).isEnableCacheContext());
-        Assert.assertNotNull(map.get(m1).getCacheConfig());
-        Assert.assertNotNull(map.get(m2).getCacheConfig());
+        Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
+        Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
 
         Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -110,8 +110,8 @@ public class CachePointCutTest {
 
         Assert.assertFalse(map.get(m1).isEnableCacheContext());
         Assert.assertFalse(map.get(m2).isEnableCacheContext());
-        Assert.assertNotNull(map.get(m1).getCacheConfig());
-        Assert.assertNotNull(map.get(m2).getCacheConfig());
+        Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
+        Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
     }
 
     interface I3_Parent {
@@ -142,12 +142,12 @@ public class CachePointCutTest {
         Assert.assertTrue(map.get(m1).isEnableCacheContext());
         Assert.assertTrue(map.get(m2).isEnableCacheContext());
         Assert.assertTrue(map.get(m3).isEnableCacheContext());
-        Assert.assertEquals("A1", map.get(m1).getCacheConfig().getArea());
-        Assert.assertEquals(false, map.get(m1).getCacheConfig().isEnabled());
-        Assert.assertEquals(1, map.get(m1).getCacheConfig().getExpire());
-        Assert.assertEquals(CacheType.BOTH, map.get(m1).getCacheConfig().getCacheType());
-        Assert.assertEquals(2, map.get(m1).getCacheConfig().getLocalLimit());
-        Assert.assertEquals(10, map.get(m1).getCacheConfig().getVersion());
+        Assert.assertEquals("A1", map.get(m1).getCacheAnnoConfig().getArea());
+        Assert.assertEquals(false, map.get(m1).getCacheAnnoConfig().isEnabled());
+        Assert.assertEquals(1, map.get(m1).getCacheAnnoConfig().getExpire());
+        Assert.assertEquals(CacheType.BOTH, map.get(m1).getCacheAnnoConfig().getCacheType());
+        Assert.assertEquals(2, map.get(m1).getCacheAnnoConfig().getLocalLimit());
+        Assert.assertEquals(10, map.get(m1).getCacheAnnoConfig().getVersion());
 
     }
 
@@ -177,8 +177,8 @@ public class CachePointCutTest {
 
         Assert.assertFalse(map.get(m1).isEnableCacheContext());
         Assert.assertFalse(map.get(m2).isEnableCacheContext());
-        Assert.assertNotNull(map.get(m1).getCacheConfig());
-        Assert.assertNotNull(map.get(m2).getCacheConfig());
+        Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
+        Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
 
     }
 }

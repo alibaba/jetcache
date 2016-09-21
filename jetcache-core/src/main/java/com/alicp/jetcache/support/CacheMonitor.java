@@ -8,9 +8,9 @@ package com.alicp.jetcache.support;
  */
 public interface CacheMonitor {
 
-    public void onGet(CacheConfig cacheConfig, String subArea, String key, CacheResultCode localResult, CacheResultCode remoteResult);
+    public void onGet(CacheAnnoConfig cacheAnnoConfig, String subArea, String key, CacheResultCode localResult, CacheResultCode remoteResult);
 
-    public void onPut(CacheConfig cacheConfig, String subArea, String key, Object value, CacheResultCode localResult, CacheResultCode remoteResult);
+    public void onPut(CacheAnnoConfig cacheAnnoConfig, String subArea, String key, Object value, CacheResultCode localResult, CacheResultCode remoteResult);
 
     public void warn(String message);
 

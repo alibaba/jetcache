@@ -3,13 +3,13 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.support.CacheConfig;
+import com.alicp.jetcache.support.CacheAnnoConfig;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInvokeConfig {
-    CacheConfig cacheConfig;
+    CacheAnnoConfig cacheAnnoConfig;
     boolean enableCacheContext;
 
     EL conditionEL;
@@ -24,7 +24,7 @@ public class CacheInvokeConfig {
     }
 
     public void init() {
-        Object[] tmp = ExpressionUtil.parseEL(cacheConfig.getCondition());
+        Object[] tmp = ExpressionUtil.parseEL(cacheAnnoConfig.getCondition());
         if (tmp != null) {
             conditionEL = (EL) tmp[0];
             conditionScript = (String) tmp[1];
@@ -32,7 +32,7 @@ public class CacheInvokeConfig {
             conditionEL = null;
             conditionScript = null;
         }
-        tmp = ExpressionUtil.parseEL(cacheConfig.getUnless());
+        tmp = ExpressionUtil.parseEL(cacheAnnoConfig.getUnless());
         if (tmp != null) {
             unlessEL = (EL) tmp[0];
             unlessScript = (String) tmp[1];
@@ -42,12 +42,12 @@ public class CacheInvokeConfig {
         }
     }
 
-    public CacheConfig getCacheConfig() {
-        return cacheConfig;
+    public CacheAnnoConfig getCacheAnnoConfig() {
+        return cacheAnnoConfig;
     }
 
-    public void setCacheConfig(CacheConfig cacheConfig) {
-        this.cacheConfig = cacheConfig;
+    public void setCacheAnnoConfig(CacheAnnoConfig cacheAnnoConfig) {
+        this.cacheAnnoConfig = cacheAnnoConfig;
     }
 
     public boolean isEnableCacheContext() {
