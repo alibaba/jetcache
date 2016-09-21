@@ -1,4 +1,4 @@
-package com.alicp.jetcache.local;
+package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.CacheConsts;
 import com.alicp.jetcache.cache.CacheBuilderConfig;

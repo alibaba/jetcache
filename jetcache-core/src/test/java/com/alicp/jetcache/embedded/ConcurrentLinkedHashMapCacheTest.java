@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-24 10:20
  */
-package com.alicp.jetcache.local;
+package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.cache.CacheBuilderConfig;
@@ -12,11 +12,11 @@ import java.util.function.Function;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LinkedHashMapCacheTest extends AbstractLocalCacheTest {
+public class ConcurrentLinkedHashMapCacheTest extends AbstractLocalCacheTest {
 
     @Override
     protected Function<CacheBuilderConfig, Cache> getBuildFunc() {
-        return (c) -> new LinkedHashMapCache((LocalCacheConfig) c);
+        return (c) -> new ConcurrentLinkedHashMapCache((LocalCacheConfig) c);
     }
 
     @Override

@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-30 21:27
  */
-package com.alicp.jetcache.local;
+package com.alicp.jetcache.embedded;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;

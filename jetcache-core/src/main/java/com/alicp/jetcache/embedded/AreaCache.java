@@ -1,9 +1,7 @@
 /**
  * Created on  13-10-17 22:34
  */
-package com.alicp.jetcache.local;
-
-import java.lang.ref.SoftReference;
+package com.alicp.jetcache.embedded;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

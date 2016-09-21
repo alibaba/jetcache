@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-20 01:53
  */
-package com.alicp.jetcache.local;
+package com.alicp.jetcache.embedded;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 

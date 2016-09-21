@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-21 09:47
  */
-package com.alicp.jetcache.local;
+package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.cache.CacheBuilderConfig;

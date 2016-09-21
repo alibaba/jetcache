@@ -328,7 +328,7 @@ public class CacheHandlerTest {
         //remote put
         x1 = invoke(method, new Object[]{2000});
         cacheConfig.setCacheType(CacheType.BOTH);
-        //local miss,remote hit,local put
+        //local miss,remote hit,embedded put
         x2 = invoke(method, new Object[]{2000});
         Assert.assertEquals(x1, x2);
         cacheConfig.setCacheType(CacheType.LOCAL);

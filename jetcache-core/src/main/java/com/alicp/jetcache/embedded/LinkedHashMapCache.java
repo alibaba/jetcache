@@ -1,9 +1,7 @@
 /**
  * Created on  13-09-12 19:02
  */
-package com.alicp.jetcache.local;
-
-import com.alicp.jetcache.support.CacheConfig;
+package com.alicp.jetcache.embedded;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

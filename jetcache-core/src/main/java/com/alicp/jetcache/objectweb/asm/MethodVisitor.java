@@ -303,7 +303,7 @@ public abstract class MethodVisitor {
     }
 
     /**
-     * Visits a local variable instruction. A local variable instruction is an
+     * Visits a local variable instruction. A embedded variable instruction is an
      * instruction that loads or stores the value of a local variable.
      * 
      * @param opcode

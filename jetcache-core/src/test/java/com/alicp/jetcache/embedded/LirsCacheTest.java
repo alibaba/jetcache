@@ -1,11 +1,10 @@
 /**
  * Created on  13-09-24 10:20
  */
-package com.alicp.jetcache.local;
+package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.cache.CacheBuilderConfig;
-import com.alicp.jetcache.support.CacheConfig;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
