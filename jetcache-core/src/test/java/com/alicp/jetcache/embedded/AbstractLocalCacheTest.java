@@ -4,7 +4,7 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CacheBuilderConfig;
+import com.alicp.jetcache.cache.CacheConfig;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;
 import org.junit.Assert;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 public abstract class AbstractLocalCacheTest {
     protected Cache<String,String> cache;
 
-    protected abstract Function<CacheBuilderConfig, Cache> getBuildFunc();
+    protected abstract Function<CacheConfig, Cache> getBuildFunc();
 
     protected void setup(boolean useSofeRef, int limit){
         cache = LocalCacheBuilder.createLocalCacheBuilder().withSubArea("test").withLimit(limit)

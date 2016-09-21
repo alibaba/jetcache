@@ -4,7 +4,7 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CacheBuilderConfig;
+import com.alicp.jetcache.cache.CacheConfig;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class LirsCacheTest extends AbstractLocalCacheTest {
 
     @Override
-    protected Function<CacheBuilderConfig, Cache> getBuildFunc() {
+    protected Function<CacheConfig, Cache> getBuildFunc() {
         return (c) -> new LirsCache((LocalCacheConfig) c);
     }
 

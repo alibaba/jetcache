@@ -7,7 +7,7 @@ import com.alicp.jetcache.CacheConsts;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheBuilderConfig {
+public class CacheConfig {
     private boolean cacheNullValue;
     private int defaultTtlInSeconds = CacheConsts.DEFAULT_EXPIRE;
     private String subArea;

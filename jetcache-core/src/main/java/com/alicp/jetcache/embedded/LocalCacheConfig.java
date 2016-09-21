@@ -1,14 +1,14 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.CacheConsts;
-import com.alicp.jetcache.cache.CacheBuilderConfig;
+import com.alicp.jetcache.cache.CacheConfig;
 
 /**
  * Created on 16/9/7.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LocalCacheConfig extends CacheBuilderConfig {
+public class LocalCacheConfig extends CacheConfig {
     private int limit = CacheConsts.DEFAULT_LOCAL_LIMIT;
     private boolean useSoftRef = false;
 
