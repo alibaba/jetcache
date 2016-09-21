@@ -6,6 +6,7 @@ package com.alicp.jetcache;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
+@Deprecated
 public interface Callback {
 
     public void execute() throws Throwable;
