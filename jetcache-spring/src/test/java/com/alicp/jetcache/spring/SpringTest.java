@@ -3,14 +3,12 @@
  */
 package com.alicp.jetcache.spring;
 
-import com.alicp.jetcache.CacheContext;
-import com.alicp.jetcache.EnableCache;
+import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.spring.beans.DynamicQuery;
 import com.alicp.jetcache.spring.beans.FactoryBeanTarget;
 import com.alicp.jetcache.spring.beans.Service;
 import com.alicp.jetcache.spring.beans.TestBean;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;

@@ -9,7 +9,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
-import com.alicp.jetcache.SerialPolicy;
+import com.alicp.jetcache.anno.SerialPolicy;
 
 import java.io.*;
 

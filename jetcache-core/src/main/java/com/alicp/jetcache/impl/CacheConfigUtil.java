@@ -4,8 +4,8 @@
 package com.alicp.jetcache.impl;
 
 import com.alicp.jetcache.support.CacheConfig;
-import com.alicp.jetcache.Cached;
-import com.alicp.jetcache.EnableCache;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 
 import java.lang.reflect.Method;
 

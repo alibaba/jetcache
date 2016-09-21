@@ -4,9 +4,9 @@
 package com.alicp.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
-import com.alicp.jetcache.CacheType;
-import com.alicp.jetcache.Cached;
-import com.alicp.jetcache.EnableCache;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.impl.CacheInvokeConfig;
 import org.junit.Assert;
 import org.junit.Before;

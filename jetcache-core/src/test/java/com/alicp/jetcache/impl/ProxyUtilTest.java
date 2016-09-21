@@ -5,8 +5,8 @@ package com.alicp.jetcache.impl;
 
 import com.alicp.jetcache.support.CacheConfig;
 import com.alicp.jetcache.support.GlobalCacheConfig;
-import com.alicp.jetcache.Cached;
-import com.alicp.jetcache.EnableCache;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;

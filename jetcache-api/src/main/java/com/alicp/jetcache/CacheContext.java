@@ -3,6 +3,8 @@
  */
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.anno.EnableCache;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */

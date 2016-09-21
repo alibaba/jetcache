@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.spring.beans;
 
-import com.alicp.jetcache.Cached;
+import com.alicp.jetcache.anno.Cached;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.impl;
 
-import com.alicp.jetcache.SerialPolicy;
+import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.Assert;
 import org.junit.Test;
 

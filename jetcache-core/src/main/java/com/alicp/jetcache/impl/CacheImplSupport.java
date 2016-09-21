@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.impl;
 
-import com.alicp.jetcache.SerialPolicy;
+import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.support.CacheConfig;
 import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.support.GlobalCacheConfig;

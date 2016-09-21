@@ -5,7 +5,7 @@ package com.alicp.jetcache.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.CacheContext;
-import com.alicp.jetcache.Cached;
+import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.Callback;
 import com.alicp.jetcache.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;

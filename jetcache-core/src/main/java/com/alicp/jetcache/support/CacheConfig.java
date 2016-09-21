@@ -4,8 +4,8 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheConsts;
-import com.alicp.jetcache.CacheType;
-import com.alicp.jetcache.SerialPolicy;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.SerialPolicy;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
