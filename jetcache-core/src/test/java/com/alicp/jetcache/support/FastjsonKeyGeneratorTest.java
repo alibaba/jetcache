@@ -25,7 +25,7 @@ public class FastjsonKeyGeneratorTest {
 
     @Test
     public void test() {
-        FastjsonKeyGenerator g = new FastjsonKeyGenerator();
+        FastjsonKeyGenerator g = FastjsonKeyGenerator.INSTANCE;
         String k1, k2, k3;
 
         k1 = g.generateKey(new Object[]{10, 20, 10});

@@ -15,7 +15,7 @@ import com.alicp.jetcache.cache.KeyGenerator;
 public class CacheImplSupport {
 
     public static KeyGenerator getDefaultKeyGenerator() {
-        return new FastjsonKeyGenerator();
+        return FastjsonKeyGenerator.INSTANCE;
     }
 
     public static <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig, GlobalCacheConfig globalCacheConfig) {

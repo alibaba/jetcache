@@ -11,6 +11,7 @@ import com.alicp.jetcache.cache.KeyGenerator;
  */
 public class FastjsonKeyGenerator implements KeyGenerator {
 
+    public static FastjsonKeyGenerator INSTANCE = new FastjsonKeyGenerator();
 
     public String generateKey(Object... originalKey) {
         return JSON.toJSONString(originalKey);
