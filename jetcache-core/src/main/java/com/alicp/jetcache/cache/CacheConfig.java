@@ -1,8 +1,7 @@
 package com.alicp.jetcache.cache;
 
-import com.alicp.jetcache.CacheConsts;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.CacheException;
-import com.sun.tools.classfile.Code_attribute;
 
 /**
  * Created on 16/9/7.

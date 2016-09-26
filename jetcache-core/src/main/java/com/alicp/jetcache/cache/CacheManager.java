@@ -1,7 +1,5 @@
 package com.alicp.jetcache.cache;
 
-import com.alicp.jetcache.CacheConsts;
-
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

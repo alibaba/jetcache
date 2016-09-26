@@ -1,6 +1,6 @@
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.CacheConsts;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.cache.CacheConfig;
 
 /**

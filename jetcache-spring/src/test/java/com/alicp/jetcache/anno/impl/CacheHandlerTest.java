@@ -11,7 +11,6 @@ import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.GlobalCacheConfig;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
-import com.alicp.jetcache.testsupport.TestUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,7 +32,7 @@ public class CacheHandlerTest {
 
     @Before
     public void setup() {
-        globalCacheConfig = TestUtil.getCacheProviderFactory();
+        globalCacheConfig = null;//TODO
         cacheAnnoConfig = new CacheAnnoConfig();
         cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.cacheAnnoConfig = cacheAnnoConfig;

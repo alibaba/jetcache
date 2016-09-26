@@ -10,7 +10,6 @@ import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
-import com.alicp.jetcache.testsupport.TestUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,7 @@ public class ProxyUtilTest {
 
     @Before
     public void setup() {
-        globalCacheConfig = TestUtil.getCacheProviderFactory();
+        globalCacheConfig = null;//TODO
         cacheAnnoConfig = new CacheAnnoConfig();
     }
 

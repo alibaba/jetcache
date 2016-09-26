@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.support.CacheMonitor;
 import org.mvel2.MVEL;
 

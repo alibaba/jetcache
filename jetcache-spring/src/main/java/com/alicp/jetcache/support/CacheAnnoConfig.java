@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.CacheConsts;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.SerialPolicy;
 

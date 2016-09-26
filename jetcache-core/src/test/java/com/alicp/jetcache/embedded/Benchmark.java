@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.CacheConsts;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.support.CacheResult;
 import com.alicp.jetcache.support.CacheResultCode;

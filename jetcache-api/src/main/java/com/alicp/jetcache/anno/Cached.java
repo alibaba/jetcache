@@ -3,8 +3,6 @@
  */
 package com.alicp.jetcache.anno;
 
-import com.alicp.jetcache.CacheConsts;
-
 import java.lang.annotation.*;
 
 /**

@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-08 10:12
  */
-package com.alicp.jetcache;
+package com.alicp.jetcache.anno;
 
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.SerialPolicy;

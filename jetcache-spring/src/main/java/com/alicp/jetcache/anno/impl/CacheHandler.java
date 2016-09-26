@@ -25,15 +25,15 @@ class CacheHandler implements InvocationHandler {
 
     private static class CacheContextSupport extends CacheContext {
         void _enable() {
-            CacheContext.enable();
+            enable();
         }
 
         void _disable() {
-            CacheContext.disable();
+            disable();
         }
 
         boolean _isEnabled() {
-            return CacheContext.isEnabled();
+            return isEnabled();
         }
     }
 
