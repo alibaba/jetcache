@@ -5,8 +5,8 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.cache.CacheValueHolder;
-import com.alicp.jetcache.support.CacheResult;
-import com.alicp.jetcache.support.CacheResultCode;
+import com.alicp.jetcache.cache.CacheResult;
+import com.alicp.jetcache.cache.CacheResultCode;
 
 import java.lang.ref.SoftReference;
 

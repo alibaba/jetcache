@@ -1,8 +1,5 @@
 package com.alicp.jetcache.cache;
 
-import com.alicp.jetcache.support.CacheResult;
-import com.alicp.jetcache.support.CacheResultCode;
-
 import java.util.function.Function;
 
 /**

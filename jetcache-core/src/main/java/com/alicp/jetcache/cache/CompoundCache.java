@@ -1,8 +1,5 @@
 package com.alicp.jetcache.cache;
 
-import com.alicp.jetcache.support.CacheResult;
-import com.alicp.jetcache.support.CacheResultCode;
-
 /**
  * Created on 16/9/13.
  *

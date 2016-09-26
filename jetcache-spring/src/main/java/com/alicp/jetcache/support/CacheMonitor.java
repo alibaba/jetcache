@@ -3,6 +3,8 @@
  */
 package com.alicp.jetcache.support;
 
+import com.alicp.jetcache.cache.CacheResultCode;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */

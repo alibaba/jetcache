@@ -4,7 +4,6 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.support.GlobalCacheConfig;
-import com.alicp.jetcache.support.CacheResultCode;
 
 import java.lang.reflect.Method;
 
