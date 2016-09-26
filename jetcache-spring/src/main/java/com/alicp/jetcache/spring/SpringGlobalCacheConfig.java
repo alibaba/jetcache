@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.spring;
 
-import com.alicp.jetcache.support.CacheProvider;
 import com.alicp.jetcache.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import org.springframework.beans.BeansException;
@@ -19,8 +18,7 @@ public class SpringGlobalCacheConfig extends GlobalCacheConfig implements Applic
 
     protected ApplicationContext applicationContext;
 
-    public SpringGlobalCacheConfig(Map<String, CacheProvider> providerMap) {
-        super(providerMap);
+    public SpringGlobalCacheConfig(){
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

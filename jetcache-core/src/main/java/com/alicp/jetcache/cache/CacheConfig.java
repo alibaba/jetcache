@@ -1,17 +1,28 @@
 package com.alicp.jetcache.cache;
 
 import com.alicp.jetcache.CacheConsts;
+import com.alicp.jetcache.CacheException;
+import com.sun.tools.classfile.Code_attribute;
 
 /**
  * Created on 16/9/7.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheConfig {
+public class CacheConfig implements Cloneable {
     private boolean cacheNullValue;
     private int defaultTtlInSeconds = CacheConsts.DEFAULT_EXPIRE;
     private String subArea;
     private KeyGenerator keyGenerator;
+
+    @Override
+    public CacheConfig clone(){
+        try {
+            return (CacheConfig) super.clone();
+        }catch (CloneNotSupportedException e){
+            throw new CacheException(e);
+        }
+    }
 
     public boolean isCacheNullValue() {
         return cacheNullValue;

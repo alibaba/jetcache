@@ -3,8 +3,9 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.CacheException;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.impl.factory.CacheFactory;
+import com.alicp.jetcache.cache.CacheManager;
 
 import java.util.Map;
 
@@ -13,25 +14,18 @@ import java.util.Map;
  */
 public class GlobalCacheConfig {
 
-    private final Map<String, CacheProvider> providerMap;
     private CacheMonitor cacheMonitor;
     private String[] hidePackages;
+    private Map<String, CacheFactory> cacheFactories;
+    private CacheManager cacheManager = CacheManager.defaultInstance();
 
-    public GlobalCacheConfig(Map<String, CacheProvider> providerMap) {
-        this.providerMap = providerMap;
+    public GlobalCacheConfig() {
     }
 
-    public CacheInvokeContext createCacheInvokeContext(){
+    public CacheInvokeContext createCacheInvokeContext() {
         return new CacheInvokeContext();
     }
 
-    public CacheProvider getCache(String area) {
-        CacheProvider cw = providerMap.get(area);
-        if (cw == null) {
-            throw new CacheException("area " + area + " is not registered");
-        }
-        return cw;
-    }
 
     public CacheMonitor getCacheMonitor() {
         return cacheMonitor;
@@ -47,5 +41,21 @@ public class GlobalCacheConfig {
 
     public void setHidePackages(String[] hidePackages) {
         this.hidePackages = hidePackages;
+    }
+
+    public Map<String, CacheFactory> getCacheFactories() {
+        return cacheFactories;
+    }
+
+    public void setCacheFactories(Map<String, CacheFactory> cacheFactories) {
+        this.cacheFactories = cacheFactories;
+    }
+
+    public CacheManager getCacheManager() {
+        return cacheManager;
+    }
+
+    public void setCacheManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 }

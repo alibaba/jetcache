@@ -13,13 +13,7 @@ public class CacheManager {
 
     private ConcurrentHashMap<String, Cache> caches;
 
-    private String area;
-
-    private static CacheManager instance = new CacheManager(CacheConsts.DEFAULT_AREA);
-
-    public CacheManager(String area){
-        this.area = area;
-    }
+    private static CacheManager instance = new CacheManager();
 
     public static CacheManager defaultInstance(){
         return instance;
@@ -31,10 +25,6 @@ public class CacheManager {
 
     public void addCache(String subArea, Cache cache) {
         caches.put(subArea, cache);
-    }
-
-    public String getArea() {
-        return area;
     }
 
 }

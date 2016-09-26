@@ -25,7 +25,7 @@ public class ExpressionUtilTest {
         context.cacheInvokeConfig = new CacheInvokeConfig();
         context.cacheInvokeConfig.cacheAnnoConfig = cacheAnnoConfig;
 
-        context.globalCacheConfig = new GlobalCacheConfig(new HashMap());
+        context.globalCacheConfig = new GlobalCacheConfig();
     }
 
     @Test

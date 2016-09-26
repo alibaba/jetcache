@@ -20,12 +20,7 @@ public class CacheInvokeContext {
     CacheInvokeConfig cacheInvokeConfig;
 
     Object result = null;
-
-    //status, without getter and setter
-    boolean needUpdateLocal = false;
-    boolean needUpdateRemote = false;
-    CacheResultCode localResult = null;
-    CacheResultCode remoteResult = null;
+    Throwable exception = null;
 
     public CacheInvokeContext(){
     }
@@ -71,14 +66,6 @@ public class CacheInvokeContext {
         this.globalCacheConfig = globalCacheConfig;
     }
 
-    public Object getResult() {
-        return result;
-    }
-
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
     public CacheInvokeConfig getCacheInvokeConfig() {
         return cacheInvokeConfig;
     }
@@ -86,4 +73,6 @@ public class CacheInvokeContext {
     public void setCacheInvokeConfig(CacheInvokeConfig cacheInvokeConfig) {
         this.cacheInvokeConfig = cacheInvokeConfig;
     }
+
+
 }

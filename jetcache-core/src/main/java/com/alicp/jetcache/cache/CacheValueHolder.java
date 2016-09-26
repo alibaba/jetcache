@@ -10,6 +10,15 @@ public class CacheValueHolder<V> {
     private long createTime;
     private long expireTime;
 
+    public CacheValueHolder(V value, long createTime, long expireTime){
+        this.value = value;
+        this.createTime = createTime;
+        this.expireTime = expireTime;
+    }
+
+    public CacheValueHolder(){
+    }
+
     public V getValue() {
         return value;
     }

@@ -69,4 +69,9 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return self();
     }
 
+    public T withKeyGenerator(KeyGenerator keyGenerator){
+        getConfig().setKeyGenerator(keyGenerator);
+        return self();
+    }
+
 }

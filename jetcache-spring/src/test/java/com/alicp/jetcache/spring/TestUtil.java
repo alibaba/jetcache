@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.spring;
 
-import com.alicp.jetcache.support.CacheProvider;
 import com.alicp.jetcache.support.GlobalCacheConfig;
 
 import java.util.HashMap;
@@ -15,10 +14,8 @@ import java.util.Map;
 public class TestUtil {
     public static GlobalCacheConfig getCacheProviderFactory() {
         MockRemoteCache c = new MockRemoteCache();
-        CacheProvider p = new CacheProvider();
-        Map<String, CacheProvider> m = new HashMap<String, CacheProvider>();
-        m.put("", p);
-        GlobalCacheConfig f = new GlobalCacheConfig(m);
+        GlobalCacheConfig f = new GlobalCacheConfig();
+        //TODO
         return f;
     }
 
