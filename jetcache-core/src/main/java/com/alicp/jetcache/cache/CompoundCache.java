@@ -8,14 +8,12 @@ package com.alicp.jetcache.cache;
 public class CompoundCache<K, V> implements Cache<K, V> {
 
     private CacheConfig config;
-    private Cache<K, CacheValueHolder<V>> l1Cache;
-    private Cache<K, CacheValueHolder<V>> l2Cache;
+    private Cache[] caches;
 
     @SuppressWarnings("unchecked")
-    public CompoundCache(CacheConfig config, Cache l1Cache, Cache l2Cache) {
+    public CompoundCache(CacheConfig config, Cache... caches) {
         this.config = config;
-        this.l1Cache = l1Cache;
-        this.l2Cache = l2Cache;
+        this.caches = caches;
     }
 
     @Override
@@ -25,26 +23,29 @@ public class CompoundCache<K, V> implements Cache<K, V> {
 
     @Override
     public CacheResult<V> GET(K key) {
-        CacheResult<CacheValueHolder<V>> r1 = l1Cache.GET(key);
-        if (r1.isSuccess() && r1.getValue() != null) {
-            CacheValueHolder<V> h = r1.getValue();
-            if (h.getExpireTime() < System.currentTimeMillis()) {
-                return new CacheResult<V>(CacheResultCode.EXPIRED, null);
-            } else {
-                V value = r1.getValue().getValue();
-                return new CacheResult<V>(r1.getResultCode(), value);
-            }
-        } else {
-            CacheResult<CacheValueHolder<V>> r2 = l2Cache.GET(key);
-            if(r2.isSuccess()){
-                CacheValueHolder<V> h = r2.getValue();
-                l1Cache.PUT(key, r2.getValue(), config.getDefaultTtlInSeconds());
-                return new CacheResult<V>(r2.getResultCode(), h.getValue());
-            } else {
-                CacheResultCode code = r1.getResultCode() == CacheResultCode.EXPIRED ? CacheResultCode.EXPIRED : r2.getResultCode();
-                return new CacheResult<V>(code, null);
+        for (int i = 0; i < caches.length; i++) {
+            Cache cache = caches[i];
+            CacheResult r1 = cache.GET(key);
+            if (r1.isSuccess() && r1.getValue() != null) {
+                Object cacheValue = r1.getValue();
+                if (cacheValue instanceof CacheValueHolder) {
+                    CacheValueHolder h = (CacheValueHolder) cacheValue;
+                    long now = System.currentTimeMillis();
+                    if (now > h.getExpireTime()) {
+                        continue;
+                    } else {
+                        V value = (V) h.getValue();
+                        int ttl = (int)Math.ceil((h.getExpireTime() - now) / 1000.0);
+                        update(i, key, h, ttl);
+                        return new CacheResult<V>(CacheResultCode.SUCCESS, value);
+                    }
+                } else {
+                    continue;
+                }
+
             }
         }
+        return new CacheResult<V>(CacheResultCode.NOT_EXISTS, null);
     }
 
     @Override
@@ -59,15 +60,30 @@ public class CompoundCache<K, V> implements Cache<K, V> {
         long time = System.currentTimeMillis();
         h.setCreateTime(time);
         h.setExpireTime(time + ttlInSeconds * 1000);
-        CacheResultCode c1 = l1Cache.PUT(key, h, ttlInSeconds);
-        CacheResultCode c2 = l2Cache.PUT(key, h, ttlInSeconds);
-        return c1 == CacheResultCode.SUCCESS && c2 == CacheResultCode.SUCCESS ? CacheResultCode.SUCCESS : CacheResultCode.FAIL;
+        return update(caches.length, key, h, ttlInSeconds);
+    }
+
+    private CacheResultCode update(int lastIndex, K key, CacheValueHolder<V> h, int ttlInSeconds) {
+        boolean fail = false;
+        for (int i = 0; i < lastIndex; i++) {
+            Cache cache = caches[i];
+            CacheResultCode code = cache.PUT(key, h, ttlInSeconds);
+            if (code != CacheResultCode.SUCCESS) {
+                fail = true;
+            }
+        }
+        return fail ? CacheResultCode.FAIL : CacheResultCode.SUCCESS;
     }
 
     @Override
     public CacheResultCode INVALIDATE(K key) {
-        CacheResultCode c1 = l1Cache.INVALIDATE(key);
-        CacheResultCode c2 = l2Cache.INVALIDATE(key);
-        return c1 == CacheResultCode.SUCCESS && c2 == CacheResultCode.SUCCESS ? CacheResultCode.SUCCESS : CacheResultCode.FAIL;
+        boolean fail = false;
+        for (Cache cache : caches) {
+            CacheResultCode code = cache.INVALIDATE(key);
+            if (code != CacheResultCode.SUCCESS) {
+                fail = true;
+            }
+        }
+        return fail ? CacheResultCode.FAIL : CacheResultCode.SUCCESS;
     }
 }
