@@ -12,7 +12,7 @@ import java.util.HashMap;
 //TODO BUGFIX
 public class LirsCache extends AbstractEmbeddedCache {
 
-    public LirsCache(LocalEmbeddedConfig config){
+    public LirsCache(EmbeddedCacheConfig config){
         super(config);
     }
 

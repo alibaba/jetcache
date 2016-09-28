@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class ConcurrentLinkedHashMapCache extends AbstractEmbeddedCache {
 
-    public ConcurrentLinkedHashMapCache(LocalEmbeddedConfig config){
+    public ConcurrentLinkedHashMapCache(EmbeddedCacheConfig config){
         super(config);
     }
 

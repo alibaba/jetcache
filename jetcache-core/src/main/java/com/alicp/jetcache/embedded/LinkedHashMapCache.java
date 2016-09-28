@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class LinkedHashMapCache extends AbstractEmbeddedCache {
 
-    public LinkedHashMapCache(LocalEmbeddedConfig config){
+    public LinkedHashMapCache(EmbeddedCacheConfig config){
         super(config);
     }
 

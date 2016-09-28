@@ -14,12 +14,12 @@ import java.lang.ref.SoftReference;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
-    protected LocalEmbeddedConfig config;
+    protected EmbeddedCacheConfig config;
     private AreaCache areaCache;
 
     protected abstract AreaCache createAreaCache();
 
-    public AbstractEmbeddedCache(LocalEmbeddedConfig config){
+    public AbstractEmbeddedCache(EmbeddedCacheConfig config){
         this.config = config;
         areaCache = createAreaCache();
     }
