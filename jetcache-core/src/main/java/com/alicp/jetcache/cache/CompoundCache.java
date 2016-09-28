@@ -7,18 +7,11 @@ package com.alicp.jetcache.cache;
  */
 public class CompoundCache<K, V> implements Cache<K, V> {
 
-    private CacheConfig config;
     private Cache[] caches;
 
     @SuppressWarnings("unchecked")
-    public CompoundCache(CacheConfig config, Cache... caches) {
-        this.config = config;
+    public CompoundCache(Cache... caches) {
         this.caches = caches;
-    }
-
-    @Override
-    public String getSubArea() {
-        return config.getSubArea();
     }
 
     @Override
@@ -50,7 +43,9 @@ public class CompoundCache<K, V> implements Cache<K, V> {
 
     @Override
     public void put(K key, V value) {
-        PUT(key, value, config.getDefaultTtlInSeconds());
+        for (Cache cache : caches) {
+            cache.put(key, value);
+        }
     }
 
     @Override

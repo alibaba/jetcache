@@ -25,11 +25,6 @@ public abstract class AbstractLocalCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public String getSubArea() {
-        return config.getSubArea();
-    }
-
-    @Override
     public CacheResult<V> GET(K key) {
         CacheResultCode code;
         Object value = null;

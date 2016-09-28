@@ -17,11 +17,6 @@ import java.util.HashMap;
 public class MockRemoteCache<K, V> implements Cache<K, V> {
     private HashMap<K, ValueHolder> data = new HashMap();
 
-    @Override
-    public String getSubArea() {
-        return "mock";
-    }
-
     public CacheResult<V> GET(K key) {
         CacheResultCode code;
         V value = null;

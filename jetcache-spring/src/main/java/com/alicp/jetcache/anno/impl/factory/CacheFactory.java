@@ -14,7 +14,7 @@ public abstract class CacheFactory {
 
     protected CacheConfig config;
 
-    public abstract Cache buildCache(String subArea);
+    public abstract Cache buildCache();
 
     protected CacheConfig getConfig() {
         if (config == null) {

@@ -8,26 +8,15 @@ import com.alicp.jetcache.cache.CacheBuilder;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends CacheBuilder<T> {
-
-    public static class ExternalCacheBuilderImpl extends ExternalCacheBuilder<ExternalCacheBuilderImpl>{
-    };
-
-    public static ExternalCacheBuilderImpl createLocalCacheBuilder(){
-        return new ExternalCacheBuilderImpl();
-    }
-
-    @Override
-    protected ExternalCacheConfig getConfig() {
-        if (config == null) {
-            return new ExternalCacheConfig();
-        }
-        return (ExternalCacheConfig) config;
-    }
+public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends CacheBuilder<T> {
 
     public T withValueSerialPolicy(SerialPolicy serialPolicy){
-        getConfig().setValueSerialPolicy(serialPolicy);
+        ((ExternalCacheConfig)getConfig()).setValueSerialPolicy(serialPolicy);
         return self();
     }
 
+    public T withKeyPrefix(String keyPrefix){
+        ((ExternalCacheConfig)getConfig()).setKeyPrefix(keyPrefix);
+        return self();
+    }
 }

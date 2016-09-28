@@ -34,7 +34,7 @@ public class Benchmark {
         System.out.println("data per thread : " + data[0].length);
 
         LocalCacheBuilder builder = LocalCacheBuilder.createLocalCacheBuilder()
-                .withLimit(CACHE_LIMIT).withSubArea("test");
+                .withLimit(CACHE_LIMIT);
 
 //        Cache cache = builder.build((c) -> new ConcurrentLinkedHashMapCache((LocalCacheConfig) c));
 //        Cache cache = builder.build((c) -> new LinkedHashMapCache((LocalCacheConfig) c));

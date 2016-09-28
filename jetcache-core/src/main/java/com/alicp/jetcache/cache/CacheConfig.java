@@ -11,7 +11,6 @@ import com.alicp.jetcache.CacheException;
 public class CacheConfig implements Cloneable {
     private boolean cacheNullValue;
     private int defaultTtlInSeconds = CacheConsts.DEFAULT_EXPIRE;
-    private String subArea;
     private KeyGenerator keyGenerator;
 
     @Override
@@ -37,14 +36,6 @@ public class CacheConfig implements Cloneable {
 
     public void setDefaultTtlInSeconds(int defaultTtlInSeconds) {
         this.defaultTtlInSeconds = defaultTtlInSeconds;
-    }
-
-    public String getSubArea() {
-        return subArea;
-    }
-
-    public void setSubArea(String subArea) {
-        this.subArea = subArea;
     }
 
     public KeyGenerator getKeyGenerator() {

@@ -20,9 +20,8 @@ public class LocalCacheFactory extends CacheFactory {
     }
 
     @Override
-    public Cache buildCache(String subArea) {
-        getConfig().setSubArea(subArea);
-        return new LinkedHashMapCache(getConfig());
+    public Cache buildCache() {
+        return new LinkedHashMapCache((LocalCacheConfig) getConfig().clone());
     }
 
     public void setLimit(int limit){

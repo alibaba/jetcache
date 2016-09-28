@@ -44,19 +44,11 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
     }
 
     public final Cache build() {
-        if (getConfig().getSubArea() == null) {
-            throw new CacheConfigException("no subArea");
-        }
         if (buildFunc == null) {
             throw new CacheConfigException("no buildFunc");
         }
         beforeBuild();
         return buildFunc.apply(config);
-    }
-
-    public T withSubArea(String subArea) {
-        getConfig().setSubArea(subArea);
-        return self();
     }
 
     public T withCacheNullValue(boolean cacheNullValue) {

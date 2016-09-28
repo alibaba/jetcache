@@ -9,8 +9,6 @@ import java.util.function.Function;
  */
 public interface Cache<K, V> {
 
-    String getSubArea();
-
     default V get(K key){
         CacheResult<V> result = GET(key);
         if (result.isSuccess()) {
