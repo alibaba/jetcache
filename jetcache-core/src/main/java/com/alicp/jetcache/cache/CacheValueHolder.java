@@ -8,15 +8,18 @@ package com.alicp.jetcache.cache;
 public class CacheValueHolder<V> {
     private V value;
     private long createTime;
+    private long ttlInMillis;
     private long expireTime;
 
-    public CacheValueHolder(V value, long createTime, long expireTime){
+    public CacheValueHolder(V value, long createTime, long ttlInMillis){
         this.value = value;
         this.createTime = createTime;
-        this.expireTime = expireTime;
+        this.ttlInMillis = ttlInMillis;
+        this.expireTime = createTime + ttlInMillis;
     }
 
-    public CacheValueHolder(){
+    public long getTtlInMillis() {
+        return ttlInMillis;
     }
 
     public V getValue() {

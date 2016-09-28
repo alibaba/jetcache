@@ -5,7 +5,7 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CacheResult;
+import com.alicp.jetcache.cache.CacheGetResult;
 import com.alicp.jetcache.cache.CacheResultCode;
 import org.junit.Ignore;
 
@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -94,9 +95,9 @@ public class Benchmark {
             startTime = System.currentTimeMillis();
             for (String userId : data) {
                 getCount++;
-                CacheResult result = cache.GET(userId);
+                CacheGetResult result = cache.GET(userId);
                 if (result.getResultCode() != CacheResultCode.SUCCESS) {
-                    cache.PUT(userId, VALUE, CacheConsts.DEFAULT_EXPIRE);
+                    cache.PUT(userId, VALUE, CacheConsts.DEFAULT_EXPIRE, TimeUnit.SECONDS);
                     missCount++;
                 } else {
                     hitCount++;

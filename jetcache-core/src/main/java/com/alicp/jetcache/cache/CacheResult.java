@@ -1,18 +1,21 @@
-/**
- * Created on  13-09-09 18:16
- */
 package com.alicp.jetcache.cache;
 
 /**
+ * Created on 2016/9/28.
+ *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheResult<V> {
-    private CacheResultCode resultCode;
-    private V value;
+public class CacheResult {
 
-    public CacheResult(CacheResultCode resultCode, V value) {
+    private CacheResultCode resultCode;
+    private String message;
+
+    public static final CacheResult SUCCESS = new CacheResult(CacheResultCode.SUCCESS, null);
+    public static final CacheResult FAIL = new CacheResult(CacheResultCode.FAIL, null);
+
+    public CacheResult(CacheResultCode resultCode, String message){
         this.resultCode = resultCode;
-        this.value = value;
+        this.message = message;
     }
 
     public boolean isSuccess() {
@@ -23,16 +26,15 @@ public class CacheResult<V> {
         return resultCode;
     }
 
-    public V getValue() {
-        return value;
-    }
-
     public void setResultCode(CacheResultCode resultCode) {
         this.resultCode = resultCode;
     }
 
-    public void setValue(V value) {
-        this.value = value;
+    public String getMessage() {
+        return message;
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

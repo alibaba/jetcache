@@ -5,10 +5,11 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.cache.CacheConfig;
-import com.alicp.jetcache.cache.CacheResult;
+import com.alicp.jetcache.cache.CacheGetResult;
 import com.alicp.jetcache.cache.CacheResultCode;
 import org.junit.Assert;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -28,10 +29,10 @@ public abstract class AbstractLocalCacheTest {
         for (int i = 0; i < 2; i++) {
             setup(i == 0, 100);
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
             Assert.assertEquals("V1", cache.GET("K1").getValue());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V2", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V2", 1, TimeUnit.SECONDS));
             Assert.assertEquals("V2", cache.GET("K1").getValue());
         }
     }
@@ -39,9 +40,9 @@ public abstract class AbstractLocalCacheTest {
     public void testLRU1() {
         for (int i = 0; i < 2; i++) {
             setup(i == 0, 2);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1, TimeUnit.SECONDS));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1, TimeUnit.SECONDS));
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K2").getResultCode());
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
@@ -51,10 +52,10 @@ public abstract class AbstractLocalCacheTest {
     public void testLRU2() {
         for (int i = 0; i < 2; i++) {
             setup(i == 0, 2);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1, TimeUnit.SECONDS));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1, TimeUnit.SECONDS));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
             Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K2").getResultCode());
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
@@ -64,9 +65,9 @@ public abstract class AbstractLocalCacheTest {
     public void testExpire() throws Exception {
         for (int i = 0; i < 2; i++) {
             setup(i == 0, 100);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS));
 
-            CacheResult result = cache.GET("K1");
+            CacheGetResult result = cache.GET("K1");
             Assert.assertEquals(CacheResultCode.SUCCESS, result.getResultCode());
             Assert.assertEquals("V1", result.getValue());
 
@@ -80,7 +81,7 @@ public abstract class AbstractLocalCacheTest {
     public void testNull() {
         for (int i = 0; i < 2; i++) {
             setup(i == 0, 100);
-            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", null, 1));
+            Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", null, 1, TimeUnit.SECONDS));
             Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
             Assert.assertNull(cache.GET("K1").getValue());
         }
@@ -113,8 +114,8 @@ public abstract class AbstractLocalCacheTest {
                         }
                         String key = keyPrefix + i;
                         String value = i + "";
-                        cache.PUT(key, value, 10000);
-                        CacheResult result = cache.GET(key);
+                        cache.PUT(key, value, 10000, TimeUnit.SECONDS);
+                        CacheGetResult result = cache.GET(key);
                         if (result == null || result.getResultCode() != CacheResultCode.SUCCESS) {
                             if (result == null) {
                                 System.out.println("key:" + key + ",result is null");

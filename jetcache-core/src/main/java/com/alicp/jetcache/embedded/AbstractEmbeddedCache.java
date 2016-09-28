@@ -3,12 +3,10 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CacheValueHolder;
-import com.alicp.jetcache.cache.CacheResult;
-import com.alicp.jetcache.cache.CacheResultCode;
+import com.alicp.jetcache.cache.*;
 
 import java.lang.ref.SoftReference;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -25,64 +23,58 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult<V> GET(K key) {
-        CacheResultCode code;
-        Object value = null;
+    public CacheGetResult<V> GET(K key) {
         try {
             if (config.isUseSoftRef()) {
                 SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) areaCache.getValue(key);
                 if (ref == null) {
-                    code = CacheResultCode.NOT_EXISTS;
+                    return CacheGetResult.NOT_EXISTS;
                 } else {
                     CacheValueHolder<V> cacheObject = ref.get();
                     if (cacheObject == null) {
-                        code = CacheResultCode.NOT_EXISTS;
+                        return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "soft ref released");
                     } else {
-                        if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
-                            areaCache.removeValue(key);
-                            code = CacheResultCode.EXPIRED;
-                        } else {
-                            code = CacheResultCode.SUCCESS;
-                            value = cacheObject.getValue();
-                        }
+                        return getImpl(key, cacheObject);
                     }
                 }
             } else {
                 CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) areaCache.getValue(key);
                 if (cacheObject == null) {
-                    code = CacheResultCode.NOT_EXISTS;
+                    return CacheGetResult.NOT_EXISTS;
                 } else {
-                    if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
-                        areaCache.removeValue(key);
-                        code = CacheResultCode.EXPIRED;
-                    } else {
-                        code = CacheResultCode.SUCCESS;
-                        value = cacheObject.getValue();
-                    }
+                    return getImpl(key, cacheObject);
                 }
             }
         } catch (Exception e) {
-            code = CacheResultCode.FAIL;
+            return new CacheGetResult(CacheResultCode.FAIL, null, e.getClass().getName() + ":" + e.getMessage());
         }
-        return new CacheResult(code, value);
+    }
+
+    private CacheGetResult<V> getImpl(K key, CacheValueHolder<V> cacheObject){
+        if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
+            areaCache.removeValue(key);
+            return CacheGetResult.EXPIRED;
+        } else {
+            if(config.isExpireAfterAccess()){
+                long ttlInMillis = cacheObject.getTtlInMillis();
+                cacheObject.setExpireTime(System.currentTimeMillis() + ttlInMillis);
+            }
+            return new CacheGetResult<V>(CacheResultCode.SUCCESS, null, cacheObject.getValue());
+        }
     }
 
     @Override
     public void put(K key, V value) {
-        PUT(key, value, config.getDefaultTtlInSeconds());
+        PUT(key, value, config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public CacheResultCode PUT(K key, V value, int expire) {
+    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         CacheValueHolder<V> cacheObject = null;
         if (value instanceof CacheValueHolder) {
             cacheObject = (CacheValueHolder<V>) value;
         } else {
-            cacheObject = new CacheValueHolder<V>();
-            cacheObject.setValue(value);
-            long now = System.currentTimeMillis();
-            cacheObject.setExpireTime(1000 * expire + now);
-            cacheObject.setCreateTime(now);
+            cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
         }
         if (config.isUseSoftRef()) {
             SoftReference<CacheValueHolder<V>> ref = new SoftReference(cacheObject);
@@ -90,12 +82,12 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
         } else {
             areaCache.putValue(key, cacheObject);
         }
-        return CacheResultCode.SUCCESS;
+        return CacheResult.SUCCESS;
     }
 
     @Override
-    public CacheResultCode INVALIDATE(K key) {
+    public CacheResult INVALIDATE(K key) {
         areaCache.removeValue(key);
-        return CacheResultCode.SUCCESS;
+        return CacheResult.SUCCESS;
     }
 }

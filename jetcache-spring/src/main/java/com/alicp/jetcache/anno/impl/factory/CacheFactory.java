@@ -27,8 +27,8 @@ public abstract class CacheFactory {
         getConfig().setCacheNullValue(cacheNullValue);
     }
 
-    public void setDefaultTtlInSeconds(int defaultTtlInSeconds) {
-        getConfig().setDefaultTtlInSeconds(defaultTtlInSeconds);
+    public void setDefaultExpireInMillis(int defaultExpireInMillis) {
+        getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
     }
 
     public void withKeyGenerator(KeyGenerator keyGenerator){

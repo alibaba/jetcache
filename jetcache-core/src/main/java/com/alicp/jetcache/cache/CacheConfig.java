@@ -3,6 +3,8 @@ package com.alicp.jetcache.cache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.CacheException;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created on 16/9/7.
  *
@@ -10,14 +12,15 @@ import com.alicp.jetcache.CacheException;
  */
 public class CacheConfig implements Cloneable {
     private boolean cacheNullValue;
-    private int defaultTtlInSeconds = CacheConsts.DEFAULT_EXPIRE;
+    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000;
+    private boolean expireAfterAccess = false;
     private KeyGenerator keyGenerator;
 
     @Override
-    public CacheConfig clone(){
+    public CacheConfig clone() {
         try {
             return (CacheConfig) super.clone();
-        }catch (CloneNotSupportedException e){
+        } catch (CloneNotSupportedException e) {
             throw new CacheException(e);
         }
     }
@@ -30,19 +33,27 @@ public class CacheConfig implements Cloneable {
         this.cacheNullValue = cacheNullValue;
     }
 
-    public int getDefaultTtlInSeconds() {
-        return defaultTtlInSeconds;
-    }
-
-    public void setDefaultTtlInSeconds(int defaultTtlInSeconds) {
-        this.defaultTtlInSeconds = defaultTtlInSeconds;
-    }
-
     public KeyGenerator getKeyGenerator() {
         return keyGenerator;
     }
 
     public void setKeyGenerator(KeyGenerator keyGenerator) {
         this.keyGenerator = keyGenerator;
+    }
+
+    public boolean isExpireAfterAccess() {
+        return expireAfterAccess;
+    }
+
+    public void setExpireAfterAccess(boolean expireAfterAccess) {
+        this.expireAfterAccess = expireAfterAccess;
+    }
+
+    public long getDefaultExpireInMillis() {
+        return defaultExpireInMillis;
+    }
+
+    public void setDefaultExpireInMillis(long defaultExpireInMillis) {
+        this.defaultExpireInMillis = defaultExpireInMillis;
     }
 }

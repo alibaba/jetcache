@@ -1,5 +1,6 @@
 package com.alicp.jetcache.cache;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -10,7 +11,7 @@ import java.util.function.Function;
 public interface Cache<K, V> {
 
     default V get(K key){
-        CacheResult<V> result = GET(key);
+        CacheGetResult<V> result = GET(key);
         if (result.isSuccess()) {
             return result.getValue();
         } else {
@@ -18,13 +19,13 @@ public interface Cache<K, V> {
         }
     }
 
-    CacheResult<V> GET(K key);
+    CacheGetResult<V> GET(K key);
 
     /**
      * Compute value use a loader when miss.
      */
     default V computeIfAbsent(K key, Function<K, V> loader) {
-        CacheResult<V> r = GET(key);
+        CacheGetResult<V> r = GET(key);
         if (r.isSuccess()) {
             return r.getValue();
         } else {
@@ -34,16 +35,16 @@ public interface Cache<K, V> {
 
     void put(K key, V value);
 
-    default void put(K key, V value, int ttlInSeconds){
-        PUT(key, value, ttlInSeconds);
+    default void put(K key, V value, long expire, TimeUnit timeUnit){
+        PUT(key, value, expire, timeUnit);
     }
 
-    CacheResultCode PUT(K key, V value, int ttlInSeconds);
+    CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
 
     default void invalidate(K key){
         INVALIDATE(key);
     }
 
-    CacheResultCode INVALIDATE(K key);
+    CacheResult INVALIDATE(K key);
 
 }

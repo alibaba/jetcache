@@ -2,6 +2,7 @@ package com.alicp.jetcache.cache;
 
 import com.alicp.jetcache.CacheConfigException;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -56,13 +57,18 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return self();
     }
 
-    public T withDefaultTtlInSeconds(int defaultTtlInSeconds) {
-        getConfig().setDefaultTtlInSeconds(defaultTtlInSeconds);
+    public T withDefaultExpire(TimeUnit timeUnit, int defaultExpire) {
+        getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         return self();
     }
 
     public T withKeyGenerator(KeyGenerator keyGenerator){
         getConfig().setKeyGenerator(keyGenerator);
+        return self();
+    }
+
+    public T expireAfterAccess(){
+        getConfig().setExpireAfterAccess(true);
         return self();
     }
 

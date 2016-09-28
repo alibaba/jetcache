@@ -4,32 +4,30 @@
 package com.alicp.jetcache.spring;
 
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.cache.Cache;
+import com.alicp.jetcache.cache.*;
 import com.alicp.jetcache.anno.impl.CacheImplSupport;
-import com.alicp.jetcache.cache.CacheResult;
-import com.alicp.jetcache.cache.CacheResultCode;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class MockRemoteCache<K, V> implements Cache<K, V> {
-    private HashMap<K, ValueHolder> data = new HashMap();
+    private HashMap<K, CacheValueHolder<byte[]>> data = new HashMap();
 
-    public CacheResult<V> GET(K key) {
+    public CacheGetResult<V> GET(K key) {
         CacheResultCode code;
         V value = null;
-        long expireTime = 0;
         try {
-            ValueHolder holder = data.get(key);
+            CacheValueHolder<byte[]> holder = data.get(key);
             if (holder != null) {
-                expireTime = holder.expireTime;
-                if (System.currentTimeMillis() > holder.expireTime) {
+                long expireTime = holder.getExpireTime();
+                if (System.currentTimeMillis() > expireTime) {
                     code = CacheResultCode.EXPIRED;
                 } else {
                     code = CacheResultCode.SUCCESS;
-                    value = (V)CacheImplSupport.decodeValue(holder.bytes);
+                    value = (V) CacheImplSupport.decodeValue(holder.getValue());
                 }
             } else {
                 code = CacheResultCode.NOT_EXISTS;
@@ -37,36 +35,30 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         } catch (Exception e) {
             code = CacheResultCode.FAIL;
         }
-        return new CacheResult(code, value);
+        return new CacheGetResult(code, null, value);
     }
 
     @Override
     public void put(K key, V value) {
-        PUT(key, value, CacheConsts.DEFAULT_EXPIRE);
+        PUT(key, value, CacheConsts.DEFAULT_EXPIRE, TimeUnit.SECONDS);
     }
 
-    public CacheResultCode PUT(K key, V value, int expireTime) {
+    @Override
+    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try {
             byte[] bytes = CacheImplSupport.encodeValue(value, CacheConsts.DEFAULT_SERIAL_POLICY);
-            ValueHolder v = new ValueHolder();
-            v.bytes = bytes;
-            v.expireTime = expireTime;
+            CacheValueHolder<byte[]> v = new CacheValueHolder(bytes, System.currentTimeMillis(), timeUnit.toMillis(expire));
             data.put(key, v);
-            return CacheResultCode.SUCCESS;
+            return CacheResult.SUCCESS;
         } catch (Exception e) {
-            return CacheResultCode.FAIL;
+            return CacheResult.FAIL;
         }
     }
 
     @Override
-    public CacheResultCode INVALIDATE(K key) {
+    public CacheResult INVALIDATE(K key) {
         data.remove(key);
-        return CacheResultCode.SUCCESS;
-    }
-
-    private static class ValueHolder {
-        byte[] bytes;
-        long expireTime;
+        return CacheResult.SUCCESS;
     }
 
 }
