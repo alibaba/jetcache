@@ -33,12 +33,12 @@ public class Benchmark {
         System.out.println("thead : " + THREAD_COUNT);
         System.out.println("data per thread : " + data[0].length);
 
-        LocalEmbeddedBuilder builder = LocalEmbeddedBuilder.createLocalCacheBuilder()
+        EmbeddedCacheBuilder builder = EmbeddedCacheBuilder.createLocalCacheBuilder()
                 .withLimit(CACHE_LIMIT);
 
 //        Cache cache = builder.build((c) -> new ConcurrentLinkedHashMapCache((LocalCacheConfig) c));
 //        Cache cache = builder.build((c) -> new LinkedHashMapCache((LocalCacheConfig) c));
-        builder.withBuildFunc((c) -> new LirsCache((LocalEmbeddedConfig) c));
+        builder.withBuildFunc((c) -> new LirsCache((EmbeddedCacheConfig) c));
         Cache<String, String> cache = builder.build();
 
         CountDownLatch doneSignal = new CountDownLatch(THREAD_COUNT);

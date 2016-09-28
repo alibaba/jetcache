@@ -8,7 +8,7 @@ import com.alicp.jetcache.cache.CacheConfig;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LocalEmbeddedConfig extends CacheConfig {
+public class EmbeddedCacheConfig extends CacheConfig {
     private int limit = CacheConsts.DEFAULT_LOCAL_LIMIT;
     private boolean useSoftRef = false;
 

@@ -19,7 +19,7 @@ public class LirsCacheTest extends AbstractLocalCacheTest {
 
     @Override
     protected Function<CacheConfig, Cache> getBuildFunc() {
-        return (c) -> new LirsCache((LocalEmbeddedConfig) c);
+        return (c) -> new LirsCache((EmbeddedCacheConfig) c);
     }
 
     @Override
