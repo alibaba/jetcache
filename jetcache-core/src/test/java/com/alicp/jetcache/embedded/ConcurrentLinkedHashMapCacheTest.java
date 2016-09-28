@@ -16,7 +16,7 @@ public class ConcurrentLinkedHashMapCacheTest extends AbstractLocalCacheTest {
 
     @Override
     protected Function<CacheConfig, Cache> getBuildFunc() {
-        return (c) -> new ConcurrentLinkedHashMapCache((LocalCacheConfig) c);
+        return (c) -> new ConcurrentLinkedHashMapCache((LocalEmbeddedConfig) c);
     }
 
     @Override

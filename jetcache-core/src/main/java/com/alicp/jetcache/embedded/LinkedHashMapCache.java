@@ -9,9 +9,9 @@ import java.util.Map;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LinkedHashMapCache extends AbstractLocalCache {
+public class LinkedHashMapCache extends AbstractEmbeddedCache {
 
-    public LinkedHashMapCache(LocalCacheConfig config){
+    public LinkedHashMapCache(LocalEmbeddedConfig config){
         super(config);
     }
 

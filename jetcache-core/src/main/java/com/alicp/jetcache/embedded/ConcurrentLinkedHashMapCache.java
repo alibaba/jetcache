@@ -10,9 +10,9 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class ConcurrentLinkedHashMapCache extends AbstractLocalCache {
+public class ConcurrentLinkedHashMapCache extends AbstractEmbeddedCache {
 
-    public ConcurrentLinkedHashMapCache(LocalCacheConfig config){
+    public ConcurrentLinkedHashMapCache(LocalEmbeddedConfig config){
         super(config);
     }
 

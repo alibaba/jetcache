@@ -10,9 +10,9 @@ import java.util.HashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 //TODO BUGFIX
-public class LirsCache extends AbstractLocalCache {
+public class LirsCache extends AbstractEmbeddedCache {
 
-    public LirsCache(LocalCacheConfig config){
+    public LirsCache(LocalEmbeddedConfig config){
         super(config);
     }
 

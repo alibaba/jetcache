@@ -2,7 +2,7 @@ package com.alicp.jetcache.anno.impl.factory;
 
 import com.alicp.jetcache.cache.Cache;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
-import com.alicp.jetcache.embedded.LocalCacheConfig;
+import com.alicp.jetcache.embedded.LocalEmbeddedConfig;
 
 /**
  * Created on 2016/9/26.
@@ -12,16 +12,16 @@ import com.alicp.jetcache.embedded.LocalCacheConfig;
 public class LocalCacheFactory extends CacheFactory {
 
     @Override
-    protected LocalCacheConfig getConfig() {
+    protected LocalEmbeddedConfig getConfig() {
         if (config == null) {
-            return new LocalCacheConfig();
+            return new LocalEmbeddedConfig();
         }
-        return (LocalCacheConfig) config;
+        return (LocalEmbeddedConfig) config;
     }
 
     @Override
     public Cache buildCache() {
-        return new LinkedHashMapCache((LocalCacheConfig) getConfig().clone());
+        return new LinkedHashMapCache((LocalEmbeddedConfig) getConfig().clone());
     }
 
     public void setLimit(int limit){
