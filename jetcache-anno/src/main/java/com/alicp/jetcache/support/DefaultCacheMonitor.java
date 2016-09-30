@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.cache.CacheResultCode;
+import com.alicp.jetcache.CacheResultCode;
 
 import java.text.DecimalFormat;
 import java.util.Map;

@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-09 18:16
  */
-package com.alicp.jetcache.cache;
+package com.alicp.jetcache;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

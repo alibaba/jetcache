@@ -4,7 +4,7 @@
 package com.alicp.jetcache.support;
 
 import com.alibaba.fastjson.JSON;
-import com.alicp.jetcache.cache.KeyGenerator;
+import com.alicp.jetcache.KeyGenerator;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

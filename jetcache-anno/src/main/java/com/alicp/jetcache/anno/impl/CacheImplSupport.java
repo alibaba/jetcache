@@ -7,7 +7,7 @@ import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.support.CacheAnnoConfig;
 import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.support.GlobalCacheConfig;
-import com.alicp.jetcache.cache.KeyGenerator;
+import com.alicp.jetcache.KeyGenerator;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

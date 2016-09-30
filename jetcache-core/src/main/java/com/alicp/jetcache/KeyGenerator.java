@@ -1,4 +1,4 @@
-package com.alicp.jetcache.cache;
+package com.alicp.jetcache;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

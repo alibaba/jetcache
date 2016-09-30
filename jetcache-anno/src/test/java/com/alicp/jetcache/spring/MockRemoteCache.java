@@ -3,8 +3,8 @@
  */
 package com.alicp.jetcache.spring;
 
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.cache.*;
 import com.alicp.jetcache.anno.impl.CacheImplSupport;
 
 import java.util.HashMap;

@@ -1,6 +1,6 @@
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.cache.CacheBuilder;
+import com.alicp.jetcache.CacheBuilder;
 
 /**
  * Created on 16/9/7.

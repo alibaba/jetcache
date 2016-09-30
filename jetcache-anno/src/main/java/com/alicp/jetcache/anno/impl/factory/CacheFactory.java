@@ -1,9 +1,8 @@
 package com.alicp.jetcache.anno.impl.factory;
 
-import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CacheBuilder;
-import com.alicp.jetcache.cache.CacheConfig;
-import com.alicp.jetcache.cache.KeyGenerator;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.KeyGenerator;
 
 /**
  * Created on 2016/9/26.

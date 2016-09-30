@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.cache.*;
+import com.alicp.jetcache.*;
 
 import java.lang.ref.SoftReference;
 import java.util.concurrent.TimeUnit;

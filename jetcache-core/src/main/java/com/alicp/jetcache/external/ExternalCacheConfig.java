@@ -1,7 +1,7 @@
 package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.anno.SerialPolicy;
-import com.alicp.jetcache.cache.CacheConfig;
+import com.alicp.jetcache.CacheConfig;
 
 /**
  * Created on 16/9/9.

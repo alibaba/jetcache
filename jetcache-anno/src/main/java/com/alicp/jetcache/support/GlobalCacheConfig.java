@@ -5,7 +5,7 @@ package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import com.alicp.jetcache.anno.impl.factory.CacheFactory;
-import com.alicp.jetcache.cache.CacheManager;
+import com.alicp.jetcache.CacheManager;
 
 import java.util.Map;
 

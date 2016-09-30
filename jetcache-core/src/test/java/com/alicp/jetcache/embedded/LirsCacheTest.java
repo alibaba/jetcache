@@ -3,8 +3,8 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CacheConfig;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheConfig;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

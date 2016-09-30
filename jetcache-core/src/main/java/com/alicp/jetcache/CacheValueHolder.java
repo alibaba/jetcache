@@ -1,4 +1,4 @@
-package com.alicp.jetcache.cache;
+package com.alicp.jetcache;
 
 /**
  * Created on 16/9/13.

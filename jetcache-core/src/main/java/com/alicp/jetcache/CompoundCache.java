@@ -1,4 +1,4 @@
-package com.alicp.jetcache.cache;
+package com.alicp.jetcache;
 
 import java.util.concurrent.TimeUnit;
 

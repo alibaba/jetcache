@@ -1,7 +1,5 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.cache.Cache;
-import com.alicp.jetcache.cache.CompoundCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 
 import java.util.concurrent.TimeUnit;
