@@ -1,11 +1,12 @@
 /**
  * Created on  13-09-04 15:34
  */
-package com.alicp.jetcache.anno;
+package com.alicp.jetcache.anno.context;
 
 import com.alicp.jetcache.Callback;
 import com.alicp.jetcache.CallbackException;
 import com.alicp.jetcache.ReturnValueCallback;
+import com.alicp.jetcache.anno.EnableCache;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

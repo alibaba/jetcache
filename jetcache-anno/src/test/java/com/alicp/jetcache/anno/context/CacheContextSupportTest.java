@@ -1,11 +1,11 @@
 /**
  * Created on  13-09-23 16:02
  */
-package com.alicp.jetcache.anno;
+package com.alicp.jetcache.anno.context;
 
 import com.alicp.jetcache.Callback;
 import com.alicp.jetcache.ReturnValueCallback;
-import com.alicp.jetcache.anno.CacheContext;
+import com.alicp.jetcache.anno.context.CacheContext;
 import org.junit.Assert;
 import org.junit.Test;
 

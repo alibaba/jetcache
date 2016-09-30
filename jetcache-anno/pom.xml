@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jetcache-spring</artifactId>
+    <artifactId>jetcache-anno</artifactId>
 
     <dependencies>
         <dependency>

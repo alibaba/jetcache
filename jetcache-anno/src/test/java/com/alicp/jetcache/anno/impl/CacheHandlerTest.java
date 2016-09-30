@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.CacheContext;
+import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.support.CacheAnnoConfig;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
