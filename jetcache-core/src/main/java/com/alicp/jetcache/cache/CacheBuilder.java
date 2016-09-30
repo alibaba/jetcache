@@ -44,7 +44,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
     protected void beforeBuild(){
     }
 
-    public final Cache build() {
+    public final <K,V> Cache<K, V> build() {
         if (buildFunc == null) {
             throw new CacheConfigException("no buildFunc");
         }
@@ -52,23 +52,28 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return buildFunc.apply(config);
     }
 
-    public T withCacheNullValue(boolean cacheNullValue) {
+    public T cacheNullValue(boolean cacheNullValue) {
         getConfig().setCacheNullValue(cacheNullValue);
         return self();
     }
 
-    public T withDefaultExpire(TimeUnit timeUnit, int defaultExpire) {
+    public T defaultExpire(TimeUnit timeUnit, int defaultExpire) {
         getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         return self();
     }
 
-    public T withKeyGenerator(KeyGenerator keyGenerator){
+    public T keyGenerator(KeyGenerator keyGenerator){
         getConfig().setKeyGenerator(keyGenerator);
         return self();
     }
 
     public T expireAfterAccess(){
         getConfig().setExpireAfterAccess(true);
+        return self();
+    }
+
+    public T expireAfterWrite(){
+        getConfig().setExpireAfterAccess(false);
         return self();
     }
 

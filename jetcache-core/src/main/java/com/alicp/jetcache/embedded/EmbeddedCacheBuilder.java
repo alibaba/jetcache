@@ -15,7 +15,7 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Cac
     public static class EmbeddedCacheBuilderImpl extends EmbeddedCacheBuilder<EmbeddedCacheBuilderImpl> {
     };
 
-    public static EmbeddedCacheBuilderImpl createLocalCacheBuilder(){
+    public static EmbeddedCacheBuilderImpl createEmbeddedCacheBuilder(){
         return new EmbeddedCacheBuilderImpl();
     }
 
@@ -27,12 +27,12 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Cac
         return (EmbeddedCacheConfig) config;
     }
 
-    public T withLimit(int limit){
+    public T limit(int limit){
         getConfig().setLimit(limit);
         return self();
     }
 
-    public T withUseSoftRef(boolean useSoftRef){
+    public T useSoftRef(boolean useSoftRef){
         getConfig().setUseSoftRef(useSoftRef);
         return self();
     }

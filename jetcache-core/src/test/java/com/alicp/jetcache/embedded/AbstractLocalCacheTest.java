@@ -21,8 +21,8 @@ public abstract class AbstractLocalCacheTest {
     protected abstract Function<CacheConfig, Cache> getBuildFunc();
 
     protected void setup(boolean useSofeRef, int limit){
-        cache = EmbeddedCacheBuilder.createLocalCacheBuilder().withLimit(limit)
-                .withUseSoftRef(useSofeRef).withBuildFunc(getBuildFunc()).build();
+        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().limit(limit)
+                .useSoftRef(useSofeRef).withBuildFunc(getBuildFunc()).build();
     }
 
     public void test1() throws Exception {
