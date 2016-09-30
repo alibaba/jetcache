@@ -1,7 +1,9 @@
 /**
  * Created on  13-09-23 11:31
  */
-package com.alicp.jetcache;
+package com.alicp.jetcache.anno.context;
+
+import com.alicp.jetcache.CacheException;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
