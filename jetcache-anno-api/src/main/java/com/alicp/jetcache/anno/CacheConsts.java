@@ -19,5 +19,5 @@ public interface CacheConsts {
     boolean DEFAULT_CACHE_NULL_VALUE = false;
     String DEFAULT_CONDITION = "";
     String DEFAULT_UNLESS = "";
-    SerialPolicy DEFAULT_SERIAL_POLICY = SerialPolicy.KRYO;
+    String DEFAULT_SERIAL_POLICY = SerialPolicy.KRYO;
 }

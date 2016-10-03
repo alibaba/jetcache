@@ -31,16 +31,16 @@ class SerializeUtil {
         }
     };
 
-    public static byte[] encode(Object value, SerialPolicy serialPolicy) throws Exception {
+    public static byte[] encode(Object value, String serialPolicy) throws Exception {
         switch (serialPolicy) {
-            case FASTJSON: {
+            case SerialPolicy.FASTJSON: {
                 byte[] bs = JSON.toJSONBytes(value, SerializerFeature.WriteClassName);
                 byte[] bs2 = new byte[bs.length + 1];
                 bs2[0] = FASTJSON_HEAD;
                 System.arraycopy(bs, 0, bs2, 1, bs.length);
                 return bs2;
             }
-            case JAVA: {
+            case SerialPolicy.JAVA: {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream(512);
                 ObjectOutputStream oos = new ObjectOutputStream(bos);
                 oos.write(JAVA_HEAD);
@@ -48,7 +48,7 @@ class SerializeUtil {
                 oos.flush();
                 return bos.toByteArray();
             }
-            case KRYO: {
+            case SerialPolicy.KRYO: {
                 Kryo kryo = kryoThreadLocal.get();
                 ByteArrayOutputStream bos = new ByteArrayOutputStream(128);
                 Output output = new Output(bos);

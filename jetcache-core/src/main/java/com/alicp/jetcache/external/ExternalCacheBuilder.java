@@ -10,7 +10,7 @@ import com.alicp.jetcache.CacheBuilder;
  */
 public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends CacheBuilder<T> {
 
-    public T valueSerialPolicy(SerialPolicy serialPolicy){
+    public T valueSerialPolicy(String serialPolicy){
         ((ExternalCacheConfig)getConfig()).setValueSerialPolicy(serialPolicy);
         return self();
     }

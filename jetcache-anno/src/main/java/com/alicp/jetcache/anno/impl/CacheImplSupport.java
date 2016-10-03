@@ -31,7 +31,7 @@ public class CacheImplSupport {
         return CacheHandler.invoke(context);
     }
 
-    public static byte[] encodeValue(Object value, SerialPolicy serialPolicy) throws Exception {
+    public static byte[] encodeValue(Object value, String serialPolicy) throws Exception {
         return SerializeUtil.encode(value, serialPolicy);
     }
 

@@ -9,14 +9,14 @@ import com.alicp.jetcache.CacheConfig;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public abstract class ExternalCacheConfig extends CacheConfig {
-    private SerialPolicy valueSerialPolicy;
+    private String valueSerialPolicy;
     private String keyPrefix;
 
-    public SerialPolicy getValueSerialPolicy() {
+    public String getValueSerialPolicy() {
         return valueSerialPolicy;
     }
 
-    public void setValueSerialPolicy(SerialPolicy valueSerialPolicy) {
+    public void setValueSerialPolicy(String valueSerialPolicy) {
         this.valueSerialPolicy = valueSerialPolicy;
     }
 

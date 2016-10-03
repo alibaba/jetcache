@@ -6,6 +6,8 @@ package com.alicp.jetcache.anno;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public enum SerialPolicy {
-    JAVA, FASTJSON, KRYO
+public interface SerialPolicy {
+    String JAVA = "JAVA";
+    String FASTJSON = "FASTJSON";
+    String KRYO = "KRYO";
 }

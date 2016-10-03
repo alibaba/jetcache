@@ -21,7 +21,7 @@ public class CacheAnnoConfig {
     private boolean cacheNullValue = CacheConsts.DEFAULT_CACHE_NULL_VALUE;
     private String condition = CacheConsts.DEFAULT_CONDITION;
     private String unless = CacheConsts.DEFAULT_UNLESS;
-    private SerialPolicy serialPolicy = CacheConsts.DEFAULT_SERIAL_POLICY;
+    private String serialPolicy = CacheConsts.DEFAULT_SERIAL_POLICY;
 
     public String getArea() {
         return area;
@@ -95,11 +95,11 @@ public class CacheAnnoConfig {
         this.unless = unless;
     }
 
-    public SerialPolicy getSerialPolicy() {
+    public String getSerialPolicy() {
         return serialPolicy;
     }
 
-    public void setSerialPolicy(SerialPolicy serialPolicy) {
+    public void setSerialPolicy(String serialPolicy) {
         this.serialPolicy = serialPolicy;
     }
 }

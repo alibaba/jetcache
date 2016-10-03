@@ -91,7 +91,7 @@ public class SerializeUtilTest {
         System.out.println((System.currentTimeMillis() - t));
     }
 
-    private void testPerformance(SerialPolicy p) throws Exception{
+    private void testPerformance(String serialPolicy) throws Exception{
         A a = new A();
         B b = new B();
         a.b = b;
@@ -99,11 +99,11 @@ public class SerializeUtilTest {
         a.map.put("a", a);
         a.map.put("b", b);
 
-        byte[] bs1 = SerializeUtil.encode(a, p);
+        byte[] bs1 = SerializeUtil.encode(a, serialPolicy);
         A a2 = (A) SerializeUtil.decode(bs1);
     }
 
-    private void test(SerialPolicy p) throws Exception {
+    private void test(String p) throws Exception {
         A a = new A();
         B b = new B();
         a.b = b;
