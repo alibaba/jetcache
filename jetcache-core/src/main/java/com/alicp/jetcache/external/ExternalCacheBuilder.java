@@ -3,6 +3,8 @@ package com.alicp.jetcache.external;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.CacheBuilder;
 
+import java.util.function.Function;
+
 /**
  * Created on 16/9/9.
  *
@@ -10,13 +12,18 @@ import com.alicp.jetcache.CacheBuilder;
  */
 public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends CacheBuilder<T> {
 
-    public T valueSerialPolicy(String serialPolicy){
-        ((ExternalCacheConfig)getConfig()).setValueSerialPolicy(serialPolicy);
+    public T keyPrefix(String keyPrefix){
+        ((ExternalCacheConfig)getConfig()).setKeyPrefix(keyPrefix);
         return self();
     }
 
-    public T keyPrefix(String keyPrefix){
-        ((ExternalCacheConfig)getConfig()).setKeyPrefix(keyPrefix);
+    public T valueEncoder(Function<Object, byte[]> valueEncoder){
+        ((ExternalCacheConfig)getConfig()).setValueEncoder(valueEncoder);
+        return self();
+    }
+
+    public T valueDecoder(Function<byte[], Object> valueDecoder){
+        ((ExternalCacheConfig)getConfig()).setValueDecoder(valueDecoder);
         return self();
     }
 }
