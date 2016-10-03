@@ -2,7 +2,8 @@ package com.alicp.jetcache.anno.impl.factory;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
-import com.alicp.jetcache.KeyGenerator;
+
+import java.util.function.Function;
 
 /**
  * Created on 2016/9/26.
@@ -30,7 +31,7 @@ public abstract class CacheFactory {
         getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
     }
 
-    public void withKeyGenerator(KeyGenerator keyGenerator){
+    public void setKeyGenerator(Function<Object,Object> keyGenerator){
         getConfig().setKeyGenerator(keyGenerator);
     }
 

@@ -4,16 +4,17 @@
 package com.alicp.jetcache.support;
 
 import com.alibaba.fastjson.JSON;
-import com.alicp.jetcache.KeyGenerator;
+
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class FastjsonKeyGenerator implements KeyGenerator {
+public class FastjsonKeyGenerator implements Function<Object, Object> {
 
     public static FastjsonKeyGenerator INSTANCE = new FastjsonKeyGenerator();
 
-    public String generateKey(Object... originalKey) {
+    public Object apply(Object originalKey) {
         return JSON.toJSONString(originalKey);
     }
 

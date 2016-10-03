@@ -7,14 +7,15 @@ import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.support.CacheAnnoConfig;
 import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.support.GlobalCacheConfig;
-import com.alicp.jetcache.KeyGenerator;
+
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheImplSupport {
 
-    public static KeyGenerator getDefaultKeyGenerator() {
+    public static Function<Object, Object> getDefaultKeyGenerator() {
         return FastjsonKeyGenerator.INSTANCE;
     }
 

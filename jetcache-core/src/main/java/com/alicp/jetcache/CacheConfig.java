@@ -2,6 +2,8 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.anno.CacheConsts;
 
+import java.util.function.Function;
+
 /**
  * Created on 16/9/7.
  *
@@ -11,7 +13,7 @@ public class CacheConfig implements Cloneable {
     private boolean cacheNullValue;
     private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000;
     private boolean expireAfterAccess = false;
-    private KeyGenerator keyGenerator;
+    private Function<Object,Object> keyGenerator;
 
     @Override
     public CacheConfig clone() {
@@ -30,11 +32,11 @@ public class CacheConfig implements Cloneable {
         this.cacheNullValue = cacheNullValue;
     }
 
-    public KeyGenerator getKeyGenerator() {
+    public Function<Object,Object> getKeyGenerator() {
         return keyGenerator;
     }
 
-    public void setKeyGenerator(KeyGenerator keyGenerator) {
+    public void setKeyGenerator(Function<Object,Object> keyGenerator) {
         this.keyGenerator = keyGenerator;
     }
 
