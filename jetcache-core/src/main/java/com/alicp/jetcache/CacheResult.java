@@ -10,8 +10,8 @@ public class CacheResult {
     private CacheResultCode resultCode;
     private String message;
 
-    public static final CacheResult SUCCESS = new CacheResult(CacheResultCode.SUCCESS, null);
-    public static final CacheResult FAIL = new CacheResult(CacheResultCode.FAIL, null);
+    public static final CacheResult SUCCESS_WITHOUT_MSG = new CacheResult(CacheResultCode.SUCCESS, null);
+    public static final CacheResult FAIL_WITHOUT_MSG = new CacheResult(CacheResultCode.FAIL, null);
 
     public CacheResult(CacheResultCode resultCode, String message){
         this.resultCode = resultCode;

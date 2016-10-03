@@ -49,16 +49,16 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
             byte[] bytes = CacheImplSupport.encodeValue(value, CacheConsts.DEFAULT_SERIAL_POLICY);
             CacheValueHolder<byte[]> v = new CacheValueHolder(bytes, System.currentTimeMillis(), timeUnit.toMillis(expire));
             data.put(key, v);
-            return CacheResult.SUCCESS;
+            return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception e) {
-            return CacheResult.FAIL;
+            return CacheResult.FAIL_WITHOUT_MSG;
         }
     }
 
     @Override
     public CacheResult INVALIDATE(K key) {
         data.remove(key);
-        return CacheResult.SUCCESS;
+        return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
 }

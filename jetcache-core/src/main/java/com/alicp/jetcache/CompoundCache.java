@@ -39,7 +39,7 @@ public class CompoundCache<K, V> implements Cache<K, V> {
                 }
             }
         }
-        return CacheGetResult.NOT_EXISTS;
+        return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
     }
 
     @Override
@@ -64,7 +64,7 @@ public class CompoundCache<K, V> implements Cache<K, V> {
                 fail = true;
             }
         }
-        return fail ? CacheResult.FAIL : CacheResult.SUCCESS;
+        return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
@@ -76,6 +76,6 @@ public class CompoundCache<K, V> implements Cache<K, V> {
                 fail = true;
             }
         }
-        return fail ? CacheResult.FAIL : CacheResult.SUCCESS;
+        return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
     }
 }

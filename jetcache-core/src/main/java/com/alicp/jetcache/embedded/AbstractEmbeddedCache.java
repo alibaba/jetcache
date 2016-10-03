@@ -28,7 +28,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
             if (config.isUseSoftRef()) {
                 SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) areaCache.getValue(key);
                 if (ref == null) {
-                    return CacheGetResult.NOT_EXISTS;
+                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
                 } else {
                     CacheValueHolder<V> cacheObject = ref.get();
                     if (cacheObject == null) {
@@ -40,7 +40,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
             } else {
                 CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) areaCache.getValue(key);
                 if (cacheObject == null) {
-                    return CacheGetResult.NOT_EXISTS;
+                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
                 } else {
                     return getImpl(key, cacheObject);
                 }
@@ -53,7 +53,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
     private CacheGetResult<V> getImpl(K key, CacheValueHolder<V> cacheObject){
         if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
             areaCache.removeValue(key);
-            return CacheGetResult.EXPIRED;
+            return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
             if(config.isExpireAfterAccess()){
                 long ttlInMillis = cacheObject.getTtlInMillis();
@@ -82,12 +82,12 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
         } else {
             areaCache.putValue(key, cacheObject);
         }
-        return CacheResult.SUCCESS;
+        return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
     public CacheResult INVALIDATE(K key) {
         areaCache.removeValue(key);
-        return CacheResult.SUCCESS;
+        return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 }
