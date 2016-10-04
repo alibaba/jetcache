@@ -35,4 +35,8 @@ public abstract class CacheFactory {
         getConfig().setKeyGenerator(keyGenerator);
     }
 
+    public void setExpireAfterAccess(boolean expireAfterAccess){
+        getConfig().setExpireAfterAccess(expireAfterAccess);
+    }
+
 }

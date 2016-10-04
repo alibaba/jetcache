@@ -10,7 +10,7 @@ import com.alicp.jetcache.CacheConfig;
  */
 public class EmbeddedCacheConfig extends CacheConfig {
     private int limit = CacheConsts.DEFAULT_LOCAL_LIMIT;
-    private boolean useSoftRef = false;
+    private boolean softValues = false;
 
     public int getLimit() {
         return limit;
@@ -20,11 +20,11 @@ public class EmbeddedCacheConfig extends CacheConfig {
         this.limit = limit;
     }
 
-    public boolean isUseSoftRef() {
-        return useSoftRef;
+    public boolean isSoftValues() {
+        return softValues;
     }
 
-    public void setUseSoftRef(boolean useSoftRef) {
-        this.useSoftRef = useSoftRef;
+    public void setSoftValues(boolean softValues) {
+        this.softValues = softValues;
     }
 }

@@ -9,7 +9,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LocalCacheFactory extends CacheFactory {
+public class EmbeddedCacheFactory extends CacheFactory {
 
     @Override
     protected EmbeddedCacheConfig getConfig() {
@@ -28,7 +28,7 @@ public class LocalCacheFactory extends CacheFactory {
         getConfig().setLimit(limit);
     }
 
-    public void setSoftRef(boolean useSoftRef){
-        getConfig().setUseSoftRef(useSoftRef);
+    public void setSoftValues(boolean softValues){
+        getConfig().setSoftValues(softValues);
     }
 }

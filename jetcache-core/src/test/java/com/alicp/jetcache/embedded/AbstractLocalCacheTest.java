@@ -22,7 +22,7 @@ public abstract class AbstractLocalCacheTest {
 
     protected void setup(boolean useSofeRef, int limit){
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().limit(limit)
-                .useSoftRef(useSofeRef).withBuildFunc(getBuildFunc()).build();
+                .softValues(useSofeRef).buildFunc(getBuildFunc()).build();
     }
 
     public void test1() throws Exception {

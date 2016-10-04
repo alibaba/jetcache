@@ -25,7 +25,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
     @Override
     public CacheGetResult<V> GET(K key) {
         try {
-            if (config.isUseSoftRef()) {
+            if (config.isSoftValues()) {
                 SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) areaCache.getValue(key);
                 if (ref == null) {
                     return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
@@ -76,7 +76,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
         } else {
             cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
         }
-        if (config.isUseSoftRef()) {
+        if (config.isSoftValues()) {
             SoftReference<CacheValueHolder<V>> ref = new SoftReference(cacheObject);
             areaCache.putValue(key, ref);
         } else {

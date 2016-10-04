@@ -9,7 +9,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class ExternalCacheConfig extends CacheConfig {
+public class ExternalCacheConfig extends CacheConfig {
     private String keyPrefix;
     private Function<Object, byte[]> valueEncoder;
     private Function<byte[], Object> valueDecoder;

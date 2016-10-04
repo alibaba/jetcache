@@ -34,7 +34,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return (T) this;
     }
 
-    public T withBuildFunc(Function<CacheConfig, Cache> buildFunc){
+    public T buildFunc(Function<CacheConfig, Cache> buildFunc){
         this.buildFunc = buildFunc;
         return self();
     }

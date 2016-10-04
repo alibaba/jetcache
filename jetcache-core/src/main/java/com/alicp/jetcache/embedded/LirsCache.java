@@ -28,7 +28,7 @@ public class LirsCache extends AbstractEmbeddedCache {
         } else {
             maxHirSize = (int) (localLimit * 0.1);
         }
-        return new LirsAreaCache(localLimit - maxHirSize, maxHirSize, localLimit * 2, config.isUseSoftRef());
+        return new LirsAreaCache(localLimit - maxHirSize, maxHirSize, localLimit * 2, config.isSoftValues());
     }
 
     static class LirsAreaCache implements AreaCache {
