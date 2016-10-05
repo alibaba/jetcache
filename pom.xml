@@ -45,6 +45,7 @@
         <module>jetcache-ali</module>
         <module>jetcache-anno</module>
         <module>jetcache-anno-api</module>
+        <module>jetcache-redis</module>
     </modules>
 
     <properties>
