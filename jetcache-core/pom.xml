@@ -17,16 +17,17 @@
             <artifactId>jetcache-anno-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.esotericsoftware</groupId>
             <artifactId>kryo</artifactId>
-            <version>3.0.3</version>
+            <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>com.googlecode.concurrentlinkedhashmap</groupId>
             <artifactId>concurrentlinkedhashmap-lru</artifactId>
