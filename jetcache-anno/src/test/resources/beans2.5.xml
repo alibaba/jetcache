@@ -22,12 +22,12 @@
             </map>
         </constructor-arg>
     </bean>
-    <bean id="ccheProvider1" class="com.alicp.jetcache.support.CacheProvider">
+    <bean id="ccheProvider1" class="com.alicp.jetcache.anno.support.CacheProvider">
         <property name="remoteCache">
             <bean class="com.alicp.jetcache.spring.MockRemoteCache"/>
         </property>
     </bean>
-    <bean id="ccheProvider2" class="com.alicp.jetcache.support.CacheProvider">
+    <bean id="ccheProvider2" class="com.alicp.jetcache.anno.support.CacheProvider">
         <property name="remoteCache">
             <bean class="com.alicp.jetcache.spring.MockRemoteCache"/>
         </property>

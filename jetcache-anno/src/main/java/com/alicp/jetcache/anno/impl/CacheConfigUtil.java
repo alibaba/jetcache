@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 

@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
 

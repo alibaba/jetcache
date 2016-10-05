@@ -5,8 +5,8 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.support.CacheAnnoConfig;
-import com.alicp.jetcache.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
