@@ -31,8 +31,8 @@ public abstract class CacheFactory {
         getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
     }
 
-    public void setKeyGenerator(Function<Object,Object> keyGenerator){
-        getConfig().setKeyGenerator(keyGenerator);
+    public void setKeyConvertor(Function<Object,Object> keyConvertor){
+        getConfig().setKeyConvertor(keyConvertor);
     }
 
     public void setExpireAfterAccess(boolean expireAfterAccess){

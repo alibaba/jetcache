@@ -13,7 +13,7 @@ public class CacheConfig implements Cloneable {
     private boolean cacheNullValue;
     private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000;
     private boolean expireAfterAccess = false;
-    private Function<Object,Object> keyGenerator;
+    private Function<Object,Object> keyConvertor;
 
     @Override
     public CacheConfig clone() {
@@ -32,12 +32,12 @@ public class CacheConfig implements Cloneable {
         this.cacheNullValue = cacheNullValue;
     }
 
-    public Function<Object,Object> getKeyGenerator() {
-        return keyGenerator;
+    public Function<Object,Object> getKeyConvertor() {
+        return keyConvertor;
     }
 
-    public void setKeyGenerator(Function<Object,Object> keyGenerator) {
-        this.keyGenerator = keyGenerator;
+    public void setKeyConvertor(Function<Object,Object> keyConvertor) {
+        this.keyConvertor = keyConvertor;
     }
 
     public boolean isExpireAfterAccess() {

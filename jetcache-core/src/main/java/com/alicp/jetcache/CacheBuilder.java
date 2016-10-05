@@ -60,8 +60,8 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return self();
     }
 
-    public T keyGenerator(Function<Object,Object> keyGenerator){
-        getConfig().setKeyGenerator(keyGenerator);
+    public T keyConvertor(Function<Object,Object> keyConvertor){
+        getConfig().setKeyConvertor(keyConvertor);
         return self();
     }
 
