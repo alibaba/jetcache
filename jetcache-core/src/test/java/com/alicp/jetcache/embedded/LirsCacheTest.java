@@ -15,7 +15,7 @@ import java.util.function.Function;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @Ignore
-public class LirsCacheTest extends AbstractLocalCacheTest {
+public class LirsCacheTest extends AbstractEmbeddedCacheTest {
 
     @Override
     protected Function<CacheConfig, Cache> getBuildFunc() {
@@ -24,14 +24,8 @@ public class LirsCacheTest extends AbstractLocalCacheTest {
 
     @Override
     @Test
-    public void test1() throws Exception {
-        super.test1();
-    }
-
-    @Override
-    @Test
-    public void testNull() {
-        super.testNull();
+    public void test() throws Exception {
+        super.test();
     }
 
     public void testLirs() {

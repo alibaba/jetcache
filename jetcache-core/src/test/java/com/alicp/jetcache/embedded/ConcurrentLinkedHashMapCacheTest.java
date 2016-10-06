@@ -12,7 +12,7 @@ import java.util.function.Function;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class ConcurrentLinkedHashMapCacheTest extends AbstractLocalCacheTest {
+public class ConcurrentLinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
 
     @Override
     protected Function<CacheConfig, Cache> getBuildFunc() {
@@ -21,32 +21,8 @@ public class ConcurrentLinkedHashMapCacheTest extends AbstractLocalCacheTest {
 
     @Override
     @Test
-    public void test1() throws Exception {
-        super.test1();
-    }
-
-    @Override
-    @Test
-    public void testLRU1() {
-        super.testLRU1();
-    }
-
-    @Override
-    @Test
-    public void testLRU2() {
-        super.testLRU2();
-    }
-
-    @Override
-    @Test
-    public void testExpire() throws Exception {
-        super.testExpire();
-    }
-
-    @Override
-    @Test
-    public void testNull() {
-        super.testNull();
+    public void test() throws Exception {
+        super.test();
     }
 
     @Override

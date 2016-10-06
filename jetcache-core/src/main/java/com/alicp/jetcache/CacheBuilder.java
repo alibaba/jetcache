@@ -25,7 +25,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
 
     protected CacheConfig getConfig() {
         if (config == null) {
-            return new CacheConfig();
+            config = new CacheConfig();
         }
         return config;
     }
@@ -47,12 +47,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
             throw new CacheConfigException("no buildFunc");
         }
         beforeBuild();
-        return buildFunc.apply(config);
-    }
-
-    public T cacheNullValue(boolean cacheNullValue) {
-        getConfig().setCacheNullValue(cacheNullValue);
-        return self();
+        return buildFunc.apply(getConfig());
     }
 
     public T defaultExpire(TimeUnit timeUnit, int defaultExpire) {

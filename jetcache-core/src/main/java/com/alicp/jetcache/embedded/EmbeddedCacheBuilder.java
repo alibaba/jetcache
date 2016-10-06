@@ -22,7 +22,7 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Cac
     @Override
     protected EmbeddedCacheConfig getConfig() {
         if (config == null) {
-            return new EmbeddedCacheConfig();
+            config = new EmbeddedCacheConfig();
         }
         return (EmbeddedCacheConfig) config;
     }

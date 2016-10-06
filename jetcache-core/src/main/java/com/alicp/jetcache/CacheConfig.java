@@ -10,7 +10,6 @@ import java.util.function.Function;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheConfig implements Cloneable {
-    private boolean cacheNullValue;
     private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000;
     private boolean expireAfterAccess = false;
     private Function<Object,Object> keyConvertor;
@@ -22,14 +21,6 @@ public class CacheConfig implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new CacheException(e);
         }
-    }
-
-    public boolean isCacheNullValue() {
-        return cacheNullValue;
-    }
-
-    public void setCacheNullValue(boolean cacheNullValue) {
-        this.cacheNullValue = cacheNullValue;
     }
 
     public Function<Object,Object> getKeyConvertor() {

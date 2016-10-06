@@ -21,15 +21,20 @@ public interface Cache<K, V> {
 
     CacheGetResult<V> GET(K key);
 
-    /**
-     * Compute value use a loader when miss.
-     */
     default V computeIfAbsent(K key, Function<K, V> loader) {
+        return computeIfAbsent(key, loader, false);
+    }
+
+    default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
         CacheGetResult<V> r = GET(key);
         if (r.isSuccess()) {
             return r.getValue();
         } else {
-            return loader.apply(key);
+            V loadedValue = loader.apply(key);
+            if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
+                put(key, loadedValue);
+            }
+            return loadedValue;
         }
     }
 

@@ -23,10 +23,6 @@ public abstract class CacheFactory {
         return config;
     }
 
-    public void setCacheNullValue(boolean cacheNullValue) {
-        getConfig().setCacheNullValue(cacheNullValue);
-    }
-
     public void setDefaultExpireInMillis(int defaultExpireInMillis) {
         getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
     }
