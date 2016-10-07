@@ -40,7 +40,9 @@ public interface Cache<K, V> {
         }
     }
 
-    void put(K key, V value);
+    default void put(K key, V value){
+        PUT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+    }
 
     default void put(K key, V value, long expire, TimeUnit timeUnit){
         PUT(key, value, expire, timeUnit);

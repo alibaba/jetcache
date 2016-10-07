@@ -16,6 +16,11 @@ import java.util.concurrent.TimeUnit;
 public class MockRemoteCache<K, V> implements Cache<K, V> {
     private HashMap<K, CacheValueHolder<byte[]>> data = new HashMap();
 
+    @Override
+    public CacheConfig config() {
+        return null;
+    }
+
     public CacheGetResult<V> GET(K key) {
         CacheResultCode code;
         V value = null;

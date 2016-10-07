@@ -94,11 +94,6 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
     }
 
     @Override
-    public void put(K key, V value) {
-        PUT(key, value, config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
-    }
-
-    @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         CacheValueHolder<V> cacheObject = null;
         cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
