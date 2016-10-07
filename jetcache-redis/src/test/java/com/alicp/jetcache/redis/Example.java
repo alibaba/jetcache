@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class Example {
     public static void main(String[] args) {
-        Cache<String, String> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<Object, Object> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(10)
                 .defaultExpire(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
@@ -26,7 +26,7 @@ public class Example {
                 .expireAfterWrite()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        Cache<String, String> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<Object, Object> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100000)
                 .defaultExpire(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
@@ -34,7 +34,7 @@ public class Example {
                 .expireAfterWrite()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        Cache<String, String> l3Cache = RedisCacheBuilder.createRedisCacheBuilder()
+        Cache<Object, Object> l3Cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(/*replace with your jedis pool*/null)
                 .defaultExpire(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
@@ -42,12 +42,53 @@ public class Example {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .build();
 
-        CompoundCache<String, String> compoundCache = new CompoundCache<>(l1Cache, l2Cache, l3Cache);
+        CompoundCache<Object, Object> compoundCache = new CompoundCache<>(l1Cache, l2Cache, l3Cache);
 
         compoundCache.put("K1", "V1");
         compoundCache.put("K2", "V2", 20, TimeUnit.SECONDS);
         compoundCache.get("K1");
         compoundCache.invalidate("K2");
 
+        DynamicQuery key = new DynamicQuery();
+        key.setName("AAA");
+        key.setEmail("BBB");
+        compoundCache.get(key);
+
+        compoundCache.computeIfAbsent("K3", k -> loadFromDatabase(k));
+    }
+
+    private static Object loadFromDatabase(Object key) {
+        //...
+        return null;
+    }
+
+    static class DynamicQuery {
+        private long id;
+        private String name;
+        private String email;
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 }
