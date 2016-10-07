@@ -39,7 +39,7 @@ public class CompoundCache<K, V> implements WapperValueCache<K, V> {
                     if (now > h.getExpireTime()) {
                         continue;
                     } else {
-                        long restTtl = h.getExpireTime() - now;
+                        long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
                         update(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
                         return new CacheGetResult<CacheValueHolder<V>>(CacheResultCode.SUCCESS, null, h);
                     }
