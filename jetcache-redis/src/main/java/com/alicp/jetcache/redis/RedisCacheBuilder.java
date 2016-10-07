@@ -27,13 +27,4 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
         return (RedisCacheConfig) config;
     }
 
-    public T hosts(String... hosts) {
-        getConfig().setHosts(hosts);
-        return self();
-    }
-
-    public T ports(int... ports) {
-        getConfig().setPorts(ports);
-        return self();
-    }
 }

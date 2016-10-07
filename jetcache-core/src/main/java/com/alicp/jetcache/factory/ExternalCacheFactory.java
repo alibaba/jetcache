@@ -1,4 +1,4 @@
-package com.alicp.jetcache.anno.factory;
+package com.alicp.jetcache.factory;
 
 import com.alicp.jetcache.external.ExternalCacheConfig;
 
@@ -13,7 +13,7 @@ public abstract class ExternalCacheFactory extends CacheFactory {
     @Override
     protected ExternalCacheConfig getConfig() {
         if (config == null) {
-            return new ExternalCacheConfig();
+            config = new ExternalCacheConfig();
         }
         return (ExternalCacheConfig) config;
     }

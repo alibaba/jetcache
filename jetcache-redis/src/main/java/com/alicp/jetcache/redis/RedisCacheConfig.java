@@ -1,9 +1,6 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.external.ExternalCacheConfig;
-import redis.clients.jedis.BinaryJedisCommands;
-import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.JedisCommands;
 import redis.clients.jedis.JedisPool;
 
 /**
@@ -14,24 +11,6 @@ import redis.clients.jedis.JedisPool;
 public class RedisCacheConfig extends ExternalCacheConfig {
 
     private JedisPool jedisPool;
-    private String[] hosts;
-    private int[] ports;
-
-    public String[] getHosts() {
-        return hosts;
-    }
-
-    public void setHosts(String[] hosts) {
-        this.hosts = hosts;
-    }
-
-    public int[] getPorts() {
-        return ports;
-    }
-
-    public void setPorts(int[] ports) {
-        this.ports = ports;
-    }
 
     public JedisPool getJedisPool() {
         return jedisPool;

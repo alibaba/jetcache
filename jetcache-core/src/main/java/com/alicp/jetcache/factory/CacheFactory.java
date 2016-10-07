@@ -1,4 +1,4 @@
-package com.alicp.jetcache.anno.factory;
+package com.alicp.jetcache.factory;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
@@ -18,7 +18,7 @@ public abstract class CacheFactory {
 
     protected CacheConfig getConfig() {
         if (config == null) {
-            return new CacheConfig();
+            config = new CacheConfig();
         }
         return config;
     }
