@@ -4,7 +4,7 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.support.FastjsonKeyGenerator;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 
@@ -133,7 +133,7 @@ public abstract class AbstractEmbeddedCacheTest {
         Assert.assertNull(cache.get(d2));
 
         builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
-        cache = builder.buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyGenerator.INSTANCE).build();
+        cache = builder.buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).build();
         cache.put(d1, "V1");
         Assert.assertEquals("V1", cache.get(d2));
         Assert.assertNull(cache.get(d3));

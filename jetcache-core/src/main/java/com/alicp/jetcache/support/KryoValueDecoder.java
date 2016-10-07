@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
  */
 public class KryoValueDecoder extends AbstractValueDecoder {
 
+    public static final KryoValueDecoder INSTANCE = new KryoValueDecoder();
 
     @Override
     public Object apply(byte[] buffer) {

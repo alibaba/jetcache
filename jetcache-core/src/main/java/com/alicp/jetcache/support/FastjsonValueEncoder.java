@@ -10,6 +10,8 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  */
 public class FastjsonValueEncoder extends AbstractValueEncoder {
 
+    public static final FastjsonValueEncoder INSTANCE = new FastjsonValueEncoder();
+
     protected static int IDENTITY_NUMBER = 0x4A953A81;
 
     @Override

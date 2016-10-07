@@ -11,6 +11,9 @@ import java.io.ObjectInputStream;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class JavaValueDecoder extends AbstractValueDecoder {
+
+    public static final JavaValueDecoder INSTANCE = new JavaValueDecoder();
+
     @Override
     public Object apply(byte[] buffer) {
         try {

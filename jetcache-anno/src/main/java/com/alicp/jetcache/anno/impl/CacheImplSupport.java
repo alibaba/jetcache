@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.support.FastjsonKeyGenerator;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.util.function.Function;
@@ -15,7 +15,7 @@ import java.util.function.Function;
 public class CacheImplSupport {
 
     public static Function<Object, Object> getDefaultKeyGenerator() {
-        return FastjsonKeyGenerator.INSTANCE;
+        return FastjsonKeyConvertor.INSTANCE;
     }
 
     public static <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig, GlobalCacheConfig globalCacheConfig) {

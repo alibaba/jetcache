@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.support.FastjsonKeyGenerator;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class FastjsonKeyGeneratorTest {
+public class FastjsonKeyConvertorTest {
     static class C extends DynamicQuery {
         private C mate;
 
@@ -26,7 +26,7 @@ public class FastjsonKeyGeneratorTest {
 
     @Test
     public void test() {
-        FastjsonKeyGenerator g = FastjsonKeyGenerator.INSTANCE;
+        FastjsonKeyConvertor g = FastjsonKeyConvertor.INSTANCE;
         Object k1, k2, k3;
 
         k1 = g.apply(new Object[]{10, 20, 10});

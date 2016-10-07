@@ -10,9 +10,9 @@ import java.util.function.Function;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class FastjsonKeyGenerator implements Function<Object, Object> {
+public class FastjsonKeyConvertor implements Function<Object, Object> {
 
-    public static FastjsonKeyGenerator INSTANCE = new FastjsonKeyGenerator();
+    public static final FastjsonKeyConvertor INSTANCE = new FastjsonKeyConvertor();
 
     public Object apply(Object originalKey) {
         return JSON.toJSONString(originalKey);

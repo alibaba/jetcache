@@ -13,6 +13,8 @@ import java.io.ObjectOutputStream;
  */
 public class JavaValueEncoder extends AbstractValueEncoder {
 
+    public static final JavaValueEncoder INSTANCE = new JavaValueEncoder();
+
     protected static int IDENTITY_NUMBER = 0x4A953A80;
 
     @Override

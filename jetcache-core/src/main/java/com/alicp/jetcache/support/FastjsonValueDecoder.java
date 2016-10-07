@@ -9,6 +9,8 @@ import com.alibaba.fastjson.JSON;
  */
 public class FastjsonValueDecoder extends AbstractValueDecoder {
 
+    public static final FastjsonValueDecoder INSTANCE = new FastjsonValueDecoder();
+
     @Override
     public Object apply(byte[] buffer) {
         checkHeader(buffer, FastjsonValueEncoder.IDENTITY_NUMBER);
