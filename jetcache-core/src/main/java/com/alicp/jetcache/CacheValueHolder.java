@@ -8,18 +8,22 @@ package com.alicp.jetcache;
 public class CacheValueHolder<V> {
     private V value;
     private long createTime;
-    private long ttlInMillis;
+    private long initTtlInMillis;
     private long expireTime;
 
-    public CacheValueHolder(V value, long createTime, long ttlInMillis){
+    public CacheValueHolder(V value, long createTime, long initTtlInMillis){
         this.value = value;
         this.createTime = createTime;
-        this.ttlInMillis = ttlInMillis;
-        this.expireTime = createTime + ttlInMillis;
+        this.initTtlInMillis = initTtlInMillis;
+        this.expireTime = createTime + initTtlInMillis;
     }
 
-    public long getTtlInMillis() {
-        return ttlInMillis;
+    public long getInitTtlInMillis() {
+        return initTtlInMillis;
+    }
+
+    public long getCreateTime() {
+        return createTime;
     }
 
     public V getValue() {
@@ -28,14 +32,6 @@ public class CacheValueHolder<V> {
 
     public void setValue(V value) {
         this.value = value;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
     }
 
     public long getExpireTime() {

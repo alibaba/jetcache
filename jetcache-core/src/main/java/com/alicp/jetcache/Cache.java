@@ -10,6 +10,8 @@ import java.util.function.Function;
  */
 public interface Cache<K, V> {
 
+    CacheConfig config();
+
     default V get(K key){
         CacheGetResult<V> result = GET(key);
         if (result.isSuccess()) {

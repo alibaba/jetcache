@@ -50,7 +50,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return buildFunc.apply(getConfig());
     }
 
-    public T defaultExpire(TimeUnit timeUnit, int defaultExpire) {
+    public T defaultExpire(int defaultExpire, TimeUnit timeUnit) {
         getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         return self();
     }

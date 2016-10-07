@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CompoundCache<K, V> implements Cache<K, V> {
+public class CompoundCache<K, V> implements WapperValueCache<K, V> {
 
     private Cache[] caches;
 
@@ -17,54 +17,74 @@ public class CompoundCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheGetResult<V> GET(K key) {
-        for (int i = 0; i < caches.length; i++) {
-            Cache cache = caches[i];
-            CacheGetResult r1 = cache.GET(key);
-            if (r1.isSuccess() && r1.getValue() != null) {
-                Object cacheValue = r1.getValue();
-                if (cacheValue instanceof CacheValueHolder) {
-                    CacheValueHolder h = (CacheValueHolder) cacheValue;
+    public CacheConfig config() {
+        return null;
+    }
+
+    @Override
+    public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
+        try {
+            for (int i = 0; i < caches.length; i++) {
+                Cache cache = caches[i];
+                CacheGetResult<CacheValueHolder<V>> r1 = null;
+                if (cache instanceof WapperValueCache) {
+                    r1 = ((WapperValueCache) cache).GET_HOLDER(key);
+                } else {
+                    r1 = cache.GET(key);
+                }
+                if (r1.isSuccess() && r1.getValue() != null) {
+                    Object cacheValue = r1.getValue();
+                    CacheValueHolder<V> h = (CacheValueHolder<V>) cacheValue;
                     long now = System.currentTimeMillis();
                     if (now > h.getExpireTime()) {
                         continue;
                     } else {
-                        V value = (V) h.getValue();
-                        long ttl = h.getExpireTime() - now;
-                        update(i, key, h, ttl, TimeUnit.MILLISECONDS);
-                        return new CacheGetResult<V>(CacheResultCode.SUCCESS, null, value);
+                        long restTtl = h.getExpireTime() - now;
+                        update(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                        return new CacheGetResult<CacheValueHolder<V>>(CacheResultCode.SUCCESS, null, h);
                     }
-                } else {
-                    continue;
                 }
             }
+            return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+        } catch (Exception e) {
+            return new CacheGetResult<>(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage(), null);
         }
-        return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
     }
 
     @Override
     public void put(K key, V value) {
         for (Cache cache : caches) {
-            cache.put(key, value);
+            long defaultTtl = cache.config().getDefaultExpireInMillis();
+            PUT_impl(cache, key, value, defaultTtl, TimeUnit.MILLISECONDS);
         }
     }
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
-        CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-        return update(caches.length, key, h, expire, timeUnit);
+        return update(caches.length, key, value, expire, timeUnit);
     }
 
-    private CacheResult update(int lastIndex, K key, CacheValueHolder<V> h, long expire, TimeUnit timeUnit) {
+    private CacheResult update(int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         boolean fail = false;
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
-            CacheResult r = cache.PUT(key, h, expire, timeUnit);
+            CacheResult r = PUT_impl(cache, key, value, expire, timeUnit);
             if (!r.isSuccess()) {
                 fail = true;
             }
         }
         return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
+    }
+
+    private CacheResult PUT_impl(Cache cache, K key, V value, long expire, TimeUnit timeUnit) {
+        CacheResult r = null;
+        if (cache instanceof WapperValueCache) {
+            r = cache.PUT(key, value, expire, timeUnit);
+        } else {
+            CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+            r = cache.PUT(key, h, expire, timeUnit);
+        }
+        return r;
     }
 
     @Override

@@ -13,11 +13,11 @@ public class Example {
     public static void main(String[] args) {
         Cache<String, String> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(10)
-                .defaultExpire(TimeUnit.SECONDS, 200)
+                .defaultExpire(200, TimeUnit.SECONDS)
                 .build();
         Cache<String, String> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(2000)
-                .defaultExpire(TimeUnit.SECONDS, 200)
+                .defaultExpire(200, TimeUnit.SECONDS)
                 .build();
 
 

@@ -13,7 +13,7 @@ import java.util.function.Function;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
+public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K, V> {
     protected EmbeddedCacheConfig config;
     private AreaCache areaCache;
 
@@ -22,6 +22,11 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
     public AbstractEmbeddedCache(EmbeddedCacheConfig config) {
         this.config = config;
         areaCache = createAreaCache();
+    }
+
+    @Override
+    public CacheConfig config() {
+        return config;
     }
 
     private Object buildKey(K key) {
@@ -33,37 +38,8 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
         return newKey;
     }
 
-    protected CacheValueHolder<V> getHolder(K key) {
-        try {
-            Object newKey = buildKey(key);
-            CacheValueHolder<V> holder = null;
-            if (config.isWeakValues()) {
-                WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) areaCache.getValue(newKey);
-                if (ref == null) {
-                    holder = null;
-                } else {
-                    holder = ref.get();
-
-                }
-            } else if (config.isSoftValues()) {
-                SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) areaCache.getValue(newKey);
-                if (ref == null) {
-                    holder = null;
-                } else {
-                    holder = ref.get();
-                }
-            } else {
-                holder = (CacheValueHolder<V>) areaCache.getValue(newKey);
-
-            }
-            return holder;
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
     @Override
-    public CacheGetResult<V> GET(K key) {
+    public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
         try {
             Object newKey = buildKey(key);
             CacheValueHolder<V> holder = null;
@@ -104,16 +80,16 @@ public abstract class AbstractEmbeddedCache<K, V> implements Cache<K, V> {
         }
     }
 
-    private CacheGetResult<V> getImpl(Object newKey, CacheValueHolder<V> cacheObject) {
+    private CacheGetResult<CacheValueHolder<V>> getImpl(Object newKey, CacheValueHolder<V> cacheObject) {
         if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
             areaCache.removeValue(newKey);
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
             if (config.isExpireAfterAccess()) {
-                long ttlInMillis = cacheObject.getTtlInMillis();
+                long ttlInMillis = cacheObject.getInitTtlInMillis();
                 cacheObject.setExpireTime(System.currentTimeMillis() + ttlInMillis);
             }
-            return new CacheGetResult<V>(CacheResultCode.SUCCESS, null, cacheObject.getValue());
+            return new CacheGetResult(CacheResultCode.SUCCESS, null, cacheObject);
         }
     }
 

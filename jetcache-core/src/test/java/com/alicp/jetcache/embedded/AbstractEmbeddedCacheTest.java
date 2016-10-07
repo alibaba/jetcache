@@ -97,19 +97,19 @@ public abstract class AbstractEmbeddedCacheTest {
 
     public void test() throws Exception {
         builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
-        cache = builder.buildFunc(getBuildFunc()).defaultExpire(TimeUnit.MILLISECONDS, 100).limit(2).build();
+        cache = builder.buildFunc(getBuildFunc()).defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireTest();
         lruTest();
 
         builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
-        cache = builder.buildFunc(getBuildFunc()).softValues().defaultExpire(TimeUnit.MILLISECONDS, 100).limit(2).build();
+        cache = builder.buildFunc(getBuildFunc()).softValues().defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireTest();
         lruTest();
 
         builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
-        cache = builder.buildFunc(getBuildFunc()).weakValues().defaultExpire(TimeUnit.MILLISECONDS, 100).limit(2).build();
+        cache = builder.buildFunc(getBuildFunc()).weakValues().defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireTest();
         lruTest();
