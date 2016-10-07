@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-10 15:45
  */
-package com.alicp.jetcache.anno.support;
+package com.alicp.jetcache.support;
 
 import com.alibaba.fastjson.JSON;
 

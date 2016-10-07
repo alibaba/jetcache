@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.anno.support.FastjsonKeyGenerator;
+import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.util.function.Function;

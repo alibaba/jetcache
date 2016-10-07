@@ -4,7 +4,7 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.support.FastjsonKeyGenerator;
+import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 

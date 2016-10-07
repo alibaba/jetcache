@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.support.FastjsonKeyGenerator;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,4 +1,4 @@
-package com.alicp.jetcache.anno.support;
+package com.alicp.jetcache.support;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
