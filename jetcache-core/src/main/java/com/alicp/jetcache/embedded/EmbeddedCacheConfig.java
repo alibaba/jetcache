@@ -11,6 +11,7 @@ import com.alicp.jetcache.CacheConfig;
 public class EmbeddedCacheConfig extends CacheConfig {
     private int limit = CacheConsts.DEFAULT_LOCAL_LIMIT;
     private boolean softValues = false;
+    private boolean weakValues = false;
 
     public int getLimit() {
         return limit;
@@ -26,5 +27,13 @@ public class EmbeddedCacheConfig extends CacheConfig {
 
     public void setSoftValues(boolean softValues) {
         this.softValues = softValues;
+    }
+
+    public boolean isWeakValues() {
+        return weakValues;
+    }
+
+    public void setWeakValues(boolean weakValues) {
+        this.weakValues = weakValues;
     }
 }

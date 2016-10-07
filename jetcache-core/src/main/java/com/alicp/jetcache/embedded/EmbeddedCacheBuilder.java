@@ -32,8 +32,13 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Cac
         return self();
     }
 
-    public T softValues(boolean useSoftRef){
-        getConfig().setSoftValues(useSoftRef);
+    public T softValues(){
+        getConfig().setSoftValues(true);
+        return self();
+    }
+
+    public T weakValues(){
+        getConfig().setWeakValues(true);
         return self();
     }
 }

@@ -42,7 +42,7 @@ public abstract class AbstractEmbeddedCacheTest {
             cache.put("EXPIRE_K1", "V1");
             expireTestImpl1(ttl);
 
-            ttl = 10;
+            ttl = ttl / 2;
             cache.put("EXPIRE_K1", "V1", ttl, TimeUnit.MILLISECONDS);
             expireTestImpl1(ttl);
         } else {
@@ -50,7 +50,7 @@ public abstract class AbstractEmbeddedCacheTest {
             cache.put("EXPIRE_K1", "V1");
             expireTestImpl2(ttl);
 
-            ttl = 10;
+            ttl = ttl / 2;
             cache.put("EXPIRE_K1", "V1", ttl, TimeUnit.MILLISECONDS);
             expireTestImpl2(ttl);
         }
@@ -97,13 +97,19 @@ public abstract class AbstractEmbeddedCacheTest {
 
     public void test() throws Exception {
         builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
-        cache = builder.buildFunc(getBuildFunc()).defaultExpire(TimeUnit.MILLISECONDS, 20).limit(2).build();
+        cache = builder.buildFunc(getBuildFunc()).defaultExpire(TimeUnit.MILLISECONDS, 100).limit(2).build();
         baseTest();
         expireTest();
         lruTest();
 
         builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
-        cache = builder.buildFunc(getBuildFunc()).softValues(true).defaultExpire(TimeUnit.MILLISECONDS, 20).limit(2).build();
+        cache = builder.buildFunc(getBuildFunc()).softValues().defaultExpire(TimeUnit.MILLISECONDS, 100).limit(2).build();
+        baseTest();
+        expireTest();
+        lruTest();
+
+        builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder();
+        cache = builder.buildFunc(getBuildFunc()).weakValues().defaultExpire(TimeUnit.MILLISECONDS, 100).limit(2).build();
         baseTest();
         expireTest();
         lruTest();

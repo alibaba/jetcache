@@ -31,4 +31,8 @@ public class EmbeddedCacheFactory extends CacheFactory {
     public void setSoftValues(boolean softValues){
         getConfig().setSoftValues(softValues);
     }
+
+    public void setWeakValues(boolean weakValues){
+        getConfig().setWeakValues(weakValues);
+    }
 }
