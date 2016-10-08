@@ -63,13 +63,13 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).build();
-        testKeyCoverter();
+        keyCoverterTest();
 
         int thread = 10;
         int count = 100;
         int time = 1000;
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(thread * count).build();
-        testConcurrentImpl(thread, count ,time);
+        concurrentTest(thread, count ,time);
     }
 
 }

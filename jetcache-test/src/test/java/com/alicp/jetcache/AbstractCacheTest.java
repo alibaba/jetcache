@@ -74,7 +74,7 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(r.getValue());
     }
 
-    protected void testKeyCoverter() {
+    protected void keyCoverterTest() {
         DynamicQuery d1 = new DynamicQuery();
         DynamicQuery d2 = new DynamicQuery();
         DynamicQuery d3 = new DynamicQuery();
@@ -92,7 +92,7 @@ public abstract class AbstractCacheTest {
 
     private volatile boolean cocurrentFail = false;
 
-    protected void testConcurrentImpl(int threadCount, int count, int time) throws Exception {
+    protected void concurrentTest(int threadCount, int count, int time) throws Exception {
         class T extends Thread {
             private String keyPrefix;
             private transient boolean stop;

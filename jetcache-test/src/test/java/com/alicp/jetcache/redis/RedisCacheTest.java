@@ -1,7 +1,6 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.AbstractCacheTest;
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
@@ -57,7 +56,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .build();
-        testKeyCoverter();
+        keyCoverterTest();
 
         int thread = 10;
         int count = 100;
@@ -69,6 +68,6 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .build();
-        testConcurrentImpl(thread, count, time);
+        concurrentTest(thread, count, time);
     }
 }
