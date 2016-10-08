@@ -11,6 +11,10 @@
 
     <artifactId>jetcache-test</artifactId>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
