@@ -13,6 +13,7 @@ public class TestObject implements Serializable {
     private long id;
     private String name;
     private String email;
+    private Object data;
 
     public long getId() {
         return id;
@@ -36,5 +37,13 @@ public class TestObject implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }

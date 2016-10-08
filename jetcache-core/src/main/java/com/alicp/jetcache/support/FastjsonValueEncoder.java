@@ -8,6 +8,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
+@Deprecated
 public class FastjsonValueEncoder extends AbstractValueEncoder {
 
     public static final FastjsonValueEncoder INSTANCE = new FastjsonValueEncoder();

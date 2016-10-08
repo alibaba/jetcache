@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
+@Deprecated
 public class FastjsonValueDecoder extends AbstractValueDecoder {
 
     public static final FastjsonValueDecoder INSTANCE = new FastjsonValueDecoder();

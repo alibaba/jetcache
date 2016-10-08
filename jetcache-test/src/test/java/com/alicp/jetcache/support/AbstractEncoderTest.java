@@ -27,6 +27,7 @@ public class AbstractEncoderTest {
         q.setId(100);
         q.setEmail("aaa");
         q.setName("bbb");
+        q.setData(new byte[]{1,2,3});
 
         byte bs[] = encoder.apply(q);
         TestObject q2 = (TestObject) decoder.apply(bs);
@@ -34,6 +35,7 @@ public class AbstractEncoderTest {
         Assert.assertEquals(q.getId(), q2.getId());
         Assert.assertEquals(q.getName(), q2.getName());
         Assert.assertEquals(q.getEmail(), q2.getEmail());
+        Assert.assertArrayEquals(new byte[]{1, 2, 3}, (byte[])q.getData());
 
         bs = encoder.apply(new Object[]{q, 123});
         Object[] o = (Object[]) decoder.apply(bs);
@@ -43,6 +45,7 @@ public class AbstractEncoderTest {
         Assert.assertEquals(q.getId(), q2.getId());
         Assert.assertEquals(q.getName(), q2.getName());
         Assert.assertEquals(q.getEmail(), q2.getEmail());
+        Assert.assertArrayEquals(new byte[]{1, 2, 3}, (byte[])q.getData());
 
     }
 }

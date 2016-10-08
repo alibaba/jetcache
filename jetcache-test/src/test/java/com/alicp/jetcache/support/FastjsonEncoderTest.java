@@ -1,5 +1,6 @@
 package com.alicp.jetcache.support;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -7,6 +8,7 @@ import org.junit.Test;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
+@Ignore
 public class FastjsonEncoderTest extends AbstractEncoderTest {
     @Test
     public void test() {
