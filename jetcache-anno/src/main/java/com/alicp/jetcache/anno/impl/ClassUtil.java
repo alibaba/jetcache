@@ -5,7 +5,7 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.objectweb.asm.Type;
+import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
