@@ -10,9 +10,9 @@ import java.util.function.Function;
 public abstract class AbstractValueEncoder implements Function<Object, byte[]> {
 
     protected void writeHeader(byte[] buf, int header) {
-        buf[0] = (byte) (header >>> 24);
-        buf[1] = (byte) (header >>> 16);
-        buf[2] = (byte) (header >>> 8);
-        buf[3] = (byte) header;
+        buf[0] = (byte) (header >> 24 & 0xFF);
+        buf[1] = (byte) (header >> 16 & 0xFF);
+        buf[2] = (byte) (header >> 8 & 0xFF);
+        buf[3] = (byte) (header & 0xFF);
     }
 }

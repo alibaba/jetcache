@@ -20,9 +20,12 @@ public class JavaValueEncoder extends AbstractValueEncoder {
     @Override
     public byte[] apply(Object value) {
         try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(512);
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
+            bos.write((IDENTITY_NUMBER >> 24) & 0xFF);
+            bos.write((IDENTITY_NUMBER >> 16) & 0xFF);
+            bos.write((IDENTITY_NUMBER >> 8) & 0xFF);
+            bos.write(IDENTITY_NUMBER & 0xFF);
             ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeInt(IDENTITY_NUMBER);
             oos.writeObject(value);
             oos.flush();
             return bos.toByteArray();

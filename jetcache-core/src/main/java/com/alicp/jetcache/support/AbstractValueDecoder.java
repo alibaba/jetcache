@@ -26,7 +26,7 @@ public abstract class AbstractValueDecoder implements Function<byte[], Object> {
     protected void checkHeader(byte[] buf, int expectedHeader) {
         int x = parseHeader(buf);
         if(x != expectedHeader){
-            throw new CacheException("unexpected header:" + Integer.toHexString(x));
+            throw new CacheException("unexpected header:" + Integer.toHexString(x) + ",expect " + Integer.toHexString(expectedHeader));
         }
     }
 }

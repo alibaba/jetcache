@@ -19,7 +19,7 @@ public class FastjsonValueEncoder extends AbstractValueEncoder {
         byte[] bs1 = JSON.toJSONBytes(o, SerializerFeature.WriteClassName);
         byte[] bs2 = new byte[bs1.length + 4];
         writeHeader(bs2, IDENTITY_NUMBER);
-        System.arraycopy(bs1, 0, bs2, 0, bs1.length);
+        System.arraycopy(bs1, 0, bs2, 4, bs1.length);
         return bs2;
     }
 }
