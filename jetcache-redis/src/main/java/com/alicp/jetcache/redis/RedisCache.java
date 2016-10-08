@@ -1,6 +1,5 @@
 package com.alicp.jetcache.redis;
 
-import com.alibaba.fastjson.JSON;
 import com.alicp.jetcache.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;

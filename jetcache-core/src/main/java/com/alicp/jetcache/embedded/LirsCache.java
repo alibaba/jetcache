@@ -10,6 +10,7 @@ import java.util.HashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 //TODO BUGFIX
+@Deprecated
 public class LirsCache extends AbstractEmbeddedCache {
 
     public LirsCache(EmbeddedCacheConfig config){
