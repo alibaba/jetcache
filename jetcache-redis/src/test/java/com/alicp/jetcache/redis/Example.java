@@ -22,7 +22,6 @@ public class Example {
                 .limit(10)
                 .defaultExpire(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .softValues()
                 .expireAfterWrite()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
@@ -62,6 +61,7 @@ public class Example {
         return null;
     }
 
+    // no "equals" method
     static class DynamicQuery {
         private long id;
         private String name;
