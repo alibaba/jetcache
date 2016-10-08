@@ -1,10 +1,9 @@
-package com.alicp.jetcache.redis;
+package com.alicp.jetcache;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CompoundCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;

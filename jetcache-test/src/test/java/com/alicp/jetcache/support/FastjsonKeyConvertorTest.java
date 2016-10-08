@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-23 17:02
  */
-package com.alicp.jetcache.anno.support;
+package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.DynamicQuery;
