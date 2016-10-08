@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.alicp.jetcache.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 
 import java.io.UnsupportedEncodingException;
 import java.util.concurrent.TimeUnit;
@@ -57,14 +59,20 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
     public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
         try (Jedis jedis = jedisPool.getResource()) {
             byte[] newKey = buildKey(key);
-            byte[] valueBytes = jedis.get(newKey);
-            if (valueBytes != null) {
-                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueBytes);
-                if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                    return CacheGetResult.EXPIRED_WITHOUT_MSG;
-                } else {
-                    return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
+            Pipeline p = jedis.pipelined();
+            Response<byte[]> valueResp = p.get(newKey);
+            Response<Long> pttlResp = p.pttl(newKey);
+            p.sync();
+            if (valueResp.get() != null) {
+                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueResp.get());
+                Long restTtl = pttlResp.get();
+                if (restTtl != null) {
+                    holder.setExpireTime(System.currentTimeMillis() + restTtl);
                 }
+                if (config.isExpireAfterAccess()) {
+                    jedis.pexpire(newKey, holder.getInitTtlInMillis());
+                }
+                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
             } else {
                 return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
             }
@@ -78,11 +86,17 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try (Jedis jedis = jedisPool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-            String rt = jedis.setex(buildKey(key), convertTtl(expire, timeUnit), valueEncoder.apply(holder));
-            if (rt != null && "OK".equals(rt)) {
+
+            byte[] newKey = buildKey(key);
+            Pipeline p = jedis.pipelined();
+            Response<String> rt = p.set(newKey, valueEncoder.apply(holder));
+            p.pexpire(newKey, timeUnit.toMillis(expire));
+            p.sync();
+
+            if ("OK".equals(rt.get())) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             } else {
-                return new CacheResult(CacheResultCode.FAIL, rt);//TODO expire?
+                return new CacheResult(CacheResultCode.FAIL, rt.get());
             }
         } catch (Exception e) {
             return new CacheResult(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage());
@@ -94,7 +108,7 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
         if (t == 0 && expire > 0) {
             return 1;
         } else {
-            return (int)t;
+            return (int) t;
         }
     }
 

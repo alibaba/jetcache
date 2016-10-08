@@ -26,16 +26,29 @@ public class RedisCacheTest extends AbstractCacheTest {
         pc.setMaxIdle(10);
         pc.setMaxTotal(10);
         JedisPool pool = new JedisPool(pc, "localhost", 6379);
+
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .defaultExpire(2000, TimeUnit.MILLISECONDS)
+                .defaultExpire(200, TimeUnit.MILLISECONDS)
                 .build();
         baseTest();
         expireAfterWriteTest();
+
+        cache = RedisCacheBuilder.createRedisCacheBuilder()
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .valueEncoder(KryoValueEncoder.INSTANCE)
+                .valueDecoder(KryoValueDecoder.INSTANCE)
+                .jedisPool(pool)
+                .keyPrefix(new Random().nextInt() + "")
+                .defaultExpire(200, TimeUnit.MILLISECONDS)
+                .expireAfterAccess()
+                .build();
+        baseTest();
+        expireAfterAccessTest();
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
