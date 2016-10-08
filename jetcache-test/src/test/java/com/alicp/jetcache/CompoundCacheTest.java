@@ -32,5 +32,6 @@ public class CompoundCacheTest extends AbstractCacheTest {
                 .build();
         cache = new CompoundCache<>(l1Cache, l2Cache);
         baseTest();
+        expireAfterWriteTest(200);
     }
 }

@@ -41,25 +41,25 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
-        expireAfterWriteTest();
+        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterAccess(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
-        expireAfterAccessTest();
+        expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).softValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
-        expireAfterWriteTest();
+        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
-        expireAfterWriteTest();
+        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).build();

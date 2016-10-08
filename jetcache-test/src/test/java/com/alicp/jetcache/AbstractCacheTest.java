@@ -28,31 +28,25 @@ public abstract class AbstractCacheTest {
     }
 
 
-    protected void expireAfterWriteTest() throws InterruptedException {
-        CacheConfig config = cache.config();
-        long defaultExpireInMillis = config.getDefaultExpireInMillis();
-        long ttl = defaultExpireInMillis;
+    protected void expireAfterWriteTest(long ttl) throws InterruptedException {
         cache.put("EXPIRE_W_K1", "V1");
-        expireTestImpl1(ttl);
+        expireAfterWriteTestImpl(ttl);
 
         ttl = ttl / 2;
         cache.put("EXPIRE_W_K1", "V1", ttl, TimeUnit.MILLISECONDS);
-        expireTestImpl1(ttl);
+        expireAfterWriteTestImpl(ttl);
     }
 
-    protected void expireAfterAccessTest() throws InterruptedException {
-        CacheConfig config = cache.config();
-        long defaultExpireInMillis = config.getDefaultExpireInMillis();
-        long ttl = defaultExpireInMillis;
+    protected void expireAfterAccessTest(long ttl) throws InterruptedException {
         cache.put("EXPIRE_A_K1", "V1");
-        expireTestImpl2(ttl);
+        expireAfterAccessTestImpl(ttl);
 
         ttl = ttl / 2;
         cache.put("EXPIRE_A_K1", "V1", ttl, TimeUnit.MILLISECONDS);
-        expireTestImpl2(ttl);
+        expireAfterAccessTestImpl(ttl);
     }
 
-    private void expireTestImpl1(long ttl) throws InterruptedException {
+    protected void expireAfterWriteTestImpl(long ttl) throws InterruptedException {
         Assert.assertEquals("V1", cache.get("EXPIRE_W_K1"));
         Thread.sleep(ttl / 2);
         Assert.assertEquals("V1", cache.get("EXPIRE_W_K1"));
@@ -62,7 +56,7 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(r.getValue());
     }
 
-    private void expireTestImpl2(long ttl) throws InterruptedException {
+    protected void expireAfterAccessTestImpl(long ttl) throws InterruptedException {
         Assert.assertEquals("V1", cache.get("EXPIRE_A_K1"));
         Thread.sleep(ttl / 2);
         Assert.assertEquals("V1", cache.get("EXPIRE_A_K1"));
