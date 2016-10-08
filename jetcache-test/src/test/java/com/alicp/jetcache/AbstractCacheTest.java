@@ -1,6 +1,5 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 
@@ -30,7 +29,7 @@ public abstract class AbstractCacheTest {
 
 
     protected void expireAfterWriteTest() throws InterruptedException {
-        EmbeddedCacheConfig config = (EmbeddedCacheConfig) cache.config();
+        CacheConfig config = cache.config();
         long defaultExpireInMillis = config.getDefaultExpireInMillis();
         long ttl = defaultExpireInMillis;
         cache.put("EXPIRE_W_K1", "V1");
@@ -42,7 +41,7 @@ public abstract class AbstractCacheTest {
     }
 
     protected void expireAfterAccessTest() throws InterruptedException {
-        EmbeddedCacheConfig config = (EmbeddedCacheConfig) cache.config();
+        CacheConfig config = cache.config();
         long defaultExpireInMillis = config.getDefaultExpireInMillis();
         long ttl = defaultExpireInMillis;
         cache.put("EXPIRE_A_K1", "V1");
@@ -59,7 +58,7 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V1", cache.get("EXPIRE_W_K1"));
         Thread.sleep(ttl / 2 + 1);
         CacheGetResult<Object> r = cache.GET("EXPIRE_W_K1");
-        Assert.assertEquals(CacheResultCode.EXPIRED, r.getResultCode());
+        Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
         Assert.assertNull(r.getValue());
     }
 
@@ -71,7 +70,7 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V1", cache.get("EXPIRE_A_K1"));
         Thread.sleep(ttl + 1);
         CacheGetResult<Object> r = cache.GET("EXPIRE_A_K1");
-        Assert.assertEquals(CacheResultCode.EXPIRED, r.getResultCode());
+        Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
         Assert.assertNull(r.getValue());
     }
 

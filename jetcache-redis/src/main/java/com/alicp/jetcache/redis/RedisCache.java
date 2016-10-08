@@ -78,7 +78,7 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try (Jedis jedis = jedisPool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-            String rt = jedis.setex(buildKey(key), (int) timeUnit.toSeconds(expire), valueEncoder.apply(holder));
+            String rt = jedis.setex(buildKey(key), convertTtl(expire, timeUnit), valueEncoder.apply(holder));
             if (rt != null && "OK".equals(rt)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             } else {
@@ -88,6 +88,16 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
             return new CacheResult(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage());
         }
     }
+
+    private int convertTtl(long expire, TimeUnit timeUnit) {
+        long t = timeUnit.toSeconds(expire);
+        if (t == 0 && expire > 0) {
+            return 1;
+        } else {
+            return (int)t;
+        }
+    }
+
 
     @Override
     public CacheResult INVALIDATE(K key) {

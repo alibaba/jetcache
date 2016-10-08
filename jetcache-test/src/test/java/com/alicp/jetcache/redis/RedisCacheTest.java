@@ -32,9 +32,10 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
+                .defaultExpire(2000, TimeUnit.MILLISECONDS)
                 .build();
         baseTest();
-//        expireAfterWriteTest();
+        expireAfterWriteTest();
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
