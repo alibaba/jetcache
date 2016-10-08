@@ -25,9 +25,4 @@ public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
         super.test();
     }
 
-    @Override
-    @Test
-    public void testConcurrent() throws Exception {
-        super.testConcurrent();
-    }
 }

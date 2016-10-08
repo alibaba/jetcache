@@ -1,5 +1,6 @@
 package com.alicp.jetcache.redis;
 
+import com.alibaba.fastjson.JSON;
 import com.alicp.jetcache.*;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -68,6 +69,7 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
                 return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return new CacheGetResult(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage(), null);
         }
     }

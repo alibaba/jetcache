@@ -13,20 +13,20 @@ public abstract class AbstractValueDecoder implements Function<byte[], Object> {
 
     protected int parseHeader(byte[] buf){
         int x = 0;
-        x = x & buf[0];
+        x = x | (buf[0] & 0xFF);
         x <<= 8;
-        x = x & buf[1];
+        x = x | (buf[1] & 0xFF);
         x <<= 8;
-        x = x & buf[2];
+        x = x | (buf[2] & 0xFF);
         x <<= 8;
-        x = x & buf[3];
+        x = x | (buf[3] & 0xFF);
         return x;
     }
 
     protected void checkHeader(byte[] buf, int expectedHeader) {
         int x = parseHeader(buf);
         if(x != expectedHeader){
-            throw new CacheException("unexpected header");
+            throw new CacheException("unexpected header:" + Integer.toHexString(x));
         }
     }
 }

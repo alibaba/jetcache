@@ -40,9 +40,4 @@ public class LirsCacheTest extends AbstractEmbeddedCacheTest {
         Assert.assertNotNull(c.getValue("4"));
     }
 
-    @Override
-    @Test
-    public void testConcurrent() throws Exception {
-        super.testConcurrent();
-    }
 }
