@@ -1,6 +1,7 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.external.AbstractExternalCache;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
@@ -15,7 +16,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class RedisCache<K, V> implements WapperValueCache<K, V> {
+public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements WapperValueCache<K, V> {
 
     private RedisCacheConfig config;
 
@@ -25,11 +26,16 @@ public class RedisCache<K, V> implements WapperValueCache<K, V> {
     private JedisPool jedisPool;
 
     public RedisCache(RedisCacheConfig config) {
+        super(config);
         this.config = config;
         this.jedisPool = config.getJedisPool();
         this.keyConvertor = config.getKeyConvertor();
         this.valueEncoder = config.getValueEncoder();
         this.valueDecoder = config.getValueDecoder();
+
+        if (jedisPool == null) {
+            throw new CacheConfigException("no jedisPool");
+        }
     }
 
     @Override
