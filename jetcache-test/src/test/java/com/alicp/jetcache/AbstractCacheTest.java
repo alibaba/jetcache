@@ -20,6 +20,8 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V1", cache.GET("BASE_K1").getValue());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V2", 1, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals("V2", cache.GET("BASE_K1").getValue());
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.INVALIDATE("BASE_K1").getResultCode());
+        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
 
         cache.put("BASE_K2", null);
         CacheGetResult<Object> r = cache.GET("BASE_K2");

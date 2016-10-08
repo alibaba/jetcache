@@ -4,6 +4,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -17,13 +18,15 @@ public class CompoundCacheTest extends AbstractCacheTest {
 
     @Test
     public void test() throws Exception {
-        Cache<Object, Object> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        WapperValueCache<Object, Object> l1Cache = (WapperValueCache<Object, Object>) EmbeddedCacheBuilder
+                .createEmbeddedCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        Cache<Object, Object> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        WapperValueCache<Object, Object> l2Cache = (WapperValueCache<Object, Object>) EmbeddedCacheBuilder
+                .createEmbeddedCacheBuilder()
                 .limit(100000)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
@@ -33,5 +36,14 @@ public class CompoundCacheTest extends AbstractCacheTest {
         cache = new CompoundCache<>(l1Cache, l2Cache);
         baseTest();
         expireAfterWriteTest(200);
+
+
+        cache.put("K1", "V1");
+        Thread.sleep(50);
+        l1Cache.invalidate("K1");
+        Assert.assertEquals("V1", cache.get("K1"));
+        CacheGetResult<CacheValueHolder<Object>> h1 = l1Cache.GET_HOLDER("K1");
+        CacheGetResult<CacheValueHolder<Object>> h2 = l2Cache.GET_HOLDER("K1");
+        Assert.assertEquals(h1.getValue().getExpireTime(), h2.getValue().getExpireTime(), 5);
     }
 }
