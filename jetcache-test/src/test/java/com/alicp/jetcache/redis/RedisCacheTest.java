@@ -32,7 +32,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .defaultExpire(200, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .build();
         baseTest();
         expireAfterWriteTest();
@@ -43,8 +43,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .defaultExpire(200, TimeUnit.MILLISECONDS)
-                .expireAfterAccess()
+                .expireAfterAccess(200, TimeUnit.MILLISECONDS)
                 .build();
         baseTest();
         expireAfterAccessTest();

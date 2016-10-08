@@ -13,10 +13,10 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
     protected CacheConfig config;
     private Function<CacheConfig, Cache> buildFunc;
 
-    public static class CacheBuilderImpl extends CacheBuilder<CacheBuilderImpl>{
+    public static class CacheBuilderImpl extends CacheBuilder<CacheBuilderImpl> {
     }
 
-    public static CacheBuilderImpl createCacheBuilder(){
+    public static CacheBuilderImpl createCacheBuilder() {
         return new CacheBuilderImpl();
     }
 
@@ -30,19 +30,19 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return config;
     }
 
-    protected T self(){
+    protected T self() {
         return (T) this;
     }
 
-    public T buildFunc(Function<CacheConfig, Cache> buildFunc){
+    public T buildFunc(Function<CacheConfig, Cache> buildFunc) {
         this.buildFunc = buildFunc;
         return self();
     }
 
-    protected void beforeBuild(){
+    protected void beforeBuild() {
     }
 
-    public final <K,V> Cache<K, V> build() {
+    public final <K, V> Cache<K, V> build() {
         if (buildFunc == null) {
             throw new CacheConfigException("no buildFunc");
         }
@@ -50,22 +50,19 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
         return buildFunc.apply(getConfig());
     }
 
-    public T defaultExpire(int defaultExpire, TimeUnit timeUnit) {
-        getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
-        return self();
-    }
-
-    public T keyConvertor(Function<Object,Object> keyConvertor){
+    public T keyConvertor(Function<Object, Object> keyConvertor) {
         getConfig().setKeyConvertor(keyConvertor);
         return self();
     }
 
-    public T expireAfterAccess(){
+    public T expireAfterAccess(int defaultExpire, TimeUnit timeUnit) {
+        getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         getConfig().setExpireAfterAccess(true);
         return self();
     }
 
-    public T expireAfterWrite(){
+    public T expireAfterWrite(int defaultExpire, TimeUnit timeUnit) {
+        getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         getConfig().setExpireAfterAccess(false);
         return self();
     }

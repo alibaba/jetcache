@@ -39,25 +39,25 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
 
     public void test() throws Exception {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest();
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterAccess().defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).expireAfterAccess(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterAccessTest();
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).softValues().defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest();
         lruTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).weakValues().defaultExpire(100, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest();
         lruTest();

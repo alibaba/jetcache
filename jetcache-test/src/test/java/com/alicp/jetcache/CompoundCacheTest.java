@@ -19,17 +19,15 @@ public class CompoundCacheTest extends AbstractCacheTest {
     public void test() throws Exception {
         Cache<Object, Object> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(10)
-                .defaultExpire(200, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .expireAfterWrite()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
         Cache<Object, Object> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100000)
-                .defaultExpire(200, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .softValues()
-                .expireAfterWrite()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
         cache = new CompoundCache<>(l1Cache, l2Cache);
