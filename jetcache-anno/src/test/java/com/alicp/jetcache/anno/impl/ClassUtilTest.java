@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
  */
 public class ClassUtilTest {
 
-    private static final String[] hidePack = new String[]{"com.alicp.jetcache"};
+    private static final String[] hidePack = new String[]{"com.alicp.jetcache.anno"};
 
     interface I1 extends Serializable {
     }

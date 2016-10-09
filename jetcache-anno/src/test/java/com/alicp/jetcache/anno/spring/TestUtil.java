@@ -12,7 +12,7 @@ public class TestUtil {
     public static GlobalCacheConfig getCacheProviderFactory() {
         MockRemoteCache c = new MockRemoteCache();
         GlobalCacheConfig f = new GlobalCacheConfig();
-        //TODO
+//        f.setCacheManager();
         return f;
     }
 

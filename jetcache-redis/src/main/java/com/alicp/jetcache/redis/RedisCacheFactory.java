@@ -22,7 +22,7 @@ public class RedisCacheFactory extends ExternalCacheFactory {
 
     @Override
     public Cache buildCache() {
-        return new RedisCache(getConfig());
+        return new RedisCache((RedisCacheConfig) getConfig().clone());
     }
 
     public void setJedisPool(JedisPool jedisPool) {

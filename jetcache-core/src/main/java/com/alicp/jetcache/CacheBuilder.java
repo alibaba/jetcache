@@ -47,7 +47,7 @@ public abstract class CacheBuilder<T extends CacheBuilder<T>> {
             throw new CacheConfigException("no buildFunc");
         }
         beforeBuild();
-        return buildFunc.apply(getConfig());
+        return buildFunc.apply(getConfig().clone());
     }
 
     public T keyConvertor(Function<Object, Object> keyConvertor) {
