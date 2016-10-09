@@ -42,10 +42,13 @@ public class SerializeUtil {
             case SerialPolicy.JAVA: {
                 ByteArrayOutputStream bos = new ByteArrayOutputStream(512);
                 ObjectOutputStream oos = new ObjectOutputStream(bos);
-                oos.write(JAVA_HEAD);
                 oos.writeObject(value);
                 oos.flush();
-                return bos.toByteArray();
+                byte[] bs = bos.toByteArray();
+                byte[] bs2 = new byte[bs.length + 1];
+                System.arraycopy(bs, 0, bs2, 1, bs.length);
+                bs2[0] = JAVA_HEAD;
+                return bs2;
             }
             case SerialPolicy.KRYO: {
                 Kryo kryo = kryoThreadLocal.get();
