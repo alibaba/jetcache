@@ -6,7 +6,6 @@ package com.alicp.jetcache.anno.spring;
 import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.context.Callback;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
@@ -15,6 +14,7 @@ import org.junit.*;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -115,10 +115,14 @@ public class CacheInterceptorTest {
 
         interceptor.invoke(mi);
         interceptor.invoke(mi);
-        CacheContext.enableCache(new Callback() {
-            public void execute() throws Throwable {
+        CacheContext.enableCache(() -> {
+            try {
                 interceptor.invoke(mi);
                 interceptor.invoke(mi);
+                return null;
+            } catch (Throwable e) {
+                Assert.fail();
+                return null;
             }
         });
     }

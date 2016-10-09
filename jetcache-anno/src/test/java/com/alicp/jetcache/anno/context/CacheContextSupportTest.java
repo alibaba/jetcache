@@ -11,44 +11,31 @@ import org.junit.Test;
  */
 public class CacheContextSupportTest {
     @Test
-    public void test(){
+    public void test() {
         CacheContext.enable();
         Assert.assertTrue(CacheContext.isEnabled());
         CacheContext.disable();
         Assert.assertFalse(CacheContext.isEnabled());
 
         Assert.assertFalse(CacheContext.isEnabled());
-        CacheContext.enableCache(new Callback() {
-            public void execute() throws Throwable {
-                Assert.assertTrue(CacheContext.isEnabled());
-            }
-        });
-        Assert.assertFalse(CacheContext.isEnabled());
-
-        Assert.assertFalse(CacheContext.isEnabled());
-        CacheContext.enableCache(new ReturnValueCallback<Object>() {
-            public Object execute() throws Throwable {
-                Assert.assertTrue(CacheContext.isEnabled());
-                return null;
-            }
+        CacheContext.enableCache(() -> {
+            Assert.assertTrue(CacheContext.isEnabled());
+            return null;
         });
         Assert.assertFalse(CacheContext.isEnabled());
 
         // 嵌套
         Assert.assertFalse(CacheContext.isEnabled());
-        CacheContext.enableCache(new Callback() {
-            public void execute() throws Throwable {
+        CacheContext.enableCache(() -> {
+            Assert.assertTrue(CacheContext.isEnabled());
+            CacheContext.enableCache(() -> {
                 Assert.assertTrue(CacheContext.isEnabled());
-                CacheContext.enableCache(new ReturnValueCallback<Object>() {
-                    public Object execute() throws Throwable {
-                        Assert.assertTrue(CacheContext.isEnabled());
-                        CacheContext.enable();
-                        CacheContext.disable();
-                        return null;
-                    }
-                });
-                Assert.assertTrue(CacheContext.isEnabled());
-            }
+                CacheContext.enable();
+                CacheContext.disable();
+                return null;
+            });
+            Assert.assertTrue(CacheContext.isEnabled());
+            return null;
         });
         Assert.assertFalse(CacheContext.isEnabled());
     }

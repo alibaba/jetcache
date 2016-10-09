@@ -5,7 +5,6 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.context.Callback;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.DefaultCacheMonitor;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -214,9 +213,9 @@ public class CacheHandlerTest {
     }
 
     @Test
-    public void testStaticInvokeCondition() throws Throwable{
-        Method method = CountClass.class.getMethod("count",int.class);
-        int x1,x2;
+    public void testStaticInvokeCondition() throws Throwable {
+        Method method = CountClass.class.getMethod("count", int.class);
+        int x1, x2;
         cacheAnnoConfig.setCondition("mvel{args[0]>10}");
         cacheInvokeConfig.init();
         x1 = (Integer) CacheHandler.invoke(createContext(null, method, new Object[]{10}));
@@ -228,9 +227,9 @@ public class CacheHandlerTest {
     }
 
     @Test
-    public void testStaticInvokeUnless() throws Throwable{
+    public void testStaticInvokeUnless() throws Throwable {
         Method method = CountClass.class.getMethod("count");
-        int x1,x2,x3,x4;
+        int x1, x2, x3, x4;
         cacheAnnoConfig.setUnless("mvel{result%2==1}");
         cacheInvokeConfig.init();
         x1 = (Integer) CacheHandler.invoke(createContext(null, method, null));//return 0
@@ -246,7 +245,7 @@ public class CacheHandlerTest {
     }
 
     @Test
-    public void testStaticInvokeUnlessAndNull() throws Throwable{
+    public void testStaticInvokeUnlessAndNull() throws Throwable {
 
     }
 
@@ -290,14 +289,17 @@ public class CacheHandlerTest {
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 
         cacheAnnoConfig.setEnabled(false);
-        CacheContext.enableCache(new Callback() {
-            public void execute() throws Throwable {
-                int x1 = invoke(method, null);
-                int x2 = invoke(method, null);
-                int x3 = invoke(method, null);
-                Assert.assertEquals(x1, x2);
-                Assert.assertEquals(x1, x3);
+        CacheContext.enableCache(() -> {
+            try {
+                int xx1 = invoke(method, null);
+                int xx2 = invoke(method, null);
+                int xx3 = invoke(method, null);
+                Assert.assertEquals(xx1, xx2);
+                Assert.assertEquals(xx1, xx3);
+            } catch (Throwable e) {
+                Assert.fail();
             }
+            return null;
         });
 
         cacheAnnoConfig.setEnabled(false);
