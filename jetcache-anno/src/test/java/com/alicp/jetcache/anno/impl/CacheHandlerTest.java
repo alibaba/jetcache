@@ -37,7 +37,6 @@ public class CacheHandlerTest {
         cacheInvokeConfig.cacheAnnoConfig = cacheAnnoConfig;
         count = new CountClass();
         monitor = new DefaultCacheMonitor();
-        globalCacheConfig.setCacheMonitor(monitor);
     }
 
     @After

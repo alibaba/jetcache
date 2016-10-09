@@ -14,7 +14,6 @@ import java.util.Map;
  */
 public class GlobalCacheConfig {
 
-    private CacheMonitor cacheMonitor;
     private String[] hidePackages;
     private Map<String, CacheFactory> cacheFactories;
     private CacheManager cacheManager = CacheManager.defaultInstance();
@@ -24,15 +23,6 @@ public class GlobalCacheConfig {
 
     public CacheInvokeContext createCacheInvokeContext() {
         return new CacheInvokeContext();
-    }
-
-
-    public CacheMonitor getCacheMonitor() {
-        return cacheMonitor;
-    }
-
-    public void setCacheMonitor(CacheMonitor cacheMonitor) {
-        this.cacheMonitor = cacheMonitor;
     }
 
     public String[] getHidePackages() {

@@ -7,6 +7,8 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.CacheMonitor;
 import org.mvel2.MVEL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,6 +17,8 @@ import java.util.regex.Pattern;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 class ExpressionUtil {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExpressionUtil.class);
 
     private static boolean eval(String text, CacheInvokeContext context, EL el) {
         if (el == EL.MVEL) {
@@ -32,10 +36,7 @@ class ExpressionUtil {
         try {
             return eval(context.cacheInvokeConfig.conditionScript, context, context.cacheInvokeConfig.conditionEL);
         } catch (Exception e) {
-            CacheMonitor cm = context.globalCacheConfig.getCacheMonitor();
-            if (cm != null) {
-                cm.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
-            }
+            logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return false;
         }
     }
@@ -48,10 +49,7 @@ class ExpressionUtil {
         try {
             return !eval(context.cacheInvokeConfig.unlessScript, context, context.cacheInvokeConfig.unlessEL);
         } catch (Exception e) {
-            CacheMonitor cm = context.globalCacheConfig.getCacheMonitor();
-            if (cm != null) {
-                cm.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
-            }
+            logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return false;
         }
     }
