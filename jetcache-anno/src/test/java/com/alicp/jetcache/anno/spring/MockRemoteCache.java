@@ -5,7 +5,7 @@ package com.alicp.jetcache.anno.spring;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.impl.CacheImplSupport;
+import com.alicp.jetcache.anno.impl.SerializeUtil;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +32,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
                     code = CacheResultCode.EXPIRED;
                 } else {
                     code = CacheResultCode.SUCCESS;
-                    value = (V) CacheImplSupport.decodeValue(holder.getValue());
+                    value = (V) SerializeUtil.decode(holder.getValue());
                 }
             } else {
                 code = CacheResultCode.NOT_EXISTS;
@@ -51,7 +51,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try {
-            byte[] bytes = CacheImplSupport.encodeValue(value, CacheConsts.DEFAULT_SERIAL_POLICY);
+            byte[] bytes = SerializeUtil.encode(value, CacheConsts.DEFAULT_SERIAL_POLICY);
             CacheValueHolder<byte[]> v = new CacheValueHolder(bytes, System.currentTimeMillis(), timeUnit.toMillis(expire));
             data.put(key, v);
             return CacheResult.SUCCESS_WITHOUT_MSG;

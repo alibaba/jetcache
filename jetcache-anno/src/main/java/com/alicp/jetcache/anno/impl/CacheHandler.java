@@ -15,7 +15,7 @@ import java.util.HashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class CacheHandler implements InvocationHandler {
+public class CacheHandler implements InvocationHandler {
 
     private Object src;
     private GlobalCacheConfig globalCacheConfig;
@@ -124,7 +124,7 @@ class CacheHandler implements InvocationHandler {
                 context.exception = e;
                 return null;
             }
-        });
+        }, cacheAnnoConfig.isCacheNullValue());
         if (context.exception != null) {
             throw context.exception;
         }

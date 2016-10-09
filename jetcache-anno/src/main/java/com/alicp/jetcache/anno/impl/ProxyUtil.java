@@ -14,7 +14,7 @@ import java.util.HashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class ProxyUtil {
+public class ProxyUtil {
     public static <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig, GlobalCacheConfig globalCacheConfig) {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, cacheAnnoConfig, globalCacheConfig);

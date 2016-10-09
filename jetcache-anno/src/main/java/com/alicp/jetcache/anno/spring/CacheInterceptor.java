@@ -4,8 +4,8 @@
 package com.alicp.jetcache.anno.spring;
 
 import com.alibaba.fastjson.util.IdentityHashMap;
+import com.alicp.jetcache.anno.impl.CacheHandler;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.anno.impl.CacheImplSupport;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import com.alicp.jetcache.anno.impl.Invoker;
@@ -40,7 +40,7 @@ public class CacheInterceptor implements MethodInterceptor {
         context.setArgs(invocation.getArguments());
         context.setGlobalCacheConfig(globalCacheConfig);
         context.setCacheInvokeConfig(cac);
-        return CacheImplSupport.invoke(context);
+        return CacheHandler.invoke(context);
     }
 
     public void setCacheConfigMap(IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap) {

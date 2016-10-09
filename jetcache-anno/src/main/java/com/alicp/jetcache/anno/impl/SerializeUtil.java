@@ -16,8 +16,7 @@ import java.io.*;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-//TODO enhance performance
-class SerializeUtil {
+public class SerializeUtil {
     private static final byte JAVA_HEAD = 'J';
     private static final byte FASTJSON_HEAD = 'F';
     private static final byte KRYO_HEAD = 'K';

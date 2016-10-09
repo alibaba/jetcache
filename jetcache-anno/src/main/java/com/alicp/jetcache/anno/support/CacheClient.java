@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.anno.impl.CacheImplSupport;
+import com.alicp.jetcache.anno.impl.ProxyUtil;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -13,11 +13,11 @@ public class CacheClient {
     private GlobalCacheConfig globalCacheConfig;
 
     public <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig) {
-        return CacheImplSupport.getProxy(target, cacheAnnoConfig, globalCacheConfig);
+        return ProxyUtil.getProxy(target, cacheAnnoConfig, globalCacheConfig);
     }
 
     public <T> T getProxyByAnnotation(T target) {
-        return CacheImplSupport.getProxyByAnnotation(target, globalCacheConfig);
+        return ProxyUtil.getProxyByAnnotation(target, globalCacheConfig);
     }
 
     public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
