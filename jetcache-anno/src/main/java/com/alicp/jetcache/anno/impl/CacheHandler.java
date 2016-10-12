@@ -107,7 +107,7 @@ public class CacheHandler implements InvocationHandler {
 
         CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.cacheAnnoConfig;
 
-        String subArea = ClassUtil.getSubArea(cacheAnnoConfig, context.method, context.globalCacheConfig.getHidePackages());
+        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.globalCacheConfig.getHidePackages());
 
         Cache cache = context.globalCacheConfig.getCacheManager().getCache(subArea);
 

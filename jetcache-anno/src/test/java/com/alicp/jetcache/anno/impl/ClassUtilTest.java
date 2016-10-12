@@ -53,21 +53,20 @@ public class ClassUtilTest {
 
     @Test
     public void testGetSubArea() throws Exception {
-        CacheAnnoConfig cc = new CacheAnnoConfig();
         Method m1 = C1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo", I1.class);
         Method m3 = C1.class.getMethod("foo2", I1.class);
 
-        String s1 = cc.getVersion() + "_impl.ClassUtilTest$C1." + m1.getName() + "()V";
-        String s2 = ClassUtil.getSubArea(cc, m1, hidePack);
+        String s1 = "1_impl.ClassUtilTest$C1." + m1.getName() + "()V";
+        String s2 = ClassUtil.getSubArea(1, m1, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = cc.getVersion() + "_impl.ClassUtilTest$C1." + m2.getName() + "(Limpl/ClassUtilTest$I1;)Ljava/lang/String;";
-        s2 = ClassUtil.getSubArea(cc, m2, hidePack);
+        s1 = "1_impl.ClassUtilTest$C1." + m2.getName() + "(Limpl/ClassUtilTest$I1;)Ljava/lang/String;";
+        s2 = ClassUtil.getSubArea(1, m2, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = cc.getVersion() + "_" + C1.class.getName() + "." + m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
-        s2 = ClassUtil.getSubArea(cc, m3, null);
+        s1 = "1_" + C1.class.getName() + "." + m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
+        s2 = ClassUtil.getSubArea(1, m3, null);
         Assert.assertEquals(s1, s2);
     }
 

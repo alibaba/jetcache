@@ -3,29 +3,28 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 class ClassUtil {
 
-    private static IdentityHashMap<Method, String> subAreaMap = new IdentityHashMap<Method, String>();
-    private static IdentityHashMap<Method, String> methodSigMap = new IdentityHashMap<Method, String>();
+    private static ConcurrentHashMap<Method, String> subAreaMap = new ConcurrentHashMap();
+    private static ConcurrentHashMap<Method, String> methodSigMap = new ConcurrentHashMap();
 
-    public static String getSubArea(CacheAnnoConfig cacheAnnoConfig, Method method, String[] hidePackages) {
+    public static String getSubArea(int version, Method method, String[] hidePackages) {
         // TODO invalid cache when param type changed
-
         String prefix = subAreaMap.get(method);
 
         if (prefix == null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(cacheAnnoConfig.getVersion()).append('_');
+            sb.append(version).append('_');
             sb.append(method.getDeclaringClass().getName());
             sb.append('.');
             getMethodSig(sb, method);
