@@ -25,16 +25,8 @@ public class CacheInvokeContext {
     }
 
 
-    public Invoker getInvoker() {
-        return invoker;
-    }
-
     public void setInvoker(Invoker invoker) {
         this.invoker = invoker;
-    }
-
-    public Object getTarget() {
-        return target;
     }
 
     public void setTarget(Object target) {
@@ -49,29 +41,23 @@ public class CacheInvokeContext {
         this.method = method;
     }
 
-    public Object[] getArgs() {
-        return args;
-    }
-
     public void setArgs(Object[] args) {
         this.args = args;
-    }
-
-    public GlobalCacheConfig getGlobalCacheConfig() {
-        return globalCacheConfig;
     }
 
     public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
     }
 
-    public CacheInvokeConfig getCacheInvokeConfig() {
-        return cacheInvokeConfig;
-    }
-
     public void setCacheInvokeConfig(CacheInvokeConfig cacheInvokeConfig) {
         this.cacheInvokeConfig = cacheInvokeConfig;
     }
 
+    public Object[] getArgs() {
+        return args;
+    }
 
+    public Object getResult() {
+        return result;
+    }
 }
