@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheManager {
 
-    private ConcurrentHashMap<String, Cache> caches;
+    private ConcurrentHashMap<String, Cache> caches = new ConcurrentHashMap();
 
     private static CacheManager instance = new CacheManager();
 

@@ -7,6 +7,8 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -17,6 +19,7 @@ import java.util.function.Supplier;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheHandler implements InvocationHandler {
+    private static Logger logger = LoggerFactory.getLogger(CacheHandler.class);
 
     private Object src;
     private Supplier<CacheInvokeContext> contextSupplier;
@@ -109,25 +112,37 @@ public class CacheHandler implements InvocationHandler {
         CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
         String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.hiddenPackages);
         Cache cache = context.cacheFunction.apply(subArea);
+        if (cache == null) {
+            logger.error("no cache with name: " + subArea);
+            return invokeOrigin(context);
+        }
+
+        Object key = context.args;
+        if (key == null) {
+            key = "_$JETCACHE_NULL_KEY$_";
+        }
 
         // the semantics of "unless" and "cacheNullValue" is not very accurate, we do our best to process it.
-        CacheGetResult cacheGetResult = cache.GET(context.args);
+        CacheGetResult cacheGetResult = cache.GET(key);
+        if (cacheGetResult.isSuccess()) {
+            context.result = cacheGetResult.getValue();
+        }
         if (!cacheGetResult.isSuccess() || (context.result == null && !cacheAnnoConfig.isCacheNullValue())) {
             context.result = invokeOrigin(context);
             if (canNotCache(context)) {
                 if (cacheGetResult.isSuccess()) {
-                    cache.invalidate(context.args);
+                    cache.invalidate(key);
                 }
             } else {
-                cache.put(context.args, context.result);
+                cache.put(key, context.result);
             }
         } else { //cache hit
             if (canNotCache(context)) {
                 context.result = invokeOrigin(context);//reload
                 if (canNotCache(context)) {//eval again
-                    cache.invalidate(context.args);
+                    cache.invalidate(key);
                 } else {// new result can cache, do update
-                    cache.put(context.args, context.result);
+                    cache.put(key, context.result);
                 }
             }
         }

@@ -14,7 +14,7 @@ public class FastjsonEncoderTest extends AbstractEncoderTest {
     public void test() {
         encoder = FastjsonValueEncoder.INSTANCE;
         decoder = FastjsonValueDecoder.INSTANCE;
-        super.doTest();
+        super.baseTest();
     }
 
 }

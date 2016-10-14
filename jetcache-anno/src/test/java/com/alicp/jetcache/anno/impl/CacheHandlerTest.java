@@ -7,13 +7,13 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CompoundCache;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.After;
@@ -43,9 +43,11 @@ public class CacheHandlerTest {
         globalCacheConfig.setCacheManager(new CacheManager());
         local = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .build();
         remote = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .build();
         cache = new CompoundCache(local, remote);
         globalCacheConfig.getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
@@ -72,8 +74,8 @@ public class CacheHandlerTest {
         return c;
     }
 
-    private int invoke(Method method, Object[] params) throws Throwable {
-        return (Integer) CacheHandler.invoke(createContext(() -> method.invoke(params), method, params));
+    private Integer invoke(Method method, Object[] params) throws Throwable {
+        return (Integer) CacheHandler.invoke(createContext(() -> method.invoke(count, params), method, params));
     }
 
     // basic test
@@ -81,11 +83,10 @@ public class CacheHandlerTest {
     public void testStaticInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
+        method.invoke(count, null);
 
         x1 = invoke(method, null);
-        Thread.sleep(10);
         x2 = invoke(method, null);
-        Thread.sleep(10);
         x3 = invoke(method, null);
         Assert.assertEquals(x1, x2);
         Assert.assertEquals(x1, x3);
@@ -251,7 +252,7 @@ public class CacheHandlerTest {
     public void testStaticInvoke_CacheContext() throws Throwable {
         final Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
-        Invoker invoker = () -> method.invoke(null);
+        Invoker invoker = () -> method.invoke(count, null);
 
         CacheInvokeContext context = createContext(invoker, method, null);
         cacheAnnoConfig.setEnabled(false);
@@ -296,7 +297,7 @@ public class CacheHandlerTest {
     @Test
     public void testInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
-        Invoker invoker = () -> method.invoke(null);
+        Invoker invoker = () -> method.invoke(count, null);
         CacheHandler ch = new CacheHandler(count, cacheInvokeConfig, () -> createContext(invoker, method, null), null);
         int x1 = (Integer) ch.invoke(null, method, null);
         int x2 = (Integer) ch.invoke(null, method, null);
@@ -314,7 +315,7 @@ public class CacheHandlerTest {
                 return cac;
             }
         };
-        Invoker invoker = () -> method.invoke(null);
+        Invoker invoker = () -> method.invoke(count, null);
         CacheHandler ch = new CacheHandler(count, configMap, () -> createContext(invoker, method, null), null);
 
         int x1 = (Integer) ch.invoke(null, method, null);

@@ -12,7 +12,15 @@ public class JavaEncoderTest extends AbstractEncoderTest {
     public void test() {
         encoder = JavaValueEncoder.INSTANCE;
         decoder = JavaValueDecoder.INSTANCE;
-        super.doTest();
+        baseTest();
+
+        encoder = (p) -> JavaValueEncoder.INSTANCE.apply(JavaValueEncoder.INSTANCE.apply(p));
+        decoder = (p) -> JavaValueDecoder.INSTANCE.apply((byte[]) JavaValueDecoder.INSTANCE.apply(p));
+        baseTest();
+
+        encoder = (p) -> JavaValueEncoder.INSTANCE.apply(KryoValueEncoder.INSTANCE.apply(p));
+        decoder = (p) -> KryoValueDecoder.INSTANCE.apply((byte[]) JavaValueDecoder.INSTANCE.apply(p));
+        baseTest();
     }
 
 }

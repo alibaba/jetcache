@@ -1,7 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.testsupport.DynamicQuery;
-import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -14,7 +12,15 @@ public class KryoEncoderTest extends AbstractEncoderTest {
     public void test() {
         encoder = KryoValueEncoder.INSTANCE;
         decoder = KryoValueDecoder.INSTANCE;
-        super.doTest();
+        super.baseTest();
+
+        encoder = (p) -> KryoValueEncoder.INSTANCE.apply(KryoValueEncoder.INSTANCE.apply(p));
+        decoder = (p) -> KryoValueDecoder.INSTANCE.apply((byte[]) KryoValueDecoder.INSTANCE.apply(p));
+        baseTest();
+
+        encoder = (p) -> KryoValueEncoder.INSTANCE.apply(JavaValueEncoder.INSTANCE.apply(p));
+        decoder = (p) -> JavaValueDecoder.INSTANCE.apply((byte[]) KryoValueDecoder.INSTANCE.apply(p));
+        baseTest();
     }
 
 }
