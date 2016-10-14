@@ -9,13 +9,15 @@ import com.alicp.jetcache.anno.support.CacheAnnoConfig;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInvokeConfig {
-    CacheAnnoConfig cacheAnnoConfig;
-    boolean enableCacheContext;
+    private CacheAnnoConfig cacheAnnoConfig;
+    private boolean enableCacheContext;
 
     EL conditionEL;
     String conditionScript;
     EL unlessEL;
     String unlessScript;
+
+
 
     private static final CacheInvokeConfig noCacheInvokeConfigInstance = new CacheInvokeConfig();
 

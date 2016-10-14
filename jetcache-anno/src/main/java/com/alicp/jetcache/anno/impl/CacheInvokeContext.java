@@ -3,23 +3,26 @@
  */
 package com.alicp.jetcache.anno.impl;
 
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInvokeContext {
     Invoker invoker;
-    Object target;
     Method method;
     Object[] args;
-    GlobalCacheConfig globalCacheConfig;
     CacheInvokeConfig cacheInvokeConfig;
 
+    Function<String, Cache> cacheFunction;
+    String[] hiddenPackages;
+
     Object result = null;
-    Throwable exception = null;
 
     public CacheInvokeContext(){
     }
@@ -27,10 +30,6 @@ public class CacheInvokeContext {
 
     public void setInvoker(Invoker invoker) {
         this.invoker = invoker;
-    }
-
-    public void setTarget(Object target) {
-        this.target = target;
     }
 
     public Method getMethod() {
@@ -45,13 +44,19 @@ public class CacheInvokeContext {
         this.args = args;
     }
 
-    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
-        this.globalCacheConfig = globalCacheConfig;
-    }
-
     public void setCacheInvokeConfig(CacheInvokeConfig cacheInvokeConfig) {
         this.cacheInvokeConfig = cacheInvokeConfig;
     }
+
+    public void setHiddenPackages(String[] hiddenPackages) {
+        this.hiddenPackages = hiddenPackages;
+    }
+
+    public void setCacheFunction(Function<String, Cache> cacheFunction) {
+        this.cacheFunction = cacheFunction;
+    }
+
+    //------------for eval script
 
     public Object[] getArgs() {
         return args;

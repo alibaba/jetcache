@@ -17,7 +17,12 @@ import java.util.HashMap;
 public class ProxyUtil {
     public static <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig, GlobalCacheConfig globalCacheConfig) {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CacheHandler h = new CacheHandler(target, cacheAnnoConfig, globalCacheConfig);
+        CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
+        cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
+        cacheInvokeConfig.init();
+        CacheHandler h = new CacheHandler(target, cacheInvokeConfig,
+                () -> globalCacheConfig.createCacheInvokeContext(),
+                globalCacheConfig.getHidePackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
@@ -26,7 +31,9 @@ public class ProxyUtil {
         final HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>();
         processType(configMap, target.getClass(), globalCacheConfig);
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CacheHandler h = new CacheHandler(target, configMap, globalCacheConfig);
+        CacheHandler h = new CacheHandler(target, configMap,
+                () -> globalCacheConfig.createCacheInvokeContext(),
+                globalCacheConfig.getHidePackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }

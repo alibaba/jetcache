@@ -25,6 +25,8 @@ public class SpringGlobalCacheConfig extends GlobalCacheConfig implements Applic
 
     @Override
     public CacheInvokeContext createCacheInvokeContext() {
-        return new SpringCacheInvokeContext(applicationContext);
+        SpringCacheInvokeContext c = new SpringCacheInvokeContext(applicationContext);
+        c.setCacheFunction((cacheName) -> getCacheManager().getCache(cacheName));
+        return c;
     }
 }

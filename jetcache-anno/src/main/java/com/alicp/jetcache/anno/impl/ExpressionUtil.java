@@ -29,7 +29,7 @@ class ExpressionUtil {
     }
 
     public static boolean evalCondition(CacheInvokeContext context) {
-        String condition = context.cacheInvokeConfig.cacheAnnoConfig.getCondition();
+        String condition = context.cacheInvokeConfig.getCacheAnnoConfig().getCondition();
         if (CacheConsts.DEFAULT_CONDITION.equals(condition)) {
             return true;
         }
@@ -42,15 +42,15 @@ class ExpressionUtil {
     }
 
     public static boolean evalUnless(CacheInvokeContext context) {
-        String unless = context.cacheInvokeConfig.cacheAnnoConfig.getUnless();
+        String unless = context.cacheInvokeConfig.getCacheAnnoConfig().getUnless();
         if (CacheConsts.DEFAULT_UNLESS.equals(unless)) {
-            return true;
+            return false;
         }
         try {
-            return !eval(context.cacheInvokeConfig.unlessScript, context, context.cacheInvokeConfig.unlessEL);
+            return eval(context.cacheInvokeConfig.unlessScript, context, context.cacheInvokeConfig.unlessEL);
         } catch (Exception e) {
             logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
-            return false;
+            return true;
         }
     }
 

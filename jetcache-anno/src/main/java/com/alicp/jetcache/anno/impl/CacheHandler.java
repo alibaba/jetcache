@@ -3,14 +3,15 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -18,8 +19,8 @@ import java.util.HashMap;
 public class CacheHandler implements InvocationHandler {
 
     private Object src;
-    private GlobalCacheConfig globalCacheConfig;
-
+    private Supplier<CacheInvokeContext> contextSupplier;
+    private String[] hiddenPackages;
     private CacheInvokeConfig cacheInvokeConfig;
     private HashMap<String, CacheInvokeConfig> configMap;
 
@@ -39,46 +40,46 @@ public class CacheHandler implements InvocationHandler {
 
     private static CacheContextSupport cacheContextSupport = new CacheContextSupport();
 
-    public CacheHandler(Object src, CacheAnnoConfig cacheAnnoConfig, GlobalCacheConfig globalCacheConfig) {
+    public CacheHandler(Object src, CacheInvokeConfig cacheInvokeConfig, Supplier<CacheInvokeContext> contextSupplier, String[] hiddenPackages) {
         this.src = src;
-        cacheInvokeConfig = new CacheInvokeConfig();
-        cacheInvokeConfig.cacheAnnoConfig = cacheAnnoConfig;
-        cacheInvokeConfig.init();
-        this.globalCacheConfig = globalCacheConfig;
+        this.cacheInvokeConfig = cacheInvokeConfig;
+        this.contextSupplier = contextSupplier;
+        this.hiddenPackages = hiddenPackages;
     }
 
-    public CacheHandler(Object src, HashMap<String, CacheInvokeConfig> configMap, GlobalCacheConfig globalCacheConfig) {
+    public CacheHandler(Object src, HashMap<String, CacheInvokeConfig> configMap, Supplier<CacheInvokeContext> contextSupplier, String[] hiddenPackages) {
         this.src = src;
         this.configMap = configMap;
-        this.globalCacheConfig = globalCacheConfig;
+        this.contextSupplier = contextSupplier;
+        this.hiddenPackages = hiddenPackages;
     }
 
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheInvokeContext context = null;
         if (cacheInvokeConfig != null) {
-            context = globalCacheConfig.createCacheInvokeContext();
+            context = contextSupplier.get();
             context.cacheInvokeConfig = cacheInvokeConfig;
         } else {
-            String sig = ClassUtil.getMethodSig(method, globalCacheConfig.getHidePackages());
+            String sig = ClassUtil.getMethodSig(method, hiddenPackages);
             CacheInvokeConfig cac = configMap.get(sig);
             if (cac != null) {
-                context = globalCacheConfig.createCacheInvokeContext();
+                context = contextSupplier.get();
                 context.cacheInvokeConfig = cac;
             }
         }
         if (context == null) {
             return method.invoke(src, args);
         } else {
+            context.invoker = () -> method.invoke(src, args);
+            context.hiddenPackages = hiddenPackages;
             context.args = args;
-            context.globalCacheConfig = globalCacheConfig;
             context.method = method;
-            context.target = src;
             return invoke(context);
         }
     }
 
     public static Object invoke(CacheInvokeContext context) throws Throwable {
-        if (context.cacheInvokeConfig.enableCacheContext) {
+        if (context.cacheInvokeConfig.isEnableCacheContext()) {
             try {
                 cacheContextSupport._enable();
                 return doInvoke(context);
@@ -91,7 +92,7 @@ public class CacheHandler implements InvocationHandler {
     }
 
     private static Object doInvoke(CacheInvokeContext context) throws Throwable {
-        CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.cacheAnnoConfig;
+        CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
         if (cacheAnnoConfig != null && (cacheAnnoConfig.isEnabled() || cacheContextSupport._isEnabled())) {
             return invokeWithCache(context);
         } else {
@@ -105,39 +106,42 @@ public class CacheHandler implements InvocationHandler {
             return invokeOrigin(context);
         }
 
-        CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.cacheAnnoConfig;
+        CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
+        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.hiddenPackages);
+        Cache cache = context.cacheFunction.apply(subArea);
 
-        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.globalCacheConfig.getHidePackages());
-
-        Cache cache = context.globalCacheConfig.getCacheManager().getCache(subArea);
-
-        cache.computeIfAbsent(context.args, (key) -> {
-            try {
-                context.result = invokeOrigin(context);
-                if (ExpressionUtil.evalUnless(context)) {
-                    // don't cache it
-                    return null;
-                } else {
-                    return context.result;
+        // the semantics of "unless" and "cacheNullValue" is not very accurate, we do our best to process it.
+        CacheGetResult cacheGetResult = cache.GET(context.args);
+        if (!cacheGetResult.isSuccess() || (context.result == null && !cacheAnnoConfig.isCacheNullValue())) {
+            context.result = invokeOrigin(context);
+            if (canNotCache(context)) {
+                if (cacheGetResult.isSuccess()) {
+                    cache.invalidate(context.args);
                 }
-            } catch (Throwable e) {
-                context.exception = e;
-                return null;
+            } else {
+                cache.put(context.args, context.result);
             }
-        }, cacheAnnoConfig.isCacheNullValue());
-        if (context.exception != null) {
-            throw context.exception;
+        } else { //cache hit
+            if (canNotCache(context)) {
+                context.result = invokeOrigin(context);//reload
+                if (canNotCache(context)) {//eval again
+                    cache.invalidate(context.args);
+                } else {// new result can cache, do update
+                    cache.put(context.args, context.result);
+                }
+            }
         }
 
         return context.result;
     }
 
+    private static boolean canNotCache(CacheInvokeContext context) {
+        return ExpressionUtil.evalUnless(context) ||
+                (context.result == null && !context.cacheInvokeConfig.getCacheAnnoConfig().isCacheNullValue());
+    }
+
     private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {
-        if (context.invoker == null) {
-            return context.method.invoke(context.target, context.args);
-        } else {
-            return context.invoker.invoke();
-        }
+        return context.invoker.invoke();
     }
 
 

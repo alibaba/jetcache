@@ -22,7 +22,9 @@ public class GlobalCacheConfig {
     }
 
     public CacheInvokeContext createCacheInvokeContext() {
-        return new CacheInvokeContext();
+        CacheInvokeContext c = new CacheInvokeContext();
+        c.setCacheFunction((cacheName) -> getCacheManager().getCache(cacheName));
+        return c;
     }
 
     public String[] getHidePackages() {
