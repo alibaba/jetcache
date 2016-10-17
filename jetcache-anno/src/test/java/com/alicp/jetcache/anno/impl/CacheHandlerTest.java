@@ -5,7 +5,6 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.CompoundCache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
@@ -16,7 +15,6 @@ import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,23 +31,16 @@ public class CacheHandlerTest {
     private CacheAnnoConfig cacheAnnoConfig;
     private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
-    private Cache local;
-    private Cache remote;
     private Cache cache;
 
     @Before
     public void setup() {
         globalCacheConfig = new GlobalCacheConfig();
         globalCacheConfig.setCacheManager(new CacheManager());
-        local = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .build();
-        remote = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .build();
-        cache = new CompoundCache(local, remote);
         globalCacheConfig.getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
 
         cacheAnnoConfig = new CacheAnnoConfig();
