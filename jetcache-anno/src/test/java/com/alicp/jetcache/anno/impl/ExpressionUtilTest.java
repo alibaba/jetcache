@@ -41,7 +41,7 @@ public class ExpressionUtilTest {
     public void testUnless() {
         cacheAnnoConfig.setUnless("mvel{result==null}");
         context.cacheInvokeConfig.init();
-        Assert.assertFalse(ExpressionUtil.evalUnless(context));
+        Assert.assertTrue(ExpressionUtil.evalUnless(context));
     }
 
 }
