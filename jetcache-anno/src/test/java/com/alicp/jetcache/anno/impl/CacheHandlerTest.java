@@ -58,11 +58,6 @@ public class CacheHandlerTest {
         count = new CountClass();
     }
 
-    @After
-    public void close() {
-        //System.out.println(monitor.getStatText());
-    }
-
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
         CacheInvokeContext c = globalCacheConfig.createCacheInvokeContext();
         c.cacheInvokeConfig = cacheInvokeConfig;
@@ -228,7 +223,34 @@ public class CacheHandlerTest {
 
     @Test
     public void testStaticInvokeUnlessAndNull() throws Throwable {
-        //TODO
+        Method method = CountClass.class.getMethod("countNull");
+
+        cacheAnnoConfig.setCacheNullValue(false);
+        cacheAnnoConfig.setUnless("mvel{result==0}");
+        cacheInvokeConfig.init();
+        Assert.assertNull(invoke(method, null));//null, not cached
+        Assert.assertEquals(0, invoke(method, null).longValue());//0, not cached
+        Assert.assertEquals(1, invoke(method, null).longValue());//1, cache
+        Assert.assertEquals(1, invoke(method, null).longValue());//cache hit
+
+        cacheAnnoConfig.setUnless("mvel{result==1}");
+        cacheInvokeConfig.init();
+        Assert.assertEquals(2, invoke(method, null).longValue());
+        Assert.assertEquals(2, invoke(method, null).longValue());
+
+        count = new CountClass();
+        cacheAnnoConfig.setUnless("mvel{result==2}");
+        cacheInvokeConfig.init();
+        Assert.assertNull(invoke(method, null));
+        Assert.assertEquals(0, invoke(method, null).longValue());//0, cached
+        Assert.assertEquals(0, invoke(method, null).longValue());//cache hit
+
+        cacheAnnoConfig.setCacheNullValue(true);
+        count = new CountClass();
+        cacheAnnoConfig.setUnless("mvel{result==0}");
+        cacheInvokeConfig.init();
+        Assert.assertNull(invoke(method, null));
+        Assert.assertNull(invoke(method, null));
     }
 
     private void assertEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {

@@ -25,13 +25,16 @@ public class CountClass implements Count {
         return q.hashCode() + p + count++;
     }
 
-    private boolean returnNull = false;
+    private boolean first = true;
 
     /**
      * first invoke return null.
      */
     public Integer countNull() {
-        returnNull = !returnNull;
-        return returnNull ? null : count++;
+        if(first){
+            first = false;
+            return null;
+        }
+        return count++;
     }
 }
