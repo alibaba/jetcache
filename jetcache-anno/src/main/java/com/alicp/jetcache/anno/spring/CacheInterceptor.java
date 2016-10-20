@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.impl.CacheHandler;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
@@ -12,13 +11,14 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInterceptor implements MethodInterceptor {
 
-    private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap;
+    private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap;
     private GlobalCacheConfig globalCacheConfig;
 
     public Object invoke(final MethodInvocation invocation) throws Throwable {
@@ -27,7 +27,7 @@ public class CacheInterceptor implements MethodInterceptor {
             return invocation.proceed();
         }
 
-        CacheInvokeContext context = globalCacheConfig.createCacheInvokeContext();
+        CacheInvokeContext context = globalCacheConfig.cacheContext().createCacheInvokeContext();
         context.setInvoker(() -> invocation.proceed());
         context.setMethod(invocation.getMethod());
         context.setArgs(invocation.getArguments());
@@ -36,7 +36,7 @@ public class CacheInterceptor implements MethodInterceptor {
         return CacheHandler.invoke(context);
     }
 
-    public void setCacheConfigMap(IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap) {
+    public void setCacheConfigMap(ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 

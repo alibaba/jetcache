@@ -3,11 +3,15 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -24,9 +28,7 @@ public class SpringGlobalCacheConfig extends GlobalCacheConfig implements Applic
     }
 
     @Override
-    public CacheInvokeContext createCacheInvokeContext() {
-        SpringCacheInvokeContext c = new SpringCacheInvokeContext(applicationContext);
-        c.setCacheFunction((cacheName) -> getCacheManager().getCache(cacheName));
-        return c;
+    protected CacheContext newCacheContext() {
+        return new SpringCacheContext(this, applicationContext);
     }
 }

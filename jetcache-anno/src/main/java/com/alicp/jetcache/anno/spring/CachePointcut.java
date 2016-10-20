@@ -3,21 +3,21 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alibaba.fastjson.util.IdentityHashMap;
-import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import com.alicp.jetcache.anno.impl.CacheConfigUtil;
+import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 
-    private IdentityHashMap<Method, CacheInvokeConfig> cacheConfigMap = new IdentityHashMap<Method, CacheInvokeConfig>();
+    private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap = new ConcurrentHashMap<Method, CacheInvokeConfig>();
     private String[] basePackages;
 
     public CachePointcut(String[] basePackages) {
@@ -146,7 +146,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
 
-    public void setCacheConfigMap(IdentityHashMap cacheConfigMap) {
+    public void setCacheConfigMap(ConcurrentHashMap cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 }

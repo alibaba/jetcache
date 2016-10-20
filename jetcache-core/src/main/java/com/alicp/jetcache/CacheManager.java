@@ -17,12 +17,12 @@ public class CacheManager {
         return instance;
     }
 
-    public Cache getCache(String subArea) {
-        return caches.get(subArea);
+    public Cache getCache(String key) {
+        return caches.get(key);
     }
 
-    public void addCache(String subArea, Cache cache) {
-        caches.put(subArea, cache);
+    public void addCache(String key, Cache cache) {
+        caches.put(key, cache);
     }
 
 }

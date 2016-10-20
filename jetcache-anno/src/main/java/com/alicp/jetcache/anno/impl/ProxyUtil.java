@@ -21,7 +21,7 @@ public class ProxyUtil {
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
         cacheInvokeConfig.init();
         CacheHandler h = new CacheHandler(target, cacheInvokeConfig,
-                () -> globalCacheConfig.createCacheInvokeContext(),
+                () -> globalCacheConfig.cacheContext().createCacheInvokeContext(),
                 globalCacheConfig.getHidePackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
@@ -32,7 +32,7 @@ public class ProxyUtil {
         processType(configMap, target.getClass(), globalCacheConfig);
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap,
-                () -> globalCacheConfig.createCacheInvokeContext(),
+                () -> globalCacheConfig.cacheContext().createCacheInvokeContext(),
                 globalCacheConfig.getHidePackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;

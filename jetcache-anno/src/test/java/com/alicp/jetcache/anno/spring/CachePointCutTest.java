@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alibaba.fastjson.util.IdentityHashMap;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
@@ -16,18 +15,19 @@ import otherpackage.OtherService;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CachePointCutTest {
     private CachePointcut pc;
-    private IdentityHashMap<Method, CacheInvokeConfig> map;
+    private ConcurrentHashMap<Method, CacheInvokeConfig> map;
 
     @Before
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        map = new IdentityHashMap<Method, CacheInvokeConfig>();
+        map = new ConcurrentHashMap<Method, CacheInvokeConfig>();
         pc.setCacheConfigMap(map);
     }
 

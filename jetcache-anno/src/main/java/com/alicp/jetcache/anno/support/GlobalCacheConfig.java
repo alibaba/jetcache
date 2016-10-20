@@ -3,11 +3,13 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import com.alicp.jetcache.factory.CacheFactory;
-import com.alicp.jetcache.CacheManager;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -15,16 +17,25 @@ import java.util.Map;
 public class GlobalCacheConfig {
 
     private String[] hidePackages;
-    private Map<String, CacheFactory> cacheFactories;
-    private CacheManager cacheManager = CacheManager.defaultInstance();
+    private Map<String, CacheFactory> localCacheFacotories;
+    private Map<String, CacheFactory> remoteCacheFacotories;
+    private CacheContext cacheContext;
 
     public GlobalCacheConfig() {
     }
 
-    public CacheInvokeContext createCacheInvokeContext() {
-        CacheInvokeContext c = new CacheInvokeContext();
-        c.setCacheFunction((cacheName) -> getCacheManager().getCache(cacheName));
-        return c;
+    public CacheContext cacheContext(){
+        if (cacheContext != null) {
+            return cacheContext;
+        }
+        synchronized (this) {
+            cacheContext = newCacheContext();
+        }
+        return cacheContext;
+    }
+
+    protected CacheContext newCacheContext(){
+        return new CacheContext(this);
     }
 
     public String[] getHidePackages() {
@@ -35,19 +46,20 @@ public class GlobalCacheConfig {
         this.hidePackages = hidePackages;
     }
 
-    public Map<String, CacheFactory> getCacheFactories() {
-        return cacheFactories;
+    public Map<String, CacheFactory> getLocalCacheFacotories() {
+        return localCacheFacotories;
     }
 
-    public void setCacheFactories(Map<String, CacheFactory> cacheFactories) {
-        this.cacheFactories = cacheFactories;
+    public void setLocalCacheFacotories(Map<String, CacheFactory> localCacheFacotories) {
+        this.localCacheFacotories = localCacheFacotories;
     }
 
-    public CacheManager getCacheManager() {
-        return cacheManager;
+    public Map<String, CacheFactory> getRemoteCacheFacotories() {
+        return remoteCacheFacotories;
     }
 
-    public void setCacheManager(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
+    public void setRemoteCacheFacotories(Map<String, CacheFactory> remoteCacheFacotories) {
+        this.remoteCacheFacotories = remoteCacheFacotories;
     }
+
 }

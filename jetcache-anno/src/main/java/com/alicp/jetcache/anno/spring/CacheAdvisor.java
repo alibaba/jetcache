@@ -3,9 +3,10 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alibaba.fastjson.util.IdentityHashMap;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -14,7 +15,7 @@ public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
     private CachePointcut pointcut;
 
-    private IdentityHashMap cacheConfigMap;
+    private ConcurrentHashMap cacheConfigMap;
 
     private String[] basePackages;
 
@@ -24,7 +25,7 @@ public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
         return pointcut;
     }
 
-    public void setCacheConfigMap(IdentityHashMap cacheConfigMap) {
+    public void setCacheConfigMap(ConcurrentHashMap cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 

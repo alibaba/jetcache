@@ -36,12 +36,11 @@ public class CacheHandlerTest {
     @Before
     public void setup() {
         globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setCacheManager(new CacheManager());
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .build();
-        globalCacheConfig.getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
+        globalCacheConfig.cacheContext().getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
 
         cacheAnnoConfig = new CacheAnnoConfig();
         cacheInvokeConfig = new CacheInvokeConfig();
@@ -50,7 +49,7 @@ public class CacheHandlerTest {
     }
 
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
-        CacheInvokeContext c = globalCacheConfig.createCacheInvokeContext();
+        CacheInvokeContext c = globalCacheConfig.cacheContext().createCacheInvokeContext();
         c.cacheInvokeConfig = cacheInvokeConfig;
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
         c.invoker = invoker;

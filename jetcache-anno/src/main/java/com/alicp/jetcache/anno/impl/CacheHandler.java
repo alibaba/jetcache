@@ -7,6 +7,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,20 +29,23 @@ public class CacheHandler implements InvocationHandler {
     private HashMap<String, CacheInvokeConfig> configMap;
 
     private static class CacheContextSupport extends CacheContext {
-        void _enable() {
+
+        public CacheContextSupport(GlobalCacheConfig globalCacheConfig) {
+            super(globalCacheConfig);
+        }
+
+        static void _enable() {
             enable();
         }
 
-        void _disable() {
+        static void _disable() {
             disable();
         }
 
-        boolean _isEnabled() {
+        static boolean _isEnabled() {
             return isEnabled();
         }
     }
-
-    private static CacheContextSupport cacheContextSupport = new CacheContextSupport();
 
     public CacheHandler(Object src, CacheInvokeConfig cacheInvokeConfig, Supplier<CacheInvokeContext> contextSupplier, String[] hiddenPackages) {
         this.src = src;
@@ -84,10 +88,10 @@ public class CacheHandler implements InvocationHandler {
     public static Object invoke(CacheInvokeContext context) throws Throwable {
         if (context.cacheInvokeConfig.isEnableCacheContext()) {
             try {
-                cacheContextSupport._enable();
+                CacheContextSupport._enable();
                 return doInvoke(context);
             } finally {
-                cacheContextSupport._disable();
+                CacheContextSupport._disable();
             }
         } else {
             return doInvoke(context);
@@ -96,7 +100,7 @@ public class CacheHandler implements InvocationHandler {
 
     private static Object doInvoke(CacheInvokeContext context) throws Throwable {
         CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
-        if (cacheAnnoConfig != null && (cacheAnnoConfig.isEnabled() || cacheContextSupport._isEnabled())) {
+        if (cacheAnnoConfig != null && (cacheAnnoConfig.isEnabled() || CacheContextSupport._isEnabled())) {
             return invokeWithCache(context);
         } else {
             return invokeOrigin(context);
@@ -111,7 +115,7 @@ public class CacheHandler implements InvocationHandler {
 
         CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
         String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.hiddenPackages);
-        Cache cache = context.cacheFunction.apply(subArea);
+        Cache cache = context.cacheFunction.apply(cacheAnnoConfig.getArea() + "_" + subArea);
         if (cache == null) {
             logger.error("no cache with name: " + subArea);
             return invokeOrigin(context);

@@ -16,6 +16,8 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -34,7 +36,7 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
         if (!parserContext.getRegistry().containsBeanDefinition(CACHE_ADVISOR_BEAN_NAME)) {
             Object eleSource = parserContext.extractSource(element);
 
-            RootBeanDefinition configMapDef = new RootBeanDefinition(IdentityHashMap.class);
+            RootBeanDefinition configMapDef = new RootBeanDefinition(ConcurrentHashMap.class);
             configMapDef.setSource(eleSource);
             configMapDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             String configMapName = parserContext.getReaderContext().registerWithGeneratedName(configMapDef);

@@ -3,8 +3,24 @@
  */
 package com.alicp.jetcache.anno.context;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.CompoundCache;
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.SerialPolicy;
+import com.alicp.jetcache.anno.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.factory.CacheFactory;
+import com.alicp.jetcache.factory.EmbeddedCacheFactory;
+import com.alicp.jetcache.factory.ExternalCacheFactory;
+import com.alicp.jetcache.support.*;
 
+import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -18,8 +34,74 @@ public class CacheContext {
             return new CacheThreadLocal();
         }
     };
+    private CacheManager cacheManager;
+    private GlobalCacheConfig globalCacheConfig;
 
-    protected CacheContext() {
+    public CacheContext(GlobalCacheConfig globalCacheConfig) {
+        this.globalCacheConfig = globalCacheConfig;
+        this.cacheManager = new CacheManager();
+    }
+
+    public CacheInvokeContext createCacheInvokeContext() {
+//        String area = cacheAnnoConfig.getArea();
+//        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), method, hiddenPackages);
+//        String key = area + "_" + subArea;
+//        Cache cache = cacheManager.getCache(key);
+        CacheInvokeContext c = newCacheInvokeContext();
+//        if (cache == null) {
+//            if (cacheAnnoConfig.getCacheType() == CacheType.LOCAL) {
+//                cache = buildLocal(cacheAnnoConfig, area);
+//            } else if (cacheAnnoConfig.getCacheType() == CacheType.REMOTE) {
+//                cache = buildRemote(cacheAnnoConfig, area, subArea);
+//            } else {
+//                Cache local = buildLocal(cacheAnnoConfig, area);
+//                Cache remote = buildRemote(cacheAnnoConfig, area, subArea);
+//                cache = new CompoundCache(local, remote);
+//                cacheManager.addCache(key + "_local", local);
+//                cacheManager.addCache(key + "_remote", remote);
+//            }
+//            cacheManager.addCache(key, cache);
+//        }
+//        c.setCache(cache);
+        return c;
+    }
+
+    private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String subArea) {
+        Cache cache;
+        ExternalCacheFactory cacheFactory = (ExternalCacheFactory) globalCacheConfig.getRemoteCacheFacotories().get(area);
+        cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cacheFactory.setKeyPrefix(subArea);
+        if (SerialPolicy.KRYO.equals(cacheAnnoConfig.getSerialPolicy())) {
+            cacheFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
+            cacheFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
+        } else if (SerialPolicy.JAVA.equals(cacheAnnoConfig.getSerialPolicy())) {
+            cacheFactory.setValueEncoder(JavaValueEncoder.INSTANCE);
+            cacheFactory.setValueDecoder(JavaValueDecoder.INSTANCE);
+        } else if (SerialPolicy.FASTJSON.equals(cacheAnnoConfig.getSerialPolicy())) {
+            cacheFactory.setValueEncoder(FastjsonValueEncoder.INSTANCE);
+            cacheFactory.setValueDecoder(FastjsonValueDecoder.INSTANCE);
+        } else {
+            throw new CacheException(cacheAnnoConfig.getSerialPolicy());
+        }
+        cache = cacheFactory.buildCache();
+        return cache;
+    }
+
+    private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
+        Cache cache;
+        EmbeddedCacheFactory cacheFactory = (EmbeddedCacheFactory) globalCacheConfig.getLocalCacheFacotories().get(area);
+        cacheFactory.setLimit(cacheAnnoConfig.getLocalLimit());
+        cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cache = cacheFactory.buildCache();
+        return cache;
+    }
+
+    protected CacheInvokeContext newCacheInvokeContext() {
+        return new CacheInvokeContext();
+    }
+
+    public CacheManager getCacheManager() {
+        return cacheManager;
     }
 
     /**
@@ -38,12 +120,12 @@ public class CacheContext {
         }
     }
 
-    protected static void enable(){
+    protected static void enable() {
         CacheThreadLocal var = cacheThreadLocal.get();
         var.setEnabledCount(var.getEnabledCount() + 1);
     }
 
-    protected static void disable(){
+    protected static void disable() {
         CacheThreadLocal var = cacheThreadLocal.get();
         var.setEnabledCount(var.getEnabledCount() - 1);
     }

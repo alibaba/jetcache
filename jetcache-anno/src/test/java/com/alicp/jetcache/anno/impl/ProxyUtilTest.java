@@ -22,6 +22,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.function.Supplier;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -37,19 +39,21 @@ public class ProxyUtilTest {
 
         globalCacheConfig = new GlobalCacheConfig(){
             @Override
-            public CacheInvokeContext createCacheInvokeContext() {
-                CacheInvokeContext c = super.createCacheInvokeContext();
-                c.setCacheFunction((config) -> cache);
-                return c;
+            protected CacheContext newCacheContext() {
+                return new CacheContext(null){
+                    @Override
+                    public CacheInvokeContext createCacheInvokeContext() {
+                        CacheInvokeContext c = super.newCacheInvokeContext();
+                        c.setCacheFunction((config) -> cache);
+                        return c;
+                    }
+                };
             }
         };
-        globalCacheConfig.setCacheManager(new CacheManager());
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .build();
-
-        globalCacheConfig.getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
 
         cacheAnnoConfig = new CacheAnnoConfig();
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();

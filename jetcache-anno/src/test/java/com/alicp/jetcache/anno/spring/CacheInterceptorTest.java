@@ -3,25 +3,27 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alibaba.fastjson.util.IdentityHashMap;
-import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.context.CacheContext;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.function.Supplier;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInterceptorTest {
     private CachePointcut pc;
-    private IdentityHashMap<Method, CacheInvokeConfig> map;
+    private ConcurrentHashMap<Method, CacheInvokeConfig> map;
     private CacheInterceptor interceptor;
 
     @Rule
@@ -30,7 +32,7 @@ public class CacheInterceptorTest {
     @Before
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        map = new IdentityHashMap<Method, CacheInvokeConfig>();
+        map = new ConcurrentHashMap<Method, CacheInvokeConfig>();
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);
