@@ -11,6 +11,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.impl.ClassUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.factory.CacheFactory;
@@ -43,26 +44,31 @@ public class CacheContext {
     }
 
     public CacheInvokeContext createCacheInvokeContext() {
-//        String area = cacheAnnoConfig.getArea();
-//        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), method, hiddenPackages);
-//        String key = area + "_" + subArea;
-//        Cache cache = cacheManager.getCache(key);
         CacheInvokeContext c = newCacheInvokeContext();
-//        if (cache == null) {
-//            if (cacheAnnoConfig.getCacheType() == CacheType.LOCAL) {
-//                cache = buildLocal(cacheAnnoConfig, area);
-//            } else if (cacheAnnoConfig.getCacheType() == CacheType.REMOTE) {
-//                cache = buildRemote(cacheAnnoConfig, area, subArea);
-//            } else {
-//                Cache local = buildLocal(cacheAnnoConfig, area);
-//                Cache remote = buildRemote(cacheAnnoConfig, area, subArea);
-//                cache = new CompoundCache(local, remote);
-//                cacheManager.addCache(key + "_local", local);
-//                cacheManager.addCache(key + "_remote", remote);
-//            }
-//            cacheManager.addCache(key, cache);
-//        }
-//        c.setCache(cache);
+        c.setCacheFunction((invokeContext) -> {
+            CacheAnnoConfig cacheAnnoConfig = invokeContext.getCacheInvokeConfig().getCacheAnnoConfig();
+            String area = cacheAnnoConfig.getArea();
+            String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(),
+                    invokeContext.getMethod(), invokeContext.getHiddenPackages());
+            String cacheName = area + "_" + subArea;
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache == null) {
+                if (cacheAnnoConfig.getCacheType() == CacheType.LOCAL) {
+                    cache = buildLocal(cacheAnnoConfig, area);
+                } else if (cacheAnnoConfig.getCacheType() == CacheType.REMOTE) {
+                    cache = buildRemote(cacheAnnoConfig, area, subArea);
+                } else {
+                    Cache local = buildLocal(cacheAnnoConfig, area);
+                    Cache remote = buildRemote(cacheAnnoConfig, area, subArea);
+                    cache = new CompoundCache(local, remote);
+                    cacheManager.addCache(cacheName + "_local", local);
+                    cacheManager.addCache(cacheName + "_remote", remote);
+                }
+                cacheManager.addCache(cacheName, cache);
+            }
+            return cache;
+        });
+
         return c;
     }
 

@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class ClassUtil {
+public class ClassUtil {
 
     private static ConcurrentHashMap<Method, String> subAreaMap = new ConcurrentHashMap();
     private static ConcurrentHashMap<Method, String> methodSigMap = new ConcurrentHashMap();

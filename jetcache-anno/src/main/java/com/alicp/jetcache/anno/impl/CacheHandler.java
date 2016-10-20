@@ -114,10 +114,10 @@ public class CacheHandler implements InvocationHandler {
         }
 
         CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
-        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.hiddenPackages);
-        Cache cache = context.cacheFunction.apply(cacheAnnoConfig.getArea() + "_" + subArea);
+//        String subArea = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(), context.method, context.hiddenPackages);
+        Cache cache = context.cacheFunction.apply(context);
         if (cache == null) {
-            logger.error("no cache with name: " + subArea);
+            logger.error("no cache with name: " + context.method);
             return invokeOrigin(context);
         }
 

@@ -4,11 +4,9 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -19,7 +17,7 @@ public class CacheInvokeContext {
     Object[] args;
     CacheInvokeConfig cacheInvokeConfig;
 
-    Function<String, Cache> cacheFunction;
+    Function<CacheInvokeContext, Cache> cacheFunction;
     String[] hiddenPackages;
 
     Object result = null;
@@ -48,11 +46,19 @@ public class CacheInvokeContext {
         this.cacheInvokeConfig = cacheInvokeConfig;
     }
 
+    public CacheInvokeConfig getCacheInvokeConfig() {
+        return cacheInvokeConfig;
+    }
+
     public void setHiddenPackages(String[] hiddenPackages) {
         this.hiddenPackages = hiddenPackages;
     }
 
-    public void setCacheFunction(Function<String, Cache> cacheFunction) {
+    public String[] getHiddenPackages() {
+        return hiddenPackages;
+    }
+
+    public void setCacheFunction(Function<CacheInvokeContext, Cache> cacheFunction) {
         this.cacheFunction = cacheFunction;
     }
 
