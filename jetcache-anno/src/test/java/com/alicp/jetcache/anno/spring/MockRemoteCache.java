@@ -6,6 +6,8 @@ package com.alicp.jetcache.anno.spring;
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.impl.SerializeUtil;
+import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.ExternalCacheConfig;
 
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -13,19 +15,29 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MockRemoteCache<K, V> implements Cache<K, V> {
-    private HashMap<K, CacheValueHolder<byte[]>> data = new HashMap();
+public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
+    private HashMap<Object, CacheValueHolder<byte[]>> data = new HashMap();
+    private ExternalCacheConfig config;
+
+    public MockRemoteCache(ExternalCacheConfig config) {
+        super(config);
+        this.config = config;
+    }
 
     @Override
     public CacheConfig config() {
-        return null;
+        return config;
+    }
+
+    private Object buildKey(K key){
+        return config().getKeyConvertor().apply(key);
     }
 
     public CacheGetResult<V> GET(K key) {
         CacheResultCode code;
         V value = null;
         try {
-            CacheValueHolder<byte[]> holder = data.get(key);
+            CacheValueHolder<byte[]> holder = data.get(buildKey(key));
             if (holder != null) {
                 long expireTime = holder.getExpireTime();
                 if (System.currentTimeMillis() > expireTime) {
@@ -44,16 +56,11 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public void put(K key, V value) {
-        PUT(key, value, CacheConsts.DEFAULT_EXPIRE, TimeUnit.SECONDS);
-    }
-
-    @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try {
             byte[] bytes = SerializeUtil.encode(value, CacheConsts.DEFAULT_SERIAL_POLICY);
             CacheValueHolder<byte[]> v = new CacheValueHolder(bytes, System.currentTimeMillis(), timeUnit.toMillis(expire));
-            data.put(key, v);
+            data.put(buildKey(key), v);
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception e) {
             return CacheResult.FAIL_WITHOUT_MSG;
@@ -62,7 +69,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
 
     @Override
     public CacheResult INVALIDATE(K key) {
-        data.remove(key);
+        data.remove(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 

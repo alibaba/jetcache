@@ -10,7 +10,7 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
  */
 public class TestUtil {
     public static GlobalCacheConfig getCacheProviderFactory() {
-        MockRemoteCache c = new MockRemoteCache();
+//        MockRemoteCache c = new MockRemoteCache();
         GlobalCacheConfig f = new GlobalCacheConfig();
 //        f.setCacheManager();
         return f;

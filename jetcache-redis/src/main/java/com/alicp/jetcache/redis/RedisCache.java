@@ -56,7 +56,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements Wap
             System.arraycopy(bs2, 0, rt, bs1.length, bs2.length);
             return rt;
         } else {
-            throw new CacheException("type error");//TODO ?
+            throw new CacheException("type error");
         }
     }
 

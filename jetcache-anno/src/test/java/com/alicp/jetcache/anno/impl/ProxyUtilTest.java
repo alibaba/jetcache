@@ -3,18 +3,17 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.context.CacheContext;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.anno.context.CacheContext;
+import com.alicp.jetcache.anno.spring.MockRemoteCacheFactory;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.factory.EmbeddedCacheFactory;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.KryoValueDecoder;
+import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
@@ -22,7 +21,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.function.Supplier;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -31,29 +31,25 @@ public class ProxyUtilTest {
 
     private GlobalCacheConfig globalCacheConfig;
     private CacheAnnoConfig cacheAnnoConfig;
-    private Cache cache;
 
     @Before
     public void setup() {
-        cacheAnnoConfig = new CacheAnnoConfig();
+        EmbeddedCacheFactory localFactory = new EmbeddedCacheFactory();
+        localFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        Map localFactories = new HashMap();
+        localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
 
-        globalCacheConfig = new GlobalCacheConfig(){
-            @Override
-            protected CacheContext newCacheContext() {
-                return new CacheContext(null){
-                    @Override
-                    public CacheInvokeContext createCacheInvokeContext() {
-                        CacheInvokeContext c = super.newCacheInvokeContext();
-                        c.setCacheFunction((config) -> cache);
-                        return c;
-                    }
-                };
-            }
-        };
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .build();
+        MockRemoteCacheFactory remoteFactory = new MockRemoteCacheFactory();
+        remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
+        remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
+        Map remoteFactories = new HashMap();
+        remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteFactory);
+
+        globalCacheConfig = new GlobalCacheConfig();
+        globalCacheConfig.setLocalCacheFacotories(localFactories);
+        globalCacheConfig.setRemoteCacheFacotories(remoteFactories);
+
 
         cacheAnnoConfig = new CacheAnnoConfig();
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
@@ -120,16 +116,31 @@ public class ProxyUtilTest {
             return count++;
         }
     }
+    class C22 implements I2 {
+        int count;
+
+        public int count() {
+            return count++;
+        }
+        public int countWithoutCache(){
+            return count++;
+        }
+    }
 
     @Test
     //annotation on intface
     public void testGetProxyByAnnotation2() {
         I2 c1 = new C2();
         I2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
         Assert.assertEquals(c2.count(), c2.count());
         Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+
+        I2 c3 = new C22();
+        I2 c4 = ProxyUtil.getProxyByAnnotation(c3, globalCacheConfig);
+        Assert.assertEquals(c2.count(), c4.count());
     }
 
     interface I3_1 {

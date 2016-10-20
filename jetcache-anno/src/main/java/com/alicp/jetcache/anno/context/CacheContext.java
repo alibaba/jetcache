@@ -73,7 +73,6 @@ public class CacheContext {
     }
 
     private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String subArea) {
-        Cache cache;
         ExternalCacheFactory cacheFactory = (ExternalCacheFactory) globalCacheConfig.getRemoteCacheFacotories().get(area);
         cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
         cacheFactory.setKeyPrefix(subArea);
@@ -89,7 +88,7 @@ public class CacheContext {
         } else {
             throw new CacheException(cacheAnnoConfig.getSerialPolicy());
         }
-        cache = cacheFactory.buildCache();
+        Cache cache = cacheFactory.buildCache();
         return cache;
     }
 
