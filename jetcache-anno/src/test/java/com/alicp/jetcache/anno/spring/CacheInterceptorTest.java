@@ -32,11 +32,11 @@ public class CacheInterceptorTest {
     @Before
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        map = new ConcurrentHashMap<Method, CacheInvokeConfig>();
+        map = new ConcurrentHashMap();
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);
-        interceptor.setGlobalCacheConfig(TestUtil.getCacheProviderFactory());
+        interceptor.setGlobalCacheConfig(TestUtil.createGloableConfig());
     }
 
     interface I1 {

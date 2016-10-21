@@ -3,26 +3,18 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.context.CacheContext;
-import com.alicp.jetcache.anno.spring.MockRemoteCacheFactory;
+import com.alicp.jetcache.anno.spring.TestUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.factory.EmbeddedCacheFactory;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
-import com.alicp.jetcache.support.KryoValueDecoder;
-import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -34,22 +26,7 @@ public class ProxyUtilTest {
 
     @Before
     public void setup() {
-        EmbeddedCacheFactory localFactory = new EmbeddedCacheFactory();
-        localFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-        Map localFactories = new HashMap();
-        localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
-
-        MockRemoteCacheFactory remoteFactory = new MockRemoteCacheFactory();
-        remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-        remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
-        remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
-        Map remoteFactories = new HashMap();
-        remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteFactory);
-
-        globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setLocalCacheFacotories(localFactories);
-        globalCacheConfig.setRemoteCacheFacotories(remoteFactories);
-
+        globalCacheConfig = TestUtil.createGloableConfig();
 
         cacheAnnoConfig = new CacheAnnoConfig();
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
