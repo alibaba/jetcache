@@ -30,9 +30,11 @@ public class SpringTest {
         int x1, x2, x3;
 
         Service service = (Service) context.getBean("service");
-        x1 = service.count();
-        x2 = service.count();
-        x3 = service.count();
+        Assert.assertNotEquals(service.notCachedCount(), service.notCachedCount());
+
+        x1 = service.countWithAnnoOnClass();
+        x2 = service.countWithAnnoOnClass();
+        x3 = service.countWithAnnoOnClass();
         Assert.assertEquals(x1, x2);
         Assert.assertEquals(x1, x3);
 
@@ -41,6 +43,7 @@ public class SpringTest {
         Assert.assertEquals(x1, x2);
 
         TestBean bean = (TestBean)context.getBean("testBean");
+        Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
         x1 = bean.count();
         x2 = bean.count();
         Assert.assertEquals(x1, x2);
@@ -50,6 +53,7 @@ public class SpringTest {
         Assert.assertNotEquals(x1, x2);
 
         C c = (C)context.getBean("c");
+        Assert.assertNotEquals(c.enableCacheWithNoCacheCount(bean), c.enableCacheWithNoCacheCount(bean));
         x1 = c.count(bean);
         x2 = c.count(bean);
         Assert.assertEquals(x1, x2);
@@ -93,6 +97,11 @@ public class SpringTest {
         @EnableCache
         public int count(TestBean bean){
             return bean.countWithDisabledCache();
+        }
+
+        @EnableCache
+        public int enableCacheWithNoCacheCount(TestBean bean){
+            return bean.noCacheCount();
         }
     }
 

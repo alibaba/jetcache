@@ -9,7 +9,10 @@ import com.alicp.jetcache.anno.Cached;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface Service {
-    int count();
+
+    int notCachedCount();
+
+    int countWithAnnoOnClass();
 
     @Cached
     int countWithAnnoOnInterface();

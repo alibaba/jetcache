@@ -14,8 +14,13 @@ public class ServiceImpl implements Service {
 
     private int count;
 
+    @Override
+    public int notCachedCount() {
+        return count++;
+    }
+
     @Cached
-    public int count() {
+    public int countWithAnnoOnClass() {
         return count++;
     }
 

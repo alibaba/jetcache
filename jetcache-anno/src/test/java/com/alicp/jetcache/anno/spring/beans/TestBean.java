@@ -18,6 +18,10 @@ public class TestBean {
     public TestBean() {
     }
 
+    public int noCacheCount(){
+        return count++;
+    }
+
     @Cached
     public int count() {
         return count++;
