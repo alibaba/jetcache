@@ -251,6 +251,7 @@ public class ProxyUtilTest {
 
     interface I7_1 {
         int count();
+        int countWithoutCache();
     }
 
     class C7_1 implements I7_1 {
@@ -259,18 +260,28 @@ public class ProxyUtilTest {
         public int count() {
             return count++;
         }
+
+        @Override
+        public int countWithoutCache() {
+            return count++;
+        }
     }
 
     interface I7_2 {
-        int foo();
+        int count();
+        int countWithoutCache();
     }
 
     class C7_2 implements I7_2 {
         I7_1 service;
 
         @EnableCache
-        public int foo() {
+        public int count() {
             return service.count();
+        }
+        @EnableCache
+        public int countWithoutCache(){
+            return service.countWithoutCache();
         }
     }
 
@@ -283,7 +294,8 @@ public class ProxyUtilTest {
         C7_2 c2_1 = new C7_2();
         c2_1.service = c1_2;
         I7_2 c2_2 = ProxyUtil.getProxyByAnnotation(c2_1, globalCacheConfig);
-        Assert.assertNotEquals(c2_1.foo(), c2_1.foo());
-        Assert.assertEquals(c2_2.foo(), c2_2.foo());
+        Assert.assertNotEquals(c2_1.count(), c2_1.count());
+        Assert.assertNotEquals(c2_2.countWithoutCache(), c2_2.countWithoutCache());
+        Assert.assertEquals(c2_2.count(), c2_2.count());
     }
 }
