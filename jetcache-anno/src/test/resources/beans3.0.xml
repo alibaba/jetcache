@@ -1,10 +1,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:jetcache="http://www.alibaba.com/schema/jetcache"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-3.0.xsd
         http://www.alibaba.com/schema/jetcache
         http://www.alibaba.com/schema/jetcache/jetcache.xsd">
     <context:annotation-config/>
@@ -12,24 +14,49 @@
 
     <jetcache:annotation-driven base-package="com.alicp.jetcache"/>
 
-    <bean id="factoryBeanTarget" class="com.alicp.jetcache.spring.beans.MyFactoryBean"/>
+    <bean id="factoryBeanTarget" class="com.alicp.jetcache.anno.spring.beans.MyFactoryBean"/>
 
-    <bean id="globalCacheConfig" class="com.alicp.jetcache.spring.SpringGlobalCacheConfig">
-        <constructor-arg index="0">
+    <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.spring.SpringGlobalCacheConfig">
+        <property name="localCacheFacotories">
             <map>
-                <entry key="" value-ref="ccheProvider1"/>
-                <entry key="A1" value-ref="ccheProvider2"/>
+                <entry key="" value-ref="localCacheFactory"/>
+                <entry key="A1" value-ref="localCacheFactory"/>
             </map>
-        </constructor-arg>
-    </bean>
-    <bean id="ccheProvider1" class="com.alicp.jetcache.anno.support.CacheProvider">
-        <property name="remoteCache">
-            <bean class="com.alicp.jetcache.spring.MockRemoteCache"/>
+        </property>
+        <property name="remoteCacheFacotories">
+            <map>
+                <entry key="" value-ref="remoteCacheFactory"/>
+                <entry key="A1" value-ref="remoteCacheFactory2"/>
+            </map>
         </property>
     </bean>
-    <bean id="ccheProvider2" class="com.alicp.jetcache.anno.support.CacheProvider">
-        <property name="remoteCache">
-            <bean class="com.alicp.jetcache.spring.MockRemoteCache"/>
+    <bean id="localCacheFactory" class="com.alicp.jetcache.factory.EmbeddedCacheFactory">
+        <property name="keyConvertor">
+            <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
+        </property>
+    </bean>
+    <bean id="remoteCacheFactory" class="com.alicp.jetcache.anno.spring.MockRemoteCacheFactory">
+        <property name="keyPrefix" value="aa"/>
+        <property name="keyConvertor">
+            <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
+        </property>
+        <property name="valueEncoder">
+            <util:constant static-field="com.alicp.jetcache.support.KryoValueEncoder.INSTANCE"/>
+        </property>
+        <property name="valueDecoder">
+            <util:constant static-field="com.alicp.jetcache.support.KryoValueDecoder.INSTANCE"/>
+        </property>
+    </bean>
+    <bean id="remoteCacheFactory2" class="com.alicp.jetcache.anno.spring.MockRemoteCacheFactory">
+        <property name="keyPrefix" value="aa"/>
+        <property name="keyConvertor">
+            <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
+        </property>
+        <property name="valueEncoder">
+            <util:constant static-field="com.alicp.jetcache.support.KryoValueEncoder.INSTANCE"/>
+        </property>
+        <property name="valueDecoder">
+            <util:constant static-field="com.alicp.jetcache.support.KryoValueDecoder.INSTANCE"/>
         </property>
     </bean>
 </beans>

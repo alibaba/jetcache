@@ -3,10 +3,7 @@
  */
 package com.alicp.jetcache.anno.context;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheException;
-import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.CompoundCache;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.SerialPolicy;
@@ -74,6 +71,9 @@ public class CacheContext {
 
     private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String subArea) {
         ExternalCacheFactory cacheFactory = (ExternalCacheFactory) globalCacheConfig.getRemoteCacheFacotories().get(area);
+        if (cacheFactory == null) {
+            throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in remoteCacheFacotories");
+        }
         cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
         cacheFactory.setKeyPrefix(subArea);
         if (SerialPolicy.KRYO.equals(cacheAnnoConfig.getSerialPolicy())) {
@@ -95,6 +95,9 @@ public class CacheContext {
     private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
         Cache cache;
         EmbeddedCacheFactory cacheFactory = (EmbeddedCacheFactory) globalCacheConfig.getLocalCacheFacotories().get(area);
+        if (cacheFactory == null) {
+            throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in localCacheFactory");
+        }
         cacheFactory.setLimit(cacheAnnoConfig.getLocalLimit());
         cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
         cache = cacheFactory.buildCache();

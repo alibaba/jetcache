@@ -26,12 +26,6 @@ public class SpringTest {
         test1();
     }
 
-//    @Test
-//    public void test2_5(){
-//        context = new ClassPathXmlApplicationContext("beans2.5.xml");
-//        test1();
-//    }
-
     public void test1() {
         int x1, x2, x3;
 
