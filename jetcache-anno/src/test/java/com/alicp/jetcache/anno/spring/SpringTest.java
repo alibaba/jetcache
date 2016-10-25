@@ -4,10 +4,10 @@
 package com.alicp.jetcache.anno.spring;
 
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.spring.beans.DynamicQuery;
 import com.alicp.jetcache.anno.spring.beans.FactoryBeanTarget;
 import com.alicp.jetcache.anno.spring.beans.Service;
 import com.alicp.jetcache.anno.spring.beans.TestBean;
+import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

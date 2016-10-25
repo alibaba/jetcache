@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.spring.beans;
 
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.springframework.stereotype.Component;
 
 /**
