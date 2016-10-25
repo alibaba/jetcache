@@ -61,11 +61,11 @@ public class CacheInterceptorTest {
             {
                 try {
                     allowing(mi).getMethod();
-                    will(returnValue(m));
+                    will(Expectations.returnValue(m));
                     allowing(mi).getThis();
-                    will(returnValue(c));
+                    will(Expectations.returnValue(c));
                     allowing(mi).getArguments();
-                    will(returnValue(null));
+                    will(Expectations.returnValue(null));
                     oneOf(mi).proceed();
                 } catch (Throwable e) {
                     Assert.fail();
@@ -100,11 +100,11 @@ public class CacheInterceptorTest {
             {
                 try {
                     allowing(mi).getMethod();
-                    will(returnValue(m));
+                    will(Expectations.returnValue(m));
                     allowing(mi).getThis();
-                    will(returnValue(c));
+                    will(Expectations.returnValue(c));
                     allowing(mi).getArguments();
-                    will(returnValue(null));
+                    will(Expectations.returnValue(null));
                     oneOf(mi).proceed();
                     oneOf(mi).proceed();
 
@@ -152,13 +152,13 @@ public class CacheInterceptorTest {
             {
                 try {
                     allowing(mi).getMethod();
-                    will(returnValue(m));
+                    will(Expectations.returnValue(m));
                     allowing(mi).getThis();
-                    will(returnValue(c));
+                    will(Expectations.returnValue(c));
                     allowing(mi).getArguments();
-                    will(returnValue(null));
+                    will(Expectations.returnValue(null));
                     oneOf(mi).proceed();
-                    will(throwException(new SQLException()));
+                    will(Expectations.throwException(new SQLException()));
                 } catch (Throwable e) {
                     Assert.fail();
                 }
