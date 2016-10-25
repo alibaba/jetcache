@@ -15,13 +15,13 @@ import java.util.function.Function;
  */
 public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K, V> {
     protected EmbeddedCacheConfig config;
-    private AreaCache areaCache;
+    private IntenalMap intenalMap;
 
-    protected abstract AreaCache createAreaCache();
+    protected abstract IntenalMap createAreaCache();
 
     public AbstractEmbeddedCache(EmbeddedCacheConfig config) {
         this.config = config;
-        areaCache = createAreaCache();
+        intenalMap = createAreaCache();
     }
 
     @Override
@@ -44,7 +44,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
             Object newKey = buildKey(key);
             CacheValueHolder<V> holder = null;
             if (config.isWeakValues()) {
-                WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) areaCache.getValue(newKey);
+                WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
                 if (ref == null) {
                     return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
                 } else {
@@ -56,7 +56,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
                     }
                 }
             } else if (config.isSoftValues()) {
-                SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) areaCache.getValue(newKey);
+                SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
                 if (ref == null) {
                     return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
                 } else {
@@ -68,7 +68,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
                     }
                 }
             } else {
-                CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) areaCache.getValue(newKey);
+                CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) intenalMap.getValue(newKey);
                 if (cacheObject == null) {
                     return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
                 } else {
@@ -82,7 +82,7 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
 
     private CacheGetResult<CacheValueHolder<V>> getImpl(Object newKey, CacheValueHolder<V> cacheObject) {
         if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
-            areaCache.removeValue(newKey);
+            intenalMap.removeValue(newKey);
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
             if (config.isExpireAfterAccess()) {
@@ -99,19 +99,19 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
         cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
         if (config.isWeakValues()) {
             WeakReference<CacheValueHolder<V>> ref = new WeakReference(cacheObject);
-            areaCache.putValue(buildKey(key), ref);
+            intenalMap.putValue(buildKey(key), ref);
         } else if (config.isSoftValues()) {
             SoftReference<CacheValueHolder<V>> ref = new SoftReference(cacheObject);
-            areaCache.putValue(buildKey(key), ref);
+            intenalMap.putValue(buildKey(key), ref);
         } else {
-            areaCache.putValue(buildKey(key), cacheObject);
+            intenalMap.putValue(buildKey(key), cacheObject);
         }
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
     public CacheResult INVALIDATE(K key) {
-        areaCache.removeValue(buildKey(key));
+        intenalMap.removeValue(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 }

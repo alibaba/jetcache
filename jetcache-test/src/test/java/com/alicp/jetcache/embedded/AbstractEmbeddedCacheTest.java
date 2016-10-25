@@ -37,30 +37,38 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
     }
 
-    public void test() throws Exception {
+    public void test(boolean testLru) throws Exception {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
-        lruTest();
+        if(testLru) {
+            lruTest();
+        }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterAccess(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
-        lruTest();
+        if(testLru) {
+            lruTest();
+        }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).softValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
-        lruTest();
+        if(testLru) {
+            lruTest();
+        }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
-        lruTest();
+        if(testLru) {
+            lruTest();
+        }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).build();
         keyCoverterTest();

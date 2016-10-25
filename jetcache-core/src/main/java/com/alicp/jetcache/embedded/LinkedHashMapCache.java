@@ -16,11 +16,11 @@ public class LinkedHashMapCache extends AbstractEmbeddedCache {
     }
 
     @Override
-    protected AreaCache createAreaCache(){
+    protected IntenalMap createAreaCache(){
         return new LRUMap(config.getLimit());
     }
 
-    private static final class LRUMap extends LinkedHashMap implements AreaCache {
+    private static final class LRUMap extends LinkedHashMap implements IntenalMap {
 
         private final int max;
 
@@ -38,12 +38,12 @@ public class LinkedHashMapCache extends AbstractEmbeddedCache {
             return get(key);
         }
 
-        public synchronized Object putValue(Object key, Object value) {
-            return put(key, value);
+        public synchronized void putValue(Object key, Object value) {
+            put(key, value);
         }
 
-        public synchronized Object removeValue(Object key) {
-            return remove(key);
+        public synchronized void removeValue(Object key) {
+            remove(key);
         }
     }
 

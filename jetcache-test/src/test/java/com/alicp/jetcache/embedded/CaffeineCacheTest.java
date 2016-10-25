@@ -1,6 +1,3 @@
-/**
- * Created on  13-09-24 10:20
- */
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.Cache;
@@ -10,18 +7,19 @@ import org.junit.Test;
 import java.util.function.Function;
 
 /**
+ * Created on 2016/10/25.
+ *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
-
+public class CaffeineCacheTest extends AbstractEmbeddedCacheTest {
     @Override
     protected Function<CacheConfig, Cache> getBuildFunc() {
-        return (c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c);
+        return (c) -> new CaffeineCache((EmbeddedCacheConfig) c);
     }
 
     @Test
     public void test() throws Exception {
-        super.test(true);
+        super.test(false);
     }
 
 }
