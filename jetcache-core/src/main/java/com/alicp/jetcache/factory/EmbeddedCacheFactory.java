@@ -9,7 +9,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class EmbeddedCacheFactory extends CacheFactory {
+public abstract class EmbeddedCacheFactory extends CacheFactory {
 
     @Override
     protected EmbeddedCacheConfig getConfig() {
@@ -17,11 +17,6 @@ public class EmbeddedCacheFactory extends CacheFactory {
             config = new EmbeddedCacheConfig();
         }
         return (EmbeddedCacheConfig) config;
-    }
-
-    @Override
-    public Cache buildCache() {
-        return new LinkedHashMapCache((EmbeddedCacheConfig) getConfig().clone());
     }
 
     public void setLimit(int limit){

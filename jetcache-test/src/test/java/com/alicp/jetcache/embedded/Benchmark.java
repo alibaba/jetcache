@@ -36,10 +36,7 @@ public class Benchmark {
 
         EmbeddedCacheBuilder builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(CACHE_LIMIT);
-
-//        Cache cache = builder.build((c) -> new ConcurrentLinkedHashMapCache((LocalCacheConfig) c));
-//        Cache cache = builder.build((c) -> new LinkedHashMapCache((LocalCacheConfig) c));
-        builder.buildFunc((c) -> new LirsCache((EmbeddedCacheConfig) c));
+        builder.buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig)c));
         Cache<String, String> cache = builder.build();
 
         CountDownLatch doneSignal = new CountDownLatch(THREAD_COUNT);

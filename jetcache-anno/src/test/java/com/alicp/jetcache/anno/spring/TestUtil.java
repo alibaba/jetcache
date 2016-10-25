@@ -6,6 +6,7 @@ package com.alicp.jetcache.anno.spring;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.factory.EmbeddedCacheFactory;
+import com.alicp.jetcache.factory.LinkedHashMapCacheFactory;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public class TestUtil {
     public static GlobalCacheConfig createGloableConfig() {
-        EmbeddedCacheFactory localFactory = new EmbeddedCacheFactory();
+        EmbeddedCacheFactory localFactory = new LinkedHashMapCacheFactory();
         localFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         Map localFactories = new HashMap();
         localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);

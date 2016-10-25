@@ -30,7 +30,7 @@
             </map>
         </property>
     </bean>
-    <bean id="localCacheFactory" class="com.alicp.jetcache.factory.EmbeddedCacheFactory">
+    <bean id="localCacheFactory" class="com.alicp.jetcache.factory.LinkedHashMapCacheFactory">
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
         </property>
