@@ -8,9 +8,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public interface WapperValueCache<K, V> extends Cache<K, V> {
+public interface WrapValueCache<K, V> extends Cache<K, V> {
 
-    Logger INTENAL_LOGGER = LoggerFactory.getLogger(WapperValueCache.class);
+    Logger WRAP_VALUE_CACHE_INTERNAL_LOGGER = LoggerFactory.getLogger(WrapValueCache.class);
 
     CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key);
 
@@ -24,7 +24,7 @@ public interface WapperValueCache<K, V> extends Cache<K, V> {
             }
             return newResult;
         } catch (ClassCastException ex) {
-            INTENAL_LOGGER.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            WRAP_VALUE_CACHE_INTERNAL_LOGGER.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return new CacheGetResult<V>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
     }

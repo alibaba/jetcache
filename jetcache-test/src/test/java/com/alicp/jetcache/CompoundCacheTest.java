@@ -18,14 +18,14 @@ public class CompoundCacheTest extends AbstractCacheTest {
 
     @Test
     public void test() throws Exception {
-        WapperValueCache<Object, Object> l1Cache = (WapperValueCache<Object, Object>) EmbeddedCacheBuilder
+        WrapValueCache<Object, Object> l1Cache = (WrapValueCache<Object, Object>) EmbeddedCacheBuilder
                 .createEmbeddedCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        WapperValueCache<Object, Object> l2Cache = (WapperValueCache<Object, Object>) EmbeddedCacheBuilder
+        WrapValueCache<Object, Object> l2Cache = (WrapValueCache<Object, Object>) EmbeddedCacheBuilder
                 .createEmbeddedCacheBuilder()
                 .limit(100000)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)

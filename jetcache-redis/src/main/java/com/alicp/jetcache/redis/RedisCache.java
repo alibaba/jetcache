@@ -18,7 +18,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements WapperValueCache<K, V> {
+public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements WrapValueCache<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisCache.class);
 

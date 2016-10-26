@@ -13,7 +13,7 @@ import java.util.function.Function;
  */
 public interface Cache<K, V> {
 
-    Logger INTENAL_LOGGER = LoggerFactory.getLogger(Cache.class);
+    Logger CACHE_INTERNAL_LOGGER = LoggerFactory.getLogger(Cache.class);
 
     CacheConfig config();
 
@@ -26,7 +26,7 @@ public interface Cache<K, V> {
                 return null;
             }
         } catch (ClassCastException ex) {
-            INTENAL_LOGGER.warn("jetcache get error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            CACHE_INTERNAL_LOGGER.warn("jetcache get error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return null;
         }
     }
@@ -50,7 +50,7 @@ public interface Cache<K, V> {
                 return loadedValue;
             }
         } catch (ClassCastException ex) {
-            INTENAL_LOGGER.warn("jetcache computeIfAbsent error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            CACHE_INTERNAL_LOGGER.warn("jetcache computeIfAbsent error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return null;
         }
     }
