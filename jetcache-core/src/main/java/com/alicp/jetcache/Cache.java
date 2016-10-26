@@ -38,6 +38,11 @@ public interface Cache<K, V> {
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
+        return computeIfAbsent(key, loader, cacheNullWhenLoaderReturnNull,
+                config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
         try {
             CacheGetResult<V> r = GET(key);
             if (r.isSuccess()) {
@@ -45,7 +50,7 @@ public interface Cache<K, V> {
             } else {
                 V loadedValue = loader.apply(key);
                 if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
-                    put(key, loadedValue);
+                    PUT(key, loadedValue, expire, timeUnit);
                 }
                 return loadedValue;
             }
