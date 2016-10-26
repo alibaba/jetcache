@@ -2,6 +2,8 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
@@ -17,6 +19,8 @@ import java.util.function.Function;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements WapperValueCache<K, V> {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
     private RedisCacheConfig config;
 
@@ -81,9 +85,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements Wap
             } else {
                 return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new CacheGetResult(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage(), null);
+        } catch (Exception ex) {
+            logger.warn("jetcache(RedisCache) GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            return new CacheGetResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
     }
 
@@ -103,20 +107,11 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements Wap
             } else {
                 return new CacheResult(CacheResultCode.FAIL, rt.get());
             }
-        } catch (Exception e) {
-            return new CacheResult(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage());
+        } catch (Exception ex) {
+            logger.warn("jetcache(RedisCache) PUT error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }
-
-    private int convertTtl(long expire, TimeUnit timeUnit) {
-        long t = timeUnit.toSeconds(expire);
-        if (t == 0 && expire > 0) {
-            return 1;
-        } else {
-            return (int) t;
-        }
-    }
-
 
     @Override
     public CacheResult INVALIDATE(K key) {
@@ -127,8 +122,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> implements Wap
             } else {
                 return CacheResult.FAIL_WITHOUT_MSG;
             }
-        } catch (Exception e) {
-            return new CacheResult(CacheResultCode.FAIL, e.getClass() + ":" + e.getMessage());
+        } catch (Exception ex) {
+            logger.warn("jetcache(RedisCache) INVALIDATE error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }
 }

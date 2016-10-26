@@ -75,8 +75,9 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
                     return getImpl(newKey, cacheObject);
                 }
             }
-        } catch (Exception e) {
-            return new CacheGetResult(CacheResultCode.FAIL, null, e.getClass().getName() + ":" + e.getMessage());
+        } catch (ClassCastException ex) {
+            logger.warn("jetcache(AbstractEmbeddedCache) GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            return new CacheGetResult(CacheResultCode.FAIL, null, ex.getClass().getName() + ":" + ex.getMessage());
         }
     }
 
