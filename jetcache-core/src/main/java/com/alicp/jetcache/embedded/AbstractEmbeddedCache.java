@@ -40,44 +40,39 @@ public abstract class AbstractEmbeddedCache<K, V> implements WapperValueCache<K,
 
     @Override
     public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
-        try {
-            Object newKey = buildKey(key);
-            CacheValueHolder<V> holder = null;
-            if (config.isWeakValues()) {
-                WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
-                if (ref == null) {
-                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-                } else {
-                    holder = ref.get();
-                    if (holder == null) {
-                        return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "weak ref released");
-                    } else {
-                        return getImpl(newKey, holder);
-                    }
-                }
-            } else if (config.isSoftValues()) {
-                SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
-                if (ref == null) {
-                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-                } else {
-                    holder = ref.get();
-                    if (holder == null) {
-                        return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "soft ref released");
-                    } else {
-                        return getImpl(newKey, holder);
-                    }
-                }
+        Object newKey = buildKey(key);
+        CacheValueHolder<V> holder = null;
+        if (config.isWeakValues()) {
+            WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
+            if (ref == null) {
+                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
             } else {
-                CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) intenalMap.getValue(newKey);
-                if (cacheObject == null) {
-                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+                holder = ref.get();
+                if (holder == null) {
+                    return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "weak ref released");
                 } else {
-                    return getImpl(newKey, cacheObject);
+                    return getImpl(newKey, holder);
                 }
             }
-        } catch (ClassCastException ex) {
-            logger.warn("jetcache(AbstractEmbeddedCache) GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
-            return new CacheGetResult(CacheResultCode.FAIL, null, ex.getClass().getName() + ":" + ex.getMessage());
+        } else if (config.isSoftValues()) {
+            SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
+            if (ref == null) {
+                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+            } else {
+                holder = ref.get();
+                if (holder == null) {
+                    return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "soft ref released");
+                } else {
+                    return getImpl(newKey, holder);
+                }
+            }
+        } else {
+            CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) intenalMap.getValue(newKey);
+            if (cacheObject == null) {
+                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+            } else {
+                return getImpl(newKey, cacheObject);
+            }
         }
     }
 

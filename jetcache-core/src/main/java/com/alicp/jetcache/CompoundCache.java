@@ -1,8 +1,5 @@
 package com.alicp.jetcache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -11,8 +8,6 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CompoundCache<K, V> implements WapperValueCache<K, V> {
-
-    private static final Logger logger = LoggerFactory.getLogger(CompoundCache.class);
 
     private Cache[] caches;
 
@@ -28,33 +23,28 @@ public class CompoundCache<K, V> implements WapperValueCache<K, V> {
 
     @Override
     public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
-        try {
-            for (int i = 0; i < caches.length; i++) {
-                Cache cache = caches[i];
-                CacheGetResult<CacheValueHolder<V>> r1 = null;
-                if (cache instanceof WapperValueCache) {
-                    r1 = ((WapperValueCache) cache).GET_HOLDER(key);
+        for (int i = 0; i < caches.length; i++) {
+            Cache cache = caches[i];
+            CacheGetResult<CacheValueHolder<V>> r1 = null;
+            if (cache instanceof WapperValueCache) {
+                r1 = ((WapperValueCache) cache).GET_HOLDER(key);
+            } else {
+                r1 = cache.GET(key);
+            }
+            if (r1.isSuccess() && r1.getValue() != null) {
+                Object cacheValue = r1.getValue();
+                CacheValueHolder<V> h = (CacheValueHolder<V>) cacheValue;
+                long now = System.currentTimeMillis();
+                if (now > h.getExpireTime()) {
+                    continue;
                 } else {
-                    r1 = cache.GET(key);
-                }
-                if (r1.isSuccess() && r1.getValue() != null) {
-                    Object cacheValue = r1.getValue();
-                    CacheValueHolder<V> h = (CacheValueHolder<V>) cacheValue;
-                    long now = System.currentTimeMillis();
-                    if (now > h.getExpireTime()) {
-                        continue;
-                    } else {
-                        long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
-                        PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
-                        return new CacheGetResult<CacheValueHolder<V>>(CacheResultCode.SUCCESS, null, h);
-                    }
+                    long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
+                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                    return new CacheGetResult<CacheValueHolder<V>>(CacheResultCode.SUCCESS, null, h);
                 }
             }
-            return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-        } catch (ClassCastException ex) {
-            logger.warn("jetcache(CompoundCache) GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
-            return new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
+        return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
     }
 
     @Override

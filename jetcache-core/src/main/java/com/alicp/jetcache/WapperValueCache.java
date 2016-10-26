@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  */
 public interface WapperValueCache<K, V> extends Cache<K, V> {
 
-    Logger logger = LoggerFactory.getLogger(WapperValueCache.class);
+    Logger INTENAL_LOGGER = LoggerFactory.getLogger(WapperValueCache.class);
 
     CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key);
 
@@ -23,8 +23,8 @@ public interface WapperValueCache<K, V> extends Cache<K, V> {
                 newResult.setValue(result.getValue().getValue());
             }
             return newResult;
-        } catch (Exception ex) {
-            logger.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+        } catch (ClassCastException ex) {
+            INTENAL_LOGGER.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return new CacheGetResult<V>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
     }
