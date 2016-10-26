@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CompoundCache<K, V> implements WapperValueCache<K, V> {
+public class CompoundCache<K, V> implements WrapValueCache<K, V> {
 
     private Cache[] caches;
 
@@ -26,8 +26,8 @@ public class CompoundCache<K, V> implements WapperValueCache<K, V> {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult<CacheValueHolder<V>> r1 = null;
-            if (cache instanceof WapperValueCache) {
-                r1 = ((WapperValueCache) cache).GET_HOLDER(key);
+            if (cache instanceof WrapValueCache) {
+                r1 = ((WrapValueCache) cache).GET_HOLDER(key);
             } else {
                 r1 = cache.GET(key);
             }
@@ -74,7 +74,7 @@ public class CompoundCache<K, V> implements WapperValueCache<K, V> {
 
     private CacheResult PUT_impl(Cache cache, K key, V value, long expire, TimeUnit timeUnit) {
         CacheResult r = null;
-        if (cache instanceof WapperValueCache) {
+        if (cache instanceof WrapValueCache) {
             r = cache.PUT(key, value, expire, timeUnit);
         } else {
             CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
