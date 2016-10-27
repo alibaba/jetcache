@@ -14,15 +14,39 @@ public abstract class AbstractCacheTest {
     protected Cache<Object, Object> cache;
 
     protected void baseTest() {
+        // get/put/get
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V1", 1, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("BASE_K1").getResultCode());
         Assert.assertEquals("V1", cache.GET("BASE_K1").getValue());
+
+        // update
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V2", 1, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals("V2", cache.GET("BASE_K1").getValue());
+
+        //computeIfAbsent
+        cache.computeIfAbsent("BASE_K1", k -> {
+            throw new RuntimeException();
+        });
+        Assert.assertEquals("AAA", cache.computeIfAbsent("NOT_EXIST_1", k -> "AAA"));
+        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> null));
+        final Object[] invoked = new Object[1];
+        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> {
+            invoked[0] = new Object();
+            return null;
+        }));
+        Assert.assertNotNull(invoked[0]);
+        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> null, true));
+        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> {
+            throw new RuntimeException();
+        }, true));
+
+
+        //invalidate
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.INVALIDATE("BASE_K1").getResultCode());
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
 
+        // null value
         cache.put("BASE_K2", null);
         CacheGetResult<Object> r = cache.GET("BASE_K2");
         Assert.assertTrue(r.isSuccess());
