@@ -15,12 +15,11 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
+public class MockRemoteCache<K, V> implements Cache<K, V> {
     private HashMap<Object, CacheValueHolder<byte[]>> data = new HashMap();
     private ExternalCacheConfig config;
 
     public MockRemoteCache(ExternalCacheConfig config) {
-        super(config);
         this.config = config;
     }
 

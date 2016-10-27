@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CompoundCache<K, V> implements WrapValueCache<K, V> {
+public class CompoundCache<K, V> extends WrapValueCache<K, V> {
 
     private Cache[] caches;
 

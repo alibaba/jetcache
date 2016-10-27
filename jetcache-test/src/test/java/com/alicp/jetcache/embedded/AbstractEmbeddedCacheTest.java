@@ -39,7 +39,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
 
     public void test(boolean testLru) throws Exception {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterWrite(200, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).expireAfterWrite(500, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
@@ -47,7 +47,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterAccess(200, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).expireAfterAccess(500, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
@@ -55,7 +55,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(200, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(500, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
@@ -63,7 +63,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(200, TimeUnit.MILLISECONDS).limit(2).build();
+                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(500, TimeUnit.MILLISECONDS).limit(2).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {

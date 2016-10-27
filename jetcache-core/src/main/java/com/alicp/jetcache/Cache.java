@@ -48,11 +48,12 @@ public interface Cache<K, V> {
             if (r.isSuccess()) {
                 return r.getValue();
             } else {
-                V loadedValue = loader.apply(key);
+                Object loadedValue = loader.apply(key);
+                V castedValue = (V) loadedValue;
                 if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
-                    PUT(key, loadedValue, expire, timeUnit);
+                    PUT(key, castedValue, expire, timeUnit);
                 }
-                return loadedValue;
+                return castedValue;
             }
         } catch (ClassCastException ex) {
             CACHE_INTERNAL_LOGGER.warn("jetcache computeIfAbsent error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());

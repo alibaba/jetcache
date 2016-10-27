@@ -8,24 +8,25 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public interface WrapValueCache<K, V> extends Cache<K, V> {
+public abstract class WrapValueCache<K, V> implements Cache<K, V> {
 
-    Logger WRAP_VALUE_CACHE_INTERNAL_LOGGER = LoggerFactory.getLogger(WrapValueCache.class);
+    private static Logger WRAP_VALUE_CACHE_INTERNAL_LOGGER = LoggerFactory.getLogger(WrapValueCache.class);
 
-    CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key);
+    protected abstract CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key);
 
     @Override
-    default CacheGetResult<V> GET(K key) {
+    public CacheGetResult<V> GET(K key) {
+        CacheGetResult<V> result;
         try {
-            CacheGetResult<CacheValueHolder<V>> result = GET_HOLDER(key);
-            CacheGetResult<V> newResult = (CacheGetResult<V>) result;
-            if (result.getValue() != null) {
-                newResult.setValue(result.getValue().getValue());
+            CacheGetResult<CacheValueHolder<V>> holderResult = GET_HOLDER(key);
+            result = (CacheGetResult<V>) holderResult;
+            if (holderResult.getValue() != null) {
+                result.setValue(holderResult.getValue().getValue());
             }
-            return newResult;
         } catch (ClassCastException ex) {
             WRAP_VALUE_CACHE_INTERNAL_LOGGER.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
-            return new CacheGetResult<V>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
+            result = new CacheGetResult<V>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
+        return result;
     }
 }
