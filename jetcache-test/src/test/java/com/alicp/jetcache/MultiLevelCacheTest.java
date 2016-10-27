@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CompoundCacheTest extends AbstractCacheTest {
+public class MultiLevelCacheTest extends AbstractCacheTest {
 
     @Test
     public void test() throws Exception {
@@ -33,7 +33,7 @@ public class CompoundCacheTest extends AbstractCacheTest {
                 .softValues()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        cache = new CompoundCache<>(l1Cache, l2Cache);
+        cache = new MultiLevelCache<>(l1Cache, l2Cache);
         baseTest();
         expireAfterWriteTest(200);
 

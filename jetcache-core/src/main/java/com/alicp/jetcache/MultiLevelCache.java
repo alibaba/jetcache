@@ -7,12 +7,12 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CompoundCache<K, V> extends WrapValueCache<K, V> {
+public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
 
     private Cache[] caches;
 
     @SuppressWarnings("unchecked")
-    public CompoundCache(Cache... caches) {
+    public MultiLevelCache(Cache... caches) {
         this.caches = caches;
     }
 

@@ -38,19 +38,19 @@ public class Example {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .build();
 
-        CompoundCache<Object, Object> compoundCache = new CompoundCache<>(l1Cache, l2Cache, l3Cache);
+        MultiLevelCache<Object, Object> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache, l3Cache);
 
-        compoundCache.put("K1", "V1");
-        compoundCache.put("K2", "V2", 20, TimeUnit.SECONDS);
-        compoundCache.get("K1");
-        compoundCache.invalidate("K2");
+        multiLevelCache.put("K1", "V1");
+        multiLevelCache.put("K2", "V2", 20, TimeUnit.SECONDS);
+        multiLevelCache.get("K1");
+        multiLevelCache.invalidate("K2");
 
         DynamicQuery key = new DynamicQuery();
         key.setName("AAA");
         key.setEmail("BBB");
-        compoundCache.get(key);
+        multiLevelCache.get(key);
 
-        compoundCache.computeIfAbsent("K3", k -> loadFromDatabase(k));
+        multiLevelCache.computeIfAbsent("K3", k -> loadFromDatabase(k));
     }
 
     private static Object loadFromDatabase(Object key) {

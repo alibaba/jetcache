@@ -11,14 +11,10 @@ import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import com.alicp.jetcache.anno.impl.ClassUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.factory.CacheFactory;
 import com.alicp.jetcache.factory.EmbeddedCacheFactory;
 import com.alicp.jetcache.factory.ExternalCacheFactory;
 import com.alicp.jetcache.support.*;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -57,7 +53,7 @@ public class CacheContext {
                 } else {
                     Cache local = buildLocal(cacheAnnoConfig, area);
                     Cache remote = buildRemote(cacheAnnoConfig, area, subArea);
-                    cache = new CompoundCache(local, remote);
+                    cache = new MultiLevelCache(local, remote);
                     cacheManager.addCache(cacheName + "_local", local);
                     cacheManager.addCache(cacheName + "_remote", remote);
                 }
