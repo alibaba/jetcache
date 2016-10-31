@@ -1,4 +1,6 @@
-package com.alicp.jetcache;
+package com.alicp.jetcache.support;
+
+import com.alicp.jetcache.CacheException;
 
 import java.io.Serializable;
 

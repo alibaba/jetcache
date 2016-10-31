@@ -1,4 +1,4 @@
-package com.alicp.jetcache;
+package com.alicp.jetcache.support;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
