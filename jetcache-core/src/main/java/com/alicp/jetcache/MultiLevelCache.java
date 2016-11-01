@@ -15,9 +15,9 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
         this.caches = caches;
+        isWrap = new boolean[caches.length];
         for (int i = 0; i < caches.length; i++) {
             Cache c = caches[i];
-            boolean wrap = false;
             while (c instanceof DelegateCache) {
                 c = ((DelegateCache) c).getTargetCache();
             }
