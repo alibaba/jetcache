@@ -56,6 +56,16 @@ public class CacheStat implements Serializable, Cloneable {
         }
     }
 
+    public double qps() {
+        long t = statEndTime;
+        if (t == 0) {
+            t = System.currentTimeMillis();
+        }
+        t = t - statStartTime;
+        return 1000.0 * getCount / t ;
+    }
+
+
     public double hitRate() {
         if (getCount == 0) {
             return 0;

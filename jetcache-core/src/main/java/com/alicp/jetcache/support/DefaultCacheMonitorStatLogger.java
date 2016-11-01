@@ -50,18 +50,18 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
     }
 
     protected StringBuilder statText(LinkedList<CacheStat> statsCopy) {
-        //TODO 目前输出的信息很少
         StringBuilder sb = new StringBuilder(512);
-        sb.append("cache\tget\thit(rate)\texpire\tfail\tavgLoadTime\tmaxLoadTime");
+        sb.append("cache|get(qps)|hit(rate)|expire|fail|avgLoadTime|maxLoadTime");
         sb.append("----------------------------------------------------------");
-        DecimalFormat df = new DecimalFormat("#%");
+        DecimalFormat hitRateFomater = new DecimalFormat("#%");
+        DecimalFormat qpsFomater = new DecimalFormat("#.##");
         for (CacheStat s : statsCopy) {
-            sb.append(s.getCacheName()).append('\t');
-            sb.append(s.getGetCount()).append('\t');
-            sb.append(s.getGetHitCount()).append('(').append(df.format(s.hitRate())).append(')').append('\t');
-            sb.append(s.getGetExpireCount()).append('\t');
-            sb.append(s.getGetFailCount()).append('\t');
-            sb.append(s.avgLoadTime()).append('\t');
+            sb.append(s.getCacheName()).append('|');
+            sb.append(s.getGetCount()).append('(').append(qpsFomater.format(s.qps())).append(')').append('|');
+            sb.append(s.getGetHitCount()).append('(').append(hitRateFomater.format(s.hitRate())).append(')').append('|');
+            sb.append(s.getGetExpireCount()).append('|');
+            sb.append(s.getGetFailCount()).append('|');
+            sb.append(s.avgLoadTime()).append('|');
             sb.append(s.getMaxGetTime());
         }
         sb.append("----------------------------------------------------------");
