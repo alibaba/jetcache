@@ -10,10 +10,19 @@ import java.util.concurrent.TimeUnit;
 public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
 
     private Cache[] caches;
+    private boolean[] isWrap;
 
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
         this.caches = caches;
+        for (int i = 0; i < caches.length; i++) {
+            Cache c = caches[i];
+            boolean wrap = false;
+            while (c instanceof DelegateCache) {
+                c = ((DelegateCache) c).getTargetCache();
+            }
+            isWrap[i] = c instanceof WrapValueCache;
+        }
     }
 
     @Override
@@ -26,7 +35,7 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult<CacheValueHolder<V>> r1 = null;
-            if (cache instanceof WrapValueCache) {
+            if (isWrap[i]) {
                 r1 = ((WrapValueCache) cache).GET_HOLDER(key);
             } else {
                 r1 = cache.GET(key);
@@ -40,7 +49,7 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
                 } else {
                     long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
                     PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
-                    return new CacheGetResult<CacheValueHolder<V>>(CacheResultCode.SUCCESS, null, h);
+                    return new CacheGetResult(CacheResultCode.SUCCESS, null, h);
                 }
             }
         }
@@ -49,9 +58,9 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
 
     @Override
     public void put(K key, V value) {
-        for (Cache cache : caches) {
-            long defaultTtl = cache.config().getDefaultExpireInMillis();
-            PUT_impl(cache, key, value, defaultTtl, TimeUnit.MILLISECONDS);
+        for (int i = 0; i < caches.length; i++) {
+            long defaultTtl = caches[i].config().getDefaultExpireInMillis();
+            PUT_impl(i, key, value, defaultTtl, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -63,8 +72,7 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
     private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         boolean fail = false;
         for (int i = 0; i < lastIndex; i++) {
-            Cache cache = caches[i];
-            CacheResult r = PUT_impl(cache, key, value, expire, timeUnit);
+            CacheResult r = PUT_impl(i, key, value, expire, timeUnit);
             if (!r.isSuccess()) {
                 fail = true;
             }
@@ -72,9 +80,10 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
         return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
-    private CacheResult PUT_impl(Cache cache, K key, V value, long expire, TimeUnit timeUnit) {
+    private CacheResult PUT_impl(int index, K key, V value, long expire, TimeUnit timeUnit) {
         CacheResult r = null;
-        if (cache instanceof WrapValueCache) {
+        Cache cache = caches[index];
+        if (isWrap[index]) {
             r = cache.PUT(key, value, expire, timeUnit);
         } else {
             CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));

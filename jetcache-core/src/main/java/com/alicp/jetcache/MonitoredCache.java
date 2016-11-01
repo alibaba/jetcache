@@ -8,7 +8,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MonitoredCache<K, V> implements Cache<K, V> {
+public class MonitoredCache<K, V> implements Cache<K, V>, DelegateCache<K, V> {
 
     private Cache<K, V> cache;
     private CacheMonitor monitor;
@@ -18,6 +18,7 @@ public class MonitoredCache<K, V> implements Cache<K, V> {
         this.monitor = monitor;
     }
 
+    @Override
     public Cache<K, V> getTargetCache() {
         return cache;
     }
