@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorStatLogger.class);
 
-    private LinkedList<CacheStat> stats;
+    private LinkedList<CacheStat> stats = new LinkedList<>();
 
     @Override
     public synchronized void accept(CacheStat cacheStatCopy) {
