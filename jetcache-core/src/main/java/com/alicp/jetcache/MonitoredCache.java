@@ -37,9 +37,8 @@ public class MonitoredCache<K, V> implements Cache<K, V>, DelegateCache<K, V> {
         return result;
     }
 
-    @Override
-    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
-        Function<K, V> newLoader = (k) -> {
+    private Function<K, V> createProxyLoader(K key, Function<K, V> loader) {
+        return (k) -> {
             long t = System.currentTimeMillis();
             V v = null;
             boolean success = false;
@@ -52,6 +51,17 @@ public class MonitoredCache<K, V> implements Cache<K, V>, DelegateCache<K, V> {
             }
             return v;
         };
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
+        Function<K, V> newLoader = createProxyLoader(key, loader);
+        return cache.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
+        Function<K, V> newLoader = createProxyLoader(key, loader);
         return cache.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
     }
 

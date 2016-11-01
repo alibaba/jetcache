@@ -25,21 +25,41 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V2", cache.GET("BASE_K1").getValue());
 
         //computeIfAbsent
-        cache.computeIfAbsent("BASE_K1", k -> {
-            throw new RuntimeException();
-        });
-        Assert.assertEquals("AAA", cache.computeIfAbsent("NOT_EXIST_1", k -> "AAA"));
-        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> null));
-        final Object[] invoked = new Object[1];
-        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> {
-            invoked[0] = new Object();
-            return null;
-        }));
-        Assert.assertNotNull(invoked[0]);
-        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> null, true));
-        Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> {
-            throw new RuntimeException();
-        }, true));
+        {
+            cache.computeIfAbsent("BASE_K1", k -> {
+                throw new RuntimeException();
+            });
+            Assert.assertEquals("AAA", cache.computeIfAbsent("NOT_EXIST_1", k -> "AAA"));
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> null));
+            final Object[] invoked = new Object[1];
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> {
+                invoked[0] = new Object();
+                return null;
+            }));
+            Assert.assertNotNull(invoked[0]);
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> null, true));
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> {
+                throw new RuntimeException();
+            }, true));
+        }
+
+        {
+            cache.computeIfAbsent("BASE_K1", k -> {
+                throw new RuntimeException();
+            }, false, 1, TimeUnit.MINUTES);
+            Assert.assertEquals("AAA", cache.computeIfAbsent("NOT_EXIST_11", k -> "AAA", false, 1, TimeUnit.MINUTES));
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_22", k -> null, false, 1, TimeUnit.MINUTES));
+            final Object[] invoked = new Object[1];
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_33", k -> {
+                invoked[0] = new Object();
+                return null;
+            }));
+            Assert.assertNotNull(invoked[0]);
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_33", k -> null, true, 1, TimeUnit.MINUTES));
+            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_33", k -> {
+                throw new RuntimeException();
+            }, true, 1, TimeUnit.MINUTES));
+        }
 
 
         //invalidate
