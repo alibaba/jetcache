@@ -13,7 +13,7 @@ import java.util.function.Function;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractEmbeddedCache<K, V> extends WrapValueCache<K, V> {
+public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     protected EmbeddedCacheConfig config;
     private IntenalMap intenalMap;
 

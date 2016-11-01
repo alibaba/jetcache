@@ -1,6 +1,6 @@
 package com.alicp.jetcache.external;
 
-import com.alicp.jetcache.WrapValueCache;
+import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.CacheConfigException;
 
 /**
@@ -8,7 +8,7 @@ import com.alicp.jetcache.CacheConfigException;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractExternalCache<K, V> extends WrapValueCache<K, V> {
+public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 
     public AbstractExternalCache(ExternalCacheConfig config){
         if (config.getKeyConvertor() == null) {

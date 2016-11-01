@@ -76,11 +76,15 @@ public interface Cache<K, V> {
     }
 
     default void put(K key, V value) {
-        PUT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        PUT(key, value);
     }
 
     default void put(K key, V value, long expire, TimeUnit timeUnit) {
         PUT(key, value, expire, timeUnit);
+    }
+
+    default CacheResult PUT(K key, V value){
+        return PUT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
     }
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);

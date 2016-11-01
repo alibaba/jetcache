@@ -7,22 +7,13 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
+public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     private Cache[] caches;
-    private boolean[] isWrap;
 
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
         this.caches = caches;
-        isWrap = new boolean[caches.length];
-        for (int i = 0; i < caches.length; i++) {
-            Cache c = caches[i];
-            while (c instanceof DelegateCache) {
-                c = ((DelegateCache) c).getTargetCache();
-            }
-            isWrap[i] = c instanceof WrapValueCache;
-        }
     }
 
     @Override
@@ -35,7 +26,7 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult<CacheValueHolder<V>> r1 = null;
-            if (isWrap[i]) {
+            if (cache instanceof WrapValueCache) {
                 r1 = ((WrapValueCache) cache).GET_HOLDER(key);
             } else {
                 r1 = cache.GET(key);
@@ -48,7 +39,7 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
                     continue;
                 } else {
                     long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
-                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                    PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
                     return new CacheGetResult(CacheResultCode.SUCCESS, null, h);
                 }
             }
@@ -57,39 +48,37 @@ public class MultiLevelCache<K, V> extends WrapValueCache<K, V> {
     }
 
     @Override
-    public void put(K key, V value) {
-        for (int i = 0; i < caches.length; i++) {
-            long defaultTtl = caches[i].config().getDefaultExpireInMillis();
-            PUT_impl(i, key, value, defaultTtl, TimeUnit.MILLISECONDS);
-        }
+    public CacheResult PUT(K key, V value) {
+        //override to prevent NullPointerException when config() is null
+        return PUT_caches(true, caches.length, key, value, Integer.MIN_VALUE, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
-        return PUT_caches(caches.length, key, value, expire, timeUnit);
+        return PUT_caches(false, caches.length, key, value, expire, timeUnit);
     }
 
-    private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
+    private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         boolean fail = false;
         for (int i = 0; i < lastIndex; i++) {
-            CacheResult r = PUT_impl(i, key, value, expire, timeUnit);
+            CacheResult r1 = null;
+            Cache cache = caches[i];
+            if(useDefaultExpire){
+                expire = cache.config().getDefaultExpireInMillis();
+                timeUnit = TimeUnit.MILLISECONDS;
+            }
+            if (cache instanceof WrapValueCache) {
+                r1 = cache.PUT(key, value, expire, timeUnit);
+            } else {
+                CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+                r1 = cache.PUT(key, h, expire, timeUnit);
+            }
+            CacheResult r = r1;
             if (!r.isSuccess()) {
                 fail = true;
             }
         }
         return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
-    }
-
-    private CacheResult PUT_impl(int index, K key, V value, long expire, TimeUnit timeUnit) {
-        CacheResult r = null;
-        Cache cache = caches[index];
-        if (isWrap[index]) {
-            r = cache.PUT(key, value, expire, timeUnit);
-        } else {
-            CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-            r = cache.PUT(key, h, expire, timeUnit);
-        }
-        return r;
     }
 
     @Override

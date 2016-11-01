@@ -18,14 +18,14 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
     @Test
     public void test() throws Exception {
-        WrapValueCache<Object, Object> l1Cache = (WrapValueCache<Object, Object>) EmbeddedCacheBuilder
+        AbstractCache<Object, Object> l1Cache = (AbstractCache<Object, Object>) EmbeddedCacheBuilder
                 .createEmbeddedCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        WrapValueCache<Object, Object> l2Cache = (WrapValueCache<Object, Object>) EmbeddedCacheBuilder
+        AbstractCache<Object, Object> l2Cache = (AbstractCache<Object, Object>) EmbeddedCacheBuilder
                 .createEmbeddedCacheBuilder()
                 .limit(100000)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)

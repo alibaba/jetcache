@@ -64,7 +64,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
     }
 
     protected LocalDateTime computeFirstResetTime(int time, TimeUnit unit) {
-        if (unit != TimeUnit.SECONDS || unit != TimeUnit.MINUTES || unit != TimeUnit.HOURS || unit != TimeUnit.DAYS) {
+        if (unit != TimeUnit.SECONDS && unit != TimeUnit.MINUTES && unit != TimeUnit.HOURS && unit != TimeUnit.DAYS) {
             throw new IllegalArgumentException();
         }
         LocalDateTime t = LocalDateTime.now();
