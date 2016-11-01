@@ -38,8 +38,22 @@ public interface Cache<K, V> {
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
-        return computeIfAbsent(key, loader, cacheNullWhenLoaderReturnNull,
-                config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        try {
+            CacheGetResult<V> r = GET(key);
+            if (r.isSuccess()) {
+                return r.getValue();
+            } else {
+                Object loadedValue = loader.apply(key);
+                V castedValue = (V) loadedValue;
+                if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
+                    put(key, castedValue);
+                }
+                return castedValue;
+            }
+        } catch (ClassCastException ex) {
+            CACHE_INTERNAL_LOGGER.warn("jetcache computeIfAbsent error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            return null;
+        }
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
