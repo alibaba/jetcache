@@ -72,13 +72,13 @@ public class MonitoredCache<K, V> implements Cache<K, V>, WrapValueCache<K, V> {
     @Override
     public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
         Function<K, V> newLoader = createProxyLoader(key, loader);
-        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
+        return WrapValueCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
     }
 
     @Override
     public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
         Function<K, V> newLoader = createProxyLoader(key, loader);
-        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
+        return WrapValueCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
     }
 
     @Override

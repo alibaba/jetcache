@@ -5,6 +5,6 @@ package com.alicp.jetcache;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public interface WrapValueCache<K,V> {
+interface WrapValueCache<K,V> extends Cache<K,V> {
     CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key);
 }
