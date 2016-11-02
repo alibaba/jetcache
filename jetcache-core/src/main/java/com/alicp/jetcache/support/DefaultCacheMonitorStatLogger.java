@@ -21,7 +21,7 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
     private int logDelaySeconds;
 
     public DefaultCacheMonitorStatLogger() {
-        this(1);
+        this(5);
     }
 
     public DefaultCacheMonitorStatLogger(int logDelaySeconds) {
