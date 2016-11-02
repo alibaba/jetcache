@@ -116,6 +116,6 @@ public class DefaultCacheMonnitorTest {
         mc = new MonitoredCache(mc, mcm);
         basetest(mc, mcm);
 
-        Thread.sleep(10000);
+//        Thread.sleep(10000);
     }
 }
