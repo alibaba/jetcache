@@ -45,7 +45,7 @@ public class CacheStat implements Serializable, Cloneable {
     protected long loadFailCount;
     protected long loadTimeSum;
     protected long minLoadTime = Long.MAX_VALUE;
-    protected long maxLoadTime = Long.MIN_VALUE;
+    protected long maxLoadTime = 0;
 
     @Override
     public CacheStat clone() {
