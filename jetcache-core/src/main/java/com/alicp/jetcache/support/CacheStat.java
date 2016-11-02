@@ -24,21 +24,21 @@ public class CacheStat implements Serializable, Cloneable {
     protected long getExpireCount;
     protected long getTimeSum;
     protected long minGetTime = Long.MAX_VALUE;
-    protected long maxGetTime = Long.MIN_VALUE;
+    protected long maxGetTime = 0;
 
     protected long putCount;
     protected long putSuccessCount;
     protected long putFailCount;
     protected long putTimeSum;
     protected long minPutTime = Long.MAX_VALUE;
-    protected long maxPutTime = Long.MIN_VALUE;
+    protected long maxPutTime = 0;
 
     protected long invalidateCount;
     protected long invalidateSuccessCount;
     protected long invalidateFailCount;
     protected long invalidateTimeSum;
     protected long minInvalidateTime = Long.MAX_VALUE;
-    protected long maxInvalidateTime = Long.MIN_VALUE;
+    protected long maxInvalidateTime = 0;
 
     protected long loadCount;
     protected long loadSuccessCount;
@@ -62,7 +62,12 @@ public class CacheStat implements Serializable, Cloneable {
             t = System.currentTimeMillis();
         }
         t = t - statStartTime;
-        return 1000.0 * getCount / t ;
+        if (t == 0) {
+            return 0;
+        } else {
+            return 1000.0 * getCount / t;
+        }
+
     }
 
 

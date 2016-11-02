@@ -31,7 +31,7 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
                     stats.clear();
                 }
                 logStat(statsCopy);
-            }, 5, TimeUnit.SECONDS);
+            }, 3, TimeUnit.SECONDS);
         }
     }
 
@@ -45,24 +45,26 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
                 return o1.getCacheName().compareTo(o2.getCacheName());
             }
         });
-        String s = statText(statsCopy).insert(0, "jetcache stat:\n").toString();
+        String s = statText(statsCopy).insert(0, "jetcache get stat:\n").toString();
         logger.info(s);
     }
 
     protected StringBuilder statText(LinkedList<CacheStat> statsCopy) {
         StringBuilder sb = new StringBuilder(512);
-        sb.append("cache|get(qps)|hit(rate)|expire|fail|avgLoadTime|maxLoadTime");
-        sb.append("----------------------------------------------------------");
+        sb.append("cache|qps|rate|get|hit|expire|fail|avgLoadTime|maxLoadTime\n");
+        sb.append("----------------------------------------------------------\n");
         DecimalFormat hitRateFomater = new DecimalFormat("#%");
         DecimalFormat qpsFomater = new DecimalFormat("#.##");
         for (CacheStat s : statsCopy) {
             sb.append(s.getCacheName()).append('|');
-            sb.append(s.getGetCount()).append('(').append(qpsFomater.format(s.qps())).append(')').append('|');
-            sb.append(s.getGetHitCount()).append('(').append(hitRateFomater.format(s.hitRate())).append(')').append('|');
+            sb.append(qpsFomater.format(s.qps())).append('|');
+            sb.append(hitRateFomater.format(s.hitRate())).append('|');
+            sb.append(s.getGetCount()).append('|');
+            sb.append(s.getGetHitCount()).append('|');
             sb.append(s.getGetExpireCount()).append('|');
             sb.append(s.getGetFailCount()).append('|');
             sb.append(s.avgLoadTime()).append('|');
-            sb.append(s.getMaxGetTime());
+            sb.append(s.getMaxGetTime()).append('\n');
         }
         sb.append("----------------------------------------------------------");
         return sb;

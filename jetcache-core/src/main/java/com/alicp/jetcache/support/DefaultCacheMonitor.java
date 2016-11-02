@@ -24,15 +24,12 @@ public class DefaultCacheMonitor implements CacheMonitor {
     protected static ScheduledExecutorService executorService;
 
     protected CacheStat cacheStat;
-    private String cacheName;
 
     public DefaultCacheMonitor(String cacheName) {
-        this.cacheName = cacheName;
         initStat(cacheName);
     }
 
     public DefaultCacheMonitor(String cacheName, int resetTime, TimeUnit resetTimeUnit, Consumer<CacheStat> resetAction) {
-        this.cacheName = cacheName;
         initStat(cacheName);
         if (executorService == null) {
             initExecutor();
@@ -48,7 +45,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
             }
         };
         long delay = firstDelay(resetTime, resetTimeUnit);
-        executorService.scheduleAtFixedRate(cmd, delay, resetTime, resetTimeUnit);
+        executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
     }
 
     private void initStat(String cacheName) {
@@ -57,44 +54,44 @@ public class DefaultCacheMonitor implements CacheMonitor {
         cacheStat.setCacheName(cacheName);
     }
 
-    protected long firstDelay(int resetTime, TimeUnit resetTimeUnit) {
-        LocalDateTime firstResetTime = computeFirstResetTime(resetTime, resetTimeUnit);
+    protected static long firstDelay(int resetTime, TimeUnit resetTimeUnit) {
+        LocalDateTime firstResetTime = computeFirstResetTime(LocalDateTime.now(), resetTime, resetTimeUnit);
         long d = firstResetTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
         return d;
     }
 
-    protected LocalDateTime computeFirstResetTime(int time, TimeUnit unit) {
+    protected static LocalDateTime computeFirstResetTime(LocalDateTime baseTime, int time, TimeUnit unit) {
         if (unit != TimeUnit.SECONDS && unit != TimeUnit.MINUTES && unit != TimeUnit.HOURS && unit != TimeUnit.DAYS) {
             throw new IllegalArgumentException();
         }
-        LocalDateTime t = LocalDateTime.now();
+        LocalDateTime t = baseTime;
         switch (unit) {
             case DAYS:
-                t = t.plusDays(1).withHour(0);
-                t = t.plusHours(1).withMinute(0);
-                t = t.plusMinutes(1).withSecond(0);
-                t = t.plusSeconds(1).withNano(0);
+                t = t.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
                 break;
             case HOURS:
-                t = t.plusHours(1).withMinute(0);
-                t = t.plusMinutes(1).withSecond(0);
-                t = t.plusSeconds(1).withNano(0);
                 if (24 % time == 0) {
                     t = t.plusHours(time - t.getHour() % time);
+                } else {
+                    t = t.plusHours(1);
                 }
+                t = t.withMinute(0).withSecond(0).withNano(0);
                 break;
             case MINUTES:
-                t = t.plusMinutes(1).withSecond(0);
-                t = t.plusSeconds(1).withNano(0);
                 if (60 % time == 0) {
                     t = t.plusMinutes(time - t.getMinute() % time);
+                } else {
+                    t = t.plusMinutes(1);
                 }
+                t = t.withSecond(0).withNano(0);
                 break;
             case SECONDS:
-                t = t.plusSeconds(1).withNano(0);
                 if (60 % time == 0) {
                     t = t.plusSeconds(time - t.getSecond() % time);
+                } else {
+                    t = t.plusSeconds(1);
                 }
+                t = t.withNano(0);
                 break;
         }
         return t;
