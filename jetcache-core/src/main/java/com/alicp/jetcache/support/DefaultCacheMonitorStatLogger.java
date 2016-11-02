@@ -73,7 +73,7 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
             sb.append(s.getGetExpireCount()).append('|');
             sb.append(s.getGetFailCount()).append('|');
             sb.append(s.avgLoadTime()).append('|');
-            sb.append(s.getMaxGetTime()).append('\n');
+            sb.append(s.getMaxLoadTime()).append('\n');
         }
         sb.append("----------------------------------------------------------");
         return sb;
