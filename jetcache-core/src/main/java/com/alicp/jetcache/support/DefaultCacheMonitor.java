@@ -109,7 +109,11 @@ public class DefaultCacheMonitor implements CacheMonitor {
         synchronized (DefaultCacheMonitor.class) {
             if (executorService == null) {
                 executorService = Executors.newSingleThreadScheduledExecutor(
-                        r -> new Thread(r, "JetCacheMonitorThread"));
+                        r -> {
+                            Thread t = new Thread(r, "JetCacheMonitorThread");
+                            t.setDaemon(true);
+                            return t;
+                        });
             }
         }
     }
