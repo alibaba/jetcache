@@ -95,8 +95,7 @@ public class DefaultCacheMonitorManager {
 
     protected static long firstDelay(int resetTime, TimeUnit resetTimeUnit) {
         LocalDateTime firstResetTime = computeFirstResetTime(LocalDateTime.now(), resetTime, resetTimeUnit);
-        long d = firstResetTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
-        return d;
+        return firstResetTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
     }
 
     protected static LocalDateTime computeFirstResetTime(LocalDateTime baseTime, int time, TimeUnit unit) {

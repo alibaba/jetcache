@@ -84,8 +84,7 @@ public class CacheContext {
         } else {
             throw new CacheException(cacheAnnoConfig.getSerialPolicy());
         }
-        Cache cache = cacheFactory.buildCache();
-        return cache;
+        return cacheFactory.buildCache();
     }
 
     private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
