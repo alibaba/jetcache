@@ -10,7 +10,7 @@ import com.alicp.jetcache.anno.SerialPolicy;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface CacheConsts {
-    String DEFAULT_AREA = "";
+    String DEFAULT_AREA = "default";
     boolean DEFAULT_ENABLED = true;
     int DEFAULT_EXPIRE = 600;
     CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;

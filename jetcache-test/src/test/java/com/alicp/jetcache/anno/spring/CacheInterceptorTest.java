@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.spring;
 
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.context.CacheContext;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;

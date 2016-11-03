@@ -5,7 +5,7 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
-import com.alicp.jetcache.anno.context.CacheContext;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.slf4j.Logger;

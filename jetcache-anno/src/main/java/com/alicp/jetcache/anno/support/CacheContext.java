@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-04 15:34
  */
-package com.alicp.jetcache.anno.context;
+package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheType;
@@ -9,8 +9,6 @@ import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import com.alicp.jetcache.anno.impl.ClassUtil;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.factory.EmbeddedCacheFactory;
 import com.alicp.jetcache.factory.ExternalCacheFactory;
 import com.alicp.jetcache.support.*;

@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-23 16:02
  */
-package com.alicp.jetcache.anno.context;
+package com.alicp.jetcache.anno.support;
 
 import org.junit.Assert;
 import org.junit.Test;

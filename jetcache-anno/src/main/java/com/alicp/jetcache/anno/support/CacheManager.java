@@ -1,4 +1,6 @@
-package com.alicp.jetcache;
+package com.alicp.jetcache.anno.support;
+
+import com.alicp.jetcache.Cache;
 
 import java.util.concurrent.ConcurrentHashMap;
 

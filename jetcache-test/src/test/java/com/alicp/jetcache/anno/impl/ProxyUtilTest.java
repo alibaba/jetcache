@@ -5,7 +5,7 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.context.CacheContext;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.spring.TestUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;

@@ -4,9 +4,8 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.context.CacheContext;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;

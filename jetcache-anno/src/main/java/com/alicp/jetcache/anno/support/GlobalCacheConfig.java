@@ -3,13 +3,9 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.anno.context.CacheContext;
-import com.alicp.jetcache.anno.impl.CacheInvokeContext;
 import com.alicp.jetcache.factory.CacheFactory;
 
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

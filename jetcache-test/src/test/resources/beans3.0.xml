@@ -19,13 +19,13 @@
     <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.spring.SpringGlobalCacheConfig">
         <property name="localCacheFacotories">
             <map>
-                <entry key="" value-ref="localCacheFactory"/>
+                <entry key="default" value-ref="localCacheFactory"/>
                 <entry key="A1" value-ref="localCacheFactory"/>
             </map>
         </property>
         <property name="remoteCacheFacotories">
             <map>
-                <entry key="" value-ref="remoteCacheFactory"/>
+                <entry key="default" value-ref="remoteCacheFactory"/>
                 <entry key="A1" value-ref="remoteCacheFactory2"/>
             </map>
         </property>
