@@ -20,7 +20,7 @@ public class DefaultCacheMonitorManager {
 
     protected static ScheduledExecutorService executorService;
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
-    ;
+
     private ScheduledFuture<?> future;
     private Consumer<List<CacheStat>> resetAction;
 

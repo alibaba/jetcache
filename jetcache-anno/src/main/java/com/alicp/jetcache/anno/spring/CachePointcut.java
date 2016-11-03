@@ -51,11 +51,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         if (exclude(name)) {
             return false;
         }
-        if(include(name)){
-            return true;
-        } else {
-            return false;
-        }
+        return include(name);
     }
 
     private boolean include(String name) {
@@ -73,6 +69,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         if (name.startsWith("java")) {
             return true;
         }
+        //noinspection RedundantIfStatement
         if (name.startsWith("org.springframework")) {
             return true;
         }

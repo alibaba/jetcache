@@ -7,11 +7,11 @@ package com.alicp.jetcache.testsupport;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface Count {
-    public int count();
+    int count();
 
-    public int count(int p);
+    int count(int p);
 
-    public int count(String s, int p);
+    int count(String s, int p);
 
-    public int count(DynamicQuery q, int p);
+    int count(DynamicQuery q, int p);
 }

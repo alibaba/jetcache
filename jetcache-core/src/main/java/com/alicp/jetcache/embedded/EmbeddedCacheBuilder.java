@@ -13,7 +13,7 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Cac
     }
 
     public static class EmbeddedCacheBuilderImpl extends EmbeddedCacheBuilder<EmbeddedCacheBuilderImpl> {
-    };
+    }
 
     public static EmbeddedCacheBuilderImpl createEmbeddedCacheBuilder(){
         return new EmbeddedCacheBuilderImpl();

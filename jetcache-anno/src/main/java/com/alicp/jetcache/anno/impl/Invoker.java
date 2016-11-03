@@ -7,5 +7,5 @@ package com.alicp.jetcache.anno.impl;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public interface Invoker {
-    public Object invoke() throws Throwable;
+    Object invoke() throws Throwable;
 }

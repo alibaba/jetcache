@@ -10,5 +10,5 @@ import com.alicp.jetcache.anno.Cached;
  */
 public interface FactoryBeanTarget {
     @Cached
-    public int count();
+    int count();
 }

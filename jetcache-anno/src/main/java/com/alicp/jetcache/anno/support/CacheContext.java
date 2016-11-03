@@ -77,7 +77,9 @@ public class CacheContext {
             cacheFactory.setValueEncoder(JavaValueEncoder.INSTANCE);
             cacheFactory.setValueDecoder(JavaValueDecoder.INSTANCE);
         } else if (SerialPolicy.FASTJSON.equals(cacheAnnoConfig.getSerialPolicy())) {
+            //noinspection deprecation
             cacheFactory.setValueEncoder(FastjsonValueEncoder.INSTANCE);
+            //noinspection deprecation
             cacheFactory.setValueDecoder(FastjsonValueDecoder.INSTANCE);
         } else {
             throw new CacheException(cacheAnnoConfig.getSerialPolicy());

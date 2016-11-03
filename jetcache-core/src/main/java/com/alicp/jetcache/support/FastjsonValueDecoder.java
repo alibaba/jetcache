@@ -10,10 +10,12 @@ import com.alibaba.fastjson.JSON;
 @Deprecated
 public class FastjsonValueDecoder extends AbstractValueDecoder {
 
+    @SuppressWarnings("deprecation")
     public static final FastjsonValueDecoder INSTANCE = new FastjsonValueDecoder();
 
     @Override
     public Object apply(byte[] buffer) {
+        //noinspection deprecation
         checkHeader(buffer, FastjsonValueEncoder.IDENTITY_NUMBER);
         byte[] bs = new byte[buffer.length - 4];
         System.arraycopy(buffer, 4, bs, 0, bs.length);

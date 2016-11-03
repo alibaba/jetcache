@@ -11,6 +11,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 @Deprecated
 public class FastjsonValueEncoder extends AbstractValueEncoder {
 
+    @SuppressWarnings("deprecation")
     public static final FastjsonValueEncoder INSTANCE = new FastjsonValueEncoder();
 
     protected static int IDENTITY_NUMBER = 0x4A953A81;

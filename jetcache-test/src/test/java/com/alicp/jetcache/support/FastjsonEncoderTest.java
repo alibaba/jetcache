@@ -12,7 +12,9 @@ import org.junit.Test;
 public class FastjsonEncoderTest extends AbstractEncoderTest {
     @Test
     public void test() {
+        //noinspection deprecation
         encoder = FastjsonValueEncoder.INSTANCE;
+        //noinspection deprecation
         decoder = FastjsonValueDecoder.INSTANCE;
         super.baseTest();
     }
