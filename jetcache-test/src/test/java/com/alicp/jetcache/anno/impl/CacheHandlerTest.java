@@ -67,7 +67,7 @@ public class CacheHandlerTest {
     public void testStaticInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
-        method.invoke(count, null);
+        method.invoke(count);
 
         x1 = invoke(method, null);
         x2 = invoke(method, null);
@@ -263,7 +263,7 @@ public class CacheHandlerTest {
     public void testStaticInvoke_CacheContext() throws Throwable {
         final Method method = CountClass.class.getMethod("count");
         int x1, x2, x3;
-        Invoker invoker = () -> method.invoke(count, null);
+        Invoker invoker = () -> method.invoke(count);
 
         CacheInvokeContext context = createContext(invoker, method, null);
         cacheAnnoConfig.setEnabled(false);
@@ -308,7 +308,7 @@ public class CacheHandlerTest {
     @Test
     public void testInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
-        Invoker invoker = () -> method.invoke(count, null);
+        Invoker invoker = () -> method.invoke(count);
         CacheHandler ch = new CacheHandler(count, cacheInvokeConfig, () -> createContext(invoker, method, null), null);
         int x1 = (Integer) ch.invoke(null, method, null);
         int x2 = (Integer) ch.invoke(null, method, null);
@@ -326,7 +326,7 @@ public class CacheHandlerTest {
                 return cac;
             }
         };
-        Invoker invoker = () -> method.invoke(count, null);
+        Invoker invoker = () -> method.invoke(count);
         CacheHandler ch = new CacheHandler(count, configMap, () -> createContext(invoker, method, null), null);
 
         int x1 = (Integer) ch.invoke(null, method, null);

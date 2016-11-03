@@ -111,7 +111,7 @@ public class Benchmark {
         String[][] data = new String[THREAD_COUNT][rowsPerThread];
         FileInputStream fis = new FileInputStream(FILE);
         BufferedReader br = new BufferedReader(new InputStreamReader(fis, "GBK"));
-        String line = null;
+        String line;
         int threadIndex = 0;
         int rowIndex = 0;
         while ((line = br.readLine()) != null) {

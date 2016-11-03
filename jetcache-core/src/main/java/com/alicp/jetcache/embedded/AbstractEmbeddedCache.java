@@ -41,7 +41,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     @Override
     public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
         Object newKey = buildKey(key);
-        CacheValueHolder<V> holder = null;
+        CacheValueHolder<V> holder;
         if (config.isWeakValues()) {
             WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
             if (ref == null) {
@@ -91,8 +91,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
-        CacheValueHolder<V> cacheObject = null;
-        cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
         if (config.isWeakValues()) {
             WeakReference<CacheValueHolder<V>> ref = new WeakReference(cacheObject);
             intenalMap.putValue(buildKey(key), ref);

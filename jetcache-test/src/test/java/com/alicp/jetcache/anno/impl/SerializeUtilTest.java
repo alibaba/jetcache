@@ -100,6 +100,7 @@ public class SerializeUtilTest {
         a.map.put("b", b);
 
         byte[] bs1 = SerializeUtil.encode(a, serialPolicy);
+        @SuppressWarnings("UnusedAssignment")
         A a2 = (A) SerializeUtil.decode(bs1);
     }
 
@@ -108,7 +109,7 @@ public class SerializeUtilTest {
         B b = new B();
         a.b = b;
         b.a = a;
-        if (p != SerialPolicy.FASTJSON) {
+        if (!SerialPolicy.FASTJSON.equals(p)) {
             a.map.put("a", a);
             a.map.put("b", b);
         }
@@ -123,7 +124,7 @@ public class SerializeUtilTest {
         Assert.assertNotNull(a2.b);
         Assert.assertSame(a2, a2.b.a);
 
-        if (p != SerialPolicy.FASTJSON) {
+        if (!SerialPolicy.FASTJSON.equals(p)) {
             Assert.assertSame(a2, a2.map.get("a"));
             Assert.assertSame(a2, ((B) a2.map.get("b")).a);
             Assert.assertEquals(b.f2, ((B) a2.map.get("b")).f2);
@@ -135,7 +136,7 @@ public class SerializeUtilTest {
         Assert.assertNotNull(b2.a);
         Assert.assertNotNull(b2.a.map);
         Assert.assertSame(b2, b2.a.b);
-        if (p != SerialPolicy.FASTJSON) {
+        if (!SerialPolicy.FASTJSON.equals(p)) {
             Assert.assertSame(b2, b2.a.map.get("b"));
             Assert.assertSame(b2.a, b2.a.map.get("a"));
         }

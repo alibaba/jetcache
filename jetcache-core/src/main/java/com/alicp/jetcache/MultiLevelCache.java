@@ -25,7 +25,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
-            CacheGetResult<CacheValueHolder<V>> r1 = null;
+            CacheGetResult<CacheValueHolder<V>> r1;
             if (cache instanceof WrapValueCache) {
                 r1 = ((WrapValueCache) cache).GET_HOLDER(key);
             } else {
@@ -59,7 +59,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         boolean fail = false;
         for (int i = 0; i < lastIndex; i++) {
-            CacheResult r1 = null;
+            CacheResult r1;
             Cache cache = caches[i];
             if(useDefaultExpire){
                 expire = cache.config().getDefaultExpireInMillis();

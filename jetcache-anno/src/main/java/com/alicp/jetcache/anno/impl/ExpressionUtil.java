@@ -5,7 +5,6 @@ package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.support.CacheMonitor;
 import org.mvel2.MVEL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
