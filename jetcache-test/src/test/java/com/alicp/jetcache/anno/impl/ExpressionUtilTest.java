@@ -4,7 +4,6 @@
 package com.alicp.jetcache.anno.impl;
 
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

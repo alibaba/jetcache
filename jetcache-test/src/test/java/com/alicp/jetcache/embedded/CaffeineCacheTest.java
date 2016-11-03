@@ -2,11 +2,8 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
-import com.alicp.jetcache.CacheResultCode;
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**

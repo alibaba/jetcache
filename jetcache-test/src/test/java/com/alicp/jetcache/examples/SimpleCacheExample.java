@@ -4,7 +4,6 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 
 import java.util.concurrent.TimeUnit;
 

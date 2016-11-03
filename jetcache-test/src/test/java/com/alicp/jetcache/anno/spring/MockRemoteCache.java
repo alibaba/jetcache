@@ -6,7 +6,6 @@ package com.alicp.jetcache.anno.spring;
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.impl.SerializeUtil;
-import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 
 import java.util.HashMap;

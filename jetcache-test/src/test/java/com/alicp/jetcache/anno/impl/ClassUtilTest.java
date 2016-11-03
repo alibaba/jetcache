@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.anno.impl;
 
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import org.junit.Assert;
 import org.junit.Test;
 

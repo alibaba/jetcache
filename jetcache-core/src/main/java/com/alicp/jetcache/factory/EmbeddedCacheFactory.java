@@ -1,7 +1,5 @@
 package com.alicp.jetcache.factory;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 
 /**

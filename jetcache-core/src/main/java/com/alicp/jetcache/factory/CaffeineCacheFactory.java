@@ -3,7 +3,6 @@ package com.alicp.jetcache.factory;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 
 /**
  * Created on 2016/10/25.
