@@ -13,14 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
-    private CachePointcut pointcut;
-
     private ConcurrentHashMap cacheConfigMap;
 
     private String[] basePackages;
 
     public Pointcut getPointcut() {
-        pointcut = new CachePointcut(basePackages);
+        CachePointcut pointcut = new CachePointcut(basePackages);
         pointcut.setCacheConfigMap(cacheConfigMap);
         return pointcut;
     }

@@ -23,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheInterceptorTest {
     private CachePointcut pc;
-    private ConcurrentHashMap<Method, CacheInvokeConfig> map;
     private CacheInterceptor interceptor;
 
     @Rule
@@ -32,7 +31,7 @@ public class CacheInterceptorTest {
     @Before
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        map = new ConcurrentHashMap();
+        ConcurrentHashMap<Method, CacheInvokeConfig> map = new ConcurrentHashMap();
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);
