@@ -52,6 +52,11 @@ public class DefaultCacheMonitorManager {
         return this;
     }
 
+    public DefaultCacheMonitorManager add(DefaultCacheMonitor... monitors) {
+        monitorList.addAll(Arrays.asList(monitors));
+        return this;
+    }
+
     public DefaultCacheMonitorManager remove(DefaultCacheMonitor monitor) {
         monitorList.remove(monitor);
         return this;
