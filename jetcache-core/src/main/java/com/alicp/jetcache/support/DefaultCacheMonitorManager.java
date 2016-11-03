@@ -1,6 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.MonitoredCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,26 +8,25 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 
 /**
  * Created on 2016/10/31.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class DefaultCacheMonitorStatLogger {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorStatLogger.class);
+public class DefaultCacheMonitorManager {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorManager.class);
 
     protected static ScheduledExecutorService executorService;
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
     ;
     private ScheduledFuture<?> future;
 
-    public DefaultCacheMonitorStatLogger(int resetTime, TimeUnit resetTimeUnit) {
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit) {
         init(resetTime, resetTimeUnit);
     }
 
-    public DefaultCacheMonitorStatLogger(int resetTime, TimeUnit resetTimeUnit, DefaultCacheMonitor... monitors) {
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, DefaultCacheMonitor... monitors) {
         this.monitorList.addAll(Arrays.asList(monitors));
         init(resetTime, resetTimeUnit);
     }
@@ -37,15 +35,7 @@ public class DefaultCacheMonitorStatLogger {
         if (executorService == null) {
             initExecutor();
         }
-        Runnable cmd = () -> {
-            DefaultCacheMonitor[] monitorArray = monitorList.toArray(new DefaultCacheMonitor[monitorList.size()]);
-            List<CacheStat> stats = new ArrayList<>();
-            for (DefaultCacheMonitor m : monitorArray) {
-                stats.add(m.getCacheStat());
-                m.resetStat();
-            }
-            logStat(stats);
-        };
+        Runnable cmd = () -> logStat(stats());
         long delay = firstDelay(resetTime, resetTimeUnit);
         future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
     }
@@ -54,14 +44,24 @@ public class DefaultCacheMonitorStatLogger {
         future.cancel(false);
     }
 
-    public DefaultCacheMonitorStatLogger add(DefaultCacheMonitor monitor) {
+    public DefaultCacheMonitorManager add(DefaultCacheMonitor monitor) {
         monitorList.add(monitor);
         return this;
     }
 
-    public DefaultCacheMonitorStatLogger remove(DefaultCacheMonitor monitor) {
+    public DefaultCacheMonitorManager remove(DefaultCacheMonitor monitor) {
         monitorList.remove(monitor);
         return this;
+    }
+
+    public List<CacheStat> stats() {
+        DefaultCacheMonitor[] monitorArray = monitorList.toArray(new DefaultCacheMonitor[monitorList.size()]);
+        List<CacheStat> stats = new ArrayList<>();
+        for (DefaultCacheMonitor m : monitorArray) {
+            stats.add(m.getCacheStat());
+            m.resetStat();
+        }
+        return stats;
     }
 
     public static ScheduledExecutorService executorService() {

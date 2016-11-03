@@ -6,7 +6,7 @@ import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorStatLogger;
+import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 
 import java.util.concurrent.TimeUnit;
@@ -28,7 +28,7 @@ public class CacheMonitorExample {
 
         Cache<String, Integer> orderCache = new MonitoredCache(cache, orderCacheMonitor);
 
-        DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger(1, TimeUnit.SECONDS);
+        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS);
         statLogger.add(orderCacheMonitor);
 
         Thread t = new Thread(() -> {
@@ -46,5 +46,7 @@ public class CacheMonitorExample {
         });
         t.start();
         t.join();
+
+        statLogger.shutdown();
     }
 }

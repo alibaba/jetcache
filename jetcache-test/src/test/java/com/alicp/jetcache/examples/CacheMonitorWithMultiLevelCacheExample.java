@@ -7,7 +7,7 @@ import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorStatLogger;
+import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 
 import java.util.concurrent.TimeUnit;
@@ -40,7 +40,7 @@ public class CacheMonitorWithMultiLevelCacheExample {
         Cache<String, Integer> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
         Cache<String, Integer> orderCache = new MonitoredCache<>(multiLevelCache, orderCacheMonitor);
 
-        DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger(1, TimeUnit.SECONDS);
+        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS);
         statLogger.add(l1CacheMonitor).add(l2CacheMonitor).add(orderCacheMonitor);
 
         Thread t = new Thread(() -> {
@@ -58,5 +58,7 @@ public class CacheMonitorWithMultiLevelCacheExample {
         });
         t.start();
         t.join();
+
+        statLogger.shutdown();
     }
 }

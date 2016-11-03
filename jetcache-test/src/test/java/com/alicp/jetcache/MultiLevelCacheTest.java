@@ -5,7 +5,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorStatLogger;
+import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import org.junit.Assert;
 import org.junit.Test;
@@ -61,7 +61,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l2Cache = new MonitoredCache(l2Cache, m2);
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
         cache = new MonitoredCache<>(cache, mc);
-        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(1, TimeUnit.SECONDS);
+        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS);
         logger.add(m1).add(m1_again).add(m2).add(mc);
         doTest();
         logger.shutdown();
