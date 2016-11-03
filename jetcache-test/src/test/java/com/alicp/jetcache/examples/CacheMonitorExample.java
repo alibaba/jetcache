@@ -19,8 +19,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheMonitorExample {
     public static void main(String[] args) throws Exception {
-        int logDelayMillis = 500;
-        DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger(logDelayMillis);
         Cache<String, Integer> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
@@ -33,10 +31,17 @@ public class CacheMonitorExample {
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-        l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("OrderCache_L1", 2, TimeUnit.SECONDS, statLogger));
-        l2Cache = new MonitoredCache(l2Cache, new DefaultCacheMonitor("OrderCache_L2", 2, TimeUnit.SECONDS, statLogger));
+        DefaultCacheMonitor l1CacheMonitor = new DefaultCacheMonitor("OrderCache_L1");
+        DefaultCacheMonitor l2CacheMonitor = new DefaultCacheMonitor("OrderCache_L2");
+        DefaultCacheMonitor orderCacheMonitor = new DefaultCacheMonitor("OrderCache");
+
+        l1Cache = new MonitoredCache(l1Cache, l1CacheMonitor);
+        l2Cache = new MonitoredCache(l2Cache, l2CacheMonitor);
         Cache<String, Integer> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
-        Cache<String, Integer> orderCache = new MonitoredCache<>(multiLevelCache, new DefaultCacheMonitor("OrderCache", 2, TimeUnit.SECONDS, statLogger));
+        Cache<String, Integer> orderCache = new MonitoredCache<>(multiLevelCache, orderCacheMonitor);
+
+        DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger(1, TimeUnit.SECONDS);
+        statLogger.add(l1CacheMonitor).add(l2CacheMonitor).add(orderCacheMonitor);
 
         Thread t = new Thread(() -> {
             for (int i = 0; i < 100; i++) {

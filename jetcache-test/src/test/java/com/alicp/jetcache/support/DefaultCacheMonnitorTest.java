@@ -9,7 +9,6 @@ import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -26,45 +25,6 @@ public class DefaultCacheMonnitorTest {
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .build();
-    }
-
-    @Test
-    public void testFirstResetTime() {
-        LocalDateTime t = LocalDateTime.of(2016, 11, 11, 23, 50, 33, 123243242);
-
-        LocalDateTime rt = DefaultCacheMonitor.computeFirstResetTime(t, 1, TimeUnit.SECONDS);
-        Assert.assertEquals(t.withSecond(34).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 13, TimeUnit.SECONDS);
-        Assert.assertEquals(t.withSecond(34).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 30, TimeUnit.SECONDS);
-        Assert.assertEquals(t.withMinute(51).withSecond(0).withNano(0), rt);
-
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 1, TimeUnit.MINUTES);
-        Assert.assertEquals(t.withMinute(51).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 7, TimeUnit.MINUTES);
-        Assert.assertEquals(t.withMinute(51).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 5, TimeUnit.MINUTES);
-        Assert.assertEquals(t.withMinute(55).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 15, TimeUnit.MINUTES);
-        Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 1, TimeUnit.HOURS);
-        Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 5, TimeUnit.HOURS);
-        Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 6, TimeUnit.HOURS);
-        Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 1, TimeUnit.DAYS);
-        Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitor.computeFirstResetTime(t, 2, TimeUnit.DAYS);
-        Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-
-        try {
-            DefaultCacheMonitor.computeFirstResetTime(t, 1, TimeUnit.MILLISECONDS);
-            Assert.fail();
-        } catch (Exception e) {
-        }
     }
 
     private void basetest(Cache cache, DefaultCacheMonitor monitor) {
@@ -100,22 +60,25 @@ public class DefaultCacheMonnitorTest {
 
     @Test
     public void testWithLogger() throws Exception {
-        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(500);
         Cache c1 = createCache();
-        DefaultCacheMonitor m1 = new DefaultCacheMonitor("cache1", 2, TimeUnit.SECONDS, logger);
+        DefaultCacheMonitor m1 = new DefaultCacheMonitor("cache1");
         Cache c2 = createCache();
-        DefaultCacheMonitor m2 = new DefaultCacheMonitor("cache2", 2, TimeUnit.SECONDS, logger);
+        DefaultCacheMonitor m2 = new DefaultCacheMonitor("cache2");
 
         c1 = new MonitoredCache(c1, m1);
         c2 = new MonitoredCache(c2, m2);
+        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(2, TimeUnit.SECONDS, m1, m2);
+
         basetest(c1, m1);
         basetest(c2, m2);
 
         Cache mc = new MultiLevelCache(c1, c2);
-        DefaultCacheMonitor mcm = new DefaultCacheMonitor("multiCache", 2, TimeUnit.SECONDS, logger);
+        DefaultCacheMonitor mcm = new DefaultCacheMonitor("multiCache");
         mc = new MonitoredCache(mc, mcm);
+        logger.add(mcm);
         basetest(mc, mcm);
 
+        logger.shutdown();
 //        Thread.sleep(10000);
     }
 }

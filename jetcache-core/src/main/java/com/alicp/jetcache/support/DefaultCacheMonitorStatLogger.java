@@ -1,12 +1,14 @@
 package com.alicp.jetcache.support;
 
+import com.alicp.jetcache.MonitoredCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.concurrent.TimeUnit;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
@@ -14,37 +16,119 @@ import java.util.function.Consumer;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
+public class DefaultCacheMonitorStatLogger {
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorStatLogger.class);
 
-    private LinkedList<CacheStat> stats = new LinkedList<>();
-    private int logDelayMillis;
+    protected static ScheduledExecutorService executorService;
+    protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
+    ;
+    private ScheduledFuture<?> future;
 
-    public DefaultCacheMonitorStatLogger() {
-        this(5000);
+    public DefaultCacheMonitorStatLogger(int resetTime, TimeUnit resetTimeUnit) {
+        init(resetTime, resetTimeUnit);
     }
 
-    public DefaultCacheMonitorStatLogger(int logDelayMillis) {
-        this.logDelayMillis = logDelayMillis;
+    public DefaultCacheMonitorStatLogger(int resetTime, TimeUnit resetTimeUnit, DefaultCacheMonitor... monitors) {
+        this.monitorList.addAll(Arrays.asList(monitors));
+        init(resetTime, resetTimeUnit);
     }
 
-    @Override
-    public synchronized void accept(CacheStat cacheStatCopy) {
-        stats.add(cacheStatCopy);
-        if (stats.size() == 1) {
-            final Object lock = this;
-            DefaultCacheMonitor.executorService().schedule(() -> {
-                LinkedList<CacheStat> statsCopy;
-                synchronized (lock) {
-                    statsCopy = new LinkedList(stats);
-                    stats.clear();
-                }
-                logStat(statsCopy);
-            }, logDelayMillis, TimeUnit.MILLISECONDS);
+    private void init(int resetTime, TimeUnit resetTimeUnit) {
+        if (executorService == null) {
+            initExecutor();
+        }
+        Runnable cmd = () -> {
+            DefaultCacheMonitor[] monitorArray = monitorList.toArray(new DefaultCacheMonitor[monitorList.size()]);
+            List<CacheStat> stats = new ArrayList<>();
+            for (DefaultCacheMonitor m : monitorArray) {
+                stats.add(m.getCacheStat());
+                m.resetStat();
+            }
+            logStat(stats);
+        };
+        long delay = firstDelay(resetTime, resetTimeUnit);
+        future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
+    }
+
+    public void shutdown() {
+        future.cancel(false);
+    }
+
+    public DefaultCacheMonitorStatLogger add(DefaultCacheMonitor monitor) {
+        monitorList.add(monitor);
+        return this;
+    }
+
+    public DefaultCacheMonitorStatLogger remove(DefaultCacheMonitor monitor) {
+        monitorList.remove(monitor);
+        return this;
+    }
+
+    public static ScheduledExecutorService executorService() {
+        if (executorService != null) {
+            return executorService;
+        }
+        initExecutor();
+        return executorService;
+    }
+
+    private static void initExecutor() {
+        synchronized (DefaultCacheMonitor.class) {
+            if (executorService == null) {
+                executorService = Executors.newSingleThreadScheduledExecutor(
+                        r -> {
+                            Thread t = new Thread(r, "JetCacheMonitorThread");
+                            t.setDaemon(true);
+                            return t;
+                        });
+            }
         }
     }
 
-    protected void logStat(LinkedList<CacheStat> statsCopy) {
+    protected static long firstDelay(int resetTime, TimeUnit resetTimeUnit) {
+        LocalDateTime firstResetTime = computeFirstResetTime(LocalDateTime.now(), resetTime, resetTimeUnit);
+        long d = firstResetTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
+        return d;
+    }
+
+    protected static LocalDateTime computeFirstResetTime(LocalDateTime baseTime, int time, TimeUnit unit) {
+        if (unit != TimeUnit.SECONDS && unit != TimeUnit.MINUTES && unit != TimeUnit.HOURS && unit != TimeUnit.DAYS) {
+            throw new IllegalArgumentException();
+        }
+        LocalDateTime t = baseTime;
+        switch (unit) {
+            case DAYS:
+                t = t.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+                break;
+            case HOURS:
+                if (24 % time == 0) {
+                    t = t.plusHours(time - t.getHour() % time);
+                } else {
+                    t = t.plusHours(1);
+                }
+                t = t.withMinute(0).withSecond(0).withNano(0);
+                break;
+            case MINUTES:
+                if (60 % time == 0) {
+                    t = t.plusMinutes(time - t.getMinute() % time);
+                } else {
+                    t = t.plusMinutes(1);
+                }
+                t = t.withSecond(0).withNano(0);
+                break;
+            case SECONDS:
+                if (60 % time == 0) {
+                    t = t.plusSeconds(time - t.getSecond() % time);
+                } else {
+                    t = t.plusSeconds(1);
+                }
+                t = t.withNano(0);
+                break;
+        }
+        return t;
+    }
+
+    protected void logStat(List<CacheStat> statsCopy) {
         Collections.sort(statsCopy, (o1, o2) -> {
             if (o1.getCacheName() == null) {
                 return -1;
@@ -58,7 +142,7 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
         logger.info(s);
     }
 
-    protected StringBuilder statText(LinkedList<CacheStat> statsCopy) {
+    protected StringBuilder statText(List<CacheStat> statsCopy) {
         StringBuilder sb = new StringBuilder(512);
         sb.append("cache|qps|rate|get|hit|expire|fail|avgLoadTime|maxLoadTime\n");
         sb.append("----------------------------------------------------------\n");

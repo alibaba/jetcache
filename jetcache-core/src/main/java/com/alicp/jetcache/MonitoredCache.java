@@ -27,6 +27,10 @@ public class MonitoredCache<K, V> implements Cache<K, V>, WrapValueCache<K, V> {
         return cache;
     }
 
+    public CacheMonitor getMonitor() {
+        return monitor;
+    }
+
     @Override
     public CacheConfig config() {
         return cache.config();

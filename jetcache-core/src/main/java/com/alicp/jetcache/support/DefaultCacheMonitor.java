@@ -21,101 +21,23 @@ import java.util.function.Consumer;
 public class DefaultCacheMonitor implements CacheMonitor {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitor.class);
-    protected static ScheduledExecutorService executorService;
 
     protected CacheStat cacheStat;
+    private String cacheName;
 
     public DefaultCacheMonitor(String cacheName) {
-        initStat(cacheName);
+        this.cacheName = cacheName;
+        resetStat();
     }
 
-    public DefaultCacheMonitor(String cacheName, int resetTime, TimeUnit resetTimeUnit, Consumer<CacheStat> resetAction) {
-        initStat(cacheName);
-        if (executorService == null) {
-            initExecutor();
-        }
-        Runnable cmd = () -> {
-            CacheStat copy;
-            synchronized (this) {
-                copy = getCacheStat();
-                initStat(cacheName);
-            }
-            if (resetAction != null) {
-                resetAction.accept(copy);
-            }
-        };
-        long delay = firstDelay(resetTime, resetTimeUnit);
-        executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
+    public String getCacheName() {
+        return cacheName;
     }
 
-    private void initStat(String cacheName) {
+    public void resetStat() {
         cacheStat = new CacheStat();
         cacheStat.setStatStartTime(System.currentTimeMillis());
         cacheStat.setCacheName(cacheName);
-    }
-
-    protected static long firstDelay(int resetTime, TimeUnit resetTimeUnit) {
-        LocalDateTime firstResetTime = computeFirstResetTime(LocalDateTime.now(), resetTime, resetTimeUnit);
-        long d = firstResetTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
-        return d;
-    }
-
-    protected static LocalDateTime computeFirstResetTime(LocalDateTime baseTime, int time, TimeUnit unit) {
-        if (unit != TimeUnit.SECONDS && unit != TimeUnit.MINUTES && unit != TimeUnit.HOURS && unit != TimeUnit.DAYS) {
-            throw new IllegalArgumentException();
-        }
-        LocalDateTime t = baseTime;
-        switch (unit) {
-            case DAYS:
-                t = t.plusDays(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-                break;
-            case HOURS:
-                if (24 % time == 0) {
-                    t = t.plusHours(time - t.getHour() % time);
-                } else {
-                    t = t.plusHours(1);
-                }
-                t = t.withMinute(0).withSecond(0).withNano(0);
-                break;
-            case MINUTES:
-                if (60 % time == 0) {
-                    t = t.plusMinutes(time - t.getMinute() % time);
-                } else {
-                    t = t.plusMinutes(1);
-                }
-                t = t.withSecond(0).withNano(0);
-                break;
-            case SECONDS:
-                if (60 % time == 0) {
-                    t = t.plusSeconds(time - t.getSecond() % time);
-                } else {
-                    t = t.plusSeconds(1);
-                }
-                t = t.withNano(0);
-                break;
-        }
-        return t;
-    }
-
-    public static ScheduledExecutorService executorService() {
-        if (executorService != null) {
-            return executorService;
-        }
-        initExecutor();
-        return executorService;
-    }
-
-    private static void initExecutor() {
-        synchronized (DefaultCacheMonitor.class) {
-            if (executorService == null) {
-                executorService = Executors.newSingleThreadScheduledExecutor(
-                        r -> {
-                            Thread t = new Thread(r, "JetCacheMonitorThread");
-                            t.setDaemon(true);
-                            return t;
-                        });
-            }
-        }
     }
 
     public synchronized CacheStat getCacheStat() {

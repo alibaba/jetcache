@@ -50,20 +50,27 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
         doTest();
 
-        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(500);
+
         initL1L2();
-        l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("l1", 1, TimeUnit.SECONDS, logger));
-        l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("l1_monitor_again", 1, TimeUnit.SECONDS, logger));
-        l2Cache = new MonitoredCache(l2Cache, new DefaultCacheMonitor("l2", 1, TimeUnit.SECONDS, logger));
+        DefaultCacheMonitor m1 = new DefaultCacheMonitor("l1");
+        DefaultCacheMonitor m1_again = new DefaultCacheMonitor("l1_monitor_again");
+        DefaultCacheMonitor m2 = new DefaultCacheMonitor("l2");
+        DefaultCacheMonitor mc = new DefaultCacheMonitor("mc");
+        l1Cache = new MonitoredCache(l1Cache, m1);
+        l1Cache = new MonitoredCache(l1Cache, m1_again);
+        l2Cache = new MonitoredCache(l2Cache, m2);
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
-        cache = new MonitoredCache<>(cache, new DefaultCacheMonitor("mc", 1, TimeUnit.SECONDS, logger ));
+        cache = new MonitoredCache<>(cache, mc);
+        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(1, TimeUnit.SECONDS);
+        logger.add(m1).add(m1_again).add(m2).add(mc);
         doTest();
+        logger.shutdown();
     }
 
     private void doTest() throws Exception {
         baseTest();
         expireAfterWriteTest(200);
-        concurrentTest(20,1000, 5000);
+        concurrentTest(20, 1000, 3000);
 
         cache.put("K1", "V1");
         Thread.sleep(10);
