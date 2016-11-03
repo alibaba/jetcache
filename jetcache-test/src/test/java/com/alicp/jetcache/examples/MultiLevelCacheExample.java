@@ -2,9 +2,9 @@ package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
@@ -23,7 +23,7 @@ public class MultiLevelCacheExample {
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .build();
         Cache<Object, Object> l2Cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(/*replace with your jedis pool*/null)

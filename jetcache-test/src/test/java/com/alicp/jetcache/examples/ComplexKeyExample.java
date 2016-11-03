@@ -1,9 +1,9 @@
 package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 
 import java.util.concurrent.TimeUnit;
@@ -19,7 +19,7 @@ public class ComplexKeyExample {
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .build();
 
         DynamicQuery key = new DynamicQuery();

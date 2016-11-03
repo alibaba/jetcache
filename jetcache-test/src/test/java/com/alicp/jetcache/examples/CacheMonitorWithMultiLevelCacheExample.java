@@ -2,6 +2,7 @@ package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MonitoredCache;
+import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
@@ -16,20 +17,31 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheMonitorExample {
+public class CacheMonitorWithMultiLevelCacheExample {
     public static void main(String[] args) throws Exception {
-        Cache<String, Integer> cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<String, Integer> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .build();
+        Cache<String, Integer> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+                .limit(100)
+                .expireAfterWrite(200, TimeUnit.SECONDS)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
+                .build();
+        DefaultCacheMonitor l1CacheMonitor = new DefaultCacheMonitor("OrderCache_L1");
+        DefaultCacheMonitor l2CacheMonitor = new DefaultCacheMonitor("OrderCache_L2");
         DefaultCacheMonitor orderCacheMonitor = new DefaultCacheMonitor("OrderCache");
 
-        Cache<String, Integer> orderCache = new MonitoredCache(cache, orderCacheMonitor);
+        l1Cache = new MonitoredCache(l1Cache, l1CacheMonitor);
+        l2Cache = new MonitoredCache(l2Cache, l2CacheMonitor);
+        Cache<String, Integer> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
+        Cache<String, Integer> orderCache = new MonitoredCache<>(multiLevelCache, orderCacheMonitor);
 
         DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger(1, TimeUnit.SECONDS);
-        statLogger.add(orderCacheMonitor);
+        statLogger.add(l1CacheMonitor).add(l2CacheMonitor).add(orderCacheMonitor);
 
         Thread t = new Thread(() -> {
             for (int i = 0; i < 100; i++) {
