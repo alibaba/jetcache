@@ -21,7 +21,7 @@ public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
 
     @Test
     public void test() throws Exception {
-        super.test(true);
+        super.test(50, true);
     }
 
 }

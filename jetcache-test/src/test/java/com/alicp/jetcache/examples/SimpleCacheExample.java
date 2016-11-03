@@ -1,6 +1,7 @@
 package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
@@ -17,7 +18,8 @@ public class SimpleCacheExample {
         Cache<String, Integer> cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+//                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .build();
         cache.put("20161111", 1000000, 1 ,TimeUnit.HOURS);
         Integer orderCount1 = cache.get("20161111");

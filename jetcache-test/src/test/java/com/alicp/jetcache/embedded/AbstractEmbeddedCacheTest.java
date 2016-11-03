@@ -37,44 +37,44 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
     }
 
-    public void test(boolean testLru) throws Exception {
+    public void test(int expireMillis, boolean testLru) throws Exception {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
             lruTest();
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterAccess(100, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
         baseTest();
         expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).expireAfterAccess(100, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
             lruTest();
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).softValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
             lruTest();
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
             lruTest();
         }
 
