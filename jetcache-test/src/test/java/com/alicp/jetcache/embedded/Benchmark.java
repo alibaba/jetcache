@@ -27,6 +27,7 @@ public class Benchmark {
     private static final int LINE_COUNT = 2733824;
     private static final int CACHE_LIMIT = 10000;
 
+    @SuppressWarnings("RedundantStringConstructorCall")
     private static final String VALUE = new String();
 
     public static void main(String[] args) throws Exception {

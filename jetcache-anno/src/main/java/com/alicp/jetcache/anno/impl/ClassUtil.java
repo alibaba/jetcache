@@ -6,6 +6,7 @@ package com.alicp.jetcache.anno.impl;
 import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,9 +53,7 @@ public class ClassUtil {
         HashSet<Class<?>> s = new HashSet<Class<?>>();
         do {
             Class<?>[] its = c.getInterfaces();
-            for (Class<?> it : its) {
-                s.add(it);
-            }
+            Collections.addAll(s, its);
             c = c.getSuperclass();
         } while (c != null);
         return s.toArray(new Class<?>[s.size()]);

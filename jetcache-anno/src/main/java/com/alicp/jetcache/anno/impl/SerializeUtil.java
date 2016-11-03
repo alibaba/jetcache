@@ -60,7 +60,7 @@ public class SerializeUtil {
                 return bos.toByteArray();
             }
             default:
-                throw new IllegalArgumentException(serialPolicy.toString());
+                throw new IllegalArgumentException(serialPolicy);
         }
     }
 
