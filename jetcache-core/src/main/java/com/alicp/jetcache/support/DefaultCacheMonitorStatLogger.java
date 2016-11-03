@@ -18,14 +18,14 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorStatLogger.class);
 
     private LinkedList<CacheStat> stats = new LinkedList<>();
-    private int logDelaySeconds;
+    private int logDelayMillis;
 
     public DefaultCacheMonitorStatLogger() {
-        this(5);
+        this(5000);
     }
 
-    public DefaultCacheMonitorStatLogger(int logDelaySeconds) {
-        this.logDelaySeconds = logDelaySeconds;
+    public DefaultCacheMonitorStatLogger(int logDelayMillis) {
+        this.logDelayMillis = logDelayMillis;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class DefaultCacheMonitorStatLogger implements Consumer<CacheStat> {
                     stats.clear();
                 }
                 logStat(statsCopy);
-            }, logDelaySeconds, TimeUnit.SECONDS);
+            }, logDelayMillis, TimeUnit.MILLISECONDS);
         }
     }
 

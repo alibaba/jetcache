@@ -100,7 +100,7 @@ public class DefaultCacheMonnitorTest {
 
     @Test
     public void testWithLogger() throws Exception {
-        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger();
+        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(500);
         Cache c1 = createCache();
         DefaultCacheMonitor m1 = new DefaultCacheMonitor("cache1", 2, TimeUnit.SECONDS, logger);
         Cache c2 = createCache();

@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheMonitorExample {
     public static void main(String[] args) throws Exception {
-        DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger();
+        int logDelayMillis = 500;
+        DefaultCacheMonitorStatLogger statLogger = new DefaultCacheMonitorStatLogger(logDelayMillis);
         Cache<String, Integer> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)

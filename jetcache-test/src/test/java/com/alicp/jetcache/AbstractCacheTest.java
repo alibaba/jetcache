@@ -132,7 +132,7 @@ public abstract class AbstractCacheTest {
 
     private volatile boolean cocurrentFail = false;
 
-    protected void concurrentTest(int threadCount, int count, int time) throws Exception {
+    protected void concurrentTest(int threadCount, int count, int timeInMillis) throws Exception {
         class T extends Thread {
             private String keyPrefix;
             private transient boolean stop;
@@ -181,7 +181,7 @@ public abstract class AbstractCacheTest {
             t[i].start();
         }
 
-        Thread.sleep(time);
+        Thread.sleep(timeInMillis);
         for (int i = 0; i < threadCount; i++) {
             t[i].stop = true;
         }

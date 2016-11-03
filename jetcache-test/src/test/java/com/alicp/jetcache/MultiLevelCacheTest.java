@@ -1,5 +1,6 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
@@ -27,7 +28,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .build();
         l2Cache = (AbstractCache<Object, Object>) EmbeddedCacheBuilder
                 .createEmbeddedCacheBuilder()
@@ -45,7 +46,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         cache = new MultiLevelCache(l1Cache, l2Cache);
         doTest();
 
-        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger();
+        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(500);
 
         initL1L2();
         l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("l1", 1, TimeUnit.SECONDS, logger));
@@ -63,9 +64,11 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         doTest();
     }
 
-    private void doTest() throws InterruptedException {
+    private void doTest() throws Exception {
         baseTest();
         expireAfterWriteTest(200);
+        concurrentTest(20,1000, 5000);
+
         cache.put("K1", "V1");
         Thread.sleep(10);
         l1Cache.invalidate("K1");
