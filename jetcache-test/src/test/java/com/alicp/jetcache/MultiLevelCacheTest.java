@@ -46,15 +46,11 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         cache = new MultiLevelCache(l1Cache, l2Cache);
         doTest();
 
-        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(500);
-
         initL1L2();
-        l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("l1", 1, TimeUnit.SECONDS, logger));
-        l2Cache = new MonitoredCache(l2Cache, new DefaultCacheMonitor("l2", 1, TimeUnit.SECONDS, logger));
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
-        cache = new MonitoredCache<>(cache, new DefaultCacheMonitor("mc", 1, TimeUnit.SECONDS, logger ));
         doTest();
 
+        DefaultCacheMonitorStatLogger logger = new DefaultCacheMonitorStatLogger(500);
         initL1L2();
         l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("l1", 1, TimeUnit.SECONDS, logger));
         l1Cache = new MonitoredCache(l1Cache, new DefaultCacheMonitor("l1_monitor_again", 1, TimeUnit.SECONDS, logger));
