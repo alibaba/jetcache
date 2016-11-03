@@ -50,7 +50,7 @@ public class ClassUtil {
 
     public static Class<?>[] getAllInterfaces(Object obj) {
         Class<?> c = obj.getClass();
-        HashSet<Class<?>> s = new HashSet<Class<?>>();
+        HashSet<Class<?>> s = new HashSet<>();
         do {
             Class<?>[] its = c.getInterfaces();
             Collections.addAll(s, its);

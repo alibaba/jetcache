@@ -33,10 +33,6 @@ public class MyFactoryBean implements FactoryBean,InitializingBean {
         final FactoryBeanTarget SRC = new FactoryBeanTargetImpl();
         target = (FactoryBeanTarget) Proxy.newProxyInstance(this.getClass().getClassLoader(),
                 new Class<?>[]{FactoryBeanTarget.class},
-                new InvocationHandler() {
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        return method.invoke(SRC, args);
-                    }
-                });
+                (proxy, method, args) -> method.invoke(SRC, args));
     }
 }

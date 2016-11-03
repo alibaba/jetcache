@@ -27,7 +27,7 @@ public class CachePointCutTest {
     @Before
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        map = new ConcurrentHashMap<Method, CacheInvokeConfig>();
+        map = new ConcurrentHashMap<>();
         pc.setCacheConfigMap(map);
     }
 
@@ -77,11 +77,7 @@ public class CachePointCutTest {
         Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
         Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
 
-        Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return null;
-            }
-        });
+        Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, (proxy, method, args) -> null);
         Assert.assertTrue(pc.matches(m1, o1.getClass()));
         Assert.assertTrue(pc.matches(m2, o1.getClass()));
         Assert.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));

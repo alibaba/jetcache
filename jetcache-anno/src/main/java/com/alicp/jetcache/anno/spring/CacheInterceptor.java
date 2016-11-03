@@ -28,7 +28,7 @@ public class CacheInterceptor implements MethodInterceptor {
         }
 
         CacheInvokeContext context = globalCacheConfig.cacheContext().createCacheInvokeContext();
-        context.setInvoker(() -> invocation.proceed());
+        context.setInvoker(invocation::proceed);
         context.setMethod(invocation.getMethod());
         context.setArgs(invocation.getArguments());
         context.setCacheInvokeConfig(cac);

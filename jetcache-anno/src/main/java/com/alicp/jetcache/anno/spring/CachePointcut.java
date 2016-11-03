@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 
-    private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap = new ConcurrentHashMap<Method, CacheInvokeConfig>();
+    private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap = new ConcurrentHashMap<>();
     private String[] basePackages;
 
     public CachePointcut(String[] basePackages) {

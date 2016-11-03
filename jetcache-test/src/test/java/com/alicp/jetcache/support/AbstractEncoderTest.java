@@ -18,7 +18,7 @@ public class AbstractEncoderTest {
 
     protected void baseTest() {
         Assert.assertEquals("123", decoder.apply(encoder.apply("123")));
-        Assert.assertEquals(new Integer(123), decoder.apply(encoder.apply(123)));
+        Assert.assertEquals(123, decoder.apply(encoder.apply(123)));
         Date date = new Date();
         Assert.assertEquals(date, decoder.apply(encoder.apply(date)));
         Assert.assertArrayEquals(new byte[]{1, 2, 3, -1}, (byte[]) decoder.apply(encoder.apply(new byte[]{1, 2, 3, -1})));

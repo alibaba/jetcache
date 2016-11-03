@@ -22,7 +22,7 @@ public class SimpleCacheExample {
                 .build();
         cache.put("20161111", 1000000, 1 ,TimeUnit.HOURS);
         Integer orderCount1 = cache.get("20161111");
-        Integer orderCount2 = cache.computeIfAbsent("20161212", (key) -> loadFromDatabase(key));
+        Integer orderCount2 = cache.computeIfAbsent("20161212", SimpleCacheExample::loadFromDatabase);
         System.out.println(orderCount1);
         System.out.println(orderCount2);
         cache.invalidate("20161212");

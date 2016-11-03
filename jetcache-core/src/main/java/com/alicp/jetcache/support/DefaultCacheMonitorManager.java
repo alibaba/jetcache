@@ -30,7 +30,7 @@ public class DefaultCacheMonitorManager {
     }
 
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit) {
-        this.resetAction = (stats) -> logStat(stats);
+        this.resetAction = this::logStat;
         init(resetTime, resetTimeUnit);
     }
 

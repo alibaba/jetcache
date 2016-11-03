@@ -23,7 +23,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V>, WrapValueCache
             }
         } catch (ClassCastException ex) {
             WRAP_VALUE_CACHE_INTERNAL_LOGGER.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
-            result = new CacheGetResult<V>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
+            result = new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
         return result;
     }

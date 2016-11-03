@@ -68,7 +68,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (cache instanceof WrapValueCache) {
                 r1 = cache.PUT(key, value, expire, timeUnit);
             } else {
-                CacheValueHolder<V> h = new CacheValueHolder<V>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+                CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
                 r1 = cache.PUT(key, h, expire, timeUnit);
             }
             CacheResult r = r1;
