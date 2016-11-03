@@ -67,7 +67,8 @@ public class DefaultCacheMonnitorTest {
 
         c1 = new MonitoredCache(c1, m1);
         c2 = new MonitoredCache(c2, m2);
-        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(2, TimeUnit.SECONDS, m1, m2);
+        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(2, TimeUnit.SECONDS);
+        logger.add(m1).add(m2);
 
         basetest(c1, m1);
         basetest(c2, m2);

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 
 /**
  * Created on 2016/10/31.
@@ -21,13 +22,15 @@ public class DefaultCacheMonitorManager {
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
     ;
     private ScheduledFuture<?> future;
+    private Consumer<List<CacheStat>> resetAction;
 
-    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit) {
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<List<CacheStat>> resetAction) {
+        this.resetAction = resetAction;
         init(resetTime, resetTimeUnit);
     }
 
-    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, DefaultCacheMonitor... monitors) {
-        this.monitorList.addAll(Arrays.asList(monitors));
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit) {
+        this.resetAction = (stats) -> logStat(stats);
         init(resetTime, resetTimeUnit);
     }
 
@@ -35,7 +38,7 @@ public class DefaultCacheMonitorManager {
         if (executorService == null) {
             initExecutor();
         }
-        Runnable cmd = () -> logStat(stats());
+        Runnable cmd = () -> resetAction.accept(stats());
         long delay = firstDelay(resetTime, resetTimeUnit);
         future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
     }
