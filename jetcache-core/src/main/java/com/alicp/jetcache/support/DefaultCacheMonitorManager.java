@@ -147,9 +147,16 @@ public class DefaultCacheMonitorManager {
         int len = Math.max(5, maxCacheNameLength.orElse(0));
 
         StringBuilder sb = new StringBuilder(512);
-        String title = String.format("%9s|%7s|%14s|%14s|%14s|%14s|%11s|%11s", "qps", "rate", "get", "hit", "expire", "fail", "avgLoadTime", "maxLoadTime");
-        sb.append(String.format("%-" + len + "s|", "cache")).append(title).append('\n');
-        sb.append("--------------------------------------------------------------------------------------------------------------------------\n");
+        String title = String.format("%-" + len + "s|%9s|%7s|%14s|%14s|%14s|%14s|%11s|%11s", "cache", "qps", "rate", "get", "hit", "expire", "fail", "avgLoadTime", "maxLoadTime");
+        sb.append(title).append('\n');
+        title.chars().forEach((c) -> {
+            if (c == '|') {
+                sb.append('+');
+            } else {
+                sb.append('-');
+            }
+        });
+        sb.append('\n');
         for (CacheStat s : statsCopy) {
             sb.append(String.format("%-" + len + "s", s.getCacheName())).append('|');
             sb.append(String.format("%9.2f", s.qps())).append('|');
@@ -161,7 +168,14 @@ public class DefaultCacheMonitorManager {
             sb.append(String.format("%,11.1f", s.avgLoadTime())).append('|');
             sb.append(String.format("%,11d", s.getMaxLoadTime())).append('\n');
         }
-        sb.append("--------------------------------------------------------------------------------------------------------------------------\n");
+        title.chars().forEach((c) -> {
+            if (c == '|') {
+                sb.append('+');
+            } else {
+                sb.append('-');
+            }
+        });
+        sb.append('\n');
         return sb;
     }
 }
