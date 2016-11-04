@@ -77,7 +77,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     private CacheGetResult<CacheValueHolder<V>> getImpl(Object newKey, CacheValueHolder<V> cacheObject) {
-        if (System.currentTimeMillis() - cacheObject.getExpireTime() >= 0) {
+        if (System.currentTimeMillis() > cacheObject.getExpireTime()) {
             intenalMap.removeValue(newKey);
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {

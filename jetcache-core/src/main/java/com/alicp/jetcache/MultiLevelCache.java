@@ -37,7 +37,9 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
                 long now = System.currentTimeMillis();
                 if (now <= h.getExpireTime()) {
                     long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
-                    PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                    if (restTtl > 0) {
+                        PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                    }
                     return new CacheGetResult(CacheResultCode.SUCCESS, null, h);
                 }
             }
