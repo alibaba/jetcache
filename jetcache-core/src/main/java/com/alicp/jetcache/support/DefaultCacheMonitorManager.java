@@ -47,17 +47,12 @@ public class DefaultCacheMonitorManager {
         future.cancel(false);
     }
 
-    public DefaultCacheMonitorManager add(DefaultCacheMonitor monitor) {
-        monitorList.add(monitor);
-        return this;
-    }
-
     public DefaultCacheMonitorManager add(DefaultCacheMonitor... monitors) {
         monitorList.addAll(Arrays.asList(monitors));
         return this;
     }
 
-    public DefaultCacheMonitorManager remove(DefaultCacheMonitor monitor) {
+    public DefaultCacheMonitorManager remove(DefaultCacheMonitor... monitor) {
         monitorList.remove(monitor);
         return this;
     }
