@@ -3,12 +3,12 @@ package com.alicp.jetcache.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2016/10/31.
@@ -58,13 +58,11 @@ public class DefaultCacheMonitorManager {
     }
 
     public List<CacheStat> stats() {
-        DefaultCacheMonitor[] monitorArray = monitorList.toArray(new DefaultCacheMonitor[monitorList.size()]);
-        List<CacheStat> stats = new ArrayList<>();
-        for (DefaultCacheMonitor m : monitorArray) {
-            stats.add(m.getCacheStat());
+        return monitorList.stream().map((m) -> {
+            CacheStat stat = m.getCacheStat();
             m.resetStat();
-        }
-        return stats;
+            return stat;
+        }).collect(Collectors.toList());
     }
 
     public static ScheduledExecutorService executorService() {
@@ -131,6 +129,11 @@ public class DefaultCacheMonitorManager {
     }
 
     protected void logStat(List<CacheStat> statsCopy) {
+        String s = statText(statsCopy).insert(0, "jetcache get stat:\n").toString();
+        logger.info(s);
+    }
+
+    protected StringBuilder statText(List<CacheStat> statsCopy) {
         Collections.sort(statsCopy, (o1, o2) -> {
             if (o1.getCacheName() == null) {
                 return -1;
@@ -140,28 +143,25 @@ public class DefaultCacheMonitorManager {
                 return o1.getCacheName().compareTo(o2.getCacheName());
             }
         });
-        String s = statText(statsCopy).insert(0, "jetcache get stat:\n").toString();
-        logger.info(s);
-    }
+        OptionalInt maxCacheNameLength = statsCopy.stream().mapToInt((s) -> s.getCacheName().length()).max();
+        int len = Math.max(5, maxCacheNameLength.orElse(0));
 
-    protected StringBuilder statText(List<CacheStat> statsCopy) {
         StringBuilder sb = new StringBuilder(512);
-        sb.append("cache|qps|rate|get|hit|expire|fail|avgLoadTime|maxLoadTime\n");
-        sb.append("----------------------------------------------------------\n");
-        DecimalFormat hitRateFomater = new DecimalFormat("#%");
-        DecimalFormat qpsFomater = new DecimalFormat("#.##");
+        String title = String.format("%9s|%7s|%14s|%14s|%14s|%14s|%11s|%11s", "qps", "rate", "get", "hit", "expire", "fail", "avgLoadTime", "maxLoadTime");
+        sb.append(String.format("%-" + len + "s|", "cache")).append(title).append('\n');
+        sb.append("--------------------------------------------------------------------------------------------------------------------------\n");
         for (CacheStat s : statsCopy) {
-            sb.append(s.getCacheName()).append('|');
-            sb.append(qpsFomater.format(s.qps())).append('|');
-            sb.append(hitRateFomater.format(s.hitRate())).append('|');
-            sb.append(s.getGetCount()).append('|');
-            sb.append(s.getGetHitCount()).append('|');
-            sb.append(s.getGetExpireCount()).append('|');
-            sb.append(s.getGetFailCount()).append('|');
-            sb.append(s.avgLoadTime()).append('|');
-            sb.append(s.getMaxLoadTime()).append('\n');
+            sb.append(String.format("%-" + len + "s", s.getCacheName())).append('|');
+            sb.append(String.format("%9.2f", s.qps())).append('|');
+            sb.append(String.format("%6.2f%%", s.hitRate() * 100)).append('|');
+            sb.append(String.format("%,14d", s.getGetCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetHitCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetExpireCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetFailCount())).append('|');
+            sb.append(String.format("%,11.1f", s.avgLoadTime())).append('|');
+            sb.append(String.format("%,11d", s.getMaxLoadTime())).append('\n');
         }
-        sb.append("----------------------------------------------------------");
+        sb.append("--------------------------------------------------------------------------------------------------------------------------\n");
         return sb;
     }
 }

@@ -19,6 +19,9 @@ public class DefaultCacheMonitor implements CacheMonitor {
     private String cacheName;
 
     public DefaultCacheMonitor(String cacheName) {
+        if (cacheName == null) {
+            throw new NullPointerException();
+        }
         this.cacheName = cacheName;
         resetStat();
     }
