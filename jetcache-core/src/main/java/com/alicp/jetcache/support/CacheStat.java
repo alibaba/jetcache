@@ -56,7 +56,7 @@ public class CacheStat implements Serializable, Cloneable {
         }
     }
 
-    public double qps() {
+    private double tps(long count){
         long t = statEndTime;
         if (t == 0) {
             t = System.currentTimeMillis();
@@ -65,11 +65,25 @@ public class CacheStat implements Serializable, Cloneable {
         if (t == 0) {
             return 0;
         } else {
-            return 1000.0 * getCount / t;
+            return 1000.0 * count / t;
         }
-
     }
 
+    public double qps() {
+        return tps(getCount);
+    }
+
+    public double putTps() {
+        return tps(putCount);
+    }
+
+    public double invalidateTps() {
+        return tps(invalidateCount);
+    }
+
+    public double loadQps() {
+        return tps(loadCount);
+    }
 
     public double hitRate() {
         if (getCount == 0) {

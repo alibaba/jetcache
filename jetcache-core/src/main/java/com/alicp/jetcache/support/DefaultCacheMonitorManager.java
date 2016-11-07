@@ -3,6 +3,7 @@ package com.alicp.jetcache.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -22,14 +23,50 @@ public class DefaultCacheMonitorManager {
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
 
     private ScheduledFuture<?> future;
-    private Consumer<List<CacheStat>> resetAction;
+    private Consumer<StatInfo> resetAction;
+    private boolean verboseLog;
 
-    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<List<CacheStat>> resetAction) {
+    public static class StatInfo {
+        private List<CacheStat> stats;
+        private long startTime;
+        private long endTime;
+
+        public List<CacheStat> getStats() {
+            return stats;
+        }
+
+        public void setStats(List<CacheStat> stats) {
+            this.stats = stats;
+        }
+
+        public long getStartTime() {
+            return startTime;
+        }
+
+        public void setStartTime(long startTime) {
+            this.startTime = startTime;
+        }
+
+        public long getEndTime() {
+            return endTime;
+        }
+
+        public void setEndTime(long endTime) {
+            this.endTime = endTime;
+        }
+    }
+
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> resetAction) {
         this.resetAction = resetAction;
         init(resetTime, resetTimeUnit);
     }
 
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit) {
+        this(resetTime, resetTimeUnit, false);
+    }
+
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, boolean verboseLog) {
+        this.verboseLog = verboseLog;
         this.resetAction = this::logStat;
         init(resetTime, resetTimeUnit);
     }
@@ -38,7 +75,31 @@ public class DefaultCacheMonitorManager {
         if (executorService == null) {
             initExecutor();
         }
-        Runnable cmd = () -> resetAction.accept(stats());
+        Runnable cmd = new Runnable() {
+            private long time = System.currentTimeMillis();
+
+            @Override
+            public void run() {
+                try {
+                    List<CacheStat> stats = monitorList.stream().map((m) -> {
+                        CacheStat stat = m.getCacheStat();
+                        m.resetStat();
+                        return stat;
+                    }).collect(Collectors.toList());
+
+                    long endTime = System.currentTimeMillis();
+                    StatInfo statInfo = new StatInfo();
+                    statInfo.setStartTime(time);
+                    statInfo.setEndTime(endTime);
+                    statInfo.setStats(stats);
+                    time = endTime;
+
+                    resetAction.accept(statInfo);
+                } catch (Exception e) {
+                    logger.error("jetcache DefaultCacheMonitorManager error", e);
+                }
+            }
+        };
         long delay = firstDelay(resetTime, resetTimeUnit);
         future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
     }
@@ -55,14 +116,6 @@ public class DefaultCacheMonitorManager {
     public DefaultCacheMonitorManager remove(DefaultCacheMonitor... monitor) {
         monitorList.remove(monitor);
         return this;
-    }
-
-    public List<CacheStat> stats() {
-        return monitorList.stream().map((m) -> {
-            CacheStat stat = m.getCacheStat();
-            m.resetStat();
-            return stat;
-        }).collect(Collectors.toList());
     }
 
     public static ScheduledExecutorService executorService() {
@@ -128,13 +181,9 @@ public class DefaultCacheMonitorManager {
         return t;
     }
 
-    protected void logStat(List<CacheStat> statsCopy) {
-        String s = statText(statsCopy).insert(0, "jetcache get stat:\n").toString();
-        logger.info(s);
-    }
-
-    protected StringBuilder statText(List<CacheStat> statsCopy) {
-        Collections.sort(statsCopy, (o1, o2) -> {
+    private void logStat(StatInfo statInfo) {
+        List<CacheStat> stats = statInfo.getStats();
+        Collections.sort(stats, (o1, o2) -> {
             if (o1.getCacheName() == null) {
                 return -1;
             } else if (o2.getCacheName() == null) {
@@ -143,12 +192,24 @@ public class DefaultCacheMonitorManager {
                 return o1.getCacheName().compareTo(o2.getCacheName());
             }
         });
-        OptionalInt maxCacheNameLength = statsCopy.stream().mapToInt((s) -> s.getCacheName().length()).max();
-        int len = Math.max(5, maxCacheNameLength.orElse(0));
+        StringBuilder sb;
+        if (verboseLog) {
+            sb = logVerbose(statInfo);
+        } else {
+            sb = logStatSummary(statInfo);
+        }
+        logger.info(sb.toString());
+    }
 
-        StringBuilder sb = new StringBuilder(512);
-        String title = String.format("%-" + len + "s|%9s|%7s|%14s|%14s|%14s|%14s|%11s|%11s", "cache", "qps", "rate", "get", "hit", "expire", "fail", "avgLoadTime", "maxLoadTime");
-        sb.append(title).append('\n');
+    private StringBuilder logTitle(int initSize, StatInfo statInfo) {
+        StringBuilder sb = new StringBuilder(initSize);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");
+        sb.append("jetcache stat from ").append(sdf.format(new Date(statInfo.getStartTime())))
+                .append(" to ").append(sdf.format(statInfo.getEndTime())).append("\n");
+        return sb;
+    }
+
+    private void printSepLine(StringBuilder sb, String title) {
         title.chars().forEach((c) -> {
             if (c == '|') {
                 sb.append('+');
@@ -157,14 +218,26 @@ public class DefaultCacheMonitorManager {
             }
         });
         sb.append('\n');
-        for (CacheStat s : statsCopy) {
+    }
+
+    private StringBuilder logStatSummary(StatInfo statInfo) {
+        StringBuilder sb = logTitle(2048, statInfo);
+
+        List<CacheStat> stats = statInfo.getStats();
+        OptionalInt maxCacheNameLength = stats.stream().mapToInt((s) -> s.getCacheName().length()).max();
+        int len = Math.max(5, maxCacheNameLength.orElse(0));
+
+        String title = String.format("%-" + len + "s|%10s|%7s|%14s|%14s|%14s|%14s|%11s|%11s", "cache", "qps", "rate", "get", "hit", "fail", "expire", "avgLoadTime", "maxLoadTime");
+        sb.append(title).append('\n');
+        printSepLine(sb, title);
+        for (CacheStat s : stats) {
             sb.append(String.format("%-" + len + "s", s.getCacheName())).append('|');
-            sb.append(String.format("%9.2f", s.qps())).append('|');
+            sb.append(String.format("%,10.2f", s.qps())).append('|');
             sb.append(String.format("%6.2f%%", s.hitRate() * 100)).append('|');
             sb.append(String.format("%,14d", s.getGetCount())).append('|');
             sb.append(String.format("%,14d", s.getGetHitCount())).append('|');
-            sb.append(String.format("%,14d", s.getGetExpireCount())).append('|');
             sb.append(String.format("%,14d", s.getGetFailCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetExpireCount())).append('|');
             sb.append(String.format("%,11.1f", s.avgLoadTime())).append('|');
             sb.append(String.format("%,11d", s.getMaxLoadTime())).append('\n');
         }
@@ -175,7 +248,70 @@ public class DefaultCacheMonitorManager {
                 sb.append('-');
             }
         });
-        sb.append('\n');
+        return sb;
+    }
+
+
+
+    private StringBuilder logVerbose(StatInfo statInfo) {
+        StringBuilder sb = logTitle(8192, statInfo);
+        List<CacheStat> stats = statInfo.getStats();
+
+        for (CacheStat s : stats) {
+            String title = String.format("%-10s|%10s|%14s|%14s|%14s|%14s|%14s|%9s|%7s|%7s", "oper", "qps/tps", "count", "success/hit", "fail", "not exists", "expired", "avgTime", "minTime", "maxTime");
+
+            printSepLine(sb, title);
+
+            sb.append(s.getCacheName()).append("(hit rate ").append(String.format("%.3f", s.hitRate() * 100)).append("%)").append('\n');
+            sb.append(title).append('\n');
+
+            printSepLine(sb, title);
+
+            sb.append(String.format("%-10s", "get")).append('|');
+            sb.append(String.format("%,10.2f", s.qps())).append('|');
+            sb.append(String.format("%,14d", s.getGetCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetHitCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetFailCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetMissCount())).append('|');
+            sb.append(String.format("%,14d", s.getGetExpireCount())).append('|');
+            sb.append(String.format("%,9.1f", s.avgGetTime())).append('|');
+            sb.append(String.format("%,7d", s.getMinGetTime() == Long.MAX_VALUE ? 0 : s.getMinGetTime())).append('|');
+            sb.append(String.format("%,7d", s.getMaxGetTime())).append('\n');
+
+            sb.append(String.format("%-10s", "put")).append('|');
+            sb.append(String.format("%,10.2f", s.putTps())).append('|');
+            sb.append(String.format("%,14d", s.getPutCount())).append('|');
+            sb.append(String.format("%,14d", s.getPutSuccessCount())).append('|');
+            sb.append(String.format("%,14d", s.getPutFailCount())).append('|');
+            sb.append(String.format("%14s", "N/A")).append('|');
+            sb.append(String.format("%14s", "N/A")).append('|');
+            sb.append(String.format("%,9.1f", s.avgPutTime())).append('|');
+            sb.append(String.format("%,7d", s.getMinPutTime() == Long.MAX_VALUE ? 0 : s.getMinPutTime())).append('|');
+            sb.append(String.format("%,7d", s.getMaxPutTime())).append('\n');
+
+            sb.append(String.format("%-10s", "invalidate")).append('|');
+            sb.append(String.format("%,10.2f", s.invalidateTps())).append('|');
+            sb.append(String.format("%,14d", s.getInvalidateCount())).append('|');
+            sb.append(String.format("%,14d", s.getInvalidateSuccessCount())).append('|');
+            sb.append(String.format("%,14d", s.getInvalidateFailCount())).append('|');
+            sb.append(String.format("%14s", "N/A")).append('|');
+            sb.append(String.format("%14s", "N/A")).append('|');
+            sb.append(String.format("%,9.1f", s.avgInvalidateTime())).append('|');
+            sb.append(String.format("%,7d", s.getMinInvalidateTime() == Long.MAX_VALUE ? 0 : s.getMinInvalidateTime())).append('|');
+            sb.append(String.format("%,7d", s.getMaxInvalidateTime())).append('\n');
+
+            sb.append(String.format("%-10s", "load")).append('|');
+            sb.append(String.format("%,10.2f", s.loadQps())).append('|');
+            sb.append(String.format("%,14d", s.getLoadCount())).append('|');
+            sb.append(String.format("%,14d", s.getLoadSuccessCount())).append('|');
+            sb.append(String.format("%,14d", s.getLoadFailCount())).append('|');
+            sb.append(String.format("%14s", "N/A")).append('|');
+            sb.append(String.format("%14s", "N/A")).append('|');
+            sb.append(String.format("%,9.1f", s.avgLoadTime())).append('|');
+            sb.append(String.format("%,7d", s.getMinLoadTime() == Long.MAX_VALUE ? 0 : s.getMinLoadTime())).append('|');
+            sb.append(String.format("%,7d", s.getMaxLoadTime())).append('\n');
+
+        }
         return sb;
     }
 }
