@@ -28,7 +28,10 @@ public class CacheMonitorExample {
 
         Cache<String, Integer> orderCache = new MonitoredCache(cache, orderCacheMonitor);
 
-        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS);
+        boolean verboseLog = false;
+        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
+//        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, (statInfo) -> {s});
+
         statLogger.add(orderCacheMonitor);
 
         Thread t = new Thread(() -> {

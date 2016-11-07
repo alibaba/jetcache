@@ -40,7 +40,8 @@ public class CacheMonitorWithMultiLevelCacheExample {
         Cache<String, Integer> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
         Cache<String, Integer> orderCache = new MonitoredCache<>(multiLevelCache, orderCacheMonitor);
 
-        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, true);
+        boolean verboseLog = false;
+        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
         statLogger.add(l1CacheMonitor, l2CacheMonitor, orderCacheMonitor);
 
         Thread t = new Thread(() -> {

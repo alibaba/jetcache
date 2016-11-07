@@ -241,13 +241,7 @@ public class DefaultCacheMonitorManager {
             sb.append(String.format("%,11.1f", s.avgLoadTime())).append('|');
             sb.append(String.format("%,11d", s.getMaxLoadTime())).append('\n');
         }
-        title.chars().forEach((c) -> {
-            if (c == '|') {
-                sb.append('+');
-            } else {
-                sb.append('-');
-            }
-        });
+        printSepLine(sb, title);
         return sb;
     }
 
@@ -258,7 +252,7 @@ public class DefaultCacheMonitorManager {
         List<CacheStat> stats = statInfo.getStats();
 
         for (CacheStat s : stats) {
-            String title = String.format("%-10s|%10s|%14s|%14s|%14s|%14s|%14s|%9s|%7s|%7s", "oper", "qps/tps", "count", "success/hit", "fail", "not exists", "expired", "avgTime", "minTime", "maxTime");
+            String title = String.format("%-10s|%10s|%14s|%14s|%14s|%14s|%14s|%9s|%7s|%7s", "oper", "qps/tps", "count", "success/hit", "fail", "miss", "expired", "avgTime", "minTime", "maxTime");
 
             printSepLine(sb, title);
 
