@@ -3,6 +3,8 @@ package com.alicp.jetcache;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -133,6 +135,7 @@ public abstract class AbstractCacheTest {
     private volatile boolean cocurrentFail = false;
 
     protected void concurrentTest(int threadCount, int count, int timeInMillis) throws Exception {
+        CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         class T extends Thread {
             private String keyPrefix;
             private transient boolean stop;
@@ -146,8 +149,7 @@ public abstract class AbstractCacheTest {
                 try {
                     int i = 0;
                     while (!stop) {
-                        i++;
-                        if (i >= count) {
+                        if (++i >= count) {
                             i = 0;
                         }
                         String key = keyPrefix + i;
@@ -170,7 +172,7 @@ public abstract class AbstractCacheTest {
                     e.printStackTrace();
                     cocurrentFail = true;
                 }
-
+                countDownLatch.countDown();
             }
         }
 
@@ -185,6 +187,7 @@ public abstract class AbstractCacheTest {
         for (int i = 0; i < threadCount; i++) {
             t[i].stop = true;
         }
+        countDownLatch.await();
 
         if (cocurrentFail) {
             Assert.fail();

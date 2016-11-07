@@ -42,12 +42,9 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
     @Test
     public void test() throws Exception {
-        initL1L2();
-        cache = new MultiLevelCache(l1Cache, l2Cache);
-        doTest();
 
         initL1L2();
-        cache = new MultiLevelCache<>(l1Cache, l2Cache);
+        cache = new MultiLevelCache(l1Cache, l2Cache);
         doTest();
 
 
@@ -61,7 +58,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l2Cache = new MonitoredCache(l2Cache, m2);
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
         cache = new MonitoredCache<>(cache, mc);
-        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS);
+        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, true);
         logger.add(m1, m1_again, m2, mc);
         doTest();
         logger.shutdown();
