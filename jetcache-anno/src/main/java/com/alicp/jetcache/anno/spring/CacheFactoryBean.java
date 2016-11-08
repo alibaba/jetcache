@@ -3,7 +3,8 @@
  */
 package com.alicp.jetcache.anno.spring;
 
-import com.alicp.jetcache.anno.support.CacheClient;
+import com.alicp.jetcache.anno.impl.ProxyUtil;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.factory.FactoryBean;
 
 /**
@@ -12,10 +13,10 @@ import org.springframework.beans.factory.FactoryBean;
 public class CacheFactoryBean implements FactoryBean {
 
     private Object target;
-    private CacheClient cacheClient;
+    private GlobalCacheConfig globalCacheConfig;
 
     public Object getObject() throws Exception {
-        return cacheClient.getProxyByAnnotation(target);
+        return ProxyUtil.getProxyByAnnotation(target, globalCacheConfig);
     }
 
     public Class<?> getObjectType() {
@@ -34,11 +35,7 @@ public class CacheFactoryBean implements FactoryBean {
         this.target = target;
     }
 
-    public CacheClient getCacheClient() {
-        return cacheClient;
-    }
-
-    public void setCacheClient(CacheClient cacheClient) {
-        this.cacheClient = cacheClient;
+    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
+        this.globalCacheConfig = globalCacheConfig;
     }
 }

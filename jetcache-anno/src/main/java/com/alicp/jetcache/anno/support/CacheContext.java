@@ -13,6 +13,9 @@ import com.alicp.jetcache.factory.EmbeddedCacheFactory;
 import com.alicp.jetcache.factory.ExternalCacheFactory;
 import com.alicp.jetcache.support.*;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
@@ -28,10 +31,25 @@ public class CacheContext {
     };
     private CacheManager cacheManager;
     private GlobalCacheConfig globalCacheConfig;
+    private DefaultCacheMonitorManager defaultCacheMonitorManager;
 
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
+    }
+
+    @PostConstruct
+    public void init() {
         this.cacheManager = new CacheManager();
+        defaultCacheMonitorManager = new DefaultCacheMonitorManager(15, TimeUnit.MINUTES);
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        defaultCacheMonitorManager.shutdown();
+    }
+
+    public DefaultCacheMonitorManager getDefaultCacheMonitorManager() {
+        return defaultCacheMonitorManager;
     }
 
     public CacheInvokeContext createCacheInvokeContext() {
@@ -50,11 +68,22 @@ public class CacheContext {
                     cache = buildRemote(cacheAnnoConfig, area, subArea);
                 } else {
                     Cache local = buildLocal(cacheAnnoConfig, area);
+                    DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(cacheName + "_local");
+                    local = new MonitoredCache(local, localMonitor);
+
                     Cache remote = buildRemote(cacheAnnoConfig, area, subArea);
+                    DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(cacheName + "_remote");
+                    remote = new MonitoredCache(remote, remoteMonitor);
+
+                    defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
+
                     cache = new MultiLevelCache(local, remote);
-                    cacheManager.addCache(cacheName + "_local", local);
-                    cacheManager.addCache(cacheName + "_remote", remote);
                 }
+
+                DefaultCacheMonitor monitor = new DefaultCacheMonitor(cacheName);
+                cache = new MonitoredCache(cache, new DefaultCacheMonitor(cacheName));
+                defaultCacheMonitorManager.add(monitor);
+
                 cacheManager.addCache(cacheName, cache);
             }
             return cache;

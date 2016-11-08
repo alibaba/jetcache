@@ -26,6 +26,7 @@ public class GlobalCacheConfig {
         }
         synchronized (this) {
             cacheContext = newCacheContext();
+            cacheContext.init();
         }
         return cacheContext;
     }
