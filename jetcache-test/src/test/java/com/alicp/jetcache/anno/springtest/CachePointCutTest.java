@@ -1,12 +1,13 @@
 /**
  * Created on  13-09-22 18:46
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.springtest;
 
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.spring.CachePointcut;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

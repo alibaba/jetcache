@@ -10,11 +10,11 @@
         http://www.alibaba.com/schema/jetcache
         http://www.alibaba.com/schema/jetcache/jetcache.xsd">
     <context:annotation-config/>
-    <context:component-scan base-package="com.alicp.jetcache"/>
+    <context:component-scan base-package="com.alicp.jetcache.anno.springtest"/>
 
     <jetcache:annotation-driven base-package="com.alicp.jetcache"/>
 
-    <bean id="factoryBeanTarget" class="com.alicp.jetcache.anno.spring.beans.MyFactoryBean"/>
+    <bean id="factoryBeanTarget" class="com.alicp.jetcache.anno.springtest.beans.MyFactoryBean"/>
 
     <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.spring.SpringGlobalCacheConfig">
         <property name="localCacheFacotories">
@@ -35,7 +35,7 @@
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
         </property>
     </bean>
-    <bean id="remoteCacheFactory" class="com.alicp.jetcache.anno.spring.MockRemoteCacheFactory">
+    <bean id="remoteCacheFactory" class="com.alicp.jetcache.anno.springtest.MockRemoteCacheFactory">
         <property name="keyPrefix" value="aa"/>
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
@@ -47,7 +47,7 @@
             <util:constant static-field="com.alicp.jetcache.support.KryoValueDecoder.INSTANCE"/>
         </property>
     </bean>
-    <bean id="remoteCacheFactory2" class="com.alicp.jetcache.anno.spring.MockRemoteCacheFactory">
+    <bean id="remoteCacheFactory2" class="com.alicp.jetcache.anno.springtest.MockRemoteCacheFactory">
         <property name="keyPrefix" value="aa"/>
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>

@@ -1,4 +1,4 @@
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.springtest;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.factory.ExternalCacheFactory;

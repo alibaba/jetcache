@@ -1,12 +1,14 @@
 /**
  * Created on  13-09-23 17:35
  */
-package com.alicp.jetcache.anno.impl;
+package com.alicp.jetcache.anno.springtest.impl;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.impl.ProxyUtil;
 import com.alicp.jetcache.anno.support.CacheContext;
-import com.alicp.jetcache.anno.spring.TestUtil;
+import com.alicp.jetcache.anno.springtest.TestUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.testsupport.Count;
@@ -47,13 +49,13 @@ public class ProxyUtilTest {
         Assert.assertNotEquals(c2.count(200), c2.count(100));
     }
 
-    interface I1 {
+    public interface I1 {
         int count();
 
         int countWithoutCache();
     }
 
-    class C1 implements I1 {
+    public class C1 implements I1 {
         int count;
 
         @Cached
@@ -77,13 +79,13 @@ public class ProxyUtilTest {
         Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
-    interface I2 {
+    public interface I2 {
         @Cached
         int count();
         int countWithoutCache();
     }
 
-    class C2 implements I2 {
+    public class C2 implements I2 {
         int count;
 
         public int count() {
@@ -93,7 +95,7 @@ public class ProxyUtilTest {
             return count++;
         }
     }
-    class C22 implements I2 {
+    public class C22 implements I2 {
         int count;
 
         public int count() {
@@ -120,17 +122,17 @@ public class ProxyUtilTest {
         Assert.assertEquals(c2.count(), c4.count());
     }
 
-    interface I3_1 {
+    public interface I3_1 {
         @Cached
         int count();
     }
 
-    interface I3_2 extends I3_1 {
+    public interface I3_2 extends I3_1 {
         int count();
         int countWithoutCache();
     }
 
-    class C3 implements I3_2 {
+    public class C3 implements I3_2 {
         int count;
 
         public int count() {
@@ -153,17 +155,17 @@ public class ProxyUtilTest {
         Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
-    interface I4_1 {
+    public interface I4_1 {
         int count();
         int countWithoutCache();
     }
 
-    interface I4_2 extends I4_1 {
+    public interface I4_2 extends I4_1 {
         @Cached
         int count();
     }
 
-    class C4 implements I4_2 {
+    public class C4 implements I4_2 {
         int count;
 
         public int count() {
@@ -185,12 +187,12 @@ public class ProxyUtilTest {
         Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
-    interface I5 {
+    public interface I5 {
         int count();
         int countWithoutCache();
     }
 
-    class C5 implements I5 {
+    public class C5 implements I5 {
         int count;
 
         @Cached(enabled = false)
@@ -220,12 +222,12 @@ public class ProxyUtilTest {
         });
     }
 
-    interface I6 {
+    public interface I6 {
         int count();
         int countWithoutCache();
     }
 
-    class C6 implements I6 {
+    public class C6 implements I6 {
         int count;
 
         @EnableCache
@@ -249,12 +251,12 @@ public class ProxyUtilTest {
         Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
-    interface I7_1 {
+    public interface I7_1 {
         int count();
         int countWithoutCache();
     }
 
-    class C7_1 implements I7_1 {
+    public class C7_1 implements I7_1 {
         int count;
         @Cached(enabled = false)
         public int count() {
@@ -267,12 +269,12 @@ public class ProxyUtilTest {
         }
     }
 
-    interface I7_2 {
+    public interface I7_2 {
         int count();
         int countWithoutCache();
     }
 
-    class C7_2 implements I7_2 {
+    public class C7_2 implements I7_2 {
         I7_1 service;
 
         @EnableCache

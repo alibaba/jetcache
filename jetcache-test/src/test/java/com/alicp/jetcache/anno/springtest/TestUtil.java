@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-23 09:36
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.springtest;
 
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;

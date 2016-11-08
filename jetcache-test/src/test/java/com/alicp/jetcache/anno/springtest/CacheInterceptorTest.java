@@ -1,9 +1,11 @@
 /**
  * Created on  13-09-23 09:27
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.springtest;
 
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.spring.CacheInterceptor;
+import com.alicp.jetcache.anno.spring.CachePointcut;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;

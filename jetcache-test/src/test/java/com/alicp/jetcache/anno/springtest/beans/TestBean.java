@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-17 11:26
  */
-package com.alicp.jetcache.anno.spring.beans;
+package com.alicp.jetcache.anno.springtest.beans;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.testsupport.DynamicQuery;

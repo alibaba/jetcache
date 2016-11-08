@@ -1,13 +1,11 @@
 /**
  * Created on  13-10-28 23:42
  */
-package com.alicp.jetcache.anno.spring.beans;
+package com.alicp.jetcache.anno.springtest.beans;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
