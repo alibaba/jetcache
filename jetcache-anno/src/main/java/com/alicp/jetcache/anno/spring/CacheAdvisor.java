@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
+    public static final String CACHE_ADVISOR_BEAN_NAME = "jetcache.internalCacheAdvisor";
+
     private ConcurrentHashMap cacheConfigMap;
 
     private String[] basePackages;

@@ -22,8 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheAnnotationParser implements BeanDefinitionParser {
 
-    private static final String CACHE_ADVISOR_BEAN_NAME = CacheAnnotationParser.class.getPackage().getName() + ".internalCacheAdvisor";
-
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         doParse(element, parserContext);
         return null;
@@ -32,7 +30,7 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
     private synchronized void doParse(Element element, ParserContext parserContext) {
         String[] basePackages = StringUtils.tokenizeToStringArray(element.getAttribute("base-package"), ",; \t\n");
         AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
-        if (!parserContext.getRegistry().containsBeanDefinition(CACHE_ADVISOR_BEAN_NAME)) {
+        if (!parserContext.getRegistry().containsBeanDefinition(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)) {
             Object eleSource = parserContext.extractSource(element);
 
             RootBeanDefinition configMapDef = new RootBeanDefinition(ConcurrentHashMap.class);
@@ -53,13 +51,13 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
             advisorDef.getPropertyValues().addPropertyValue(new PropertyValue("adviceBeanName", interceptorName));
             advisorDef.getPropertyValues().addPropertyValue(new PropertyValue("cacheConfigMap", new RuntimeBeanReference(configMapName)));
             advisorDef.getPropertyValues().addPropertyValue(new PropertyValue("basePackages", basePackages));
-            parserContext.getRegistry().registerBeanDefinition(CACHE_ADVISOR_BEAN_NAME, advisorDef);
+            parserContext.getRegistry().registerBeanDefinition(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME, advisorDef);
 
             CompositeComponentDefinition compositeDef = new CompositeComponentDefinition(element.getTagName(),
                     eleSource);
             compositeDef.addNestedComponent(new BeanComponentDefinition(configMapDef, configMapName));
             compositeDef.addNestedComponent(new BeanComponentDefinition(interceptorDef, interceptorName));
-            compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, CACHE_ADVISOR_BEAN_NAME));
+            compositeDef.addNestedComponent(new BeanComponentDefinition(advisorDef, CacheAdvisor.CACHE_ADVISOR_BEAN_NAME));
             parserContext.registerComponent(compositeDef);
         }
     }

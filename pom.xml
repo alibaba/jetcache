@@ -72,7 +72,8 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>3.2.17.RELEASE</version>
+                <!--<version>3.2.17.RELEASE</version>-->
+                <version>4.3.4.RELEASE</version>
             </dependency>
 
             <dependency>
