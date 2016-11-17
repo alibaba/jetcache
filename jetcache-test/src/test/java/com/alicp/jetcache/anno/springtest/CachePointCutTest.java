@@ -6,14 +6,13 @@ package com.alicp.jetcache.anno.springtest;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
-import com.alicp.jetcache.anno.spring.CachePointcut;
+import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.aop.CachePointcut;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import otherpackage.OtherService;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.ConcurrentHashMap;

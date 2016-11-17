@@ -1,10 +1,10 @@
 /**
  * Created on  13-09-19 20:56
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.aop;
 
-import com.alicp.jetcache.anno.impl.CacheConfigUtil;
-import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.method.CacheConfigUtil;
+import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 

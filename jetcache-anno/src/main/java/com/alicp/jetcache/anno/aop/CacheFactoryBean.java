@@ -1,9 +1,9 @@
 /**
  * Created on  13-09-14 17:32
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.aop;
 
-import com.alicp.jetcache.anno.impl.ProxyUtil;
+import com.alicp.jetcache.anno.method.ProxyUtil;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.factory.FactoryBean;
 

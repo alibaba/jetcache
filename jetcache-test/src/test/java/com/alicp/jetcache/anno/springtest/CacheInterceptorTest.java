@@ -4,10 +4,10 @@
 package com.alicp.jetcache.anno.springtest;
 
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.spring.CacheInterceptor;
-import com.alicp.jetcache.anno.spring.CachePointcut;
+import com.alicp.jetcache.anno.aop.CacheInterceptor;
+import com.alicp.jetcache.anno.aop.CachePointcut;
 import com.alicp.jetcache.anno.support.CacheContext;
-import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
+import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;

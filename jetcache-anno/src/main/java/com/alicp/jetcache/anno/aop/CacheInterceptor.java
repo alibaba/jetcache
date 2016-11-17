@@ -1,11 +1,11 @@
 /**
  * Created on  13-09-18 20:33
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.aop;
 
-import com.alicp.jetcache.anno.impl.CacheHandler;
-import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
-import com.alicp.jetcache.anno.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.method.CacheHandler;
+import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;

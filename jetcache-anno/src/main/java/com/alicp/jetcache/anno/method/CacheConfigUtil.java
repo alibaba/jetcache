@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-20 22:01
  */
-package com.alicp.jetcache.anno.impl;
+package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.Cached;

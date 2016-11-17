@@ -1,7 +1,7 @@
 package com.alicp.jetcache.anno.config;
 
-import com.alicp.jetcache.anno.spring.CacheAdvisor;
-import com.alicp.jetcache.anno.spring.CacheInterceptor;
+import com.alicp.jetcache.anno.aop.CacheAdvisor;
+import com.alicp.jetcache.anno.aop.CacheInterceptor;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;

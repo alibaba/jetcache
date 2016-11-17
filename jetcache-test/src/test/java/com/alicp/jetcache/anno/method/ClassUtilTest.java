@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-09 15:46
  */
-package com.alicp.jetcache.anno.impl;
+package com.alicp.jetcache.anno.method;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,11 +56,11 @@ public class ClassUtilTest {
         Method m2 = C1.class.getMethod("foo", I1.class);
         Method m3 = C1.class.getMethod("foo2", I1.class);
 
-        String s1 = "1_impl.ClassUtilTest$C1." + m1.getName() + "()V";
+        String s1 = "1_method.ClassUtilTest$C1." + m1.getName() + "()V";
         String s2 = ClassUtil.getSubArea(1, m1, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = "1_impl.ClassUtilTest$C1." + m2.getName() + "(Limpl/ClassUtilTest$I1;)Ljava/lang/String;";
+        s1 = "1_method.ClassUtilTest$C1." + m2.getName() + "(Lmethod/ClassUtilTest$I1;)Ljava/lang/String;";
         s2 = ClassUtil.getSubArea(1, m2, hidePack);
         Assert.assertEquals(s1, s2);
 
@@ -79,7 +79,7 @@ public class ClassUtilTest {
         String s2 = ClassUtil.getMethodSig(m1, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = m2.getName() + "(Limpl/ClassUtilTest$I1;)Ljava/lang/String;";
+        s1 = m2.getName() + "(Lmethod/ClassUtilTest$I1;)Ljava/lang/String;";
         s2 = ClassUtil.getMethodSig(m2, hidePack);
         Assert.assertEquals(s1, s2);
 

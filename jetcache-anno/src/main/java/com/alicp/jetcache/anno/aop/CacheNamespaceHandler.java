@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-18 16:37
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.aop;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 

@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-18 18:18
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.aop;
 
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.beans.PropertyValue;

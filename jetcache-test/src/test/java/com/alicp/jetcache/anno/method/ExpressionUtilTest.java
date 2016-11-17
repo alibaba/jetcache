@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-02 22:14
  */
-package com.alicp.jetcache.anno.impl;
+package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import org.junit.Assert;

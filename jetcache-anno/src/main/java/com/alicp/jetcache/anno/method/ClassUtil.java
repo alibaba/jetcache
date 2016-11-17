@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-09 17:20
  */
-package com.alicp.jetcache.anno.impl;
+package com.alicp.jetcache.anno.method;
 
 import org.springframework.asm.Type;
 

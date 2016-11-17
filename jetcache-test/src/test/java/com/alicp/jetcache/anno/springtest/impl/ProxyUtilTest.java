@@ -5,8 +5,8 @@ package com.alicp.jetcache.anno.springtest.impl;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.impl.CacheInvokeConfig;
-import com.alicp.jetcache.anno.impl.ProxyUtil;
+import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.method.ProxyUtil;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.springtest.TestUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;

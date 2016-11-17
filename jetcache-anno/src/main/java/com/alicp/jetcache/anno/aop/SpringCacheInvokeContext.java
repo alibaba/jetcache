@@ -1,9 +1,9 @@
 /**
  * Created on  13-10-07 23:25
  */
-package com.alicp.jetcache.anno.spring;
+package com.alicp.jetcache.anno.aop;
 
-import com.alicp.jetcache.anno.impl.CacheInvokeContext;
+import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import org.springframework.context.ApplicationContext;
 
 /**
