@@ -39,52 +39,52 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
 
     public void test(int expireMillis, boolean testLru) throws Exception {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
             lruTest();
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
         expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
             lruTest();
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
             lruTest();
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).build();
+                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         if(testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).build();
+                    .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
             lruTest();
         }
 
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).build();
+        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
         keyCoverterTest();
 
         int thread = 10;
         int count = 100;
         int time = 5000;
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(thread * count).build();
+        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(thread * count).buildCache();
         concurrentTest(thread, count ,time);
     }
 

@@ -15,7 +15,7 @@ public class MonitoredCacheTest extends AbstractCacheTest {
     public void test(){
         Cache target = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         cache = new MonitoredCache(target, new CacheMonitor() {
             @Override
             public void afterGET(long millis, Object key, CacheGetResult result) {

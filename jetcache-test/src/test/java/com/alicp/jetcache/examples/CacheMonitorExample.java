@@ -23,7 +23,7 @@ public class CacheMonitorExample {
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         DefaultCacheMonitor orderCacheMonitor = new DefaultCacheMonitor("OrderCache");
 
         Cache<String, Integer> orderCache = new MonitoredCache(cache, orderCacheMonitor);

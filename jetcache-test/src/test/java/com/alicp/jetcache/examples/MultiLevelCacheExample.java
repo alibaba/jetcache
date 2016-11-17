@@ -24,14 +24,14 @@ public class MultiLevelCacheExample {
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         Cache<Object, Object> l2Cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(/*replace with your jedis pool*/null)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)
-                .build();
+                .buildCache();
 
         MultiLevelCache<Object, Object> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
 

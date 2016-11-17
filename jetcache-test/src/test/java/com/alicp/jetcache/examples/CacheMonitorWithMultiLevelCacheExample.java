@@ -24,13 +24,13 @@ public class CacheMonitorWithMultiLevelCacheExample {
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         Cache<String, Integer> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         DefaultCacheMonitor l1CacheMonitor = new DefaultCacheMonitor("OrderCache_L1");
         DefaultCacheMonitor l2CacheMonitor = new DefaultCacheMonitor("OrderCache_L2");
         DefaultCacheMonitor orderCacheMonitor = new DefaultCacheMonitor("OrderCache");

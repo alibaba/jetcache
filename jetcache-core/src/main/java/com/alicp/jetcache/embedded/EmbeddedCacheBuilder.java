@@ -1,13 +1,13 @@
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.AbstractCacheBuilder;
 
 /**
  * Created on 16/9/7.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends CacheBuilder<T> {
+public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends AbstractCacheBuilder<T> {
 
     public EmbeddedCacheBuilder(){
     }

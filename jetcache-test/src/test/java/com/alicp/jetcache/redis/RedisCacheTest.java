@@ -33,7 +33,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
-                .build();
+                .buildCache();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
 
@@ -44,7 +44,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .expireAfterAccess(200, TimeUnit.MILLISECONDS)
-                .build();
+                .buildCache();
         baseTest();
         expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
 
@@ -54,7 +54,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .build();
+                .buildCache();
         keyCoverterTest();
 
         int thread = 10;
@@ -66,7 +66,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .build();
+                .buildCache();
         concurrentTest(thread, count, time);
     }
 }

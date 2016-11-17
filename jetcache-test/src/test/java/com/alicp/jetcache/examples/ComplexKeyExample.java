@@ -20,7 +20,7 @@ public class ComplexKeyExample {
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
 
         DynamicQuery key = new DynamicQuery();
         key.setName("AAA");

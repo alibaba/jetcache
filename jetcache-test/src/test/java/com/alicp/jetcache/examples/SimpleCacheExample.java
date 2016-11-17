@@ -19,7 +19,7 @@ public class SimpleCacheExample {
                 .expireAfterWrite(200, TimeUnit.SECONDS)
 //                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         cache.put("20161111", 1000000, 1 ,TimeUnit.HOURS);
         Integer orderCount1 = cache.get("20161111");
         Integer orderCount2 = cache.computeIfAbsent("20161212", SimpleCacheExample::loadFromDatabase);

@@ -1,6 +1,6 @@
 package com.alicp.jetcache.external;
 
-import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.AbstractCacheBuilder;
 
 import java.util.function.Function;
 
@@ -9,7 +9,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends CacheBuilder<T> {
+public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends AbstractCacheBuilder<T> {
 
     public T keyPrefix(String keyPrefix){
         ((ExternalCacheConfig)getConfig()).setKeyPrefix(keyPrefix);

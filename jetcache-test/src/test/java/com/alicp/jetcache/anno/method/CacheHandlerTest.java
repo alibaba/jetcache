@@ -38,7 +38,7 @@ public class CacheHandlerTest {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .build();
+                .buildCache();
         globalCacheConfig.cacheContext().getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
 
         cacheAnnoConfig = new CacheAnnoConfig();

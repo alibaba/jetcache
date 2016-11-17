@@ -24,7 +24,7 @@ public class DefaultCacheMonnitorTest {
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
     }
 
     private void basetest(Cache cache, DefaultCacheMonitor monitor) {

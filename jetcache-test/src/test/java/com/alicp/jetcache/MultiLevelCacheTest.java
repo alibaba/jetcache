@@ -29,7 +29,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
         l2Cache = (AbstractCache<Object, Object>) EmbeddedCacheBuilder
                 .createEmbeddedCacheBuilder()
                 .limit(100000)
@@ -37,7 +37,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .softValues()
                 .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
-                .build();
+                .buildCache();
     }
 
     @Test

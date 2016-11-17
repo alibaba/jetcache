@@ -1,6 +1,7 @@
 package com.alicp.jetcache.factory;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfig;
 
 import java.util.function.Function;
@@ -10,11 +11,9 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class CacheFactory {
+public abstract class CacheFactory implements CacheBuilder {
 
     protected CacheConfig config;
-
-    public abstract Cache buildCache();
 
     protected CacheConfig getConfig() {
         if (config == null) {
@@ -27,11 +26,11 @@ public abstract class CacheFactory {
         getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
     }
 
-    public void setKeyConvertor(Function<Object,Object> keyConvertor){
+    public void setKeyConvertor(Function<Object, Object> keyConvertor) {
         getConfig().setKeyConvertor(keyConvertor);
     }
 
-    public void setExpireAfterAccess(boolean expireAfterAccess){
+    public void setExpireAfterAccess(boolean expireAfterAccess) {
         getConfig().setExpireAfterAccess(expireAfterAccess);
     }
 
