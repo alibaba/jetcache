@@ -1,8 +1,10 @@
 /**
  * Created on  13-09-18 18:18
  */
-package com.alicp.jetcache.anno.aop;
+package com.alicp.jetcache.anno.config;
 
+import com.alicp.jetcache.anno.aop.CacheAdvisor;
+import com.alicp.jetcache.anno.aop.CacheInterceptor;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;

@@ -1,8 +1,9 @@
 /**
  * Created on  13-10-07 23:27
  */
-package com.alicp.jetcache.anno.aop;
+package com.alicp.jetcache.anno.config;
 
+import com.alicp.jetcache.anno.method.SpringCacheContext;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.BeansException;

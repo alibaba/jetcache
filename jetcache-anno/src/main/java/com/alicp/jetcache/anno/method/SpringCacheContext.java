@@ -1,5 +1,6 @@
-package com.alicp.jetcache.anno.aop;
+package com.alicp.jetcache.anno.method;
 
+import com.alicp.jetcache.anno.method.SpringCacheInvokeContext;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
