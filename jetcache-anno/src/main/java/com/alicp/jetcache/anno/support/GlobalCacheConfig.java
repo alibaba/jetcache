@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.factory.CacheFactory;
 
 import java.util.Map;
@@ -13,8 +14,8 @@ import java.util.Map;
 public class GlobalCacheConfig {
 
     private String[] hidePackages;
-    private Map<String, CacheFactory> localCacheFacotories;
-    private Map<String, CacheFactory> remoteCacheFacotories;
+    private Map<String, CacheBuilder> localCacheBuilders;
+    private Map<String, CacheBuilder> remoteCacheBuilders;
     private CacheContext cacheContext;
 
     public GlobalCacheConfig() {
@@ -43,20 +44,20 @@ public class GlobalCacheConfig {
         this.hidePackages = hidePackages;
     }
 
-    public Map<String, CacheFactory> getLocalCacheFacotories() {
-        return localCacheFacotories;
+    public Map<String, CacheBuilder> getLocalCacheBuilders() {
+        return localCacheBuilders;
     }
 
-    public void setLocalCacheFacotories(Map<String, CacheFactory> localCacheFacotories) {
-        this.localCacheFacotories = localCacheFacotories;
+    public void setLocalCacheBuilders(Map<String, CacheBuilder> localCacheBuilders) {
+        this.localCacheBuilders = localCacheBuilders;
     }
 
-    public Map<String, CacheFactory> getRemoteCacheFacotories() {
-        return remoteCacheFacotories;
+    public Map<String, CacheBuilder> getRemoteCacheBuilders() {
+        return remoteCacheBuilders;
     }
 
-    public void setRemoteCacheFacotories(Map<String, CacheFactory> remoteCacheFacotories) {
-        this.remoteCacheFacotories = remoteCacheFacotories;
+    public void setRemoteCacheBuilders(Map<String, CacheBuilder> remoteCacheBuilders) {
+        this.remoteCacheBuilders = remoteCacheBuilders;
     }
 
 }

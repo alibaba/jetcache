@@ -32,8 +32,8 @@ public class TestUtil {
         remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteFactory);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setLocalCacheFacotories(localFactories);
-        globalCacheConfig.setRemoteCacheFacotories(remoteFactories);
+        globalCacheConfig.setLocalCacheBuilders(localFactories);
+        globalCacheConfig.setRemoteCacheBuilders(remoteFactories);
         return globalCacheConfig;
     }
 
