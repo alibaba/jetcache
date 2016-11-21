@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-07 23:27
  */
-package com.alicp.jetcache.anno.config;
+package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.method.SpringCacheContext;
 import com.alicp.jetcache.anno.support.CacheContext;

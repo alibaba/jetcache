@@ -16,7 +16,7 @@
 
     <bean id="factoryBeanTarget" class="com.alicp.jetcache.anno.springtest.beans.MyFactoryBean"/>
 
-    <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.config.SpringGlobalCacheConfig">
+    <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.support.SpringGlobalCacheConfig">
         <property name="localCacheBuilders">
             <map>
                 <entry key="default" value-ref="localCacheFactory"/>
