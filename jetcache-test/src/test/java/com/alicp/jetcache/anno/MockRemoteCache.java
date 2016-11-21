@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-22 16:54
  */
-package com.alicp.jetcache.anno.springtest;
+package com.alicp.jetcache.anno;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;

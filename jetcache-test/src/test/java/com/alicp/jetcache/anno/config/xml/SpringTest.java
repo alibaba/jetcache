@@ -1,12 +1,12 @@
 /**
  * Created on  13-09-17 11:14
  */
-package com.alicp.jetcache.anno.springtest;
+package com.alicp.jetcache.anno.config.xml;
 
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.springtest.beans.FactoryBeanTarget;
-import com.alicp.jetcache.anno.springtest.beans.Service;
-import com.alicp.jetcache.anno.springtest.beans.TestBean;
+import com.alicp.jetcache.anno.config.xml.beans.FactoryBeanTarget;
+import com.alicp.jetcache.anno.config.xml.beans.Service;
+import com.alicp.jetcache.anno.config.xml.beans.TestBean;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;

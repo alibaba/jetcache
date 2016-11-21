@@ -1,9 +1,10 @@
 /**
  * Created on  13-09-23 09:27
  */
-package com.alicp.jetcache.anno.springtest;
+package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.TestUtil;
 import com.alicp.jetcache.anno.aop.CacheInterceptor;
 import com.alicp.jetcache.anno.aop.CachePointcut;
 import com.alicp.jetcache.anno.support.CacheContext;

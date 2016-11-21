@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-28 23:43
  */
-package com.alicp.jetcache.anno.springtest.beans;
+package com.alicp.jetcache.anno.config.xml.beans;
 
 import com.alicp.jetcache.anno.Cached;
 
