@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-17 11:26
  */
-package com.alicp.jetcache.anno.config.xml.beans;
+package com.alicp.jetcache.anno.config.beans;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.testsupport.DynamicQuery;

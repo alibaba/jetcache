@@ -4,9 +4,8 @@
 package com.alicp.jetcache.anno.config.xml;
 
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.config.xml.beans.FactoryBeanTarget;
-import com.alicp.jetcache.anno.config.xml.beans.Service;
-import com.alicp.jetcache.anno.config.xml.beans.TestBean;
+import com.alicp.jetcache.anno.config.beans.Service;
+import com.alicp.jetcache.anno.config.beans.TestBean;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;

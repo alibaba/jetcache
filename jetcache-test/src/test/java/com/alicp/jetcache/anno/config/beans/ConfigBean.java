@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-07 23:30
  */
-package com.alicp.jetcache.anno.config.xml.beans;
+package com.alicp.jetcache.anno.config.beans;
 
 import org.springframework.stereotype.Component;
 

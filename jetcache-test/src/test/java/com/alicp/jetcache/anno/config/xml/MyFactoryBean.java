@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-28 23:42
  */
-package com.alicp.jetcache.anno.config.xml.beans;
+package com.alicp.jetcache.anno.config.xml;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
