@@ -18,17 +18,17 @@
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-redis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-anno</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-anno-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
 

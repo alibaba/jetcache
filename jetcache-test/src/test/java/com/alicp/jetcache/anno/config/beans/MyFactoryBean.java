@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-28 23:42
  */
-package com.alicp.jetcache.anno.config.xml;
+package com.alicp.jetcache.anno.config.beans;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -11,7 +11,7 @@ import java.lang.reflect.Proxy;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MyFactoryBean implements FactoryBean,InitializingBean {
+public class MyFactoryBean implements FactoryBean, InitializingBean {
 
     private FactoryBeanTarget target;
 

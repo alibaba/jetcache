@@ -1,7 +1,7 @@
 /**
  * Created on  13-10-28 23:44
  */
-package com.alicp.jetcache.anno.config.xml;
+package com.alicp.jetcache.anno.config.beans;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

@@ -28,7 +28,7 @@ public class ProxyUtilTest {
 
     @Before
     public void setup() {
-        globalCacheConfig = TestUtil.createGloableConfig();
+        globalCacheConfig = TestUtil.createGloableConfig(GlobalCacheConfig::new);
 
         cacheAnnoConfig = new CacheAnnoConfig();
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();

@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.config.beans;
 
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -16,4 +17,11 @@ public interface Service {
 
     @Cached
     int countWithAnnoOnInterface();
+
+    @EnableCache
+    int enableCacheWithAnnoOnInterface(TestBean bean);
+
+    int enableCacheWithAnnoOnClass(TestBean bean);
+
+    int enableCacheWithNoCacheCount(TestBean bean);
 }

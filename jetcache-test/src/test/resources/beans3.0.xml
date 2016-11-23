@@ -14,7 +14,7 @@
 
     <jetcache:annotation-driven base-package="com.alicp.jetcache"/>
 
-    <bean id="factoryBeanTarget" class="com.alicp.jetcache.anno.config.xml.MyFactoryBean"/>
+    <bean id="factoryBeanTarget" class="com.alicp.jetcache.anno.config.beans.MyFactoryBean"/>
 
     <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.support.SpringGlobalCacheConfig">
         <property name="localCacheBuilders">
@@ -36,7 +36,7 @@
         </property>
     </bean>
     <bean id="remoteCacheFactory" class="com.alicp.jetcache.anno.MockRemoteCacheFactory">
-        <property name="keyPrefix" value="aa"/>
+        <property name="keyPrefix" value="remote1"/>
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
         </property>
@@ -48,7 +48,7 @@
         </property>
     </bean>
     <bean id="remoteCacheFactory2" class="com.alicp.jetcache.anno.MockRemoteCacheFactory">
-        <property name="keyPrefix" value="aa"/>
+        <property name="keyPrefix" value="remote2"/>
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
         </property>

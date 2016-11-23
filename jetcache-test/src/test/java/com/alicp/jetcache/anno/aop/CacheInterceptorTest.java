@@ -9,6 +9,7 @@ import com.alicp.jetcache.anno.aop.CacheInterceptor;
 import com.alicp.jetcache.anno.aop.CachePointcut;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -38,7 +39,7 @@ public class CacheInterceptorTest {
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);
-        interceptor.setGlobalCacheConfig(TestUtil.createGloableConfig());
+        interceptor.setGlobalCacheConfig(TestUtil.createGloableConfig(GlobalCacheConfig::new));
     }
 
     interface I1 {

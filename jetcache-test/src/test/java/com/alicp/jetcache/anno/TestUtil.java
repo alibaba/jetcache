@@ -12,25 +12,34 @@ import com.alicp.jetcache.support.KryoValueEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class TestUtil {
-    public static GlobalCacheConfig createGloableConfig() {
+    public static GlobalCacheConfig createGloableConfig(Supplier<GlobalCacheConfig> creator) {
+        Map localFactories = new HashMap();
         EmbeddedCacheFactory localFactory = new LinkedHashMapCacheFactory();
         localFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-        Map localFactories = new HashMap();
         localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
+        localFactories.put("A1", localFactory);
+
+        Map remoteFactories = new HashMap();
 
         MockRemoteCacheFactory remoteFactory = new MockRemoteCacheFactory();
         remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
-        Map remoteFactories = new HashMap();
         remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteFactory);
 
-        GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
+        remoteFactory = new MockRemoteCacheFactory();
+        remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
+        remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
+        remoteFactories.put("A1", remoteFactory);
+
+        GlobalCacheConfig globalCacheConfig = creator.get();
         globalCacheConfig.setLocalCacheBuilders(localFactories);
         globalCacheConfig.setRemoteCacheBuilders(remoteFactories);
         return globalCacheConfig;

@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.config.beans;
 
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,13 +20,32 @@ public class ServiceImpl implements Service {
         return count++;
     }
 
+    @Override
     @Cached
     public int countWithAnnoOnClass() {
         return count++;
     }
 
+    @Override
     public int countWithAnnoOnInterface(){
         return count++;
+    }
+
+    @Override
+    public int enableCacheWithAnnoOnInterface(TestBean bean){
+        return bean.countWithDisabledCache();
+    }
+
+    @Override
+    @EnableCache
+    public int enableCacheWithAnnoOnClass(TestBean bean){
+        return bean.countWithDisabledCache();
+    }
+
+    @Override
+    @EnableCache
+    public int enableCacheWithNoCacheCount(TestBean bean){
+        return bean.noCacheCount();
     }
 
 }

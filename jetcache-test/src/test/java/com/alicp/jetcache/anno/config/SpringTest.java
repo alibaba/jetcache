@@ -1,31 +1,22 @@
-/**
- * Created on  13-09-17 11:14
- */
-package com.alicp.jetcache.anno.config.xml;
+package com.alicp.jetcache.anno.config;
 
-import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.config.beans.FactoryBeanTarget;
 import com.alicp.jetcache.anno.config.beans.Service;
 import com.alicp.jetcache.anno.config.beans.TestBean;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.context.ApplicationContext;
 
 /**
+ * Created on 2016/11/23.
+ *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class SpringTest {
 
-    private static ClassPathXmlApplicationContext context;
+    protected static ApplicationContext context;
 
-    @Test
-    public void test3_X(){
-        context = new ClassPathXmlApplicationContext("beans3.0.xml");
-        test1();
-    }
-
-    public void test1() {
+    protected void doTest() {
         int x1, x2, x3;
 
         Service service = (Service) context.getBean("service");
@@ -51,11 +42,9 @@ public class SpringTest {
         x2 = bean.countWithDisabledCache();
         Assert.assertNotEquals(x1, x2);
 
-        C c = (C)context.getBean("c");
-        Assert.assertNotEquals(c.enableCacheWithNoCacheCount(bean), c.enableCacheWithNoCacheCount(bean));
-        x1 = c.count(bean);
-        x2 = c.count(bean);
-        Assert.assertEquals(x1, x2);
+        Assert.assertNotEquals(service.enableCacheWithNoCacheCount(bean), service.enableCacheWithNoCacheCount(bean));
+        Assert.assertEquals(service.enableCacheWithAnnoOnClass(bean), service.enableCacheWithAnnoOnClass(bean));
+        Assert.assertEquals(service.enableCacheWithAnnoOnInterface(bean), service.enableCacheWithAnnoOnInterface(bean));
 
         DynamicQuery q1 = new DynamicQuery();
         q1.setId(1000);
@@ -89,19 +78,6 @@ public class SpringTest {
 
         FactoryBeanTarget target = (FactoryBeanTarget) context.getBean("factoryBeanTarget");
         Assert.assertEquals(target.count(), target.count());
-    }
-
-    @Component("c")
-    public static class C{
-        @EnableCache
-        public int count(TestBean bean){
-            return bean.countWithDisabledCache();
-        }
-
-        @EnableCache
-        public int enableCacheWithNoCacheCount(TestBean bean){
-            return bean.noCacheCount();
-        }
     }
 
 }
