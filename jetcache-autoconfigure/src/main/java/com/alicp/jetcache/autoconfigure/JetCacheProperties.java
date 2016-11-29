@@ -1,6 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.StatInfo;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.function.Consumer;
@@ -15,7 +15,7 @@ public class JetCacheProperties {
 
     private String[] hidePackages;
     private int statIntervalMinutes;
-    private Consumer<DefaultCacheMonitorManager.StatInfo> statCallback;
+    private Consumer<StatInfo> statCallback;
 
     public JetCacheProperties(){
     }
@@ -36,11 +36,11 @@ public class JetCacheProperties {
         this.statIntervalMinutes = statIntervalMinutes;
     }
 
-    public Consumer<DefaultCacheMonitorManager.StatInfo> getStatCallback() {
+    public Consumer<StatInfo> getStatCallback() {
         return statCallback;
     }
 
-    public void setStatCallback(Consumer<DefaultCacheMonitorManager.StatInfo> statCallback) {
+    public void setStatCallback(Consumer<StatInfo> statCallback) {
         this.statCallback = statCallback;
     }
 }

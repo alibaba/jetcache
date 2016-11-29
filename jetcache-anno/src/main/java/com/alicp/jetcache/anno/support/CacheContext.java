@@ -34,10 +34,10 @@ public class CacheContext {
     private GlobalCacheConfig globalCacheConfig;
 
     private int statIntervalMinutes;
-    private Consumer<DefaultCacheMonitorManager.StatInfo> statCallback;
+    private Consumer<StatInfo> statCallback;
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
 
-    public CacheContext(GlobalCacheConfig globalCacheConfig, int statIntervalMinutes, Consumer<DefaultCacheMonitorManager.StatInfo> statCallback) {
+    public CacheContext(GlobalCacheConfig globalCacheConfig, int statIntervalMinutes, Consumer<StatInfo> statCallback) {
         this.globalCacheConfig = globalCacheConfig;
         this.statIntervalMinutes = statIntervalMinutes;
         this.statCallback = statCallback;

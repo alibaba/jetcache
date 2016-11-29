@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.StatInfo;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -20,7 +20,7 @@ public class GlobalCacheConfig {
     private CacheContext cacheContext;
 
     protected int statIntervalMinutes;
-    protected Consumer<DefaultCacheMonitorManager.StatInfo> statCallback;
+    protected Consumer<StatInfo> statCallback;
 
     public GlobalCacheConfig() {
     }
@@ -75,11 +75,11 @@ public class GlobalCacheConfig {
         this.statIntervalMinutes = statIntervalMinutes;
     }
 
-    public Consumer<DefaultCacheMonitorManager.StatInfo> getStatCallback() {
+    public Consumer<StatInfo> getStatCallback() {
         return statCallback;
     }
 
-    public void setStatCallback(Consumer<DefaultCacheMonitorManager.StatInfo> statCallback) {
+    public void setStatCallback(Consumer<StatInfo> statCallback) {
         this.statCallback = statCallback;
     }
 }

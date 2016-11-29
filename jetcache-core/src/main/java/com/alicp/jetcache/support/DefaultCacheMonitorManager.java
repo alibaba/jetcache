@@ -26,36 +26,6 @@ public class DefaultCacheMonitorManager {
     private Consumer<StatInfo> statCallback;
     private boolean verboseLog;
 
-    public static class StatInfo {
-        private List<CacheStat> stats;
-        private long startTime;
-        private long endTime;
-
-        public List<CacheStat> getStats() {
-            return stats;
-        }
-
-        public void setStats(List<CacheStat> stats) {
-            this.stats = stats;
-        }
-
-        public long getStartTime() {
-            return startTime;
-        }
-
-        public void setStartTime(long startTime) {
-            this.startTime = startTime;
-        }
-
-        public long getEndTime() {
-            return endTime;
-        }
-
-        public void setEndTime(long endTime) {
-            this.endTime = endTime;
-        }
-    }
-
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> statCallback) {
         this.statCallback = statCallback;
         init(resetTime, resetTimeUnit);
