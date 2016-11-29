@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.config.beans;
 
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class TestBean {
         return count++;
     }
 
-    @Cached(area = "A1")
+    @Cached(area = "A1", cacheType = CacheType.BOTH)
     public int count(DynamicQuery q) {
         return count++;
     }

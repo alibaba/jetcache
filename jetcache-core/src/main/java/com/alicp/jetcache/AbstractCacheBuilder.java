@@ -8,7 +8,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> implements CacheBuilder {
+public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> implements CacheBuilder, Cloneable {
 
     protected CacheConfig config;
     private Function<CacheConfig, Cache> buildFunc;
@@ -53,6 +53,13 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         }
         beforeBuild();
         return buildFunc.apply(getConfig().clone());
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        AbstractCacheBuilder copy = (AbstractCacheBuilder) super.clone();
+        copy.config = config.clone();
+        return copy;
     }
 
     public T keyConvertor(Function<Object, Object> keyConvertor) {
