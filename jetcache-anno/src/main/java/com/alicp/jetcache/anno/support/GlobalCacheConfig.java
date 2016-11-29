@@ -4,9 +4,12 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.factory.CacheFactory;
+import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -18,6 +21,9 @@ public class GlobalCacheConfig {
     private Map<String, CacheBuilder> remoteCacheBuilders;
     private CacheContext cacheContext;
 
+    protected int statIntervalMinutes;
+    protected Consumer<DefaultCacheMonitorManager.StatInfo> statCallback;
+
     public GlobalCacheConfig() {
     }
 
@@ -26,6 +32,9 @@ public class GlobalCacheConfig {
             return cacheContext;
         }
         synchronized (this) {
+            if (cacheContext != null) {
+                return cacheContext;
+            }
             cacheContext = newCacheContext();
             cacheContext.init();
         }
@@ -33,7 +42,7 @@ public class GlobalCacheConfig {
     }
 
     protected CacheContext newCacheContext(){
-        return new CacheContext(this);
+        return new CacheContext(this, statIntervalMinutes, statCallback);
     }
 
     public String[] getHidePackages() {
@@ -60,4 +69,19 @@ public class GlobalCacheConfig {
         this.remoteCacheBuilders = remoteCacheBuilders;
     }
 
+    public int getStatIntervalMinutes() {
+        return statIntervalMinutes;
+    }
+
+    public void setStatIntervalMinutes(int statIntervalMinutes) {
+        this.statIntervalMinutes = statIntervalMinutes;
+    }
+
+    public Consumer<DefaultCacheMonitorManager.StatInfo> getStatCallback() {
+        return statCallback;
+    }
+
+    public void setStatCallback(Consumer<DefaultCacheMonitorManager.StatInfo> statCallback) {
+        this.statCallback = statCallback;
+    }
 }

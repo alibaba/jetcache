@@ -45,7 +45,9 @@
         <module>jetcache-ali</module>
         <module>jetcache-anno</module>
         <module>jetcache-anno-api</module>
-        <module>jetcache-anno-starter</module>
+        <module>jetcache-autoconfigure</module>
+        <module>jetcache-starter-caffeine</module>
+        <module>jetcache-starter-redis</module>
         <module>jetcache-redis</module>
         <module>jetcache-test</module>
     </modules>
@@ -79,6 +81,11 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>1.4.2.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
                 <version>1.4.2.RELEASE</version>
             </dependency>
 

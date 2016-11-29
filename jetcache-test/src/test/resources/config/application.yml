@@ -1,0 +1,8 @@
+jetcache:
+  foo: 123
+  local:
+    default:
+      type: redis
+
+
+

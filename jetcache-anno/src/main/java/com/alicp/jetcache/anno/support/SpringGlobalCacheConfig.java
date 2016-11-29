@@ -26,6 +26,6 @@ public class SpringGlobalCacheConfig extends GlobalCacheConfig implements Applic
 
     @Override
     protected CacheContext newCacheContext() {
-        return new SpringCacheContext(this, applicationContext);
+        return new SpringCacheContext(this, applicationContext, statIntervalMinutes, statCallback);
     }
 }

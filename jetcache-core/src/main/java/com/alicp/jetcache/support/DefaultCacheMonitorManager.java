@@ -23,7 +23,7 @@ public class DefaultCacheMonitorManager {
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
 
     private ScheduledFuture<?> future;
-    private Consumer<StatInfo> resetAction;
+    private Consumer<StatInfo> statCallback;
     private boolean verboseLog;
 
     public static class StatInfo {
@@ -56,8 +56,8 @@ public class DefaultCacheMonitorManager {
         }
     }
 
-    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> resetAction) {
-        this.resetAction = resetAction;
+    public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> statCallback) {
+        this.statCallback = statCallback;
         init(resetTime, resetTimeUnit);
     }
 
@@ -67,7 +67,7 @@ public class DefaultCacheMonitorManager {
 
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, boolean verboseLog) {
         this.verboseLog = verboseLog;
-        this.resetAction = this::logStat;
+        this.statCallback = this::logStat;
         init(resetTime, resetTimeUnit);
     }
 
@@ -94,7 +94,7 @@ public class DefaultCacheMonitorManager {
                     statInfo.setStats(stats);
                     time = endTime;
 
-                    resetAction.accept(statInfo);
+                    statCallback.accept(statInfo);
                 } catch (Exception e) {
                     logger.error("jetcache DefaultCacheMonitorManager error", e);
                 }
