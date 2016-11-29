@@ -41,4 +41,16 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Abs
         getConfig().setWeakValues(true);
         return self();
     }
+
+    public void setLimit(int limit){
+        getConfig().setLimit(limit);
+    }
+
+    public void setSoftValues(boolean softValues){
+        getConfig().setSoftValues(softValues);
+    }
+
+    public void setWeakValues(boolean weakValues){
+        getConfig().setWeakValues(weakValues);
+    }
 }

@@ -33,4 +33,8 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
         return self();
     }
 
+    public void setJedisPool(JedisPool jedisPool) {
+        getConfig().setJedisPool(jedisPool);
+    }
+
 }

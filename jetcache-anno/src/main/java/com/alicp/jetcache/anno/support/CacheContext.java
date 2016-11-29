@@ -9,8 +9,8 @@ import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.method.ClassUtil;
-import com.alicp.jetcache.factory.EmbeddedCacheFactory;
-import com.alicp.jetcache.factory.ExternalCacheFactory;
+import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
+import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.*;
 
 import javax.annotation.PostConstruct;
@@ -106,7 +106,7 @@ public class CacheContext {
     }
 
     private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String prefix) {
-        ExternalCacheFactory cacheFactory = (ExternalCacheFactory) globalCacheConfig.getRemoteCacheBuilders().get(area);
+        ExternalCacheBuilder cacheFactory = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
         if (cacheFactory == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in remoteCacheFacotories");
         }
@@ -131,7 +131,7 @@ public class CacheContext {
 
     private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
         Cache cache;
-        EmbeddedCacheFactory cacheFactory = (EmbeddedCacheFactory) globalCacheConfig.getLocalCacheBuilders().get(area);
+        EmbeddedCacheBuilder cacheFactory = (EmbeddedCacheBuilder) globalCacheConfig.getLocalCacheBuilders().get(area);
         if (cacheFactory == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in localCacheFactory");
         }

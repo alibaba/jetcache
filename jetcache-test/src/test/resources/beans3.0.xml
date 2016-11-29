@@ -19,23 +19,23 @@
     <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.support.SpringGlobalCacheConfig">
         <property name="localCacheBuilders">
             <map>
-                <entry key="default" value-ref="localCacheFactory"/>
-                <entry key="A1" value-ref="localCacheFactory"/>
+                <entry key="default" value-ref="localCacheBuilder"/>
+                <entry key="A1" value-ref="localCacheBuilder"/>
             </map>
         </property>
         <property name="remoteCacheBuilders">
             <map>
-                <entry key="default" value-ref="remoteCacheFactory"/>
-                <entry key="A1" value-ref="remoteCacheFactory2"/>
+                <entry key="default" value-ref="remoteCacheBuilder"/>
+                <entry key="A1" value-ref="remoteCacheBuilder2"/>
             </map>
         </property>
     </bean>
-    <bean id="localCacheFactory" class="com.alicp.jetcache.factory.LinkedHashMapCacheFactory">
+    <bean id="localCacheBuilder" class="com.alicp.jetcache.embedded.EmbeddedCacheBuilder">
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
         </property>
     </bean>
-    <bean id="remoteCacheFactory" class="com.alicp.jetcache.anno.MockRemoteCacheFactory">
+    <bean id="remoteCacheBuilder" class="com.alicp.jetcache.anno.MockRemoteCacheBuilder">
         <property name="keyPrefix" value="remote1"/>
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
@@ -47,7 +47,7 @@
             <util:constant static-field="com.alicp.jetcache.support.KryoValueDecoder.INSTANCE"/>
         </property>
     </bean>
-    <bean id="remoteCacheFactory2" class="com.alicp.jetcache.anno.MockRemoteCacheFactory">
+    <bean id="remoteCacheBuilder2" class="com.alicp.jetcache.anno.MockRemoteCacheBuilder">
         <property name="keyPrefix" value="remote2"/>
         <property name="keyConvertor">
             <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>

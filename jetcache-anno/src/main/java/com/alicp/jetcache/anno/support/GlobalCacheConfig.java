@@ -4,8 +4,6 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
-import com.alicp.jetcache.CacheMonitor;
-import com.alicp.jetcache.factory.CacheFactory;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 
 import java.util.Map;

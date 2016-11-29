@@ -60,6 +60,10 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return self();
     }
 
+    public void setKeyConvertor(Function<Object, Object> keyConvertor) {
+        getConfig().setKeyConvertor(keyConvertor);
+    }
+
     public T expireAfterAccess(int defaultExpire, TimeUnit timeUnit) {
         getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         getConfig().setExpireAfterAccess(true);
@@ -70,6 +74,14 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
         getConfig().setExpireAfterAccess(false);
         return self();
+    }
+
+    public void setDefaultExpireInMillis(int defaultExpireInMillis) {
+        getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
+    }
+
+    public void setExpireAfterAccess(boolean expireAfterAccess) {
+        getConfig().setExpireAfterAccess(expireAfterAccess);
     }
 
 }

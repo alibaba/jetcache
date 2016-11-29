@@ -4,8 +4,7 @@
 package com.alicp.jetcache.anno;
 
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.factory.EmbeddedCacheFactory;
-import com.alicp.jetcache.factory.LinkedHashMapCacheFactory;
+import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
@@ -20,20 +19,20 @@ import java.util.function.Supplier;
 public class TestUtil {
     public static GlobalCacheConfig createGloableConfig(Supplier<GlobalCacheConfig> creator) {
         Map localFactories = new HashMap();
-        EmbeddedCacheFactory localFactory = new LinkedHashMapCacheFactory();
+        EmbeddedCacheBuilder localFactory = new EmbeddedCacheBuilder();
         localFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
         localFactories.put("A1", localFactory);
 
         Map remoteFactories = new HashMap();
 
-        MockRemoteCacheFactory remoteFactory = new MockRemoteCacheFactory();
+        MockRemoteCacheBuilder remoteFactory = new MockRemoteCacheBuilder();
         remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
         remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteFactory);
 
-        remoteFactory = new MockRemoteCacheFactory();
+        remoteFactory = new MockRemoteCacheBuilder();
         remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
