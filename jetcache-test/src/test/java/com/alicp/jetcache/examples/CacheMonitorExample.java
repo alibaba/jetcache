@@ -31,6 +31,7 @@ public class CacheMonitorExample {
         boolean verboseLog = false;
         DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
 //        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, (statInfo) -> {s});
+        statLogger.start();
 
         statLogger.add(orderCacheMonitor);
         statLogger.start();
