@@ -8,7 +8,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MonitoredCache<K, V> implements Cache<K, V>, WrapValueCache<K, V> {
+public class MonitoredCache<K, V> implements WrapValueCache<K, V> {
 
     private CacheMonitor monitor;
 

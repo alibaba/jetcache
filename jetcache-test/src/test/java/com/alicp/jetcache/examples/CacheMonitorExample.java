@@ -33,6 +33,7 @@ public class CacheMonitorExample {
 //        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, (statInfo) -> {s});
 
         statLogger.add(orderCacheMonitor);
+        statLogger.start();
 
         Thread t = new Thread(() -> {
             for (int i = 0; i < 100; i++) {
@@ -50,6 +51,6 @@ public class CacheMonitorExample {
         t.start();
         t.join();
 
-        statLogger.shutdown();
+        statLogger.stop();
     }
 }

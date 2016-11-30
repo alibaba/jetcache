@@ -8,22 +8,25 @@ import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringGlobalCacheConfig;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Created on 2016/11/16.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = AnnoConfigTest.A.class)
 public class AnnoConfigTest extends SpringTest {
     @Test
     public void test() {
-        context = new AnnotationConfigApplicationContext(A.class);
         doTest();
     }
 
@@ -34,7 +37,8 @@ public class AnnoConfigTest extends SpringTest {
 
         @Bean
         public GlobalCacheConfig config(){
-            return TestUtil.createGloableConfig(SpringGlobalCacheConfig::new);
+            GlobalCacheConfig pc = TestUtil.createGloableConfig(SpringGlobalCacheConfig::new);
+            return pc;
         }
 
         @Bean("factoryBeanTarget")

@@ -10,10 +10,15 @@ import java.util.concurrent.TimeUnit;
 public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     private Cache[] caches;
+    private boolean[] canGetHolder;
 
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
         this.caches = caches;
+        canGetHolder = new boolean[caches.length];
+        for (int i = 0; i < caches.length; i++) {
+            canGetHolder[i] = isWrap(caches[i]);
+        }
     }
 
     @Override
@@ -21,12 +26,22 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         return null;
     }
 
+    private boolean isWrap(Cache c) {
+        if (c instanceof MonitoredCache) {
+            return isWrap(((MonitoredCache) c).getTargetCache());
+        }
+        if (c instanceof WrapValueCache) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult<CacheValueHolder<V>> r1;
-            if (cache instanceof WrapValueCache) {
+            if (canGetHolder[i]) {
                 r1 = ((WrapValueCache) cache).GET_HOLDER(key);
             } else {
                 r1 = cache.GET(key);
@@ -63,11 +78,11 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         for (int i = 0; i < lastIndex; i++) {
             CacheResult r1;
             Cache cache = caches[i];
-            if(useDefaultExpire){
+            if (useDefaultExpire) {
                 expire = cache.config().getDefaultExpireInMillis();
                 timeUnit = TimeUnit.MILLISECONDS;
             }
-            if (cache instanceof WrapValueCache) {
+            if (canGetHolder[i]) {
                 r1 = cache.PUT(key, value, expire, timeUnit);
             } else {
                 CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));

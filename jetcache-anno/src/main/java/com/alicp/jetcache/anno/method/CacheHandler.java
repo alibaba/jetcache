@@ -31,7 +31,7 @@ public class CacheHandler implements InvocationHandler {
     private static class CacheContextSupport extends CacheContext {
 
         public CacheContextSupport() {
-            super(null, 0, null);
+            super(null);
         }
 
         static void _enable() {

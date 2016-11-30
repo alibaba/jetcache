@@ -10,6 +10,9 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -25,7 +28,7 @@ public class SpringGlobalCacheConfig extends GlobalCacheConfig implements Applic
     }
 
     @Override
-    protected CacheContext newCacheContext() {
-        return new SpringCacheContext(this, applicationContext, statIntervalMinutes, statCallback);
+    protected CacheContext newContext() {
+        return new SpringCacheContext(this, applicationContext);
     }
 }

@@ -16,9 +16,8 @@ public class SpringCacheContext extends CacheContext {
 
     private ApplicationContext applicationContext;
 
-    public SpringCacheContext(GlobalCacheConfig globalCacheConfig, ApplicationContext applicationContext,
-                              int statIntervalMinutes, Consumer<StatInfo> statCallback) {
-        super(globalCacheConfig, statIntervalMinutes, statCallback);
+    public SpringCacheContext(GlobalCacheConfig globalCacheConfig, ApplicationContext applicationContext) {
+        super(globalCacheConfig);
         this.applicationContext = applicationContext;
     }
 

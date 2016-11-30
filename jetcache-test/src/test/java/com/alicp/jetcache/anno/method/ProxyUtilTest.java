@@ -14,6 +14,7 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,10 +30,15 @@ public class ProxyUtilTest {
     @Before
     public void setup() {
         globalCacheConfig = TestUtil.createGloableConfig(GlobalCacheConfig::new);
-
+        globalCacheConfig.init();
         cacheAnnoConfig = new CacheAnnoConfig();
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
+    }
+
+    @After
+    public void stop(){
+        globalCacheConfig.shutdown();
     }
 
     @Test

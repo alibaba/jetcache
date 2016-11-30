@@ -5,16 +5,18 @@ import com.alicp.jetcache.anno.config.beans.Service;
 import com.alicp.jetcache.anno.config.beans.TestBean;
 import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * Created on 2016/11/23.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class SpringTest {
+public class SpringTest implements ApplicationContextAware {
 
-    protected static ApplicationContext context;
+    protected ApplicationContext context;
 
     protected void doTest() {
         int x1, x2, x3;
@@ -80,4 +82,8 @@ public class SpringTest {
         Assert.assertEquals(target.count(), target.count());
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.context = applicationContext;
+    }
 }

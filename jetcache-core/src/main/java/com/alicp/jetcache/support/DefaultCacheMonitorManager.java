@@ -3,6 +3,8 @@ package com.alicp.jetcache.support;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -23,12 +25,16 @@ public class DefaultCacheMonitorManager {
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
 
     private ScheduledFuture<?> future;
+
+    private int resetTime;
+    private TimeUnit resetTimeUnit;
     private Consumer<StatInfo> statCallback;
     private boolean verboseLog;
 
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> statCallback) {
+        this.resetTime = resetTime;
+        this.resetTimeUnit = resetTimeUnit;
         this.statCallback = statCallback;
-        init(resetTime, resetTimeUnit);
     }
 
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit) {
@@ -36,12 +42,17 @@ public class DefaultCacheMonitorManager {
     }
 
     public DefaultCacheMonitorManager(int resetTime, TimeUnit resetTimeUnit, boolean verboseLog) {
+        this.resetTime = resetTime;
+        this.resetTimeUnit = resetTimeUnit;
         this.verboseLog = verboseLog;
         this.statCallback = this::logStat;
-        init(resetTime, resetTimeUnit);
     }
 
-    private void init(int resetTime, TimeUnit resetTimeUnit) {
+    @PostConstruct
+    public synchronized void start() {
+        if (future != null) {
+            return;
+        }
         if (executorService == null) {
             initExecutor();
         }
@@ -74,8 +85,10 @@ public class DefaultCacheMonitorManager {
         future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
     }
 
-    public void shutdown() {
+    @PreDestroy
+    public synchronized void stop() {
         future.cancel(false);
+        future = null;
     }
 
     public DefaultCacheMonitorManager add(DefaultCacheMonitor... monitors) {
@@ -214,7 +227,6 @@ public class DefaultCacheMonitorManager {
         printSepLine(sb, title);
         return sb;
     }
-
 
 
     private StringBuilder logVerbose(StatInfo statInfo) {

@@ -5,18 +5,13 @@ package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.TestUtil;
-import com.alicp.jetcache.anno.aop.CacheInterceptor;
-import com.alicp.jetcache.anno.aop.CachePointcut;
-import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -28,18 +23,26 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheInterceptorTest {
     private CachePointcut pc;
     private CacheInterceptor interceptor;
+    private GlobalCacheConfig globalCacheConfig;
 
     @Rule
     public JUnitRuleMockery context = new JUnitRuleMockery();
 
     @Before
     public void setup() {
+        globalCacheConfig = TestUtil.createGloableConfig(GlobalCacheConfig::new);
+        globalCacheConfig.init();
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
         ConcurrentHashMap<Method, CacheInvokeConfig> map = new ConcurrentHashMap();
         pc.setCacheConfigMap(map);
         interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(map);
-        interceptor.setGlobalCacheConfig(TestUtil.createGloableConfig(GlobalCacheConfig::new));
+        interceptor.setGlobalCacheConfig(globalCacheConfig);
+    }
+
+    @After
+    public void stop(){
+        globalCacheConfig.shutdown();
     }
 
     interface I1 {

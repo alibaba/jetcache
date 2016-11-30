@@ -3,20 +3,22 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.MonitoredCache;
+import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.method.ClassUtil;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import com.alicp.jetcache.support.*;
+import com.alicp.jetcache.support.DefaultCacheMonitor;
+import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -30,36 +32,45 @@ public class CacheContext {
             return new CacheThreadLocal();
         }
     };
-    private CacheManager cacheManager;
+
+    private ConfigParser configParser = new ConfigParser();
     private GlobalCacheConfig globalCacheConfig;
 
-    private int statIntervalMinutes;
-    private Consumer<StatInfo> statCallback;
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
+    private CacheManager cacheManager;
 
-    public CacheContext(GlobalCacheConfig globalCacheConfig, int statIntervalMinutes, Consumer<StatInfo> statCallback) {
+    public CacheContext(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
-        this.statIntervalMinutes = statIntervalMinutes;
-        this.statCallback = statCallback;
+    }
+
+    protected void setConfigParser(ConfigParser configParser) {
+        this.configParser = configParser;
     }
 
     @PostConstruct
-    public void init() {
-        this.cacheManager = new CacheManager();
-        if (statIntervalMinutes > 0) {
-            if (statCallback == null) {
-                defaultCacheMonitorManager = new DefaultCacheMonitorManager(statIntervalMinutes, TimeUnit.MINUTES);
-            } else {
-                defaultCacheMonitorManager = new DefaultCacheMonitorManager(statIntervalMinutes, TimeUnit.MINUTES, statCallback);
+    public synchronized void init() {
+        if (cacheManager == null) {
+            this.cacheManager = new CacheManager();
+            if (globalCacheConfig.getStatIntervalMinutes() > 0) {
+                if (globalCacheConfig.getStatCallback() == null) {
+                    defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
+                            TimeUnit.MINUTES);
+                } else {
+                    defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
+                            TimeUnit.MINUTES, globalCacheConfig.getStatCallback());
+                }
+                defaultCacheMonitorManager.start();
             }
         }
     }
 
     @PreDestroy
-    public void shutdown() {
+    public synchronized void shutdown() {
         if (defaultCacheMonitorManager != null) {
-            defaultCacheMonitorManager.shutdown();
+            defaultCacheMonitorManager.stop();
         }
+        cacheManager = null;
+        defaultCacheMonitorManager = null;
     }
 
     public CacheInvokeContext createCacheInvokeContext() {
@@ -106,38 +117,27 @@ public class CacheContext {
     }
 
     private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String prefix) {
-        ExternalCacheBuilder cacheFactory = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
-        if (cacheFactory == null) {
+        ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
+        cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
+        if (cacheBuilder == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in remoteCacheFacotories");
         }
-        cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
-        cacheFactory.setKeyPrefix(prefix);
-        if (SerialPolicy.KRYO.equals(cacheAnnoConfig.getSerialPolicy())) {
-            cacheFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
-            cacheFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
-        } else if (SerialPolicy.JAVA.equals(cacheAnnoConfig.getSerialPolicy())) {
-            cacheFactory.setValueEncoder(JavaValueEncoder.INSTANCE);
-            cacheFactory.setValueDecoder(JavaValueDecoder.INSTANCE);
-        } else if (SerialPolicy.FASTJSON.equals(cacheAnnoConfig.getSerialPolicy())) {
-            //noinspection deprecation
-            cacheFactory.setValueEncoder(FastjsonValueEncoder.INSTANCE);
-            //noinspection deprecation
-            cacheFactory.setValueDecoder(FastjsonValueDecoder.INSTANCE);
-        } else {
-            throw new CacheException(cacheAnnoConfig.getSerialPolicy());
-        }
-        return cacheFactory.buildCache();
+        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cacheBuilder.setKeyPrefix(prefix);
+        configParser.parseEncoderAndDecoder(cacheBuilder, cacheAnnoConfig.getSerialPolicy());
+        return cacheBuilder.buildCache();
     }
 
     private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
         Cache cache;
-        EmbeddedCacheBuilder cacheFactory = (EmbeddedCacheBuilder) globalCacheConfig.getLocalCacheBuilders().get(area);
-        if (cacheFactory == null) {
+        EmbeddedCacheBuilder cacheBuilder = (EmbeddedCacheBuilder) globalCacheConfig.getLocalCacheBuilders().get(area);
+        cacheBuilder = (EmbeddedCacheBuilder) cacheBuilder.clone();
+        if (cacheBuilder == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in localCacheFactory");
         }
-        cacheFactory.setLimit(cacheAnnoConfig.getLocalLimit());
-        cacheFactory.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
-        cache = cacheFactory.buildCache();
+        cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
+        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cache = cacheBuilder.buildCache();
         return cache;
     }
 

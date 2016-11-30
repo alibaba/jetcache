@@ -19,4 +19,6 @@ public class SpringCacheInvokeContext extends CacheInvokeContext {
     public Object bean(String name) {
         return context.getBean(name);
     }
+
+
 }

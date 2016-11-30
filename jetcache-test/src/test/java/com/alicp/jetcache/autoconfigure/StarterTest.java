@@ -26,8 +26,8 @@ public class StarterTest extends SpringTest {
 //    public void test() {
     public static void main(String[] args) {
         SpringApplication app = new SpringApplication();
-        context = app.run(StarterTest.class);
-        JetCacheProperties bean = context.getBean(JetCacheProperties.class);
+//        context = app.run(StarterTest.class);
+//        JetCacheProperties bean = context.getBean(JetCacheProperties.class);
 //        doTest();
     }
 

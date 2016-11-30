@@ -14,6 +14,7 @@ import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,11 +36,12 @@ public class CacheHandlerTest {
     @Before
     public void setup() {
         globalCacheConfig = new GlobalCacheConfig();
+        globalCacheConfig.init();
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
-        globalCacheConfig.cacheContext().getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
+        globalCacheConfig.getCacheContext().getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
 
         cacheAnnoConfig = new CacheAnnoConfig();
         cacheInvokeConfig = new CacheInvokeConfig();
@@ -47,8 +49,13 @@ public class CacheHandlerTest {
         count = new CountClass();
     }
 
+    @After
+    public void stop() {
+        globalCacheConfig.shutdown();
+    }
+
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
-        CacheInvokeContext c = globalCacheConfig.cacheContext().createCacheInvokeContext();
+        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext();
         c.cacheInvokeConfig = cacheInvokeConfig;
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
         c.invoker = invoker;

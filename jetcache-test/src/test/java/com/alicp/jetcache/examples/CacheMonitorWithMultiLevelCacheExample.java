@@ -43,6 +43,7 @@ public class CacheMonitorWithMultiLevelCacheExample {
         boolean verboseLog = false;
         DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
         statLogger.add(l1CacheMonitor, l2CacheMonitor, orderCacheMonitor);
+        statLogger.start();
 
         Thread t = new Thread(() -> {
             for (int i = 0; i < 100; i++) {
@@ -60,6 +61,6 @@ public class CacheMonitorWithMultiLevelCacheExample {
         t.start();
         t.join();
 
-        statLogger.shutdown();
+        statLogger.stop();
     }
 }

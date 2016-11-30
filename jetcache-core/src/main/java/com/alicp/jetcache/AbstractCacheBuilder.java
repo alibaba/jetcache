@@ -56,10 +56,15 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     }
 
     @Override
-    protected Object clone() throws CloneNotSupportedException {
-        AbstractCacheBuilder copy = (AbstractCacheBuilder) super.clone();
-        copy.config = config.clone();
-        return copy;
+    public Object clone() {
+        AbstractCacheBuilder copy = null;
+        try {
+            copy = (AbstractCacheBuilder) super.clone();
+            copy.config = config.clone();
+            return copy;
+        } catch (CloneNotSupportedException e) {
+            throw new CacheException(e);
+        }
     }
 
     public T keyConvertor(Function<Object, Object> keyConvertor) {

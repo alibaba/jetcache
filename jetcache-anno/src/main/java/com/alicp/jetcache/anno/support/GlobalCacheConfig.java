@@ -6,6 +6,8 @@ package com.alicp.jetcache.anno.support;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.support.StatInfo;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -18,29 +20,34 @@ public class GlobalCacheConfig {
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
     private CacheContext cacheContext;
-
-    protected int statIntervalMinutes;
+    protected int statIntervalMinutes = 60;
     protected Consumer<StatInfo> statCallback;
 
     public GlobalCacheConfig() {
     }
 
-    public CacheContext cacheContext(){
-        if (cacheContext != null) {
-            return cacheContext;
-        }
-        synchronized (this) {
-            if (cacheContext != null) {
-                return cacheContext;
-            }
-            cacheContext = newCacheContext();
+    @PostConstruct
+    public synchronized void init() {
+        if (cacheContext == null) {
+            cacheContext = newContext();
             cacheContext.init();
         }
-        return cacheContext;
     }
 
-    protected CacheContext newCacheContext(){
-        return new CacheContext(this, statIntervalMinutes, statCallback);
+    @PreDestroy
+    public synchronized void shutdown() {
+        if (cacheContext != null) {
+            cacheContext.shutdown();
+            cacheContext = null;
+        }
+    }
+
+    protected CacheContext newContext() {
+        return new CacheContext(this);
+    }
+
+    public CacheContext getCacheContext() {
+        return cacheContext;
     }
 
     public String[] getHidePackages() {

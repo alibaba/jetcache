@@ -60,8 +60,9 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         cache = new MonitoredCache<>(cache, mc);
         DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, true);
         logger.add(m1, m1_again, m2, mc);
+        logger.start();
         doTest();
-        logger.shutdown();
+        logger.stop();
     }
 
     private void doTest() throws Exception {
