@@ -33,7 +33,7 @@ public class CacheContext {
         }
     };
 
-    private ConfigParser configParser = new ConfigParser();
+    private ConfigProvider configProvider = new ConfigProvider();
     private GlobalCacheConfig globalCacheConfig;
 
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
@@ -43,8 +43,8 @@ public class CacheContext {
         this.globalCacheConfig = globalCacheConfig;
     }
 
-    protected void setConfigParser(ConfigParser configParser) {
-        this.configParser = configParser;
+    protected void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
     }
 
     @PostConstruct
@@ -124,7 +124,7 @@ public class CacheContext {
         }
         cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
         cacheBuilder.setKeyPrefix(prefix);
-        configParser.parseEncoderAndDecoder(cacheBuilder, cacheAnnoConfig.getSerialPolicy());
+        configProvider.parseEncoderAndDecoder(cacheBuilder, cacheAnnoConfig.getSerialPolicy());
         return cacheBuilder.buildCache();
     }
 

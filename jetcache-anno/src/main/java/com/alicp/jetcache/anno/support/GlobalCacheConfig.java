@@ -19,9 +19,13 @@ public class GlobalCacheConfig {
     private String[] hidePackages;
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
-    private CacheContext cacheContext;
+
+    private ConfigProvider configProvider = new SpringConfigProvider();
     protected int statIntervalMinutes = 60;
-    protected Consumer<StatInfo> statCallback;
+    protected Consumer<StatInfo> statCallback = null;
+
+
+    private CacheContext cacheContext;
 
     public GlobalCacheConfig() {
     }
@@ -29,7 +33,7 @@ public class GlobalCacheConfig {
     @PostConstruct
     public synchronized void init() {
         if (cacheContext == null) {
-            cacheContext = newContext();
+            cacheContext = configProvider.newContext(this);
             cacheContext.init();
         }
     }
@@ -40,10 +44,6 @@ public class GlobalCacheConfig {
             cacheContext.shutdown();
             cacheContext = null;
         }
-    }
-
-    protected CacheContext newContext() {
-        return new CacheContext(this);
     }
 
     public CacheContext getCacheContext() {
@@ -88,5 +88,13 @@ public class GlobalCacheConfig {
 
     public void setStatCallback(Consumer<StatInfo> statCallback) {
         this.statCallback = statCallback;
+    }
+
+    public ConfigProvider getConfigProvider() {
+        return configProvider;
+    }
+
+    public void setConfigProvider(ConfigProvider configProvider) {
+        this.configProvider = configProvider;
     }
 }

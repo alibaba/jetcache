@@ -7,6 +7,7 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.TestUtil;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
@@ -30,7 +31,7 @@ public class CacheInterceptorTest {
 
     @Before
     public void setup() {
-        globalCacheConfig = TestUtil.createGloableConfig(GlobalCacheConfig::new);
+        globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
         ConcurrentHashMap<Method, CacheInvokeConfig> map = new ConcurrentHashMap();

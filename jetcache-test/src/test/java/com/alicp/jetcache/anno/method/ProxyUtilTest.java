@@ -10,6 +10,7 @@ import com.alicp.jetcache.anno.method.ProxyUtil;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.TestUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
@@ -29,7 +30,7 @@ public class ProxyUtilTest {
 
     @Before
     public void setup() {
-        globalCacheConfig = TestUtil.createGloableConfig(GlobalCacheConfig::new);
+        globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
         cacheAnnoConfig = new CacheAnnoConfig();
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();

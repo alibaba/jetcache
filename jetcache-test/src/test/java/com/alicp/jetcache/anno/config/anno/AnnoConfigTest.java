@@ -6,9 +6,11 @@ import com.alicp.jetcache.anno.config.EnableJetCache;
 import com.alicp.jetcache.anno.config.SpringTest;
 import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.anno.support.SpringGlobalCacheConfig;
+import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -36,8 +38,13 @@ public class AnnoConfigTest extends SpringTest {
     public static class A {
 
         @Bean
-        public GlobalCacheConfig config(){
-            GlobalCacheConfig pc = TestUtil.createGloableConfig(SpringGlobalCacheConfig::new);
+        public SpringConfigProvider springConfigProvider() {
+            return new SpringConfigProvider();
+        }
+
+        @Bean
+        public GlobalCacheConfig config(@Autowired SpringConfigProvider configProvider){
+            GlobalCacheConfig pc = TestUtil.createGloableConfig(configProvider);
             return pc;
         }
 

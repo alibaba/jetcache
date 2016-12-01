@@ -10,7 +10,7 @@ import com.alicp.jetcache.support.*;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class ConfigParser {
+public class ConfigProvider {
 
     public void parseEncoderAndDecoder(ExternalCacheBuilder cacheBuilder, String serialPolicy) {
         if (SerialPolicy.KRYO.equals(serialPolicy)) {
@@ -27,5 +27,9 @@ public class ConfigParser {
         } else if (serialPolicy != null) {
             throw new CacheException(serialPolicy);
         }
+    }
+
+    public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
+        return new CacheContext(globalCacheConfig);
     }
 }

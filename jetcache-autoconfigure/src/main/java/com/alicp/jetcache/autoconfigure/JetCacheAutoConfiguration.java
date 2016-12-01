@@ -1,7 +1,7 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.anno.support.SpringGlobalCacheConfig;
+import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -35,12 +35,18 @@ public class JetCacheAutoConfiguration implements ApplicationContextAware {
 
     private Map localCacheBuilders = new HashMap<>();
 
-    private Map remoteCacheBuilders = new HashMap<>();;
+    private Map remoteCacheBuilders = new HashMap<>();
 
     @Bean
-    public SpringGlobalCacheConfig globalCacheConfig() {
-        SpringGlobalCacheConfig c = new SpringGlobalCacheConfig();
-        c.setApplicationContext(applicationContext);
+    @ConditionalOnMissingBean
+    public SpringConfigProvider springConfigProvider() {
+        return new SpringConfigProvider();
+    }
+
+    @Bean
+    public GlobalCacheConfig globalCacheConfig(@Autowired SpringConfigProvider configProvider) {
+        GlobalCacheConfig c = new GlobalCacheConfig();
+        c.setConfigProvider(configProvider);
         c.setHidePackages(props.getHidePackages());
         c.setStatIntervalMinutes(props.getStatIntervalMinutes());
         c.setStatCallback(props.getStatCallback());
