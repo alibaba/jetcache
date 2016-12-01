@@ -1,7 +1,9 @@
 package com.alicp.jetcache.autoconfigure;
 
+import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.anno.support.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,6 +33,9 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
 
     @Autowired
     protected Map remoteCacheBuilders;
+
+    @Autowired
+    protected ConfigProvider configProvider;
 
     protected String typeName;
 
@@ -65,8 +70,15 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
         }
     }
 
-    protected void parseGeneralConfig(ExternalCacheBuilder builder, RelaxedPropertyResolver resolver) {
-
+    protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
+        AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
+        acb.keyConvertor(configProvider.parseKeyConvertor(resolver.getProperty("keyConvertor")));
+        String expire = resolver.getProperty("defaultExpireInMillis");
+        if (expire != null && !"".equalsIgnoreCase(expire.trim())) {
+            acb.setDefaultExpireInMillis(Long.parseLong(expire));
+        }
+        String expireAfterAccess = resolver.getProperty("defaultExpireInMillis", "false");
+        acb.setExpireAfterAccess(Boolean.parseBoolean(expireAfterAccess));
     }
 
     protected abstract Cache initCache(RelaxedPropertyResolver resolver, String cacheArea);

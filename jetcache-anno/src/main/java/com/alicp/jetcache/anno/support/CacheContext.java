@@ -124,7 +124,8 @@ public class CacheContext {
         }
         cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
         cacheBuilder.setKeyPrefix(prefix);
-        configProvider.parseEncoderAndDecoder(cacheBuilder, cacheAnnoConfig.getSerialPolicy());
+        cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cacheAnnoConfig.getSerialPolicy()));
+        cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cacheAnnoConfig.getSerialPolicy()));
         return cacheBuilder.buildCache();
     }
 

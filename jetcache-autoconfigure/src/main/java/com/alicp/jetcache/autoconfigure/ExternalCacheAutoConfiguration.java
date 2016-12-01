@@ -1,5 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 
@@ -14,8 +15,11 @@ public abstract class ExternalCacheAutoConfiguration extends AbstractCacheAutoCo
     }
 
     @Override
-    protected void parseGeneralConfig(ExternalCacheBuilder builder, RelaxedPropertyResolver resolver) {
+    protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
         super.parseGeneralConfig(builder, resolver);
-
+        ExternalCacheBuilder ecb = (ExternalCacheBuilder) builder;
+        ecb.setKeyPrefix(resolver.getProperty("keyPrefix"));
+        ecb.setValueEncoder(configProvider.parseValueEncoder(resolver.getProperty("valueEncoder")));
+        ecb.setValueEncoder(configProvider.parseValueDecoder(resolver.getProperty("valueDecoder")));
     }
 }
