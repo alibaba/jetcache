@@ -1,9 +1,6 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.embedded.CaffeineCache;
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.embedded.*;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
@@ -23,20 +20,16 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     private WrapValueCache<Object, Object> l2Cache;
 
     private void initL1L2(){
-        l1Cache = (AbstractCache<Object, Object>) EmbeddedCacheBuilder
-                .createEmbeddedCacheBuilder()
+        l1Cache = (AbstractCache<Object, Object>) CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .buildCache();
-        l2Cache = (AbstractCache<Object, Object>) EmbeddedCacheBuilder
-                .createEmbeddedCacheBuilder()
+        l2Cache = (AbstractCache<Object, Object>) LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(100000)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .softValues()
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .buildCache();
     }
 

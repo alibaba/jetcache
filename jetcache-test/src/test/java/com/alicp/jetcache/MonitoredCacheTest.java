@@ -3,6 +3,7 @@ package com.alicp.jetcache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.junit.Test;
 
 /**
@@ -13,8 +14,7 @@ import org.junit.Test;
 public class MonitoredCacheTest extends AbstractCacheTest {
     @Test
     public void test(){
-        Cache target = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+        Cache target = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .buildCache();
         cache = new MonitoredCache(target, new CacheMonitor() {
             @Override

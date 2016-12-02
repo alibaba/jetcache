@@ -22,7 +22,7 @@ import java.util.Map;
 @ConditionalOnClass(GlobalCacheConfig.class)
 @ConditionalOnMissingBean(GlobalCacheConfig.class)
 @EnableConfigurationProperties(JetCacheProperties.class)
-@Import({RedisConfiguration.class})
+@Import({RedisAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
     @Autowired

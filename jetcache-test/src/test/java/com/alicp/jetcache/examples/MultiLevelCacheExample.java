@@ -3,6 +3,7 @@ package com.alicp.jetcache.examples;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.CaffeineCache;
+import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class MultiLevelCacheExample {
     public static void main(String[] args) {
-        Cache<Object, Object> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<Object, Object> l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)

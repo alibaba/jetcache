@@ -2,6 +2,7 @@ package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.embedded.CaffeineCache;
+import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 
@@ -14,11 +15,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class SimpleCacheExample {
     public static void main(String[] args) {
-        Cache<String, Integer> cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<String, Integer> cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
-//                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
-                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .buildCache();
         cache.put("20161111", 1000000, 1 ,TimeUnit.HOURS);
         Integer orderCount1 = cache.get("20161111");

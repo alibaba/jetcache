@@ -5,6 +5,7 @@ import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Protocol;
@@ -15,9 +16,10 @@ import redis.clients.jedis.Protocol;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @Component
-public class RedisConfiguration extends ExternalCacheAutoConfiguration {
+@Conditional(RedisAutoConfiguration.RedisCondition.class)
+public class RedisAutoConfiguration extends ExternalCacheAutoConfiguration {
 
-    public RedisConfiguration() {
+    public RedisAutoConfiguration() {
         super("redis");
     }
 
@@ -38,6 +40,12 @@ public class RedisConfiguration extends ExternalCacheAutoConfiguration {
                 .jedisPool(jedisPool);
         parseGeneralConfig(externalCacheBuilder, r);
         return externalCacheBuilder.buildCache();
+    }
+
+    public static class RedisCondition extends JetCacheConditon {
+        public RedisCondition() {
+            super("redis");
+        }
     }
 
 

@@ -6,6 +6,7 @@ import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -19,11 +20,9 @@ import java.util.concurrent.TimeUnit;
 public class DefaultCacheMonnitorTest {
 
     public Cache createCache() {
-        return EmbeddedCacheBuilder
-                .createEmbeddedCacheBuilder()
+        return LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
-                .buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
                 .buildCache();
     }
 

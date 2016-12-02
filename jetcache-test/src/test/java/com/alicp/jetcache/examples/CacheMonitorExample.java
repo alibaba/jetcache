@@ -2,9 +2,7 @@ package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MonitoredCache;
-import com.alicp.jetcache.embedded.CaffeineCache;
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
+import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
@@ -18,11 +16,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheMonitorExample {
     public static void main(String[] args) throws Exception {
-        Cache<String, Integer> cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<String, Integer> cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .buildCache();
         DefaultCacheMonitor orderCacheMonitor = new DefaultCacheMonitor("OrderCache");
 

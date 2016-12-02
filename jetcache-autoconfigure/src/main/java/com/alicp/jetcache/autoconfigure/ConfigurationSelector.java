@@ -11,6 +11,6 @@ import org.springframework.core.type.AnnotationMetadata;
 public class ConfigurationSelector implements ImportSelector {
     @Override
     public String[] selectImports(AnnotationMetadata importingClassMetadata) {
-        return new String[]{RedisConfiguration.class.getName()};
+        return new String[]{RedisAutoConfiguration.class.getName()};
     }
 }

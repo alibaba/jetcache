@@ -35,9 +35,8 @@ public class Benchmark {
         System.out.println("thead : " + THREAD_COUNT);
         System.out.println("data per thread : " + data[0].length);
 
-        EmbeddedCacheBuilder builder = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        LinkedHashMapCacheBuilder builder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(CACHE_LIMIT);
-        builder.buildFunc(c -> new LinkedHashMapCache((EmbeddedCacheConfig)c));
         Cache<String, String> cache = builder.buildCache();
 
         CountDownLatch doneSignal = new CountDownLatch(THREAD_COUNT);

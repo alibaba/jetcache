@@ -5,8 +5,8 @@ package com.alicp.jetcache.embedded;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LinkedHashMapCacheBuilder extends EmbeddedCacheBuilder {
-    public static class LinkedHashMapCacheBuilderImpl extends EmbeddedCacheBuilder<LinkedHashMapCacheBuilderImpl> {
+public class LinkedHashMapCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends EmbeddedCacheBuilder<T> {
+    public static class LinkedHashMapCacheBuilderImpl extends LinkedHashMapCacheBuilder<LinkedHashMapCacheBuilderImpl> {
     }
 
     public static LinkedHashMapCacheBuilderImpl createLinkedHashMapCacheBuilder() {

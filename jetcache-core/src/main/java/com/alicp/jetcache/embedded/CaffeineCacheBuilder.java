@@ -5,8 +5,8 @@ package com.alicp.jetcache.embedded;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CaffeineCacheBuilder extends EmbeddedCacheBuilder {
-    public static class CaffeineCacheBuilderImpl extends EmbeddedCacheBuilder<CaffeineCacheBuilderImpl> {
+public class CaffeineCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends EmbeddedCacheBuilder<T> {
+    public static class CaffeineCacheBuilderImpl extends CaffeineCacheBuilder<CaffeineCacheBuilderImpl> {
     }
 
     public static CaffeineCacheBuilder createCaffeineCacheBuilder() {

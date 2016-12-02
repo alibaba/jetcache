@@ -11,6 +11,7 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.CountClass;
 import com.alicp.jetcache.testsupport.DynamicQuery;
@@ -37,8 +38,7 @@ public class CacheHandlerTest {
     public void setup() {
         globalCacheConfig = new GlobalCacheConfig();
         globalCacheConfig.init();
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c))
+        cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
         globalCacheConfig.getCacheContext().getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);

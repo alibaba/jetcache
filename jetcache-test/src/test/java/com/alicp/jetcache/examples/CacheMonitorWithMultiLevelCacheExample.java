@@ -4,6 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.CaffeineCache;
+import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
@@ -19,17 +20,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class CacheMonitorWithMultiLevelCacheExample {
     public static void main(String[] args) throws Exception {
-        Cache<String, Integer> l1Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<String, Integer> l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .buildCache();
-        Cache<String, Integer> l2Cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
+        Cache<String, Integer> l2Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .buildCache();
         DefaultCacheMonitor l1CacheMonitor = new DefaultCacheMonitor("OrderCache_L1");
         DefaultCacheMonitor l2CacheMonitor = new DefaultCacheMonitor("OrderCache_L2");
