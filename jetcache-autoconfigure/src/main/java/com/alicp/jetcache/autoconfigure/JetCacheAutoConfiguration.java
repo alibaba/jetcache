@@ -25,6 +25,9 @@ import java.util.Map;
 @Import({RedisAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
+    public JetCacheAutoConfiguration(){
+    }
+
     @Autowired
     private JetCacheProperties props;
 

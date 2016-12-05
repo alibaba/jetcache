@@ -1,8 +1,7 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
-import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
@@ -17,13 +16,14 @@ import org.springframework.stereotype.Component;
 public class CaffeineAutoConfiguration extends EmbeddedCacheAutoConfiguration {
     public CaffeineAutoConfiguration() {
         super("caffeine");
+        System.out.println("CaffeineAutoConfiguration init");
     }
 
     @Override
-    protected Cache initCache(RelaxedPropertyResolver resolver, String cacheArea) {
+    protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheArea) {
         CaffeineCacheBuilder builder = CaffeineCacheBuilder.createCaffeineCacheBuilder();
         parseGeneralConfig(builder, resolver);
-        return builder.buildCache();
+        return builder;
     }
 
     public static class CaffeineCondition extends JetCacheConditon {

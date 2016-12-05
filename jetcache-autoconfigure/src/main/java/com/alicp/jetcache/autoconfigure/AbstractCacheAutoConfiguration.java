@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -50,22 +51,22 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
 
     @PostConstruct
     public void init() {
-        RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(
-                applicationContext.getEnvironment(), "jetcache.");
-        process(resolver, "local.", localCacheBuilders);
-        process(resolver, "remote.", remoteCacheBuilders);
+        process("jetcache.local.", localCacheBuilders);
+        process("jetcache.remote.", remoteCacheBuilders);
     }
 
-    private void process(RelaxedPropertyResolver resolver, String prefix, Map cacheBuilders) {
-        Map<String, Object> m = resolver.getSubProperties(prefix);
+    private void process(String prefix, Map cacheBuilders) {
+        RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(
+                applicationContext.getEnvironment(), prefix);
+        Map<String, Object> m = resolver.getSubProperties("");
         Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
         for (String cacheArea : cacheAreaNames) {
             if (!typeName.equals(m.get(cacheArea + ".type"))) {
                 continue;
             }
-            RelaxedPropertyResolver r = new RelaxedPropertyResolver(resolver, prefix + "." + cacheArea);
+            RelaxedPropertyResolver r = new RelaxedPropertyResolver(applicationContext.getEnvironment(), prefix + cacheArea + ".");
             logger.info("init cache area {} , type= {}", cacheArea, typeName);
-            Cache c = initCache(r, cacheArea);
+            CacheBuilder c = initCache(r, cacheArea);
             cacheBuilders.put(cacheArea, c);
         }
     }
@@ -81,5 +82,5 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
         acb.setExpireAfterAccess(Boolean.parseBoolean(expireAfterAccess));
     }
 
-    protected abstract Cache initCache(RelaxedPropertyResolver resolver, String cacheArea);
+    protected abstract CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheArea);
 }

@@ -1,6 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Conditional;
@@ -19,10 +19,10 @@ public class LinkedHashMapAutoConfiguration extends EmbeddedCacheAutoConfigurati
     }
 
     @Override
-    protected Cache initCache(RelaxedPropertyResolver resolver, String cacheArea) {
+    protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheArea) {
         LinkedHashMapCacheBuilder builder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder();
         parseGeneralConfig(builder, resolver);
-        return builder.buildCache();
+        return builder;
     }
 
     public static class LinkedHashMapCondition extends JetCacheConditon {

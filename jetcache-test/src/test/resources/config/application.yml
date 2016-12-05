@@ -1,8 +1,27 @@
 jetcache:
-  foo: 123
   local:
     default:
+      type: caffeine
+      limit: 100
+    A1:
+      type: caffeine
+      limit: 100
+  remote:
+    default:
       type: redis
-
+      poolConfig:
+        minIdle: 2
+        maxIdle: 5
+        maxTotal: 10
+      host: localhost
+      port: 6379
+    A1:
+      type: redis
+      poolConfig:
+        minIdle: 2
+        maxIdle: 5
+        maxTotal: 10
+      host: localhost
+      port: 6379
 
 

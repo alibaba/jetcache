@@ -118,6 +118,9 @@ public class CacheContext {
 
     private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String prefix) {
         ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
+        if (cacheBuilder == null) {
+            throw new CacheConfigException("no remote cache builder: " + area);
+        }
         cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
         if (cacheBuilder == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in remoteCacheFacotories");
@@ -132,6 +135,9 @@ public class CacheContext {
     private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
         Cache cache;
         EmbeddedCacheBuilder cacheBuilder = (EmbeddedCacheBuilder) globalCacheConfig.getLocalCacheBuilders().get(area);
+        if (cacheBuilder == null) {
+            throw new CacheConfigException("no local cache builder: " + area);
+        }
         cacheBuilder = (EmbeddedCacheBuilder) cacheBuilder.clone();
         if (cacheBuilder == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in localCacheFactory");
