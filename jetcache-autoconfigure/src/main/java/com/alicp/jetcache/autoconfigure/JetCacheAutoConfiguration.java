@@ -9,6 +9,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +24,7 @@ import java.util.Map;
 @ConditionalOnClass(GlobalCacheConfig.class)
 @ConditionalOnMissingBean(GlobalCacheConfig.class)
 @EnableConfigurationProperties(JetCacheProperties.class)
-@Import({RedisAutoConfiguration.class})
+@Import({RedisAutoConfiguration.class, CaffeineAutoConfiguration.class, LinkedHashMapAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
     public JetCacheAutoConfiguration(){

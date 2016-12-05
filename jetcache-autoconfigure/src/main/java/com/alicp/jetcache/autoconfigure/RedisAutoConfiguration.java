@@ -1,20 +1,16 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.MutablePropertyValues;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.PropertiesConfigurationFactory;
 import org.springframework.boot.bind.RelaxedDataBinder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Protocol;
@@ -26,7 +22,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-@Configuration
+@Component
 @Conditional(RedisAutoConfiguration.RedisCondition.class)
 public class RedisAutoConfiguration extends ExternalCacheAutoConfiguration {
 
