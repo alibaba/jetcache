@@ -89,11 +89,6 @@ public class DefaultCacheMonitorManager {
         future = null;
     }
 
-    @Deprecated
-    public void shutdown() {
-        stop();
-    }
-
     public DefaultCacheMonitorManager add(DefaultCacheMonitor... monitors) {
         monitorList.addAll(Arrays.asList(monitors));
         return this;
