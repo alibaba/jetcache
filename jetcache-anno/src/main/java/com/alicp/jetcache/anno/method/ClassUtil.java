@@ -18,7 +18,7 @@ public class ClassUtil {
     private static ConcurrentHashMap<Method, String> subAreaMap = new ConcurrentHashMap();
     private static ConcurrentHashMap<Method, String> methodSigMap = new ConcurrentHashMap();
 
-    public static String getSubArea(int version, Method method, String[] hidePackages) {
+    public static String generateCacheName(int version, Method method, String[] hidePackages) {
         // TODO invalid cache when param type changed
         String prefix = subAreaMap.get(method);
 

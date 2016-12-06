@@ -11,6 +11,7 @@ import com.alicp.jetcache.anno.SerialPolicy;
  */
 public interface CacheConsts {
     String DEFAULT_AREA = "default";
+    String DEFAULT_NAME = "";
     boolean DEFAULT_ENABLED = true;
     int DEFAULT_EXPIRE = 600;
     CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;

@@ -13,6 +13,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface Cached {
     String area() default CacheConsts.DEFAULT_AREA;
+    String name() default CacheConsts.DEFAULT_NAME;
     boolean enabled() default CacheConsts.DEFAULT_ENABLED;
     int expire() default CacheConsts.DEFAULT_EXPIRE;
     CacheType cacheType() default CacheType.REMOTE;

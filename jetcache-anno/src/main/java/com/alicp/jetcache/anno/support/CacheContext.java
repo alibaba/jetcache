@@ -7,6 +7,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
@@ -78,23 +79,26 @@ public class CacheContext {
         c.setCacheFunction((invokeContext) -> {
             CacheAnnoConfig cacheAnnoConfig = invokeContext.getCacheInvokeConfig().getCacheAnnoConfig();
             String area = cacheAnnoConfig.getArea();
-            String prefix = ClassUtil.getSubArea(cacheAnnoConfig.getVersion(),
-                    invokeContext.getMethod(), invokeContext.getHiddenPackages());
-            String cacheName = area + "_" + prefix;
-            Cache cache = cacheManager.getCache(cacheName);
+            String cacheName = cacheAnnoConfig.getName();
+            if (CacheConsts.DEFAULT_NAME.equalsIgnoreCase(cacheName)) {
+                cacheName = ClassUtil.generateCacheName(cacheAnnoConfig.getVersion(),
+                        invokeContext.getMethod(), invokeContext.getHiddenPackages());
+            }
+            String fullCacheName = area + "_" + cacheName;
+            Cache cache = cacheManager.getCache(fullCacheName);
             if (cache == null) {
                 if (cacheAnnoConfig.getCacheType() == CacheType.LOCAL) {
                     cache = buildLocal(cacheAnnoConfig, area);
                 } else if (cacheAnnoConfig.getCacheType() == CacheType.REMOTE) {
-                    cache = buildRemote(cacheAnnoConfig, area, prefix);
+                    cache = buildRemote(cacheAnnoConfig, area, fullCacheName);
                 } else {
                     Cache local = buildLocal(cacheAnnoConfig, area);
-                    Cache remote = buildRemote(cacheAnnoConfig, area, prefix);
+                    Cache remote = buildRemote(cacheAnnoConfig, area, fullCacheName);
 
                     if (defaultCacheMonitorManager != null) {
-                        DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(cacheName + "_local");
+                        DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(fullCacheName + "_local");
                         local = new MonitoredCache(local, localMonitor);
-                        DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(cacheName + "_remote");
+                        DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(fullCacheName + "_remote");
                         remote = new MonitoredCache(remote, remoteMonitor);
                         defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
                     }
@@ -103,12 +107,12 @@ public class CacheContext {
                 }
 
                 if (defaultCacheMonitorManager != null) {
-                    DefaultCacheMonitor monitor = new DefaultCacheMonitor(cacheName);
-                    cache = new MonitoredCache(cache, new DefaultCacheMonitor(cacheName));
+                    DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
+                    cache = new MonitoredCache(cache, new DefaultCacheMonitor(fullCacheName));
                     defaultCacheMonitorManager.add(monitor);
                 }
 
-                cacheManager.addCache(cacheName, cache);
+                cacheManager.addCache(fullCacheName, cache);
             }
             return cache;
         });

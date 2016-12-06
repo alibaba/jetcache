@@ -12,6 +12,7 @@ import com.alicp.jetcache.anno.CacheType;
 public class CacheAnnoConfig {
 
     private String area = CacheConsts.DEFAULT_AREA;
+    private String name = CacheConsts.DEFAULT_NAME;
     private boolean enabled = CacheConsts.DEFAULT_ENABLED;
     private int expire = CacheConsts.DEFAULT_EXPIRE;
     private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
@@ -100,5 +101,13 @@ public class CacheAnnoConfig {
 
     public void setSerialPolicy(String serialPolicy) {
         this.serialPolicy = serialPolicy;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
