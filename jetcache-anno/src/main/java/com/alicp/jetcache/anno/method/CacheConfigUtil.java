@@ -20,6 +20,7 @@ public class CacheConfigUtil {
         }
         CacheAnnoConfig cc = new CacheAnnoConfig();
         cc.setArea(anno.area());
+        cc.setName(anno.name());
         cc.setCacheType(anno.cacheType());
         cc.setEnabled(anno.enabled());
         cc.setExpire(anno.expire());

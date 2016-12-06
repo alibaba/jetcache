@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheContextSupportTest {
+public class CacheContextTest {
     @Test
     public void test() {
         CacheContext.enable();
