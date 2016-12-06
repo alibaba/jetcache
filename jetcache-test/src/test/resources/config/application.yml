@@ -1,3 +1,7 @@
+redis:
+  port: 6379
+  host: localhost
+
 jetcache:
   local:
     default:
@@ -13,15 +17,15 @@ jetcache:
         minIdle: 2
         maxIdle: 5
         maxTotal: 10
-      host: localhost
-      port: 6379
+      host: ${redis.host}
+      port: ${redis.port}
     A1:
       type: redis
       poolConfig:
         minIdle: 2
         maxIdle: 5
         maxTotal: 10
-      host: localhost
-      port: 6379
+      host: ${redis.host}
+      port: ${redis.port}
 
 
