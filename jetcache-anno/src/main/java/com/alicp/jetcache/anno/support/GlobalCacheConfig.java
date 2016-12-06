@@ -4,12 +4,10 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
-import com.alicp.jetcache.support.StatInfo;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -22,8 +20,6 @@ public class GlobalCacheConfig {
 
     private ConfigProvider configProvider = new SpringConfigProvider();
     protected int statIntervalMinutes = 60;
-    protected Consumer<StatInfo> statCallback = null;
-
 
     private CacheContext cacheContext;
 
@@ -80,14 +76,6 @@ public class GlobalCacheConfig {
 
     public void setStatIntervalMinutes(int statIntervalMinutes) {
         this.statIntervalMinutes = statIntervalMinutes;
-    }
-
-    public Consumer<StatInfo> getStatCallback() {
-        return statCallback;
-    }
-
-    public void setStatCallback(Consumer<StatInfo> statCallback) {
-        this.statCallback = statCallback;
     }
 
     public ConfigProvider getConfigProvider() {

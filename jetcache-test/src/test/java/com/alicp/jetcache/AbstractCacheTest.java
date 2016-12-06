@@ -4,7 +4,6 @@ import com.alicp.jetcache.testsupport.DynamicQuery;
 import org.junit.Assert;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 
 /**

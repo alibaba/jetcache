@@ -3,9 +3,9 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 
 import java.lang.reflect.Method;
 

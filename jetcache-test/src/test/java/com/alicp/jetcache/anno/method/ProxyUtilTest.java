@@ -5,11 +5,9 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.method.CacheInvokeConfig;
-import com.alicp.jetcache.anno.method.ProxyUtil;
-import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.TestUtil;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.testsupport.Count;

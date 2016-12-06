@@ -1,8 +1,5 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.junit.Test;
 

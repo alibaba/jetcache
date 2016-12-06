@@ -3,7 +3,6 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import org.springframework.context.ApplicationContext;
 
 /**

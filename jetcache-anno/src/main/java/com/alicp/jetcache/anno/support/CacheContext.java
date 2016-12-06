@@ -53,13 +53,8 @@ public class CacheContext {
         if (cacheManager == null) {
             this.cacheManager = new CacheManager();
             if (globalCacheConfig.getStatIntervalMinutes() > 0) {
-                if (globalCacheConfig.getStatCallback() == null) {
-                    defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
-                            TimeUnit.MINUTES);
-                } else {
-                    defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
-                            TimeUnit.MINUTES, globalCacheConfig.getStatCallback());
-                }
+                defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
+                        TimeUnit.MINUTES, globalCacheConfig.getConfigProvider().statCallback());
                 defaultCacheMonitorManager.start();
             }
         }

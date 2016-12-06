@@ -7,7 +7,6 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
-import com.alicp.jetcache.anno.aop.CachePointcut;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

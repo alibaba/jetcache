@@ -5,12 +5,9 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
-import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.CountClass;

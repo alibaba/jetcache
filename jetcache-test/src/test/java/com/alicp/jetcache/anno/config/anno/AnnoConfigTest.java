@@ -1,6 +1,5 @@
 package com.alicp.jetcache.anno.config.anno;
 
-import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.TestUtil;
 import com.alicp.jetcache.anno.config.EnableJetCache;
 import com.alicp.jetcache.anno.config.SpringTest;
@@ -10,9 +9,6 @@ import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

@@ -2,10 +2,7 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.support.StatInfo;
 import org.springframework.context.ApplicationContext;
-
-import java.util.function.Consumer;
 
 /**
  * Created on 2016/10/19.

@@ -1,6 +1,7 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.embedded.*;
+import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;

@@ -1,7 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.AbstractCacheBuilder;
-import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import org.slf4j.Logger;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 

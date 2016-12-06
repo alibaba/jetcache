@@ -3,7 +3,8 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheException;
 import com.alicp.jetcache.anno.CacheConsts;
 import org.mvel2.MVEL;
 import org.slf4j.Logger;

@@ -4,7 +4,6 @@
 package com.alicp.jetcache.anno;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.method.SerializeUtil;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 

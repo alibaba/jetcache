@@ -1,12 +1,10 @@
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.CacheException;
 import com.alicp.jetcache.anno.SerialPolicy;
-import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.*;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -62,5 +60,9 @@ public class ConfigProvider {
 
     public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
         return new CacheContext(globalCacheConfig);
+    }
+
+    public Consumer<StatInfo> statCallback() {
+        return new StatInfoLogger(false);
     }
 }

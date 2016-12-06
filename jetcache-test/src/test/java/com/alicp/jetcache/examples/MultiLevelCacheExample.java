@@ -4,7 +4,6 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;

@@ -3,9 +3,6 @@
  */
 package com.alicp.jetcache.anno;
 
-import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.SerialPolicy;
-
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */

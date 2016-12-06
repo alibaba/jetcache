@@ -30,6 +30,11 @@ public class StarterTest extends SpringTest {
         public MyFactoryBean factoryBean() {
             return new MyFactoryBean();
         }
+
+//        @Bean
+//        public Consumer<StatInfo> statCallback(){
+//            return si -> {};
+//        }
     }
 
 }

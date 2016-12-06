@@ -3,10 +3,10 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.anno.CacheConsts;
 import org.junit.Ignore;
 
 import java.io.BufferedReader;

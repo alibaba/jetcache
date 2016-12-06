@@ -4,8 +4,6 @@ import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**

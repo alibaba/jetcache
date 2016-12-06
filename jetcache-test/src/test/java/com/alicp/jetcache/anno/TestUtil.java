@@ -13,7 +13,6 @@ import com.alicp.jetcache.support.KryoValueEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>

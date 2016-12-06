@@ -9,8 +9,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +47,6 @@ public class JetCacheAutoConfiguration {
         c.setConfigProvider(configProvider);
         c.setHidePackages(props.getHidePackages());
         c.setStatIntervalMinutes(props.getStatIntervalMinutes());
-        c.setStatCallback(props.getStatCallback());
         c.setLocalCacheBuilders(localCacheBuilders);
         c.setRemoteCacheBuilders(remoteCacheBuilders);
         return c;
