@@ -58,4 +58,19 @@ public class TestBean {
     public int count(boolean useCache){
         return count++;
     }
+
+    @Cached(name="n1")
+    public int namedCount1_WithNameN1(){
+        return count++;
+    }
+
+    @Cached(name="n1")
+    public int namedCount2_WithNameN1(){
+        return count++;
+    }
+
+    @Cached(name="n2")
+    public int namedCount_WithNameN2(){
+        return count++;
+    }
 }

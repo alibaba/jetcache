@@ -19,9 +19,19 @@ public class SpringTest implements ApplicationContextAware {
     protected ApplicationContext context;
 
     protected void doTest() {
-        int x1, x2, x3;
-
         Service service = (Service) context.getBean("service");
+        TestBean bean = (TestBean)context.getBean("testBean");
+        testService(service, bean);
+        testTestBean(bean);
+
+        FactoryBeanTarget target = (FactoryBeanTarget) context.getBean("factoryBeanTarget");
+        Assert.assertEquals(target.count(), target.count());
+    }
+
+    private void testService(Service service, TestBean bean) {
+        int x1;
+        int x2;
+        int x3;
         Assert.assertNotEquals(service.notCachedCount(), service.notCachedCount());
 
         x1 = service.countWithAnnoOnClass();
@@ -34,7 +44,15 @@ public class SpringTest implements ApplicationContextAware {
         x2 = service.countWithAnnoOnInterface();
         Assert.assertEquals(x1, x2);
 
-        TestBean bean = (TestBean)context.getBean("testBean");
+        Assert.assertNotEquals(service.enableCacheWithNoCacheCount(bean), service.enableCacheWithNoCacheCount(bean));
+        Assert.assertEquals(service.enableCacheWithAnnoOnClass(bean), service.enableCacheWithAnnoOnClass(bean));
+        Assert.assertEquals(service.enableCacheWithAnnoOnInterface(bean), service.enableCacheWithAnnoOnInterface(bean));
+    }
+
+    private void testTestBean(TestBean bean) {
+        int x1;
+        int x2;
+        int x3;
         Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
         x1 = bean.count();
         x2 = bean.count();
@@ -44,9 +62,6 @@ public class SpringTest implements ApplicationContextAware {
         x2 = bean.countWithDisabledCache();
         Assert.assertNotEquals(x1, x2);
 
-        Assert.assertNotEquals(service.enableCacheWithNoCacheCount(bean), service.enableCacheWithNoCacheCount(bean));
-        Assert.assertEquals(service.enableCacheWithAnnoOnClass(bean), service.enableCacheWithAnnoOnClass(bean));
-        Assert.assertEquals(service.enableCacheWithAnnoOnInterface(bean), service.enableCacheWithAnnoOnInterface(bean));
 
         DynamicQuery q1 = new DynamicQuery();
         q1.setId(1000);
@@ -78,8 +93,10 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertEquals(bean.count(true), bean.count(true));
         Assert.assertNotEquals(bean.count(false), bean.count(false));
 
-        FactoryBeanTarget target = (FactoryBeanTarget) context.getBean("factoryBeanTarget");
-        Assert.assertEquals(target.count(), target.count());
+        Assert.assertEquals(bean.namedCount1_WithNameN1(),bean.namedCount1_WithNameN1());
+        Assert.assertEquals(bean.namedCount1_WithNameN1(),bean.namedCount2_WithNameN1());
+        Assert.assertNotEquals(bean.namedCount1_WithNameN1(),bean.namedCount_WithNameN2());
+        Assert.assertEquals(bean.namedCount_WithNameN2(),bean.namedCount_WithNameN2());
     }
 
     @Override
