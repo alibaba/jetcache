@@ -1,5 +1,6 @@
 package com.alicp.jetcache.anno.config;
 
+import com.alicp.jetcache.anno.field.CreateCacheAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.AdviceModeImportSelector;
 import org.springframework.context.annotation.AutoProxyRegistrar;

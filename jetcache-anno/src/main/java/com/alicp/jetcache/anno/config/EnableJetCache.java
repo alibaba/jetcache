@@ -1,5 +1,6 @@
 package com.alicp.jetcache.anno.config;
 
+import com.alicp.jetcache.anno.field.CreateCacheAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
@@ -8,12 +9,11 @@ import java.lang.annotation.*;
 
 /**
  * Created on 2016/11/16.
- *
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import(ConfigSelector.class)
+@Import({ConfigSelector.class, CreateCacheAnnotationBeanPostProcessor.class})
 public @interface EnableJetCache {
 
     /**
@@ -32,6 +32,7 @@ public @interface EnableJetCache {
     /**
      * Indicate how caching advice should be applied. The default is
      * {@link AdviceMode#PROXY}.
+     *
      * @see AdviceMode
      */
     AdviceMode mode() default AdviceMode.PROXY;

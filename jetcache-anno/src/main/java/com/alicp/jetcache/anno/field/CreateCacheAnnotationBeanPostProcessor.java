@@ -15,6 +15,7 @@ import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -31,14 +32,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  */
-public class InitCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor {
+public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor {
 
-    private static Logger logger = LoggerFactory.getLogger(InitCacheAnnotationBeanPostProcessor.class);
+    private static Logger logger = LoggerFactory.getLogger(CreateCacheAnnotationBeanPostProcessor.class);
 
     private ConfigurableListableBeanFactory beanFactory;
-
-    private GlobalCacheConfig globalCacheConfig;
-    private String globalCacheConfigBeanName;
 
     private final Map<String, InjectionMetadata> injectionMetadataCache = new ConcurrentHashMap<String, InjectionMetadata>();
 
@@ -55,15 +53,6 @@ public class InitCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBea
     @Override
     public PropertyValues postProcessPropertyValues(
             PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeanCreationException {
-        Map<String, GlobalCacheConfig> beans = beanFactory.getBeansOfType(GlobalCacheConfig.class);
-        if (beans == null || beans.size() == 0) {
-            throw new CacheConfigException("requires a GlobalCacheConfig");
-        } else if (beans.size() > 1) {
-            throw new CacheConfigException("more than one GlobalCacheConfig");
-        } else {
-            globalCacheConfigBeanName = beans.keySet().iterator().next();
-            globalCacheConfig = beans.get(globalCacheConfigBeanName);
-        }
 
         InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
         try {
@@ -147,32 +136,8 @@ public class InitCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBea
 
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
-            beanFactory.registerDependentBean(beanName, globalCacheConfigBeanName);
-
-            CacheAnnoConfig cac = new CacheAnnoConfig();
-            cac.setArea(ann.area());
-            cac.setName(ann.name());
-            cac.setExpire(ann.expire());
-            cac.setCacheType(ann.cacheType());
-            cac.setLocalLimit(ann.localLimit());
-            cac.setVersion(ann.version());
-            cac.setSerialPolicy(ann.serialPolicy());
-            cac.setKeyConvertor(ann.keyConvertor());
-
-            String cacheName = cac.getName();
-            if (CacheConsts.DEFAULT_NAME.equalsIgnoreCase(cacheName)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(field.getDeclaringClass().getName());
-                sb.append(".").append(field.getName());
-                ClassUtil.removeHiddenPackage(globalCacheConfig.getHiddenPackages(), sb);
-                cacheName = sb.toString();
-            }
-            if (cac.getVersion() != CacheConsts.DEFAULT_VERSION) {
-                cacheName = cac.getVersion() + "_" + cacheName;
-            }
-            String fullCacheName = cac.getArea() + "_" + cacheName;
-            Cache cache = globalCacheConfig.getCacheContext().__createOrGetCache(cac, ann.area(), fullCacheName);
-
+            beanFactory.registerDependentBean(beanName, "globalCacheConfig");
+            LazyInitCache cache = new LazyInitCache(beanFactory, ann, field);
             field.setAccessible(true);
             field.set(bean, cache);
         }
