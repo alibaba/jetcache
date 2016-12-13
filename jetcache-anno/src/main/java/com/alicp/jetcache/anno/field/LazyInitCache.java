@@ -45,6 +45,7 @@ class LazyInitCache implements ProxyCache {
 
     @Override
     public Cache getTargetCache() {
+        checkInit();
         return cache;
     }
 

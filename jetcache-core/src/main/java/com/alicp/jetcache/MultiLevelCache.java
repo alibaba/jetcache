@@ -21,6 +21,10 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         }
     }
 
+    public Cache[] caches() {
+        return caches;
+    }
+
     @Override
     public CacheConfig config() {
         return null;

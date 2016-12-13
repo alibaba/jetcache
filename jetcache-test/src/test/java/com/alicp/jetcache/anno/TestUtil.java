@@ -27,17 +27,17 @@ public class TestUtil {
 
         Map remoteFactories = new HashMap();
 
-        MockRemoteCacheBuilder remoteFactory = new MockRemoteCacheBuilder();
-        remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-        remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
-        remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
-        remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteFactory);
+        MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
+        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
+        remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
+        remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
-        remoteFactory = new MockRemoteCacheBuilder();
-        remoteFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-        remoteFactory.setValueEncoder(KryoValueEncoder.INSTANCE);
-        remoteFactory.setValueDecoder(KryoValueDecoder.INSTANCE);
-        remoteFactories.put("A1", remoteFactory);
+        remoteBuilder = new MockRemoteCacheBuilder();
+        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
+        remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
+        remoteFactories.put("A1", remoteBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
         globalCacheConfig.setConfigProvider(configProvider);
