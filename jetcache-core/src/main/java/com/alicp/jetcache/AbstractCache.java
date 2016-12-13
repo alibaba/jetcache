@@ -16,7 +16,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V>, WrapValueCache
     public CacheGetResult<V> GET(K key) {
         CacheGetResult<V> result;
         try {
-            CacheGetResult<CacheValueHolder<V>> holderResult = GET_HOLDER(key);
+            CacheGetResult<CacheValueHolder<V>> holderResult = __GET_HOLDER(key);
             result = (CacheGetResult<V>) holderResult;
             if (holderResult.getValue() != null) {
                 result.setValue(holderResult.getValue().getValue());

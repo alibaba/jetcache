@@ -41,12 +41,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
+    public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult<CacheValueHolder<V>> r1;
             if (canGetHolder[i]) {
-                r1 = ((WrapValueCache) cache).GET_HOLDER(key);
+                r1 = ((WrapValueCache) cache).__GET_HOLDER(key);
             } else {
                 r1 = cache.GET(key);
             }

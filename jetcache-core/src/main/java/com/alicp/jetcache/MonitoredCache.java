@@ -38,12 +38,12 @@ public class MonitoredCache<K, V> implements WrapValueCache<K, V>, ProxyCache<K,
     }
 
     @Override
-    public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
+    public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         if (wrapValueCache == null) {
             throw new UnsupportedOperationException();
         }
         long t = System.currentTimeMillis();
-        CacheGetResult<CacheValueHolder<V>> result = wrapValueCache.GET_HOLDER(key);
+        CacheGetResult<CacheValueHolder<V>> result = wrapValueCache.__GET_HOLDER(key);
         t = System.currentTimeMillis() - t;
         monitor.afterGET(t, key, result);
         return result;

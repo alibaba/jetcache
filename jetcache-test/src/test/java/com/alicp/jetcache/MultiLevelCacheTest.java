@@ -68,8 +68,8 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         Thread.sleep(10);
         l1Cache.invalidate("K1");
         Assert.assertEquals("V1", cache.get("K1"));
-        CacheGetResult<CacheValueHolder<Object>> h1 = l1Cache.GET_HOLDER("K1");
-        CacheGetResult<CacheValueHolder<Object>> h2 = l2Cache.GET_HOLDER("K1");
+        CacheGetResult<CacheValueHolder<Object>> h1 = l1Cache.__GET_HOLDER("K1");
+        CacheGetResult<CacheValueHolder<Object>> h2 = l2Cache.__GET_HOLDER("K1");
         Assert.assertEquals(h1.getValue().getExpireTime(), h2.getValue().getExpireTime());
     }
 }

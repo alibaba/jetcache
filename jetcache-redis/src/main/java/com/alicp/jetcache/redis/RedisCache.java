@@ -65,7 +65,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
+    public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         try (Jedis jedis = jedisPool.getResource()) {
             byte[] newKey = buildKey(key);
             Pipeline p = jedis.pipelined();

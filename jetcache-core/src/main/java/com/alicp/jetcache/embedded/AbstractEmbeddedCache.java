@@ -39,7 +39,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheGetResult<CacheValueHolder<V>> GET_HOLDER(K key) {
+    public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         Object newKey = buildKey(key);
         CacheValueHolder<V> holder;
         if (config.isWeakValues()) {
