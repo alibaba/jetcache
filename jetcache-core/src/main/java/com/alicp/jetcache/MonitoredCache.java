@@ -8,7 +8,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MonitoredCache<K, V> implements WrapValueCache<K, V> {
+public class MonitoredCache<K, V> implements WrapValueCache<K, V>, ProxyCache<K, V> {
 
     private CacheMonitor monitor;
 
@@ -23,6 +23,7 @@ public class MonitoredCache<K, V> implements WrapValueCache<K, V> {
         }
     }
 
+    @Override
     public Cache<K, V> getTargetCache() {
         return cache;
     }
@@ -76,13 +77,13 @@ public class MonitoredCache<K, V> implements WrapValueCache<K, V> {
     @Override
     public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
         Function<K, V> newLoader = createProxyLoader(key, loader);
-        return WrapValueCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
+        return ProxyCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
     }
 
     @Override
     public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
         Function<K, V> newLoader = createProxyLoader(key, loader);
-        return WrapValueCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
+        return ProxyCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
     }
 
     @Override

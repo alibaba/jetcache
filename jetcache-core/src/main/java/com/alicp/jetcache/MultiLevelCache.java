@@ -27,8 +27,8 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     private boolean isWrap(Cache c) {
-        if (c instanceof MonitoredCache) {
-            return isWrap(((MonitoredCache) c).getTargetCache());
+        if (c instanceof ProxyCache) {
+            return isWrap(((ProxyCache) c).getTargetCache());
         }
         if (c instanceof WrapValueCache) {
             return true;

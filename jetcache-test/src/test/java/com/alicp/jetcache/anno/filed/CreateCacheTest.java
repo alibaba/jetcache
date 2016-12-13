@@ -1,6 +1,8 @@
 package com.alicp.jetcache.anno.filed;
 
+import com.alicp.jetcache.AbstractCacheTest;
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.TestUtil;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
@@ -9,6 +11,7 @@ import com.alicp.jetcache.anno.config.SpringTest;
 import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,21 +44,6 @@ public class CreateCacheTest extends SpringTest {
     public static class A {
 
         @Bean
-        public Foo foo() {
-            return new Foo();
-        }
-
-        public static class Foo {
-            @CreateCache
-            private Cache cache;
-
-            @PostConstruct
-            public void test(){
-                cache.put("1","2");
-            }
-        }
-
-        @Bean
         public SpringConfigProvider springConfigProvider() {
             return new SpringConfigProvider();
         }
@@ -69,6 +57,36 @@ public class CreateCacheTest extends SpringTest {
         @Bean("factoryBeanTarget")
         public MyFactoryBean factoryBean() {
             return new MyFactoryBean();
+        }
+
+        @Bean
+        public Foo foo() {
+            return new Foo();
+        }
+
+        public static class Foo extends AbstractCacheTest {
+            @CreateCache
+            private Cache cache;
+
+            @CreateCache(area = "A1")
+            private Cache cache_A1;
+
+            @CreateCache(name = "name1")
+            private Cache cacheSameName1;
+
+            @CreateCache(name = "name2")
+            private Cache cacheSameName2;
+
+            @PostConstruct
+            public void test() {
+                super.cache = this.cache;
+                super.baseTest();
+
+                cache.put("K1", "V1");
+                Assert.assertNull(cache_A1.get("K1"));
+
+                Assert.assertEquals(((ProxyCache)cacheSameName1).getTargetCache(), ((ProxyCache)cacheSameName2).getTargetCache());
+            }
         }
     }
 

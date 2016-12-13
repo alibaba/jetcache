@@ -1,9 +1,6 @@
 package com.alicp.jetcache.anno.field;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheConfig;
-import com.alicp.jetcache.CacheGetResult;
-import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.method.ClassUtil;
@@ -20,7 +17,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class LazyInitCache implements Cache {
+class LazyInitCache implements ProxyCache {
 
     private transient boolean inited;
     private Cache cache;
@@ -44,6 +41,11 @@ class LazyInitCache implements Cache {
                 }
             }
         }
+    }
+
+    @Override
+    public Cache getTargetCache() {
+        return cache;
     }
 
     private void init() {
@@ -146,7 +148,7 @@ class LazyInitCache implements Cache {
     @Override
     public CacheResult INVALIDATE(Object key) {
         checkInit();
-        return INVALIDATE(key);
+        return cache.INVALIDATE(key);
     }
 
 }

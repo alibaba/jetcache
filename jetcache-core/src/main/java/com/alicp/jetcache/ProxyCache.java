@@ -1,0 +1,10 @@
+package com.alicp.jetcache;
+
+/**
+ * Created on 2016/12/13.
+ *
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ */
+public interface ProxyCache<K, V> extends Cache<K, V> {
+    Cache<K, V> getTargetCache();
+}

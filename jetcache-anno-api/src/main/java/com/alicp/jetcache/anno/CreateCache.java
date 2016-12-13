@@ -19,5 +19,5 @@ public @interface CreateCache {
     int version() default CacheConsts.DEFAULT_VERSION;
     String serialPolicy() default CacheConsts.DEFAULT_SERIAL_POLICY;
 
-    String keyConvertor() default KeyConvertor.NONE;
+    String keyConvertor() default KeyConvertor.FASTJSON;
 }
