@@ -13,8 +13,8 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({ConfigSelector.class, CreateCacheAnnotationBeanPostProcessor.class})
-public @interface EnableJetCache {
+@Import({ConfigSelector.class})
+public @interface EnableMethodCache {
 
     /**
      * Indicate whether subclass-based (CGLIB) proxies are to be created as opposed

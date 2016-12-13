@@ -1,0 +1,19 @@
+package com.alicp.jetcache.anno.config;
+
+/**
+ * Created on 2016/12/13.
+ *
+ * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ */
+
+import com.alicp.jetcache.anno.field.CreateCacheAnnotationBeanPostProcessor;
+import org.springframework.context.annotation.Import;
+
+import java.lang.annotation.*;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Import({CreateCacheAnnotationBeanPostProcessor.class})
+public @interface EnableCreateCacheAnnotation {
+}

@@ -32,7 +32,7 @@ public class ProxyConfiguration implements ImportAware {
     @Override
     public void setImportMetadata(AnnotationMetadata importMetadata) {
         this.enableJetCache = AnnotationAttributes.fromMap(
-                importMetadata.getAnnotationAttributes(EnableJetCache.class.getName(), false));
+                importMetadata.getAnnotationAttributes(EnableMethodCache.class.getName(), false));
         if (this.enableJetCache == null) {
             throw new IllegalArgumentException(
                     "@EnableJetCache is not present on importing class " + importMetadata.getClassName());

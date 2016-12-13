@@ -1,6 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.alicp.jetcache.anno.config.EnableJetCache;
+import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.config.SpringTest;
 import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @SpringBootApplication(scanBasePackages = "com.alicp.jetcache.anno.config.beans")
-@EnableJetCache(basePackages = "com.alicp.jetcache.anno.config.beans")
+@EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config.beans")
 public class StarterTest extends SpringTest {
 
     @Test

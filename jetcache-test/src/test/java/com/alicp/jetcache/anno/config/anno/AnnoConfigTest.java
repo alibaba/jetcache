@@ -1,7 +1,7 @@
 package com.alicp.jetcache.anno.config.anno;
 
 import com.alicp.jetcache.anno.TestUtil;
-import com.alicp.jetcache.anno.config.EnableJetCache;
+import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.config.SpringTest;
 import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -30,7 +30,7 @@ public class AnnoConfigTest extends SpringTest {
 
     @Configuration
     @ComponentScan(basePackages = "com.alicp.jetcache.anno.config.beans")
-    @EnableJetCache(basePackages = "com.alicp.jetcache.anno.config.beans")
+    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config.beans")
     public static class A {
 
         @Bean

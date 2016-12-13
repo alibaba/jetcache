@@ -1,6 +1,5 @@
 package com.alicp.jetcache.anno.config;
 
-import com.alicp.jetcache.anno.field.CreateCacheAnnotationBeanPostProcessor;
 import org.springframework.context.annotation.AdviceMode;
 import org.springframework.context.annotation.AdviceModeImportSelector;
 import org.springframework.context.annotation.AutoProxyRegistrar;
@@ -12,7 +11,7 @@ import java.util.List;
  * Created on 2016/11/16.
  *
  */
-public class ConfigSelector extends AdviceModeImportSelector<EnableJetCache> {
+public class ConfigSelector extends AdviceModeImportSelector<EnableMethodCache> {
 
     @Override
     public String[] selectImports(AdviceMode adviceMode) {
