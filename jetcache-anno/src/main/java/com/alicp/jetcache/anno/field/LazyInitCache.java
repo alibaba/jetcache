@@ -61,7 +61,6 @@ class LazyInitCache implements ProxyCache {
         cac.setExpire(ann.expire());
         cac.setCacheType(ann.cacheType());
         cac.setLocalLimit(ann.localLimit());
-        cac.setVersion(ann.version());
         cac.setSerialPolicy(ann.serialPolicy());
         cac.setKeyConvertor(ann.keyConvertor());
 
@@ -72,9 +71,6 @@ class LazyInitCache implements ProxyCache {
             sb.append(".").append(field.getName());
             ClassUtil.removeHiddenPackage(globalCacheConfig.getHiddenPackages(), sb);
             cacheName = sb.toString();
-        }
-        if (cac.getVersion() != CacheConsts.DEFAULT_VERSION) {
-            cacheName = cac.getVersion() + "_" + cacheName;
         }
         String fullCacheName = cac.getArea() + "_" + cacheName;
         cache = globalCacheConfig.getCacheContext().__createOrGetCache(cac, ann.area(), fullCacheName);

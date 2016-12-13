@@ -79,9 +79,6 @@ public class CacheContext {
                 cacheName = ClassUtil.generateCacheName(
                         invokeContext.getMethod(), invokeContext.getHiddenPackages());
             }
-            if (cacheAnnoConfig.getVersion() != CacheConsts.DEFAULT_VERSION) {
-                cacheName = cacheAnnoConfig.getVersion() + "_" + cacheName;
-            }
             String fullCacheName = area + "_" + cacheName;
             return __createOrGetCache(cacheAnnoConfig, area, fullCacheName);
         });

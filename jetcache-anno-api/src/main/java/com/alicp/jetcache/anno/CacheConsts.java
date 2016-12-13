@@ -13,7 +13,6 @@ public interface CacheConsts {
     int DEFAULT_EXPIRE = 600;
     CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;
     int DEFAULT_LOCAL_LIMIT = 100;
-    int DEFAULT_VERSION = 1;
     boolean DEFAULT_CACHE_NULL_VALUE = false;
     String DEFAULT_CONDITION = "";
     String DEFAULT_UNLESS = "";

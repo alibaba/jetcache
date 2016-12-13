@@ -18,7 +18,6 @@ public @interface Cached {
     int expire() default CacheConsts.DEFAULT_EXPIRE;
     CacheType cacheType() default CacheType.REMOTE;
     int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
-    int version() default CacheConsts.DEFAULT_VERSION;
     String serialPolicy() default CacheConsts.DEFAULT_SERIAL_POLICY;
 
     String keyConvertor() default KeyConvertor.FASTJSON;

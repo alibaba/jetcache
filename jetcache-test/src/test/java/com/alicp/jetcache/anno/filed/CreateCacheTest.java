@@ -80,7 +80,7 @@ public class CreateCacheTest extends SpringTest {
             @CreateCache(name = "sameCacheName")
             private Cache cacheSameName2;
 
-            @CreateCache(area = "A1", name = "name1", expire = 5, cacheType = CacheType.BOTH, localLimit = 10, version = 2, serialPolicy = SerialPolicy.JAVA, keyConvertor = KeyConvertor.NONE)
+            @CreateCache(area = "A1", name = "name1", expire = 5, cacheType = CacheType.BOTH, localLimit = 10, serialPolicy = SerialPolicy.JAVA, keyConvertor = KeyConvertor.NONE)
             private Cache cacheWithConfig;
 
             private Cache getTarget(Cache cache) {

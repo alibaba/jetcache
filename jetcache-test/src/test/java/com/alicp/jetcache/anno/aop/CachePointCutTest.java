@@ -111,7 +111,7 @@ public class CachePointCutTest {
 
     interface I3_Parent {
         @EnableCache
-        @Cached(enabled = false, area = "A1", expire = 1, cacheType = CacheType.BOTH, localLimit = 2, version = 10)
+        @Cached(enabled = false, area = "A1", expire = 1, cacheType = CacheType.BOTH, localLimit = 2)
         int foo();
     }
 
@@ -142,7 +142,6 @@ public class CachePointCutTest {
         Assert.assertEquals(1, map.get(m1).getCacheAnnoConfig().getExpire());
         Assert.assertEquals(CacheType.BOTH, map.get(m1).getCacheAnnoConfig().getCacheType());
         Assert.assertEquals(2, map.get(m1).getCacheAnnoConfig().getLocalLimit());
-        Assert.assertEquals(10, map.get(m1).getCacheAnnoConfig().getVersion());
 
     }
 

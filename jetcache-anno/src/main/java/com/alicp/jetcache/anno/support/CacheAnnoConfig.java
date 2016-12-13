@@ -18,7 +18,6 @@ public class CacheAnnoConfig {
     private int expire = CacheConsts.DEFAULT_EXPIRE;
     private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
     private int localLimit = CacheConsts.DEFAULT_LOCAL_LIMIT;
-    private int version = CacheConsts.DEFAULT_VERSION;
     private boolean cacheNullValue = CacheConsts.DEFAULT_CACHE_NULL_VALUE;
     private String condition = CacheConsts.DEFAULT_CONDITION;
     private String unless = CacheConsts.DEFAULT_UNLESS;
@@ -45,10 +44,6 @@ public class CacheAnnoConfig {
         return localLimit;
     }
 
-    public int getVersion() {
-        return version;
-    }
-
     public void setArea(String area) {
         this.area = area;
     }
@@ -67,10 +62,6 @@ public class CacheAnnoConfig {
 
     public void setLocalLimit(int localLimit) {
         this.localLimit = localLimit;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
     }
 
     public boolean isCacheNullValue() {
