@@ -42,7 +42,7 @@
     </build>
     <modules>
         <module>jetcache-core</module>
-        <module>jetcache-ali</module>
+        <module>jetcache-tair</module>
         <module>jetcache-anno</module>
         <module>jetcache-anno-api</module>
         <module>jetcache-autoconfigure</module>
