@@ -1,6 +1,7 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.anno.KeyConvertor;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.support.*;
 
@@ -52,8 +53,10 @@ public class ConfigProvider {
         if (convertor == null) {
             return null;
         }
-        if ("fastjson".equalsIgnoreCase(convertor)) {
+        if (KeyConvertor.FASTJSON.equalsIgnoreCase(convertor)) {
             return FastjsonKeyConvertor.INSTANCE;
+        } else if (KeyConvertor.NONE.equalsIgnoreCase(convertor)) {
+            return null;
         }
         throw new CacheConfigException("not supported:" + convertor);
     }

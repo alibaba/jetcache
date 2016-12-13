@@ -56,16 +56,16 @@ public class ClassUtilTest {
         Method m2 = C1.class.getMethod("foo", I1.class);
         Method m3 = C1.class.getMethod("foo2", I1.class);
 
-        String s1 = "1_method.ClassUtilTest$C1." + m1.getName() + "()V";
-        String s2 = ClassUtil.generateCacheName(1, m1, hidePack);
+        String s1 = "method.ClassUtilTest$C1." + m1.getName() + "()V";
+        String s2 = ClassUtil.generateCacheName(m1, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = "1_method.ClassUtilTest$C1." + m2.getName() + "(Lmethod/ClassUtilTest$I1;)Ljava/lang/String;";
-        s2 = ClassUtil.generateCacheName(1, m2, hidePack);
+        s1 = "method.ClassUtilTest$C1." + m2.getName() + "(Lmethod/ClassUtilTest$I1;)Ljava/lang/String;";
+        s2 = ClassUtil.generateCacheName(m2, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = "1_" + C1.class.getName() + "." + m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
-        s2 = ClassUtil.generateCacheName(1, m3, null);
+        s1 = C1.class.getName() + "." + m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
+        s2 = ClassUtil.generateCacheName(m3, null);
         Assert.assertEquals(s1, s2);
     }
 

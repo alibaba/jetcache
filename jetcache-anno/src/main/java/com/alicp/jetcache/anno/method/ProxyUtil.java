@@ -22,7 +22,7 @@ public class ProxyUtil {
         cacheInvokeConfig.init();
         CacheHandler h = new CacheHandler(target, cacheInvokeConfig,
                 () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(),
-                globalCacheConfig.getHidePackages());
+                globalCacheConfig.getHiddenPackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
@@ -33,7 +33,7 @@ public class ProxyUtil {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap,
                 () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(),
-                globalCacheConfig.getHidePackages());
+                globalCacheConfig.getHiddenPackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
@@ -65,7 +65,7 @@ public class ProxyUtil {
     }
 
     private static void processMethod(HashMap<String, CacheInvokeConfig> configMap, Method m, GlobalCacheConfig gcc) {
-        String sig = ClassUtil.getMethodSig(m, gcc.getHidePackages());
+        String sig = ClassUtil.getMethodSig(m, gcc.getHiddenPackages());
         CacheInvokeConfig cac = configMap.get(sig);
         if (cac == null) {
             cac = new CacheInvokeConfig();

@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.KeyConvertor;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -22,6 +23,7 @@ public class CacheAnnoConfig {
     private String condition = CacheConsts.DEFAULT_CONDITION;
     private String unless = CacheConsts.DEFAULT_UNLESS;
     private String serialPolicy = CacheConsts.DEFAULT_SERIAL_POLICY;
+    private String keyConvertor = KeyConvertor.FASTJSON;
 
     public String getArea() {
         return area;
@@ -109,5 +111,13 @@ public class CacheAnnoConfig {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getKeyConvertor() {
+        return keyConvertor;
+    }
+
+    public void setKeyConvertor(String keyConvertor) {
+        this.keyConvertor = keyConvertor;
     }
 }

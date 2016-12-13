@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
+import com.alicp.jetcache.anno.CacheConsts;
 import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
@@ -18,17 +19,16 @@ public class ClassUtil {
     private static ConcurrentHashMap<Method, String> subAreaMap = new ConcurrentHashMap();
     private static ConcurrentHashMap<Method, String> methodSigMap = new ConcurrentHashMap();
 
-    public static String generateCacheName(int version, Method method, String[] hidePackages) {
+    public static String generateCacheName(Method method, String[] hiddenPackages) {
         // TODO invalid cache when param type changed
         String prefix = subAreaMap.get(method);
 
         if (prefix == null) {
             StringBuilder sb = new StringBuilder();
-            sb.append(version).append('_');
             sb.append(method.getDeclaringClass().getName());
             sb.append('.');
             getMethodSig(sb, method);
-            String str = replace(hidePackages, sb);
+            String str = removeHiddenPackage(hiddenPackages, sb);
             subAreaMap.put(method, str);
             return str;
         } else {
@@ -36,10 +36,10 @@ public class ClassUtil {
         }
     }
 
-    private static String replace(String[] hidePackages, StringBuilder sb) {
+    public static String removeHiddenPackage(String[] hiddenPackages, StringBuilder sb) {
         String str = sb.toString();
-        if (hidePackages != null) {
-            for (String p : hidePackages) {
+        if (hiddenPackages != null) {
+            for (String p : hiddenPackages) {
                 String pWithDot = p + ".";
                 str = str.replace(pWithDot, "");
                 str = str.replace(pWithDot.replace('.', '/'), "");
@@ -71,7 +71,7 @@ public class ClassUtil {
         } else {
             StringBuilder sb = new StringBuilder();
             getMethodSig(sb, m);
-            sig = replace(hidePackages, sb);
+            sig = removeHiddenPackage(hidePackages, sb);
             methodSigMap.put(m, sig);
             return sig;
         }

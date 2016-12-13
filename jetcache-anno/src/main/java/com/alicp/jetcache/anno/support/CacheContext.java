@@ -76,46 +76,57 @@ public class CacheContext {
             String area = cacheAnnoConfig.getArea();
             String cacheName = cacheAnnoConfig.getName();
             if (CacheConsts.DEFAULT_NAME.equalsIgnoreCase(cacheName)) {
-                cacheName = ClassUtil.generateCacheName(cacheAnnoConfig.getVersion(),
+                cacheName = ClassUtil.generateCacheName(
                         invokeContext.getMethod(), invokeContext.getHiddenPackages());
             }
-            String fullCacheName = area + "_" + cacheName;
-            Cache cache = cacheManager.getCache(fullCacheName);
-            if (cache == null) {
-                if (cacheAnnoConfig.getCacheType() == CacheType.LOCAL) {
-                    cache = buildLocal(cacheAnnoConfig, area);
-                } else if (cacheAnnoConfig.getCacheType() == CacheType.REMOTE) {
-                    cache = buildRemote(cacheAnnoConfig, area, fullCacheName);
-                } else {
-                    Cache local = buildLocal(cacheAnnoConfig, area);
-                    Cache remote = buildRemote(cacheAnnoConfig, area, fullCacheName);
-
-                    if (defaultCacheMonitorManager != null) {
-                        DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(fullCacheName + "_local");
-                        local = new MonitoredCache(local, localMonitor);
-                        DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(fullCacheName + "_remote");
-                        remote = new MonitoredCache(remote, remoteMonitor);
-                        defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
-                    }
-
-                    cache = new MultiLevelCache(local, remote);
-                }
-
-                if (defaultCacheMonitorManager != null) {
-                    DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
-                    cache = new MonitoredCache(cache, new DefaultCacheMonitor(fullCacheName));
-                    defaultCacheMonitorManager.add(monitor);
-                }
-
-                cacheManager.addCache(fullCacheName, cache);
+            if (cacheAnnoConfig.getVersion() != CacheConsts.DEFAULT_VERSION) {
+                cacheName = cacheAnnoConfig.getVersion() + "_" + cacheName;
             }
-            return cache;
+            String fullCacheName = area + "_" + cacheName;
+            return __createOrGetCache(cacheAnnoConfig, area, fullCacheName);
         });
-
         return c;
     }
 
-    private Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String prefix) {
+    public Cache __createOrGetCache(CacheAnnoConfig cacheAnnoConfig, String area, String fullCacheName) {
+        Cache cache = cacheManager.getCache(fullCacheName);
+        if (cache == null) {
+            cache = buildCache(cacheAnnoConfig, area, fullCacheName);
+            cacheManager.addCache(fullCacheName, cache);
+        }
+        return cache;
+    }
+
+    protected Cache buildCache(CacheAnnoConfig cacheAnnoConfig, String area, String fullCacheName) {
+        Cache cache;
+        if (cacheAnnoConfig.getCacheType() == CacheType.LOCAL) {
+            cache = buildLocal(cacheAnnoConfig, area);
+        } else if (cacheAnnoConfig.getCacheType() == CacheType.REMOTE) {
+            cache = buildRemote(cacheAnnoConfig, area, fullCacheName);
+        } else {
+            Cache local = buildLocal(cacheAnnoConfig, area);
+            Cache remote = buildRemote(cacheAnnoConfig, area, fullCacheName);
+
+            if (defaultCacheMonitorManager != null) {
+                DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(fullCacheName + "_local");
+                local = new MonitoredCache(local, localMonitor);
+                DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(fullCacheName + "_remote");
+                remote = new MonitoredCache(remote, remoteMonitor);
+                defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
+            }
+
+            cache = new MultiLevelCache(local, remote);
+        }
+
+        if (defaultCacheMonitorManager != null) {
+            DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
+            cache = new MonitoredCache(cache, new DefaultCacheMonitor(fullCacheName));
+            defaultCacheMonitorManager.add(monitor);
+        }
+        return cache;
+    }
+
+    protected Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String prefix) {
         ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
         if (cacheBuilder == null) {
             throw new CacheConfigException("no remote cache builder: " + area);
@@ -126,12 +137,13 @@ public class CacheContext {
         }
         cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
         cacheBuilder.setKeyPrefix(prefix);
+        cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
         cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cacheAnnoConfig.getSerialPolicy()));
         cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cacheAnnoConfig.getSerialPolicy()));
         return cacheBuilder.buildCache();
     }
 
-    private Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
+    protected Cache buildLocal(CacheAnnoConfig cacheAnnoConfig, String area) {
         Cache cache;
         EmbeddedCacheBuilder cacheBuilder = (EmbeddedCacheBuilder) globalCacheConfig.getLocalCacheBuilders().get(area);
         if (cacheBuilder == null) {
@@ -143,6 +155,7 @@ public class CacheContext {
         }
         cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
         cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
         cache = cacheBuilder.buildCache();
         return cache;
     }

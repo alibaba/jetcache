@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class GlobalCacheConfig {
 
-    private String[] hidePackages;
+    private String[] hiddenPackages;
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
 
@@ -46,12 +46,12 @@ public class GlobalCacheConfig {
         return cacheContext;
     }
 
-    public String[] getHidePackages() {
-        return hidePackages;
+    public String[] getHiddenPackages() {
+        return hiddenPackages;
     }
 
-    public void setHidePackages(String[] hidePackages) {
-        this.hidePackages = hidePackages;
+    public void setHiddenPackages(String[] hiddenPackages) {
+        this.hiddenPackages = hiddenPackages;
     }
 
     public Map<String, CacheBuilder> getLocalCacheBuilders() {

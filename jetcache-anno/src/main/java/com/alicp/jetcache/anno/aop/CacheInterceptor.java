@@ -32,7 +32,7 @@ public class CacheInterceptor implements MethodInterceptor {
         context.setMethod(invocation.getMethod());
         context.setArgs(invocation.getArguments());
         context.setCacheInvokeConfig(cac);
-        context.setHiddenPackages(globalCacheConfig.getHidePackages());
+        context.setHiddenPackages(globalCacheConfig.getHiddenPackages());
         return CacheHandler.invoke(context);
     }
 
