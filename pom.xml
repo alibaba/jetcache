@@ -53,6 +53,7 @@
         <module>jetcache-starter/jetcache-starter-redis</module>
 
         <module>jetcache-ali/jetcache-tair</module>
+        <module>jetcache-ali/jetcache-starter-tair</module>
     </modules>
 
     <properties>
