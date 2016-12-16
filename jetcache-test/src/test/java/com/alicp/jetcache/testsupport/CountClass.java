@@ -3,6 +3,8 @@
  */
 package com.alicp.jetcache.testsupport;
 
+import com.alicp.jetcache.test.support.DynamicQuery;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */

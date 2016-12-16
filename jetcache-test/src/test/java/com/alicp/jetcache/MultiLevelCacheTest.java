@@ -5,6 +5,7 @@ import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
 import org.junit.Test;
 

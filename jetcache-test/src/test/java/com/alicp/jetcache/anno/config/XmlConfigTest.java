@@ -1,9 +1,9 @@
 /**
  * Created on  13-09-17 11:14
  */
-package com.alicp.jetcache.anno.config.xml;
+package com.alicp.jetcache.anno.config;
 
-import com.alicp.jetcache.anno.config.SpringTest;
+import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

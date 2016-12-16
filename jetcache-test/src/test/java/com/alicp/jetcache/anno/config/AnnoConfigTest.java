@@ -1,11 +1,10 @@
-package com.alicp.jetcache.anno.config.anno;
+package com.alicp.jetcache.anno.config;
 
-import com.alicp.jetcache.anno.TestUtil;
-import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.anno.config.SpringTest;
-import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
+import com.alicp.jetcache.test.anno.TestUtil;
+import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
+import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,8 @@ public class AnnoConfigTest extends SpringTest {
     }
 
     @Configuration
-    @ComponentScan(basePackages = "com.alicp.jetcache.anno.config.beans")
-    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config.beans")
+    @ComponentScan(basePackages = "com.alicp.jetcache.test.beans")
+    @EnableMethodCache(basePackages = "com.alicp.jetcache.test.beans")
     public static class A {
 
         @Bean

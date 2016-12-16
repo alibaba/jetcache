@@ -1,9 +1,9 @@
-package com.alicp.jetcache.anno.config;
+package com.alicp.jetcache.test.spring;
 
-import com.alicp.jetcache.anno.config.beans.FactoryBeanTarget;
-import com.alicp.jetcache.anno.config.beans.Service;
-import com.alicp.jetcache.anno.config.beans.TestBean;
-import com.alicp.jetcache.testsupport.DynamicQuery;
+import com.alicp.jetcache.test.beans.FactoryBeanTarget;
+import com.alicp.jetcache.test.beans.Service;
+import com.alicp.jetcache.test.beans.TestBean;
+import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

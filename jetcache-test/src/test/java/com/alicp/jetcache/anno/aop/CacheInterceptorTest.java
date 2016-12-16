@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.TestUtil;
+import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;

@@ -1,6 +1,7 @@
 package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
+import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Test;
 
 /**

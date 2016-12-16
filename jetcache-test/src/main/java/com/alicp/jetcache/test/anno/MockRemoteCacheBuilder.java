@@ -1,4 +1,4 @@
-package com.alicp.jetcache.anno;
+package com.alicp.jetcache.test.anno;
 
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;

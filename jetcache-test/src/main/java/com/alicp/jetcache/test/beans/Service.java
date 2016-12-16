@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-19 21:49
  */
-package com.alicp.jetcache.anno.config.beans;
+package com.alicp.jetcache.test.beans;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;

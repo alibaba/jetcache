@@ -1,6 +1,9 @@
-package com.alicp.jetcache;
+package com.alicp.jetcache.test;
 
-import com.alicp.jetcache.testsupport.DynamicQuery;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
 import java.util.concurrent.CountDownLatch;

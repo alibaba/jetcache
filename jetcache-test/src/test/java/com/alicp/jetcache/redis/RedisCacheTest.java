@@ -1,6 +1,6 @@
 package com.alicp.jetcache.redis;
 
-import com.alicp.jetcache.AbstractCacheTest;
+import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;

@@ -1,11 +1,11 @@
 /**
  * Created on  13-09-17 11:26
  */
-package com.alicp.jetcache.anno.config.beans;
+package com.alicp.jetcache.test.beans;
 
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.testsupport.DynamicQuery;
+import com.alicp.jetcache.test.support.DynamicQuery;
 import org.springframework.stereotype.Component;
 
 /**

@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.testsupport.DynamicQuery;
+import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;
 

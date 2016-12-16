@@ -4,8 +4,11 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.anno.config.SpringTest;
-import com.alicp.jetcache.anno.config.beans.MyFactoryBean;
+import com.alicp.jetcache.test.AbstractCacheTest;
+import com.alicp.jetcache.test.anno.MockRemoteCache;
+import com.alicp.jetcache.test.anno.TestUtil;
+import com.alicp.jetcache.test.spring.SpringTest;
+import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
@@ -41,8 +44,8 @@ public class CreateCacheTest extends SpringTest {
     }
 
     @Configuration
-    @ComponentScan(basePackages = "com.alicp.jetcache.anno.config.beans")
-    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config.beans")
+    @ComponentScan(basePackages = "com.alicp.jetcache.test.beans")
+    @EnableMethodCache(basePackages = "com.alicp.jetcache.test.beans")
     @EnableCreateCacheAnnotation
     public static class A {
 
