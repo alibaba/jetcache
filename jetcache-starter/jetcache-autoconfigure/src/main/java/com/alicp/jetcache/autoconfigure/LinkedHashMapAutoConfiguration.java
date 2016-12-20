@@ -19,7 +19,7 @@ public class LinkedHashMapAutoConfiguration extends EmbeddedCacheAutoConfigurati
     }
 
     @Override
-    protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheArea) {
+    protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheAreaWithPrefix) {
         LinkedHashMapCacheBuilder builder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder();
         parseGeneralConfig(builder, resolver);
         return builder;

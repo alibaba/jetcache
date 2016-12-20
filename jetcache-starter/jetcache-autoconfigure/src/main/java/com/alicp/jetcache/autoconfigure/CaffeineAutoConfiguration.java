@@ -20,7 +20,7 @@ public class CaffeineAutoConfiguration extends EmbeddedCacheAutoConfiguration {
     }
 
     @Override
-    protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheArea) {
+    protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheAreaWithPrefix) {
         CaffeineCacheBuilder builder = CaffeineCacheBuilder.createCaffeineCacheBuilder();
         parseGeneralConfig(builder, resolver);
         return builder;

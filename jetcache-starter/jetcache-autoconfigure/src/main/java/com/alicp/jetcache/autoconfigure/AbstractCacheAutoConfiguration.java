@@ -49,11 +49,11 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
 
     @PostConstruct
     public void init() {
-        process("jetcache.local.", localCacheBuilders);
-        process("jetcache.remote.", remoteCacheBuilders);
+        process("jetcache.local.", localCacheBuilders, true);
+        process("jetcache.remote.", remoteCacheBuilders, false);
     }
 
-    private void process(String prefix, Map cacheBuilders) {
+    private void process(String prefix, Map cacheBuilders, boolean local) {
         RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(
                 applicationContext.getEnvironment(), prefix);
         Map<String, Object> m = resolver.getSubProperties("");
@@ -64,7 +64,7 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
             }
             RelaxedPropertyResolver r = new RelaxedPropertyResolver(applicationContext.getEnvironment(), prefix + cacheArea + ".");
             logger.info("init cache area {} , type= {}", cacheArea, typeName);
-            CacheBuilder c = initCache(r, cacheArea);
+            CacheBuilder c = initCache(r, local ? "local." + cacheArea : "remote." + cacheArea);
             cacheBuilders.put(cacheArea, c);
         }
     }
@@ -80,5 +80,5 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
         acb.setExpireAfterAccess(Boolean.parseBoolean(expireAfterAccess));
     }
 
-    protected abstract CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheArea);
+    protected abstract CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheAreaWithPrefix);
 }
