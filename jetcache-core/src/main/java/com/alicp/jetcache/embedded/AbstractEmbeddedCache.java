@@ -73,4 +73,10 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         innerMap.removeValue(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
+
+    @Override
+    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        return SimpleLock.tryLock(this, key, expire, timeUnit);
+    }
+
 }

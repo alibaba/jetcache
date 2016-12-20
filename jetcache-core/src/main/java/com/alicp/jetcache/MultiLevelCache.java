@@ -116,4 +116,9 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     public <T> T unwrap(Class<T> clazz) {
         throw new UnsupportedOperationException("unwrap is not supported by MultiLevelCache");
     }
+
+    @Override
+    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        return caches[caches.length - 1].tryLock(key, expire, timeUnit);
+    }
 }

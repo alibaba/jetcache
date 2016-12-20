@@ -110,4 +110,20 @@ public interface Cache<K, V> {
      */
     <T> T unwrap(Class<T> clazz);
 
+    /**
+     * examples:
+     * <pre><code>
+     *   try(AutoReleaseLock lock = cache.tryLock("MyKey",100, TimeUnit.SECONDS)){
+     *      if(lock != null){
+     *          // do something
+     *      }
+     *   }
+     * </code></pre>
+     * @param key lockKey
+     * @param expire lock expire time
+     * @param timeUnit lock expire time unit
+     * @return an java.lang.AutoCloseable instance, or null if lock fail
+     */
+    AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit);
+
 }

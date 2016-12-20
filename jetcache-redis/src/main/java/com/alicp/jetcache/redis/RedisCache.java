@@ -10,6 +10,7 @@ import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -138,5 +139,10 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             logger.warn("jetcache(RedisCache) REMOVE error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
+    }
+
+    @Override
+    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        return null;
     }
 }

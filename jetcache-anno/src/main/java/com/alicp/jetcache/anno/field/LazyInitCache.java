@@ -148,4 +148,9 @@ class LazyInitCache implements ProxyCache {
         return cache.REMOVE(key);
     }
 
+    @Override
+    public AutoReleaseLock tryLock(Object key, long expire, TimeUnit timeUnit) {
+        checkInit();
+        return cache.tryLock(key, expire, timeUnit);
+    }
 }

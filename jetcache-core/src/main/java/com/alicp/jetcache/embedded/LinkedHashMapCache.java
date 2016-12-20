@@ -12,18 +12,18 @@ import java.util.Map;
 public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
 
-    public LinkedHashMapCache(EmbeddedCacheConfig config){
+    public LinkedHashMapCache(EmbeddedCacheConfig config) {
         super(config);
     }
 
     @Override
-    protected InnerMap createAreaCache(){
-        return new LRUMap(config.getLimit());
+    protected InnerMap createAreaCache() {
+        return new LRUMap(config.getLimit(), this);
     }
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        if(clazz.equals(LinkedHashMap.class)){
+        if (clazz.equals(LinkedHashMap.class)) {
             return (T) innerMap;
         }
         throw new IllegalArgumentException(clazz.getName());
@@ -32,10 +32,12 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
     private static final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
+        private Object lock;
 
-        public LRUMap(int max) {
+        public LRUMap(int max, Object lock) {
             super((int) (max * 1.4f), 0.75f, true);
             this.max = max;
+            this.lock = lock;
         }
 
         @Override
@@ -43,16 +45,22 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
             return size() > max;
         }
 
-        public synchronized Object getValue(Object key) {
-            return get(key);
+        public Object getValue(Object key) {
+            synchronized (lock) {
+                return get(key);
+            }
         }
 
-        public synchronized void putValue(Object key, Object value) {
-            put(key, value);
+        public void putValue(Object key, Object value) {
+            synchronized (lock) {
+                put(key, value);
+            }
         }
 
-        public synchronized boolean removeValue(Object key) {
-            return remove(key) != null;
+        public boolean removeValue(Object key) {
+            synchronized (lock) {
+                return remove(key) != null;
+            }
         }
     }
 

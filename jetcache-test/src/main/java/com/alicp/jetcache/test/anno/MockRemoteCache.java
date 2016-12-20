@@ -75,4 +75,9 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     public <T> T unwrap(Class<T> clazz) {
         return null;
     }
+
+    @Override
+    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        return null;
+    }
 }

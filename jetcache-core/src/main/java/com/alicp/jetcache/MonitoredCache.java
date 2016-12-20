@@ -113,4 +113,9 @@ public class MonitoredCache<K, V> implements WrapValueCache<K, V>, ProxyCache<K,
         monitor.afterINVALIDATE(t, key, result);
         return result;
     }
+
+    @Override
+    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        return cache.tryLock(key, expire, timeUnit);
+    }
 }
