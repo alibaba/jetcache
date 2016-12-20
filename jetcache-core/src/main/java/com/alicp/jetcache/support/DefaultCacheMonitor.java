@@ -96,7 +96,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
                 cacheStat.invalidateFailCount++;
                 break;
             default:
-                logger.warn("jetcache INVALIDATE return unexpected code: " + result.getResultCode());
+                logger.warn("jetcache REMOVE return unexpected code: " + result.getResultCode());
         }
     }
 

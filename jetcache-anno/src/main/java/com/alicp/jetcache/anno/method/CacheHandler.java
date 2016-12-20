@@ -133,7 +133,7 @@ public class CacheHandler implements InvocationHandler {
             context.result = invokeOrigin(context);
             if (canNotCache(context)) {
                 if (cacheGetResult.isSuccess()) {
-                    cache.invalidate(key);
+                    cache.remove(key);
                 }
             } else {
                 cache.put(key, context.result);
@@ -142,7 +142,7 @@ public class CacheHandler implements InvocationHandler {
             if (canNotCache(context)) {
                 context.result = invokeOrigin(context);//reload
                 if (canNotCache(context)) {//eval again
-                    cache.invalidate(key);
+                    cache.remove(key);
                 } else {// new result can cache, do update
                     cache.put(key, context.result);
                 }

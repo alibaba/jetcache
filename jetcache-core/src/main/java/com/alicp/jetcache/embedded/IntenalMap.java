@@ -11,5 +11,5 @@ public interface IntenalMap {
 
     void putValue(Object key, Object value);
 
-    void removeValue(Object key);
+    boolean removeValue(Object key);
 }

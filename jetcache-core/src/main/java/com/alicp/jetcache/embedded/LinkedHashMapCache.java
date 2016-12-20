@@ -42,8 +42,8 @@ public class LinkedHashMapCache extends AbstractEmbeddedCache {
             put(key, value);
         }
 
-        public synchronized void removeValue(Object key) {
-            remove(key);
+        public synchronized boolean removeValue(Object key) {
+            return remove(key) != null;
         }
     }
 

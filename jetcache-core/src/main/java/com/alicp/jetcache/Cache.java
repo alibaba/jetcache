@@ -89,10 +89,10 @@ public interface Cache<K, V> {
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
 
-    default void invalidate(K key) {
-        INVALIDATE(key);
+    default boolean remove(K key) {
+        return REMOVE(key).isSuccess();
     }
 
-    CacheResult INVALIDATE(K key);
+    CacheResult REMOVE(K key);
 
 }

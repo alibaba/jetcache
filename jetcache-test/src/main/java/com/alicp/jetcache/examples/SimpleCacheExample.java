@@ -21,7 +21,7 @@ public class SimpleCacheExample {
         Integer orderCount2 = cache.computeIfAbsent("20161212", SimpleCacheExample::loadFromDatabase);
         System.out.println(orderCount1);
         System.out.println(orderCount2);
-        cache.invalidate("20161212");
+        cache.remove("20161212");
     }
 
     private static Integer loadFromDatabase(String key) {

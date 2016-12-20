@@ -66,8 +66,8 @@ public abstract class AbstractCacheTest {
         }
 
 
-        //invalidate
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.INVALIDATE("BASE_K1").getResultCode());
+        //remove
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.REMOVE("BASE_K1").getResultCode());
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
 
         // null value

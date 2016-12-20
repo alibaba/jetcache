@@ -105,7 +105,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheResult INVALIDATE(K key) {
+    public CacheResult REMOVE(K key) {
         intenalMap.removeValue(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }

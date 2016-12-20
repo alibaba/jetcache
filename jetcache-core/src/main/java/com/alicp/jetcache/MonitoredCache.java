@@ -106,9 +106,9 @@ public class MonitoredCache<K, V> implements WrapValueCache<K, V>, ProxyCache<K,
     }
 
     @Override
-    public CacheResult INVALIDATE(K key) {
+    public CacheResult REMOVE(K key) {
         long t = System.currentTimeMillis();
-        CacheResult result = cache.INVALIDATE(key);
+        CacheResult result = cache.REMOVE(key);
         t = System.currentTimeMillis() - t;
         monitor.afterINVALIDATE(t, key, result);
         return result;

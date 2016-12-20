@@ -114,16 +114,20 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult INVALIDATE(K key) {
+    public CacheResult REMOVE(K key) {
         try (Jedis jedis = jedisPool.getResource()) {
             Long rt = jedis.del(buildKey(key));
-            if (rt != null && rt == 1) {
+            if (rt == null) {
+                return CacheResult.FAIL_WITHOUT_MSG;
+            } else if (rt == 1) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
+            } else if (rt == 0) {
+                return new CacheResult(CacheResultCode.NOT_EXISTS, null);
             } else {
                 return CacheResult.FAIL_WITHOUT_MSG;
             }
         } catch (Exception ex) {
-            logger.warn("jetcache(RedisCache) INVALIDATE error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logger.warn("jetcache(RedisCache) REMOVE error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }

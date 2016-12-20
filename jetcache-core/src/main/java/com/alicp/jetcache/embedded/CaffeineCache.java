@@ -37,8 +37,8 @@ public class CaffeineCache extends AbstractEmbeddedCache {
             }
 
             @Override
-            public void removeValue(Object key) {
-                cache.invalidate(key);
+            public boolean removeValue(Object key) {
+                return cache.asMap().remove(key) != null;
             }
         };
     }

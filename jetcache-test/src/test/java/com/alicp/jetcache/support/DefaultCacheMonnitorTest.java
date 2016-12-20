@@ -27,16 +27,16 @@ public class DefaultCacheMonnitorTest {
         cache.get("K1");
         cache.put("K1", "V1");
         cache.get("K1");
-        cache.invalidate("K1");
+        cache.remove("K1");
         cache.computeIfAbsent("K1", (k) -> null);
         cache.computeIfAbsent("K1", (k) -> null, true);
         cache.get("K1");
-        cache.invalidate("K1");
+        cache.remove("K1");
 
         cache.computeIfAbsent("K2", (k) -> null, false, 10, TimeUnit.SECONDS);
         cache.computeIfAbsent("K2", (k) -> null, true, 10, TimeUnit.SECONDS);
         cache.get("K2");
-        cache.invalidate("K2");
+        cache.remove("K2");
 
         CacheStat s = monitor.getCacheStat();
         Assert.assertEquals(8, s.getGetCount());

@@ -101,10 +101,10 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheResult INVALIDATE(K key) {
+    public CacheResult REMOVE(K key) {
         boolean fail = false;
         for (Cache cache : caches) {
-            CacheResult r = cache.INVALIDATE(key);
+            CacheResult r = cache.REMOVE(key);
             if (!r.isSuccess()) {
                 fail = true;
             }

@@ -125,7 +125,7 @@ public class StatInfoLogger implements Consumer<StatInfo> {
             sb.append(String.format("%,7d", s.getMinPutTime() == Long.MAX_VALUE ? 0 : s.getMinPutTime())).append('|');
             sb.append(String.format("%,7d", s.getMaxPutTime())).append('\n');
 
-            sb.append(String.format("%-10s", "invalidate")).append('|');
+            sb.append(String.format("%-10s", "remove")).append('|');
             sb.append(String.format("%,10.2f", s.invalidateTps())).append('|');
             sb.append(String.format("%,14d", s.getInvalidateCount())).append('|');
             sb.append(String.format("%,14d", s.getInvalidateSuccessCount())).append('|');

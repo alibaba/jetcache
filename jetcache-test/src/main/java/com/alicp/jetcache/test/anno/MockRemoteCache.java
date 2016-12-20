@@ -66,7 +66,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult INVALIDATE(K key) {
+    public CacheResult REMOVE(K key) {
         data.remove(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }

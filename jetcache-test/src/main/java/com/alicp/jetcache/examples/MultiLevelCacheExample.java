@@ -38,7 +38,7 @@ public class MultiLevelCacheExample {
         multiLevelCache.put("K1", "V1");
         multiLevelCache.put("K2", "V2", 20, TimeUnit.SECONDS);
         multiLevelCache.get("K1");
-        multiLevelCache.invalidate("K2");
+        multiLevelCache.remove("K2");
 
     }
 

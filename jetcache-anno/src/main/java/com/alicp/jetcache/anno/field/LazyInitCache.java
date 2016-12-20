@@ -137,15 +137,15 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
-    public void invalidate(Object key) {
+    public boolean remove(Object key) {
         checkInit();
-        cache.invalidate(key);
+        return cache.remove(key);
     }
 
     @Override
-    public CacheResult INVALIDATE(Object key) {
+    public CacheResult REMOVE(Object key) {
         checkInit();
-        return cache.INVALIDATE(key);
+        return cache.REMOVE(key);
     }
 
 }

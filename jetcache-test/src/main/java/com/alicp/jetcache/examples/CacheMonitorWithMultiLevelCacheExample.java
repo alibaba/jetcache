@@ -46,8 +46,8 @@ public class CacheMonitorWithMultiLevelCacheExample {
                 orderCache.put("20161111", 123456789);
                 orderCache.get("20161111");
                 orderCache.get("20161212");
-                orderCache.invalidate("20161111");
-                orderCache.invalidate("20161212");
+                orderCache.remove("20161111");
+                orderCache.remove("20161212");
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
