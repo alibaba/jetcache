@@ -58,26 +58,6 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
             lruTest();
         }
 
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
-        baseTest();
-        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
-        if(testLru) {
-            cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).softValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
-            lruTest();
-        }
-
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
-        baseTest();
-        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
-        if(testLru) {
-            cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
-                    .buildFunc(getBuildFunc()).weakValues().expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
-            lruTest();
-        }
-
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
         keyCoverterTest();
 

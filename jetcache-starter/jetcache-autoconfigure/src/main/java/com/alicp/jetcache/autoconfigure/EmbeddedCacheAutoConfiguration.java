@@ -22,10 +22,5 @@ public abstract class EmbeddedCacheAutoConfiguration extends AbstractCacheAutoCo
         EmbeddedCacheBuilder ecb = (EmbeddedCacheBuilder) builder;
 
         ecb.limit(Integer.parseInt(resolver.getProperty("limit", String.valueOf(CacheConsts.DEFAULT_LOCAL_LIMIT))));
-        if (Boolean.parseBoolean(resolver.getProperty("weakValues"))) {
-            ecb.weakValues();
-        } else if (Boolean.parseBoolean(resolver.getProperty("softValues"))) {
-            ecb.softValues();
-        }
     }
 }

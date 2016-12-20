@@ -5,8 +5,6 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
 
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -41,38 +39,12 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     @Override
     public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         Object newKey = buildKey(key);
-        CacheValueHolder<V> holder;
-        if (config.isWeakValues()) {
-            WeakReference<CacheValueHolder<V>> ref = (WeakReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
-            if (ref == null) {
-                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-            } else {
-                holder = ref.get();
-                if (holder == null) {
-                    return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "weak ref released");
-                } else {
-                    return getImpl(newKey, holder);
-                }
-            }
-        } else if (config.isSoftValues()) {
-            SoftReference<CacheValueHolder<V>> ref = (SoftReference<CacheValueHolder<V>>) intenalMap.getValue(newKey);
-            if (ref == null) {
-                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-            } else {
-                holder = ref.get();
-                if (holder == null) {
-                    return new CacheGetResult(CacheResultCode.NOT_EXISTS, null, "soft ref released");
-                } else {
-                    return getImpl(newKey, holder);
-                }
-            }
+
+        CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) intenalMap.getValue(newKey);
+        if (cacheObject == null) {
+            return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
         } else {
-            CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) intenalMap.getValue(newKey);
-            if (cacheObject == null) {
-                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-            } else {
-                return getImpl(newKey, cacheObject);
-            }
+            return getImpl(newKey, cacheObject);
         }
     }
 
@@ -92,15 +64,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-        if (config.isWeakValues()) {
-            WeakReference<CacheValueHolder<V>> ref = new WeakReference(cacheObject);
-            intenalMap.putValue(buildKey(key), ref);
-        } else if (config.isSoftValues()) {
-            SoftReference<CacheValueHolder<V>> ref = new SoftReference(cacheObject);
-            intenalMap.putValue(buildKey(key), ref);
-        } else {
-            intenalMap.putValue(buildKey(key), cacheObject);
-        }
+        intenalMap.putValue(buildKey(key), cacheObject);
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 

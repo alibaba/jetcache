@@ -31,7 +31,6 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .limit(100000)
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .softValues()
                 .buildCache();
     }
 
