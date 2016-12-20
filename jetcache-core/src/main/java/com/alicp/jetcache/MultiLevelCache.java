@@ -111,4 +111,9 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         }
         return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
     }
+
+    @Override
+    public <T> T unwrap(Class<T> clazz) {
+        throw new UnsupportedOperationException("unwrap is not supported by MultiLevelCache");
+    }
 }

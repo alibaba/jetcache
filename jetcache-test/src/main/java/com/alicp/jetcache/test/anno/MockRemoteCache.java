@@ -71,4 +71,8 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
+    @Override
+    public <T> T unwrap(Class<T> clazz) {
+        return null;
+    }
 }

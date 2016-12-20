@@ -47,6 +47,14 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         return config;
     }
 
+    @Override
+    public <T> T unwrap(Class<T> clazz) {
+        if(clazz.equals(JedisPool.class)){
+            return (T) jedisPool;
+        }
+        throw new IllegalArgumentException(clazz.getName());
+    }
+
     private byte[] buildKey(K key) throws UnsupportedEncodingException {
         Object newKey = keyConvertor.apply(key);
         if (newKey instanceof String) {

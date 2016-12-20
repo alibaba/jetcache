@@ -9,10 +9,20 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CaffeineCache extends AbstractEmbeddedCache {
+public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
+
+    private com.github.benmanes.caffeine.cache.Cache cache;
 
     public CaffeineCache(EmbeddedCacheConfig config) {
         super(config);
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> clazz) {
+        if (clazz.equals(com.github.benmanes.caffeine.cache.Cache.class)) {
+            return (T) cache;
+        }
+        throw new IllegalArgumentException(clazz.getName());
     }
 
     @Override
@@ -24,7 +34,7 @@ public class CaffeineCache extends AbstractEmbeddedCache {
         } else {
             builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
         }
-        com.github.benmanes.caffeine.cache.Cache cache = builder.build();
+        cache = builder.build();
         return new InnerMap() {
             @Override
             public Object getValue(Object key) {

@@ -13,7 +13,7 @@ import java.util.function.Function;
  */
 public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     protected EmbeddedCacheConfig config;
-    private InnerMap innerMap;
+    protected InnerMap innerMap;
 
     protected abstract InnerMap createAreaCache();
 

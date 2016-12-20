@@ -9,7 +9,8 @@ import java.util.Map;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LinkedHashMapCache extends AbstractEmbeddedCache {
+public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
+
 
     public LinkedHashMapCache(EmbeddedCacheConfig config){
         super(config);
@@ -18,6 +19,14 @@ public class LinkedHashMapCache extends AbstractEmbeddedCache {
     @Override
     protected InnerMap createAreaCache(){
         return new LRUMap(config.getLimit());
+    }
+
+    @Override
+    public <T> T unwrap(Class<T> clazz) {
+        if(clazz.equals(LinkedHashMap.class)){
+            return (T) innerMap;
+        }
+        throw new IllegalArgumentException(clazz.getName());
     }
 
     private static final class LRUMap extends LinkedHashMap implements InnerMap {
