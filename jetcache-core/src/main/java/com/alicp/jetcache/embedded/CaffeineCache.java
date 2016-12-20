@@ -16,7 +16,7 @@ public class CaffeineCache extends AbstractEmbeddedCache {
     }
 
     @Override
-    protected IntenalMap createAreaCache() {
+    protected InnerMap createAreaCache() {
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
         builder.maximumSize(config.getLimit());
         if (config.isExpireAfterAccess()) {
@@ -25,7 +25,7 @@ public class CaffeineCache extends AbstractEmbeddedCache {
             builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
         }
         com.github.benmanes.caffeine.cache.Cache cache = builder.build();
-        return new IntenalMap() {
+        return new InnerMap() {
             @Override
             public Object getValue(Object key) {
                 return cache.getIfPresent(key);

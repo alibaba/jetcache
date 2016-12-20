@@ -6,7 +6,7 @@ package com.alicp.jetcache.embedded;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public interface IntenalMap {
+public interface InnerMap {
     Object getValue(Object key);
 
     void putValue(Object key, Object value);

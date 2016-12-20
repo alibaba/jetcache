@@ -16,11 +16,11 @@ public class LinkedHashMapCache extends AbstractEmbeddedCache {
     }
 
     @Override
-    protected IntenalMap createAreaCache(){
+    protected InnerMap createAreaCache(){
         return new LRUMap(config.getLimit());
     }
 
-    private static final class LRUMap extends LinkedHashMap implements IntenalMap {
+    private static final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
 
