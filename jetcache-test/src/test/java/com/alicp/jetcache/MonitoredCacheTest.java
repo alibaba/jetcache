@@ -11,7 +11,7 @@ import org.junit.Test;
  */
 public class MonitoredCacheTest extends AbstractCacheTest {
     @Test
-    public void test(){
+    public void test() throws Exception {
         Cache target = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .buildCache();
         cache = new MonitoredCache(target, new CacheMonitor() {

@@ -94,7 +94,7 @@ public class CreateCacheTest extends SpringTest {
             }
 
             @PostConstruct
-            public void test() {
+            public void test() throws Exception {
                 super.cache = this.cache;
                 super.baseTest();
 

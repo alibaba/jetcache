@@ -1,5 +1,6 @@
 package com.alicp.jetcache.test;
 
+import com.alicp.jetcache.AutoReleaseLock;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.CacheResultCode;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class AbstractCacheTest {
     protected Cache<Object, Object> cache;
 
-    protected void baseTest() {
+    protected void baseTest() throws Exception {
         // get/put/get
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V1", 10, TimeUnit.SECONDS).getResultCode());
@@ -75,6 +76,17 @@ public abstract class AbstractCacheTest {
         CacheGetResult<Object> r = cache.GET("BASE_K2");
         Assert.assertTrue(r.isSuccess());
         Assert.assertNull(r.getValue());
+
+        //tryLock
+        try (AutoReleaseLock lock = cache.tryLock("LockKey1", 200, TimeUnit.MILLISECONDS)) {
+            Assert.assertNotNull(lock);
+            Assert.assertNull(cache.tryLock("LockKey1", 200, TimeUnit.MILLISECONDS));
+            Assert.assertNotNull(cache.tryLock("LockKey2", 200, TimeUnit.MILLISECONDS));
+        }
+        Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
+        Assert.assertNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
+        Thread.sleep(50);
+        Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
     }
 
 
