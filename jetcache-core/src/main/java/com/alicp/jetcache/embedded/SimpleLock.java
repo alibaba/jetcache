@@ -40,11 +40,7 @@ public class SimpleLock implements AutoReleaseLock {
     public void close() {
         long t = System.currentTimeMillis();
         if (t < expireTimestamp) {
-            synchronized (cache) {
-                if (cache.get(key) == this) {
-                    cache.remove(key);
-                }
-            }
+            cache.remove(key);
         }
     }
 }

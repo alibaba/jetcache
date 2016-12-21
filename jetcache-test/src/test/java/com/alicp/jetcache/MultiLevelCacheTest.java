@@ -62,7 +62,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     private void doTest() throws Exception {
         baseTest();
         expireAfterWriteTest(200);
-        concurrentTest(20, 1000, 3000);
+        concurrentTest(20, 3000);
 
         cache.put("K1", "V1");
         Thread.sleep(10);

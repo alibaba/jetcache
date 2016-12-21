@@ -67,6 +67,6 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
-        concurrentTest(thread, count, time);
+        concurrentTest(thread, time);
     }
 }

@@ -7,8 +7,10 @@ import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created on 2016/10/8.
@@ -154,11 +156,23 @@ public abstract class AbstractCacheTest {
 
     private volatile boolean cocurrentFail = false;
 
-    protected void concurrentTest(int threadCount, int count, int timeInMillis) throws Exception {
+
+    private volatile long lockCount1;
+    private volatile long lockCount2;
+    private volatile AtomicLong lockAtommicCount1;
+    private volatile AtomicLong lockAtommicCount2;
+
+    protected void concurrentTest(int threadCount, int timeInMillis) throws Exception {
+        int count = 100;
+        lockAtommicCount1 = new AtomicLong();
+        lockAtommicCount2 = new AtomicLong();
+        lockCount1 = 0;
+        lockCount2 = 0;
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         class T extends Thread {
             private String keyPrefix;
             private transient boolean stop;
+            private Random random = new Random();
 
             private T(String keyPrefix) {
                 this.keyPrefix = keyPrefix;
@@ -173,7 +187,8 @@ public abstract class AbstractCacheTest {
                             i = 0;
                         }
                         String key = keyPrefix + i;
-                        String value = i + "";
+                        Integer value = random.nextInt(10);
+
                         cache.PUT(key, value, 10000, TimeUnit.SECONDS);
                         CacheGetResult result = cache.GET(key);
                         if (result == null || result.getResultCode() != CacheResultCode.SUCCESS) {
@@ -186,6 +201,28 @@ public abstract class AbstractCacheTest {
                         } else if (!result.getValue().equals(value)) {
                             System.out.println("key:" + key + ",value:" + result.getValue());
                             cocurrentFail = true;
+                        }
+                        Assert.assertTrue(cache.remove(key));
+
+                        boolean b = random.nextBoolean();
+                        String lockKey = b ? "lock1" : "lock2";
+                        try(AutoReleaseLock lock = cache.tryLock(lockKey, 1, TimeUnit.SECONDS)){
+                            if (lock != null) {
+                                int x = random.nextInt(10);
+                                long y = b? lockCount1: lockCount2;
+                                String shareKey = lockKey + "_share";
+                                if (b) {
+                                    lockAtommicCount1.addAndGet(x);
+                                    cache.put(shareKey, i);
+                                    Assert.assertEquals(i, cache.get(shareKey));
+                                    lockCount1 = x + y;
+                                } else {
+                                    lockAtommicCount2.addAndGet(x);
+                                    cache.put(shareKey, i);
+                                    Assert.assertEquals(i, cache.get(shareKey));
+                                    lockCount2 = x + y;
+                                }
+                            }
                         }
                     }
                 } catch (Throwable e) {
@@ -209,8 +246,9 @@ public abstract class AbstractCacheTest {
         }
         countDownLatch.await();
 
-        if (cocurrentFail) {
-            Assert.fail();
-        }
+        Assert.assertEquals(lockAtommicCount1.get(), lockCount1);
+        Assert.assertEquals(lockAtommicCount2.get(), lockCount2);
+
+        Assert.assertFalse(cocurrentFail);
     }
 }
