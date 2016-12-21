@@ -18,6 +18,9 @@ public class FastjsonKeyConvertor implements Function<Object, Object> {
         if (originalKey instanceof String) {
             return originalKey;
         }
+        if (originalKey instanceof byte[]) {
+            return originalKey;
+        }
         return JSON.toJSONString(originalKey);
     }
 

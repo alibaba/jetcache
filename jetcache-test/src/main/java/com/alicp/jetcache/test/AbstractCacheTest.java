@@ -79,7 +79,10 @@ public abstract class AbstractCacheTest {
         Assert.assertTrue(r.isSuccess());
         Assert.assertNull(r.getValue());
 
-        //tryLock
+        lockTest();
+    }
+
+    protected void lockTest() throws Exception {
         try (AutoReleaseLock lock = cache.tryLock("LockKey1", 200, TimeUnit.MILLISECONDS)) {
             Assert.assertNotNull(lock);
             Assert.assertNull(cache.tryLock("LockKey1", 200, TimeUnit.MILLISECONDS));
@@ -206,10 +209,10 @@ public abstract class AbstractCacheTest {
 
                         boolean b = random.nextBoolean();
                         String lockKey = b ? "lock1" : "lock2";
-                        try(AutoReleaseLock lock = cache.tryLock(lockKey, 1, TimeUnit.SECONDS)){
+                        try (AutoReleaseLock lock = cache.tryLock(lockKey, 1, TimeUnit.SECONDS)) {
                             if (lock != null) {
                                 int x = random.nextInt(10);
-                                long y = b? lockCount1: lockCount2;
+                                long y = b ? lockCount1 : lockCount2;
                                 String shareKey = lockKey + "_share";
                                 if (b) {
                                     lockAtommicCount1.addAndGet(x);

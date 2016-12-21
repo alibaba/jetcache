@@ -56,23 +56,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         throw new IllegalArgumentException(clazz.getName());
     }
 
-    private byte[] buildKey(K key) throws UnsupportedEncodingException {
-        Object newKey = keyConvertor.apply(key);
-        if (newKey instanceof String) {
-            String s = config.getKeyPrefix() + newKey;
-            return s.getBytes("UTF-8");
-        } else if (newKey instanceof byte[]) {
-            byte[] bs1 = config.getKeyPrefix().getBytes("UTF-8");
-            byte[] bs2 = (byte[]) newKey;
-            byte[] rt = new byte[bs1.length + bs2.length];
-            System.arraycopy(bs1, 0, rt, 0, bs1.length);
-            System.arraycopy(bs2, 0, rt, bs1.length, bs2.length);
-            return rt;
-        } else {
-            throw new CacheException("type error");
-        }
-    }
-
     @Override
     public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         try (Jedis jedis = jedisPool.getResource()) {
