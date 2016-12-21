@@ -50,7 +50,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        if(clazz.equals(JedisPool.class)){
+        if (clazz.equals(JedisPool.class)) {
             return (T) jedisPool;
         }
         throw new IllegalArgumentException(clazz.getName());
@@ -77,22 +77,37 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
         try (Jedis jedis = jedisPool.getResource()) {
             byte[] newKey = buildKey(key);
-            Pipeline p = jedis.pipelined();
-            Response<byte[]> valueResp = p.get(newKey);
-            Response<Long> pttlResp = p.pttl(newKey);
-            p.sync();
-            if (valueResp.get() != null) {
-                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueResp.get());
-                Long restTtl = pttlResp.get();
-                if (restTtl != null) {
-                    holder.setExpireTime(System.currentTimeMillis() + restTtl);
+
+            if (!config.isExpireAfterAccess()) {
+                byte[] bytes = jedis.get(newKey);
+                if (bytes != null) {
+                    CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(bytes);
+                    if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                        return CacheGetResult.EXPIRED_WITHOUT_MSG;
+                    }
+                    return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
+                } else {
+                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
                 }
-                if (config.isExpireAfterAccess()) {
-                    jedis.pexpire(newKey, holder.getInitTtlInMillis());
-                }
-                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
             } else {
-                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+                Pipeline p = jedis.pipelined();
+                Response<byte[]> valueResp = p.get(newKey);
+                Response<Long> pttlResp = p.pttl(newKey);
+                p.sync();
+                if (valueResp.get() != null) {
+                    CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueResp.get());
+                    if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                        return CacheGetResult.EXPIRED_WITHOUT_MSG;
+                    }
+                    Long restTtl = pttlResp.get();
+                    if (restTtl != null) {
+                        holder.setExpireTime(System.currentTimeMillis() + restTtl);
+                    }
+                    jedis.pexpire(newKey, holder.getInitTtlInMillis());
+                    return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
+                } else {
+                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+                }
             }
         } catch (Exception ex) {
             logger.warn("jetcache(RedisCache) GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());

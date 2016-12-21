@@ -11,9 +11,6 @@ public class CacheValueHolder<V> {
     private long initTtlInMillis;
     private long expireTime;
 
-    public CacheValueHolder(){
-    }
-
     public CacheValueHolder(V value, long createTime, long initTtlInMillis){
         this.value = value;
         this.createTime = createTime;
