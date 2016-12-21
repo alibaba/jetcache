@@ -28,7 +28,7 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
         }
     }
 
-    protected byte[] buildKey(K key) {
+    protected byte[] buildKey(Object key) {
         try {
             Object newKey = config.getKeyConvertor().apply(key);
             if (newKey instanceof String) {

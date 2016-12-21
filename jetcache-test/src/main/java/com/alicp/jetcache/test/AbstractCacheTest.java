@@ -83,9 +83,9 @@ public abstract class AbstractCacheTest {
     }
 
     protected void lockTest() throws Exception {
-        try (AutoReleaseLock lock = cache.tryLock("LockKey1", 200, TimeUnit.MILLISECONDS)) {
+        try (AutoReleaseLock lock = cache.tryLock("LockKey1", 200, TimeUnit.HOURS)) {
             Assert.assertNotNull(lock);
-            Assert.assertNull(cache.tryLock("LockKey1", 200, TimeUnit.MILLISECONDS));
+            Assert.assertNull(cache.tryLock("LockKey1", 200, TimeUnit.HOURS));
             Assert.assertNotNull(cache.tryLock("LockKey2", 200, TimeUnit.MILLISECONDS));
         }
         Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));

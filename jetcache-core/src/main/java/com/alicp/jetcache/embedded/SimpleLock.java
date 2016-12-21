@@ -25,10 +25,10 @@ public class SimpleLock implements AutoReleaseLock {
     public static SimpleLock tryLock(Cache cache, Object key, long expire, TimeUnit timeUnit) {
         long expireTimestamp = System.currentTimeMillis() + timeUnit.toMillis(expire);
         synchronized (cache) {
-            SimpleLock fromCache = (SimpleLock) cache.get(key);
+            Object fromCache = cache.get(key);
             if (fromCache == null) {
                 SimpleLock lock = new SimpleLock(cache, key, expireTimestamp);
-                cache.put(key, lock, expire, timeUnit);
+                cache.put(key, Boolean.TRUE, expire, timeUnit);
                 return lock;
             } else {
                 return null;

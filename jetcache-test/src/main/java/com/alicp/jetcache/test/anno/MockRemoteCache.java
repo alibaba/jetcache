@@ -6,6 +6,7 @@ package com.alicp.jetcache.test.anno;
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.method.SerializeUtil;
+import com.alicp.jetcache.embedded.SimpleLock;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 
 import java.util.HashMap;
@@ -31,18 +32,18 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         return config().getKeyConvertor().apply(key);
     }
 
-    public CacheGetResult<V> GET(K key) {
+    public synchronized CacheGetResult<V> GET(K key) {
         CacheResultCode code;
         V value = null;
         try {
             CacheValueHolder<byte[]> holder = data.get(buildKey(key));
             if (holder != null) {
                 long expireTime = holder.getExpireTime();
-                if (System.currentTimeMillis() > expireTime) {
+                if (System.currentTimeMillis() >= expireTime) {
                     code = CacheResultCode.EXPIRED;
                 } else {
                     code = CacheResultCode.SUCCESS;
-                    value = (V) SerializeUtil.decode(holder.getValue());
+                    value = (V) config.getValueDecoder().apply(holder.getValue());
                 }
             } else {
                 code = CacheResultCode.NOT_EXISTS;
@@ -54,9 +55,9 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+    public synchronized CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try {
-            byte[] bytes = SerializeUtil.encode(value, CacheConsts.DEFAULT_SERIAL_POLICY);
+            byte[] bytes = config.getValueEncoder().apply(value);
             CacheValueHolder<byte[]> v = new CacheValueHolder(bytes, System.currentTimeMillis(), timeUnit.toMillis(expire));
             data.put(buildKey(key), v);
             return CacheResult.SUCCESS_WITHOUT_MSG;
@@ -66,7 +67,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult REMOVE(K key) {
+    public synchronized CacheResult REMOVE(K key) {
         data.remove(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
@@ -78,6 +79,6 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        return null;
+        return SimpleLock.tryLock(this, key, expire, timeUnit);
     }
 }
