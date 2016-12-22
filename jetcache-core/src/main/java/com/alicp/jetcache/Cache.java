@@ -15,7 +15,8 @@ public interface Cache<K, V> {
 
     Logger CACHE_INTERNAL_LOGGER = LoggerFactory.getLogger(Cache.class);
 
-    CacheConfig config();
+
+    //-----------------------------JSR 107 API------------------------------------------------
 
     default V get(K key) {
         try {
@@ -30,6 +31,49 @@ public interface Cache<K, V> {
             return null;
         }
     }
+
+    default void put(K key, V value) {
+        PUT(key, value);
+    }
+
+    default boolean remove(K key) {
+        return REMOVE(key).isSuccess();
+    }
+
+    /**
+     * Provides a standard way to access the underlying concrete cache entry
+     * implementation in order to provide access to further, proprietary features.
+     * <p>
+     * If the provider's implementation does not support the specified class,
+     * the {@link IllegalArgumentException} is thrown.
+     *
+     * @param clazz the proprietary class or interface of the underlying
+     *              concrete cache. It is this type that is returned.
+     * @return an instance of the underlying concrete cache
+     * @throws IllegalArgumentException if the caching provider doesn't support
+     *                                  the specified class.
+     */
+    <T> T unwrap(Class<T> clazz);
+
+    //--------------------------JetCache API---------------------------------------------
+
+    CacheConfig config();
+
+    /**
+     * examples:
+     * <pre><code>
+     *   try(AutoReleaseLock lock = cache.tryLock("MyKey",100, TimeUnit.SECONDS)){
+     *      if(lock != null){
+     *          // do something
+     *      }
+     *   }
+     * </code></pre>
+     * @param key lockKey
+     * @param expire lock expire time
+     * @param timeUnit lock expire time unit
+     * @return an java.lang.AutoCloseable instance, or null if lock fail
+     */
+    AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit);
 
     CacheGetResult<V> GET(K key);
 
@@ -75,10 +119,6 @@ public interface Cache<K, V> {
         }
     }
 
-    default void put(K key, V value) {
-        PUT(key, value);
-    }
-
     default void put(K key, V value, long expire, TimeUnit timeUnit) {
         PUT(key, value, expire, timeUnit);
     }
@@ -89,41 +129,7 @@ public interface Cache<K, V> {
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
 
-    default boolean remove(K key) {
-        return REMOVE(key).isSuccess();
-    }
-
     CacheResult REMOVE(K key);
 
-    /**
-     * Provides a standard way to access the underlying concrete cache entry
-     * implementation in order to provide access to further, proprietary features.
-     * <p>
-     * If the provider's implementation does not support the specified class,
-     * the {@link IllegalArgumentException} is thrown.
-     *
-     * @param clazz the proprietary class or interface of the underlying
-     *              concrete cache. It is this type that is returned.
-     * @return an instance of the underlying concrete cache
-     * @throws IllegalArgumentException if the caching provider doesn't support
-     *                                  the specified class.
-     */
-    <T> T unwrap(Class<T> clazz);
-
-    /**
-     * examples:
-     * <pre><code>
-     *   try(AutoReleaseLock lock = cache.tryLock("MyKey",100, TimeUnit.SECONDS)){
-     *      if(lock != null){
-     *          // do something
-     *      }
-     *   }
-     * </code></pre>
-     * @param key lockKey
-     * @param expire lock expire time
-     * @param timeUnit lock expire time unit
-     * @return an java.lang.AutoCloseable instance, or null if lock fail
-     */
-    AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit);
 
 }
