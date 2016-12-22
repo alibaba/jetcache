@@ -153,4 +153,16 @@ class LazyInitCache implements ProxyCache {
         checkInit();
         return cache.tryLock(key, expire, timeUnit);
     }
+
+    @Override
+    public boolean putIfAbsent(Object key, Object value) {
+        checkInit();
+        return cache.putIfAbsent(key, value);
+    }
+
+    @Override
+    public CacheResult PUT_IF_ABSENT(Object key, Object value, long expire, TimeUnit timeUnit) {
+        checkInit();
+        return cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
+    }
 }

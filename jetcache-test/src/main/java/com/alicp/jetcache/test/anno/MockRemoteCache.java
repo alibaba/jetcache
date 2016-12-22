@@ -28,7 +28,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         return config;
     }
 
-    private Object buildKey(K key){
+    private Object buildKey(K key) {
         return config().getKeyConvertor().apply(key);
     }
 
@@ -80,5 +80,15 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
         return SimpleLock.tryLock(this, key, expire, timeUnit);
+    }
+
+    @Override
+    public synchronized CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        if (get(key) == null) {
+            put(key, value, expire, timeUnit);
+            return CacheResult.SUCCESS_WITHOUT_MSG;
+        } else {
+            return CacheResult.EXISTS_WITHOUT_MSG;
+        }
     }
 }

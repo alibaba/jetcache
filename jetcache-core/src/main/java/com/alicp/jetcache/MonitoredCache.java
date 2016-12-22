@@ -118,4 +118,13 @@ public class MonitoredCache<K, V> implements WrapValueCache<K, V>, ProxyCache<K,
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
         return cache.tryLock(key, expire, timeUnit);
     }
+
+    @Override
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        long t = System.currentTimeMillis();
+        CacheResult result = cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
+        t = System.currentTimeMillis() - t;
+        monitor.afterPUT(t, key, value, result);
+        return result;
+    }
 }

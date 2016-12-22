@@ -12,4 +12,6 @@ public interface InnerMap {
     void putValue(Object key, Object value);
 
     boolean removeValue(Object key);
+
+    boolean putIfAbsentValue(Object key, Object value);
 }

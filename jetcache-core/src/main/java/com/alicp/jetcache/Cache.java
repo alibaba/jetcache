@@ -36,6 +36,11 @@ public interface Cache<K, V> {
         PUT(key, value);
     }
 
+    default boolean putIfAbsent(K key, V value){
+        CacheResult result = PUT_IF_ABSENT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        return result.getResultCode() == CacheResultCode.SUCCESS;
+    }
+
     default boolean remove(K key) {
         return REMOVE(key).isSuccess();
     }
@@ -131,5 +136,17 @@ public interface Cache<K, V> {
 
     CacheResult REMOVE(K key);
 
+    /**
+     * If the specified key is not already associated
+     * with a value, associate it with the given value.
+     * @param key
+     * @param value
+     * @param expire
+     * @param timeUnit
+     * @return SUCCESS if the specified key is not already associated with a value,
+     *         or EXISTS if the specified key is not already associated with a value,
+     *         or FAIL if error occurs.
+     */
+    CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit);
 
 }

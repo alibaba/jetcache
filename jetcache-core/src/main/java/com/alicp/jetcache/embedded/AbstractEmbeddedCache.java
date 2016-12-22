@@ -27,7 +27,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         return config;
     }
 
-    private Object buildKey(K key) {
+    protected Object buildKey(K key) {
         Object newKey = key;
         Function<Object, Object> keyConvertor = config.getKeyConvertor();
         if (keyConvertor != null) {
@@ -76,7 +76,16 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        return SimpleLock.tryLock(this, key, expire, timeUnit);
+        return SimpleLock.tryLock(this, buildKey(key), expire, timeUnit);
     }
 
+    @Override
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+        if (innerMap.putIfAbsentValue(buildKey(key), cacheObject)) {
+            return CacheResult.SUCCESS_WITHOUT_MSG;
+        } else {
+            return CacheResult.EXISTS_WITHOUT_MSG;
+        }
+    }
 }

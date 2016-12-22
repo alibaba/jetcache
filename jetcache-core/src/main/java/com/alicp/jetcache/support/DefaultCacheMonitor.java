@@ -77,6 +77,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
             case FAIL:
                 cacheStat.putFailCount++;
                 break;
+            case EXISTS:
+                break;
             default:
                 logger.warn("jetcache PUT return unexpected code: " + result.getResultCode());
         }

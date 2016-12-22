@@ -121,4 +121,14 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
         return caches[caches.length - 1].tryLock(key, expire, timeUnit);
     }
+
+    @Override
+    public boolean putIfAbsent(K key, V value) {
+        throw new UnsupportedOperationException("putIfAbsent is not supported by MultiLevelCache");
+    }
+
+    @Override
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        throw new UnsupportedOperationException("PUT_IF_ABSENT is not supported by MultiLevelCache");
+    }
 }

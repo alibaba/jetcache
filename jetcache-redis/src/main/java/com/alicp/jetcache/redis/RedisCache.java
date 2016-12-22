@@ -171,7 +171,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
                 try {
                     byte[] bs = jedis.get(newKey);
-                    if (bs!=null && uuid.equals(new String(bs))) {
+                    if (bs != null && uuid.equals(new String(bs))) {
                         logger.info("successful get lock {} after put failure, uuid={}", key, uuid);
                         return lock;
                     } else {
@@ -185,6 +185,25 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         } catch (Exception ex) {
             logger.warn("jetcache(RedisCache) tryLock error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        try (Jedis jedis = jedisPool.getResource()) {
+            CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+            byte[] newKey = buildKey(key);
+            String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expire));
+            if ("OK".equals(rt)) {
+                return CacheResult.SUCCESS_WITHOUT_MSG;
+            } else if (rt == null) {
+                return CacheResult.EXISTS_WITHOUT_MSG;
+            } else {
+                return new CacheResult(CacheResultCode.FAIL, rt);
+            }
+        } catch (Exception ex) {
+            logger.warn("jetcache(RedisCache) PUT_IF_ABSENT error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }
 }

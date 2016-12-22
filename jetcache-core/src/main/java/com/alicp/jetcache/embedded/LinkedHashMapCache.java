@@ -62,6 +62,18 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
                 return remove(key) != null;
             }
         }
+
+        @Override
+        public boolean putIfAbsentValue(Object key, Object value) {
+            synchronized (lock) {
+                if (get(key) == null) {
+                    put(key, value);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
     }
 
 

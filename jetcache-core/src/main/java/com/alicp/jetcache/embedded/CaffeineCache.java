@@ -50,6 +50,11 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
             public boolean removeValue(Object key) {
                 return cache.asMap().remove(key) != null;
             }
+
+            @Override
+            public boolean putIfAbsentValue(Object key, Object value) {
+                return cache.asMap().putIfAbsent(key, value) == null;
+            }
         };
     }
 }
