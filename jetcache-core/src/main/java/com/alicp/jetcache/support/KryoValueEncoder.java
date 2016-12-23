@@ -28,12 +28,21 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 
     @Override
     public byte[] apply(Object value) {
-        Kryo kryo = kryoThreadLocal.get();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
-        Output output = new Output(bos);
-        output.writeInt(IDENTITY_NUMBER);
-        kryo.writeClassAndObject(output, value);
-        output.close();
-        return bos.toByteArray();
+        try {
+            Kryo kryo = kryoThreadLocal.get();
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
+            Output output = new Output(bos);
+            output.writeInt(IDENTITY_NUMBER);
+            kryo.writeClassAndObject(output, value);
+            output.close();
+            return bos.toByteArray();
+        } catch (Exception e) {
+            StringBuilder sb = new StringBuilder("Kryo Encode error.");
+            if (value != null) {
+                sb.append("class=").append(value.getClass().getName()).append('.');
+            }
+            sb.append("msg=").append(e.getMessage());
+            throw new CacheEncodeException(sb.toString(), e);
+        }
     }
 }

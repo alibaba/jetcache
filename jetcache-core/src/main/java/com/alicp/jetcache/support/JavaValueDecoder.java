@@ -22,7 +22,7 @@ public class JavaValueDecoder extends AbstractValueDecoder {
             ObjectInputStream ois = new ObjectInputStream(in);
             return ois.readObject();
         } catch (Exception e) {
-            throw new CacheException("Java decode error: " + e.getMessage(), e);
+            throw new CacheEncodeException("Java decode error: " + e.getMessage(), e);
         }
     }
 }

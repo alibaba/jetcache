@@ -15,10 +15,14 @@ public class FastjsonValueDecoder extends AbstractValueDecoder {
 
     @Override
     public Object apply(byte[] buffer) {
-        //noinspection deprecation
-        checkHeader(buffer, FastjsonValueEncoder.IDENTITY_NUMBER);
-        byte[] bs = new byte[buffer.length - 4];
-        System.arraycopy(buffer, 4, bs, 0, bs.length);
-        return JSON.parse(bs);
+        try {
+            //noinspection deprecation
+            checkHeader(buffer, FastjsonValueEncoder.IDENTITY_NUMBER);
+            byte[] bs = new byte[buffer.length - 4];
+            System.arraycopy(buffer, 4, bs, 0, bs.length);
+            return JSON.parse(bs);
+        } catch (Exception e) {
+            throw new CacheEncodeException("Fastjson decode error: " + e.getMessage(), e);
+        }
     }
 }

@@ -16,10 +16,14 @@ public class KryoValueDecoder extends AbstractValueDecoder {
 
     @Override
     public Object apply(byte[] buffer) {
-        checkHeader(buffer, KryoValueEncoder.IDENTITY_NUMBER);
-        ByteArrayInputStream in = new ByteArrayInputStream(buffer, 4, buffer.length - 4);
-        Input input = new Input(in);
-        Kryo kryo = KryoValueEncoder.kryoThreadLocal.get();
-        return kryo.readClassAndObject(input);
+        try {
+            checkHeader(buffer, KryoValueEncoder.IDENTITY_NUMBER);
+            ByteArrayInputStream in = new ByteArrayInputStream(buffer, 4, buffer.length - 4);
+            Input input = new Input(in);
+            Kryo kryo = KryoValueEncoder.kryoThreadLocal.get();
+            return kryo.readClassAndObject(input);
+        } catch (Exception e) {
+            throw new CacheEncodeException("Kryo decode error: " + e.getMessage(), e);
+        }
     }
 }
