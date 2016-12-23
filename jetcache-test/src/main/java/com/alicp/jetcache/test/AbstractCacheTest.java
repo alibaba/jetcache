@@ -1,9 +1,6 @@
 package com.alicp.jetcache.test;
 
-import com.alicp.jetcache.AutoReleaseLock;
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheGetResult;
-import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
@@ -31,44 +28,6 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V2", 10, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals("V2", cache.GET("BASE_K1").getValue());
 
-        //computeIfAbsent
-        {
-            cache.computeIfAbsent("BASE_K1", k -> {
-                throw new RuntimeException();
-            });
-            Assert.assertEquals("AAA", cache.computeIfAbsent("NOT_EXIST_1", k -> "AAA"));
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> null));
-            final Object[] invoked = new Object[1];
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_2", k -> {
-                invoked[0] = new Object();
-                return null;
-            }));
-            Assert.assertNotNull(invoked[0]);
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> null, true));
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_3", k -> {
-                throw new RuntimeException();
-            }, true));
-        }
-
-        {
-            cache.computeIfAbsent("BASE_K1", k -> {
-                throw new RuntimeException();
-            }, false, 1, TimeUnit.MINUTES);
-            Assert.assertEquals("AAA", cache.computeIfAbsent("NOT_EXIST_11", k -> "AAA", false, 1, TimeUnit.MINUTES));
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_22", k -> null, false, 1, TimeUnit.MINUTES));
-            final Object[] invoked = new Object[1];
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_33", k -> {
-                invoked[0] = new Object();
-                return null;
-            }));
-            Assert.assertNotNull(invoked[0]);
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_33", k -> null, true, 1, TimeUnit.MINUTES));
-            Assert.assertNull(cache.computeIfAbsent("NOT_EXIST_33", k -> {
-                throw new RuntimeException();
-            }, true, 1, TimeUnit.MINUTES));
-        }
-
-
         //remove
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.REMOVE("BASE_K1").getResultCode());
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
@@ -79,7 +38,71 @@ public abstract class AbstractCacheTest {
         Assert.assertTrue(r.isSuccess());
         Assert.assertNull(r.getValue());
 
+        computeIfAbsentTest();
         lockTest();
+        putIfAbsentTest();
+    }
+
+    private boolean isMultiLevelCache() {
+        Cache c = cache;
+        while (c instanceof ProxyCache) {
+            c = ((ProxyCache) c).getTargetCache();
+        }
+        return c instanceof MultiLevelCache;
+    }
+
+    private void putIfAbsentTest() {
+        if (isMultiLevelCache()) {
+            return;
+        }
+        Assert.assertTrue(cache.putIfAbsent("PIA_K1", "V1"));
+        Assert.assertFalse(cache.putIfAbsent("PIA_K1", "V1"));
+        Assert.assertEquals("V1", cache.get("PIA_K1"));
+
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
+        Assert.assertEquals(CacheResultCode.EXISTS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
+        Assert.assertEquals("V2", cache.get("PIA_K2"));
+    }
+
+    private void computeIfAbsentTest() {
+        //computeIfAbsent
+        {
+            cache.put("CIA_K1", "V");
+            cache.computeIfAbsent("CIA_K1", k -> {
+                throw new RuntimeException();
+            });
+            Assert.assertEquals("AAA", cache.computeIfAbsent("CIA_NOT_EXIST_1", k -> "AAA"));
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_2", k -> null));
+            final Object[] invoked = new Object[1];
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_2", k -> {
+                invoked[0] = new Object();
+                return null;
+            }));
+            Assert.assertNotNull(invoked[0]);
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_3", k -> null, true));
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_3", k -> {
+                throw new RuntimeException();
+            }, true));
+        }
+
+        {
+            cache.put("CIA_K2", "V");
+            cache.computeIfAbsent("CIA_K2", k -> {
+                throw new RuntimeException();
+            }, false, 1, TimeUnit.MINUTES);
+            Assert.assertEquals("AAA", cache.computeIfAbsent("CIA_NOT_EXIST_11", k -> "AAA", false, 1, TimeUnit.MINUTES));
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_22", k -> null, false, 1, TimeUnit.MINUTES));
+            final Object[] invoked = new Object[1];
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_22", k -> {
+                invoked[0] = new Object();
+                return null;
+            }));
+            Assert.assertNotNull(invoked[0]);
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_33", k -> null, true, 1, TimeUnit.MINUTES));
+            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_33", k -> {
+                throw new RuntimeException();
+            }, true, 1, TimeUnit.MINUTES));
+        }
     }
 
     protected void lockTest() throws Exception {
@@ -160,8 +183,8 @@ public abstract class AbstractCacheTest {
     private volatile boolean cocurrentFail = false;
 
 
-    private volatile long lockCount1;
-    private volatile long lockCount2;
+    private volatile AtomicLong lockCount1;
+    private volatile AtomicLong lockCount2;
     private volatile AtomicLong lockAtommicCount1;
     private volatile AtomicLong lockAtommicCount2;
 
@@ -169,8 +192,8 @@ public abstract class AbstractCacheTest {
         int count = 100;
         lockAtommicCount1 = new AtomicLong();
         lockAtommicCount2 = new AtomicLong();
-        lockCount1 = 0;
-        lockCount2 = 0;
+        lockCount1 = new AtomicLong();
+        lockCount2 = new AtomicLong();
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         class T extends Thread {
             private String keyPrefix;
@@ -207,24 +230,33 @@ public abstract class AbstractCacheTest {
                         }
                         Assert.assertTrue(cache.remove(key));
 
+                        cache.putIfAbsent(String.valueOf(i), i);
+
                         boolean b = random.nextBoolean();
-                        String lockKey = b ? "lock1" : "lock2";
+                        String lockKey = b ? "locka" : "lockb";
                         try (AutoReleaseLock lock = cache.tryLock(lockKey, 1, TimeUnit.SECONDS)) {
                             if (lock != null) {
                                 int x = random.nextInt(10);
-                                long y = b ? lockCount1 : lockCount2;
+                                AtomicLong lockAtomicCount = b ? lockAtommicCount1 : lockAtommicCount2;
+                                AtomicLong lockCount = b ? lockCount1 : lockCount2;
                                 String shareKey = lockKey + "_share";
-                                if (b) {
-                                    lockAtommicCount1.addAndGet(x);
-                                    cache.put(shareKey, i);
-                                    Assert.assertEquals(i, cache.get(shareKey));
-                                    lockCount1 = x + y;
+
+                                lockAtomicCount.addAndGet(x);
+
+                                Object o = cache.get(shareKey);
+                                boolean putSuccess = cache.putIfAbsent(shareKey, x);
+                                if (o != null) {
+                                    Assert.assertFalse(putSuccess);
                                 } else {
-                                    lockAtommicCount2.addAndGet(x);
-                                    cache.put(shareKey, i);
-                                    Assert.assertEquals(i, cache.get(shareKey));
-                                    lockCount2 = x + y;
+                                    Assert.assertTrue(putSuccess);
+                                    Assert.assertEquals(x, cache.get(shareKey));
                                 }
+                                if (x < 5) {
+                                    Assert.assertTrue(cache.remove(x));
+                                }
+
+                                lockCount.set(lockCount.get() + x);
+
                             }
                         }
                     }
@@ -249,8 +281,8 @@ public abstract class AbstractCacheTest {
         }
         countDownLatch.await();
 
-        Assert.assertEquals(lockAtommicCount1.get(), lockCount1);
-        Assert.assertEquals(lockAtommicCount2.get(), lockCount2);
+        Assert.assertEquals(lockAtommicCount1.get(), lockCount1.get());
+        Assert.assertEquals(lockAtommicCount2.get(), lockCount2.get());
 
         Assert.assertFalse(cocurrentFail);
     }
