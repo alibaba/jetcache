@@ -1,9 +1,7 @@
 package com.alicp.jetcache.redis;
 
+import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
-import com.alicp.jetcache.support.KryoValueDecoder;
-import com.alicp.jetcache.support.KryoValueEncoder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
 import redis.clients.jedis.JedisPool;
@@ -28,8 +26,8 @@ public class RedisCacheTest extends AbstractCacheTest {
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .valueEncoder(KryoValueEncoder.INSTANCE)
-                .valueDecoder(KryoValueDecoder.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)

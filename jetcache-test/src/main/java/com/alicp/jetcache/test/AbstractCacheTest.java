@@ -1,16 +1,14 @@
 package com.alicp.jetcache.test;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
+import java.io.Serializable;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Function;
 
 /**
  * Created on 2016/10/8.
@@ -44,6 +42,7 @@ public abstract class AbstractCacheTest {
         computeIfAbsentTest();
         lockTest();
         putIfAbsentTest();
+        complextValueTest();
     }
 
     private boolean isMultiLevelCache() {
@@ -110,6 +109,62 @@ public abstract class AbstractCacheTest {
         }
     }
 
+
+    static class A implements Serializable {
+        private static final long serialVersionUID = 1692575072446353143L;
+
+        public A(){
+        }
+        int id;
+        String name;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public int hashCode() {
+            return id;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            return ((A) obj).id == id;
+        }
+    }
+    private void complextValueTest() {
+        A a1 = new A();
+        A a2 = new A();
+        A a3 = new A();
+        a1.id = 100;
+        a2.id = 100;
+        a3.id = 101;
+        a1.name = "N1";
+        a1.name = "N2";
+        a1.name = "N3";
+
+        cache.put("CVT_K1", a1);
+        A fromCache = (A) cache.get("CVT_K1");
+        Assert.assertEquals(a2, fromCache);
+        Assert.assertNotEquals(a3, fromCache);
+
+    }
+
     protected void lockTest() throws Exception {
         try (AutoReleaseLock lock = cache.tryLock("LockKey1", 200, TimeUnit.HOURS)) {
             Assert.assertNotNull(lock);
@@ -121,7 +176,6 @@ public abstract class AbstractCacheTest {
         Thread.sleep(50);
         Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
     }
-
 
     protected void expireAfterWriteTest(long ttl) throws InterruptedException {
         cache.put("EXPIRE_W_K1", "V1");

@@ -1,11 +1,14 @@
 package com.alicp.jetcache;
 
+import java.io.Serializable;
+
 /**
  * Created on 16/9/13.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheValueHolder<V> {
+public class CacheValueHolder<V> implements Serializable {
+    private static final long serialVersionUID = -7973743507831565203L;
     private V value;
     private long createTime;
     private long initTtlInMillis;
