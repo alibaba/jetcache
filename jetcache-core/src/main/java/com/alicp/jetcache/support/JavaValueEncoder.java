@@ -30,10 +30,7 @@ public class JavaValueEncoder extends AbstractValueEncoder {
             oos.flush();
             return bos.toByteArray();
         } catch (IOException e) {
-            StringBuilder sb = new StringBuilder("Java Encode error.");
-            if (value != null) {
-                sb.append("class=").append(value.getClass().getName()).append('.');
-            }
+            StringBuilder sb = new StringBuilder("Java Encode error. ");
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
         }

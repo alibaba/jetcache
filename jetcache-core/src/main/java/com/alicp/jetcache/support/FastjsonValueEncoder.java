@@ -25,10 +25,7 @@ public class FastjsonValueEncoder extends AbstractValueEncoder {
             System.arraycopy(bs1, 0, bs2, 4, bs1.length);
             return bs2;
         } catch (Exception e) {
-            StringBuilder sb = new StringBuilder("Fastjson Encode error.");
-            if (value != null) {
-                sb.append("class=").append(value.getClass().getName()).append('.');
-            }
+            StringBuilder sb = new StringBuilder("Fastjson Encode error. ");
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
         }
