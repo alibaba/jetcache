@@ -1,6 +1,8 @@
 package com.alicp.jetcache.test;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
@@ -8,6 +10,7 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
  * Created on 2016/10/8.
@@ -58,10 +61,12 @@ public abstract class AbstractCacheTest {
         Assert.assertTrue(cache.putIfAbsent("PIA_K1", "V1"));
         Assert.assertFalse(cache.putIfAbsent("PIA_K1", "V1"));
         Assert.assertEquals("V1", cache.get("PIA_K1"));
+        Assert.assertTrue(cache.remove("PIA_K1"));
 
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals(CacheResultCode.EXISTS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals("V2", cache.get("PIA_K2"));
+        Assert.assertTrue(cache.remove("PIA_K2"));
     }
 
     private void computeIfAbsentTest() {
@@ -230,7 +235,9 @@ public abstract class AbstractCacheTest {
                         }
                         Assert.assertTrue(cache.remove(key));
 
-                        cache.putIfAbsent(String.valueOf(i), i);
+                        if (!isMultiLevelCache()) {
+                            cache.putIfAbsent(String.valueOf(i), i);
+                        }
 
                         boolean b = random.nextBoolean();
                         String lockKey = b ? "locka" : "lockb";
@@ -243,16 +250,11 @@ public abstract class AbstractCacheTest {
 
                                 lockAtomicCount.addAndGet(x);
 
-                                Object o = cache.get(shareKey);
-                                boolean putSuccess = cache.putIfAbsent(shareKey, x);
-                                if (o != null) {
-                                    Assert.assertFalse(putSuccess);
-                                } else {
-                                    Assert.assertTrue(putSuccess);
-                                    Assert.assertEquals(x, cache.get(shareKey));
-                                }
-                                if (x < 5) {
-                                    Assert.assertTrue(cache.remove(x));
+                                cache.put(shareKey, x);
+                                Assert.assertEquals(x, cache.get(shareKey));
+                                Assert.assertTrue(cache.remove(shareKey));
+                                if (b) {
+                                    putIfAbsentTest();
                                 }
 
                                 lockCount.set(lockCount.get() + x);
