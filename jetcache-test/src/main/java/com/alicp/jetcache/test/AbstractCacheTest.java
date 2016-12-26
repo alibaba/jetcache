@@ -295,7 +295,7 @@ public abstract class AbstractCacheTest {
 
                         boolean b = random.nextBoolean();
                         String lockKey = b ? "locka" : "lockb";
-                        try (AutoReleaseLock lock = cache.tryLock(lockKey, 1, TimeUnit.SECONDS)) {
+                        try (AutoReleaseLock lock = cache.tryLock(lockKey, 10, TimeUnit.SECONDS)) {
                             if (lock != null) {
                                 int x = random.nextInt(10);
                                 AtomicLong lockAtomicCount = b ? lockAtommicCount1 : lockAtommicCount2;

@@ -21,15 +21,15 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     private WrapValueCache<Object, Object> l1Cache;
     private WrapValueCache<Object, Object> l2Cache;
 
-    private void initL1L2(){
+    private void initL1L2(int expireMillis) {
         l1Cache = (AbstractCache<Object, Object>) CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
         l2Cache = (AbstractCache<Object, Object>) LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(100000)
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
     }
@@ -37,12 +37,34 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     @Test
     public void test() throws Exception {
 
-        initL1L2();
+        initL1L2(200);
         cache = new MultiLevelCache(l1Cache, l2Cache);
-        doTest();
+        doTest(200);
+
+        initL1L2(2000);
+        cache = new MultiLevelCache(l1Cache, l2Cache);
+        concurrentTest(200, 3000);
 
 
-        initL1L2();
+        doMonitoredTest(200, () -> {
+            try {
+                doTest(200);
+            } catch (Exception e) {
+                Assert.fail();
+            }
+        });
+
+        doMonitoredTest(2000, () -> {
+            try {
+                concurrentTest(200, 3000);
+            } catch (Exception e) {
+                Assert.fail();
+            }
+        });
+    }
+
+    private void doMonitoredTest(int expireMillis, Runnable test) {
+        initL1L2(expireMillis);
         DefaultCacheMonitor m1 = new DefaultCacheMonitor("l1");
         DefaultCacheMonitor m1_again = new DefaultCacheMonitor("l1_monitor_again");
         DefaultCacheMonitor m2 = new DefaultCacheMonitor("l2");
@@ -55,14 +77,15 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, true);
         logger.add(m1, m1_again, m2, mc);
         logger.start();
-        doTest();
+
+        test.run();
+
         logger.stop();
     }
 
-    private void doTest() throws Exception {
+    private void doTest(int expireMillis) throws Exception {
         baseTest();
-        expireAfterWriteTest(200);
-        concurrentTest(20, 3000);
+        expireAfterWriteTest(expireMillis);
 
         cache.put("K1", "V1");
         Thread.sleep(10);
