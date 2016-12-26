@@ -39,9 +39,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <!--
+                <![CDATA[
                 usage: mvn --batch-mode release:update-versions -DdevelopmentVersion=2.0.2-SNAPSHOT
-                -->
+                ]]>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
