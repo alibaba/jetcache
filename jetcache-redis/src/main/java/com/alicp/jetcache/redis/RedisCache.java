@@ -87,7 +87,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 }
             }
         } catch (Exception ex) {
-            logger.warn("jetcache(RedisCache) GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logError("GET", key, ex);
             return new CacheGetResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
     }
@@ -104,7 +104,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 return new CacheResult(CacheResultCode.FAIL, rt);
             }
         } catch (Exception ex) {
-            logger.warn("jetcache(RedisCache) PUT error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logError("PUT", key, ex);
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }
@@ -127,7 +127,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 return CacheResult.FAIL_WITHOUT_MSG;
             }
         } catch (Exception ex) {
-            logger.warn("jetcache(RedisCache) REMOVE error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logError("REMOVE", key, ex);
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }
@@ -183,7 +183,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 }
             }
         } catch (Exception ex) {
-            logger.warn("jetcache(RedisCache) tryLock error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logError("tryLock", key, ex);
             return null;
         }
     }
@@ -202,7 +202,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 return new CacheResult(CacheResultCode.FAIL, rt);
             }
         } catch (Exception ex) {
-            logger.warn("jetcache(RedisCache) PUT_IF_ABSENT error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logError("PUT_IF_ABSENT", key, ex);
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
     }
