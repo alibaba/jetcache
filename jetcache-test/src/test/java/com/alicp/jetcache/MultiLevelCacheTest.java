@@ -89,12 +89,31 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         baseTest();
         expireAfterWriteTest(expireMillis);
 
-        cache.put("K1", "V1");
+        cache.put("KK1", "V1");
         Thread.sleep(15);
-        l1Cache.remove("K1");
-        Assert.assertEquals("V1", cache.get("K1"));
-        CacheGetResult<CacheValueHolder<Object>> h1 = ((AbstractCache) l1Cache).getHolder("K1");
-        CacheGetResult<CacheValueHolder<Object>> h2 = ((AbstractCache) l2Cache).getHolder("K1");
-        Assert.assertEquals(h1.getValue().getExpireTime(), h2.getValue().getExpireTime());
+        l1Cache.remove("KK1");
+        Assert.assertEquals("V1", cache.get("KK1"));
+
+        AbstractCache c1 = getAbstractCache(l1Cache);
+        AbstractCache c2 = getAbstractCache(l2Cache);
+
+        CacheGetResult<CacheValueHolder<Object>> r1 = c1.getHolder("KK1");
+        CacheGetResult<CacheValueHolder<Object>> r2 = c2.getHolder("KK1");
+
+        long x = r1.getValue().getExpireTime() - r2.getValue().getExpireTime();
+        if (Math.abs(x) > 10) {
+            CacheValueHolder h1 = r1.getValue();
+            CacheValueHolder h2 = r2.getValue();
+            System.out.println(h1.getCreateTime() + "," + h1.getExpireTime() + "," + ((CacheValueHolder) h1.getValue()).getCreateTime() + "," + ((CacheValueHolder) h1.getValue()).getExpireTime());
+            System.out.println(h2.getCreateTime() + "," + h2.getExpireTime() + "," + ((CacheValueHolder) h2.getValue()).getCreateTime() + "," + ((CacheValueHolder) h2.getValue()).getExpireTime());
+            Assert.fail();
+        }
+    }
+
+    private AbstractCache getAbstractCache(Cache c) {
+        while(c instanceof MonitoredCache){
+            c = ((MonitoredCache) c).getTargetCache();
+        }
+        return (AbstractCache) c;
     }
 }
