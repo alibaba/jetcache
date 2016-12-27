@@ -14,6 +14,9 @@ public class CacheValueHolder<V> implements Serializable {
     private long initTtlInMillis;
     private long expireTime;
 
+    /**
+     * used by kyro
+     */
     public CacheValueHolder(){
     }
 
