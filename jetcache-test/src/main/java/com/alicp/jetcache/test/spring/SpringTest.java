@@ -50,17 +50,11 @@ public class SpringTest implements ApplicationContextAware {
     }
 
     private void testTestBean(TestBean bean) {
-        int x1;
-        int x2;
-        int x3;
         Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
-        x1 = bean.count();
-        x2 = bean.count();
-        Assert.assertEquals(x1, x2);
-
-        x1 = bean.countWithDisabledCache();
-        x2 = bean.countWithDisabledCache();
-        Assert.assertNotEquals(x1, x2);
+        Assert.assertEquals(bean.count(), bean.count());
+        Assert.assertEquals(bean.countWithLocalCache(), bean.countWithLocalCache());
+        Assert.assertEquals(bean.countWithBoth(), bean.countWithBoth());
+        Assert.assertNotEquals(bean.countWithDisabledCache(), bean.countWithDisabledCache());
 
 
         DynamicQuery q1 = new DynamicQuery();
@@ -72,23 +66,18 @@ public class SpringTest implements ApplicationContextAware {
         DynamicQuery q3 = new DynamicQuery();
         q3.setId(1000);
         q3.setName("N1");
+        int x1;
+        int x2;
+        int x3;
         x1 = bean.count(q1);
         x2 = bean.count(q2);
         x3 = bean.count(q3);
         Assert.assertNotEquals(x1, x2);
         Assert.assertEquals(x1, x3);
 
-        x1 = bean.countEnabledWithConfigBean();
-        x2 = bean.countEnabledWithConfigBean();
-        Assert.assertEquals(x1, x2);
-
-        x1 = bean.countDisabledWithConfigBean();
-        x2 = bean.countDisabledWithConfigBean();
-        Assert.assertNotEquals(x1, x2);
-
-        x1 = bean.countWithWrongCondition();
-        x2 = bean.countWithWrongCondition();
-        Assert.assertNotEquals(x1, x2);
+        Assert.assertEquals(bean.countEnabledWithConfigBean(), bean.countEnabledWithConfigBean());
+        Assert.assertNotEquals(bean.countDisabledWithConfigBean(), bean.countDisabledWithConfigBean());
+        Assert.assertNotEquals(bean.countWithWrongCondition(), bean.countWithWrongCondition());
 
         Assert.assertEquals(bean.count(true), bean.count(true));
         Assert.assertNotEquals(bean.count(false), bean.count(false));

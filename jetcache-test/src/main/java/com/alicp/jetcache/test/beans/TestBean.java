@@ -29,6 +29,17 @@ public class TestBean {
         return count++;
     }
 
+    @Cached(cacheType = CacheType.LOCAL)
+    public int countWithLocalCache(){
+        return count++;
+    }
+
+    @Cached(cacheType = CacheType.BOTH)
+    public int countWithBoth(){
+        return count++;
+    }
+
+
     @Cached(enabled = false)
     public int countWithDisabledCache(){
         return count++;
