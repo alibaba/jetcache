@@ -18,16 +18,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class MultiLevelCacheTest extends AbstractCacheTest {
 
-    private WrapValueCache<Object, Object> l1Cache;
-    private WrapValueCache<Object, Object> l2Cache;
+    private Cache<Object, Object> l1Cache;
+    private Cache<Object, Object> l2Cache;
 
     private void initL1L2(int expireMillis) {
-        l1Cache = (AbstractCache<Object, Object>) CaffeineCacheBuilder.createCaffeineCacheBuilder()
+        l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
-        l2Cache = (AbstractCache<Object, Object>) LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
+        l2Cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(100000)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
@@ -50,6 +50,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
             try {
                 doTest(200);
             } catch (Exception e) {
+                e.printStackTrace();
                 Assert.fail();
             }
         });
@@ -58,6 +59,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
             try {
                 concurrentTest(200, 3000);
             } catch (Exception e) {
+                e.printStackTrace();
                 Assert.fail();
             }
         });
@@ -88,11 +90,11 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         expireAfterWriteTest(expireMillis);
 
         cache.put("K1", "V1");
-        Thread.sleep(10);
+        Thread.sleep(15);
         l1Cache.remove("K1");
         Assert.assertEquals("V1", cache.get("K1"));
-        CacheGetResult<CacheValueHolder<Object>> h1 = l1Cache.__GET_HOLDER("K1");
-        CacheGetResult<CacheValueHolder<Object>> h2 = l2Cache.__GET_HOLDER("K1");
+        CacheGetResult<CacheValueHolder<Object>> h1 = ((AbstractCache) l1Cache).getHolder("K1");
+        CacheGetResult<CacheValueHolder<Object>> h2 = ((AbstractCache) l2Cache).getHolder("K1");
         Assert.assertEquals(h1.getValue().getExpireTime(), h2.getValue().getExpireTime());
     }
 }

@@ -37,7 +37,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
+    protected CacheGetResult<CacheValueHolder<V>> getHolder(K key) {
         Object newKey = buildKey(key);
 
         CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) innerMap.getValue(newKey);

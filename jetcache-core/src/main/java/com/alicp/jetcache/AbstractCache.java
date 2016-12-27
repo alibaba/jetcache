@@ -9,15 +9,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractCache<K, V> implements Cache<K, V>, WrapValueCache<K, V> {
+public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
+
+    protected abstract CacheGetResult<CacheValueHolder<V>> getHolder(K key);
 
     @Override
     public CacheGetResult<V> GET(K key) {
         CacheGetResult<V> result;
         try {
-            CacheGetResult<CacheValueHolder<V>> holderResult = __GET_HOLDER(key);
+            CacheGetResult<CacheValueHolder<V>> holderResult = getHolder(key);
             result = (CacheGetResult<V>) holderResult;
             if (holderResult.getValue() != null) {
                 result.setValue(holderResult.getValue().getValue());

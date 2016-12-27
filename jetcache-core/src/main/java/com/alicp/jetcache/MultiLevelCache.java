@@ -10,15 +10,10 @@ import java.util.concurrent.TimeUnit;
 public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     private Cache[] caches;
-    private boolean[] canGetHolder;
 
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
         this.caches = caches;
-        canGetHolder = new boolean[caches.length];
-        for (int i = 0; i < caches.length; i++) {
-            canGetHolder[i] = isWrap(caches[i]);
-        }
     }
 
     public Cache[] caches() {
@@ -30,32 +25,17 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         return null;
     }
 
-    private boolean isWrap(Cache c) {
-        if (c instanceof ProxyCache) {
-            return isWrap(((ProxyCache) c).getTargetCache());
-        }
-        if (c instanceof WrapValueCache) {
-            return true;
-        }
-        return false;
-    }
-
     @Override
-    public CacheGetResult<CacheValueHolder<V>> __GET_HOLDER(K key) {
+    protected CacheGetResult<CacheValueHolder<V>> getHolder(K key) {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
-            CacheGetResult<CacheValueHolder<V>> r1;
-            if (canGetHolder[i]) {
-                r1 = ((WrapValueCache) cache).__GET_HOLDER(key);
-            } else {
-                r1 = cache.GET(key);
-            }
+            CacheGetResult<CacheValueHolder<V>> r1 = cache.GET(key);
             if (r1.isSuccess() && r1.getValue() != null) {
-                Object cacheValue = r1.getValue();
-                CacheValueHolder<V> h = (CacheValueHolder<V>) cacheValue;
+                CacheValueHolder<V> h = r1.getValue();
+                long currentExpire = h.getExpireTime();
                 long now = System.currentTimeMillis();
-                if (now <= h.getExpireTime()) {
-                    long restTtl = h.getExpireTime() - now; // !!!!!!!!!!!!!
+                if (now <= currentExpire) {
+                    long restTtl = currentExpire - now;
                     if (restTtl > 0) {
                         PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
                     }
@@ -80,19 +60,13 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         boolean fail = false;
         for (int i = 0; i < lastIndex; i++) {
-            CacheResult r1;
             Cache cache = caches[i];
             if (useDefaultExpire) {
                 expire = cache.config().getDefaultExpireInMillis();
                 timeUnit = TimeUnit.MILLISECONDS;
             }
-            if (canGetHolder[i]) {
-                r1 = cache.PUT(key, value, expire, timeUnit);
-            } else {
-                CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-                r1 = cache.PUT(key, h, expire, timeUnit);
-            }
-            CacheResult r = r1;
+            CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+            CacheResult r = cache.PUT(key, h, expire, timeUnit);
             if (!r.isSuccess()) {
                 fail = true;
             }
