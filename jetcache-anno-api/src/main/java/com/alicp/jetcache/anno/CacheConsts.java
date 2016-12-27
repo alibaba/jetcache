@@ -10,7 +10,7 @@ public interface CacheConsts {
     String DEFAULT_AREA = "default";
     String DEFAULT_NAME = "";
     boolean DEFAULT_ENABLED = true;
-    int DEFAULT_EXPIRE = 600;
+    int DEFAULT_EXPIRE = Integer.MAX_VALUE;
     CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;
     int DEFAULT_LOCAL_LIMIT = 100;
     boolean DEFAULT_CACHE_NULL_VALUE = false;

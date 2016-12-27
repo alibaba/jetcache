@@ -10,7 +10,7 @@ import java.util.function.Function;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheConfig implements Cloneable {
-    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000;
+    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
     private boolean expireAfterAccess = false;
     private Function<Object,Object> keyConvertor;
 

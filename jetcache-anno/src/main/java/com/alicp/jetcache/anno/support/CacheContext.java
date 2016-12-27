@@ -132,7 +132,7 @@ public class CacheContext {
         if (cacheBuilder == null) {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in remoteCacheFacotories");
         }
-        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
         cacheBuilder.setKeyPrefix(prefix);
         cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
         cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cacheAnnoConfig.getSerialPolicy()));
@@ -151,7 +151,7 @@ public class CacheContext {
             throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in localCacheFactory");
         }
         cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
-        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000);
+        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
         cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
         cache = cacheBuilder.buildCache();
         return cache;
