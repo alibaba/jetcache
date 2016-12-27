@@ -74,6 +74,7 @@ public class CacheInterceptorTest {
                     allowing(mi).getArguments();
                     will(Expectations.returnValue(null));
                     oneOf(mi).proceed();
+                    will(Expectations.returnValue(new Integer(100)));
                 } catch (Throwable e) {
                     Assert.fail();
                 }
@@ -113,9 +114,11 @@ public class CacheInterceptorTest {
                     allowing(mi).getArguments();
                     will(Expectations.returnValue(null));
                     oneOf(mi).proceed();
+                    will(Expectations.returnValue(new Integer(100)));
                     oneOf(mi).proceed();
-
+                    will(Expectations.returnValue(new Integer(100)));
                     oneOf(mi).proceed();
+                    will(Expectations.returnValue(new Integer(100)));
                 } catch (Throwable e) {
                     Assert.fail();
                 }

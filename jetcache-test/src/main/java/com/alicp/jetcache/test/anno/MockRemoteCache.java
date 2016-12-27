@@ -49,6 +49,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
                 code = CacheResultCode.NOT_EXISTS;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             code = CacheResultCode.FAIL;
         }
         return new CacheGetResult(code, null, value);
@@ -62,6 +63,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
             data.put(buildKey(key), v);
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception e) {
+            e.printStackTrace();
             return CacheResult.FAIL_WITHOUT_MSG;
         }
     }
