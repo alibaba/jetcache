@@ -7,7 +7,7 @@ import java.io.Serializable;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheValueHolder<V> implements Serializable {
+public final class CacheValueHolder<V> implements Serializable {
     private static final long serialVersionUID = -7973743507831565203L;
     private V value;
     private long createTime;
@@ -17,7 +17,7 @@ public class CacheValueHolder<V> implements Serializable {
     /**
      * used by kyro
      */
-    public CacheValueHolder(){
+    public CacheValueHolder() {
     }
 
     public CacheValueHolder(V value, long createTime, long initTtlInMillis){
