@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostP
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -32,6 +33,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  */
+@Component
 public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor {
 
     private static Logger logger = LoggerFactory.getLogger(CreateCacheAnnotationBeanPostProcessor.class);
@@ -98,7 +100,7 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
             final LinkedList<InjectionMetadata.InjectedElement> currElements =
                     new LinkedList<InjectionMetadata.InjectedElement>();
 
-            ReflectionUtils.doWithLocalFields(targetClass, new ReflectionUtils.FieldCallback() {
+            doWithLocalFields(targetClass, new ReflectionUtils.FieldCallback() {
                 @Override
                 public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
                     CreateCache ann = field.getAnnotation(CreateCache.class);
@@ -120,6 +122,17 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
         while (targetClass != null && targetClass != Object.class);
 
         return new InjectionMetadata(clazz, elements);
+    }
+
+    private void doWithLocalFields(Class clazz, ReflectionUtils.FieldCallback fieldCallback) {
+        Field fs[] = clazz.getDeclaredFields();
+        for (Field field : fs) {
+            try {
+                fieldCallback.doWith(field);
+            } catch (IllegalAccessException ex) {
+                throw new IllegalStateException("Not allowed to access field '" + field.getName() + "': " + ex);
+            }
+        }
     }
 
 

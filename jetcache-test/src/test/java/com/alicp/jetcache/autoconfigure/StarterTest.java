@@ -5,8 +5,10 @@ import com.alicp.jetcache.test.spring.SpringTest;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import org.junit.Test;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -14,7 +16,9 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-@SpringBootApplication(scanBasePackages = "com.alicp.jetcache.test.beans")
+@Configuration
+@EnableAutoConfiguration
+@ComponentScan("com.alicp.jetcache.test.beans")
 @EnableMethodCache(basePackages = "com.alicp.jetcache.test.beans")
 public class StarterTest extends SpringTest {
 
