@@ -2,6 +2,7 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.CacheBuilder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +13,11 @@ import java.util.Map;
  */
 public class AutoConfigureBeans {
 
-    private Map<String, CacheBuilder> localCacheBuilders = new HashMap();
+    private Map<String, CacheBuilder> localCacheBuilders = new HashMap<>();
 
-    private Map<String, CacheBuilder> remoteCacheBuilders = new HashMap();
+    private Map<String, CacheBuilder> remoteCacheBuilders = new HashMap<>();
+
+    private Map<String, Object> customContainer = Collections.synchronizedMap(new HashMap<>());
 
     public Map<String, CacheBuilder> getLocalCacheBuilders() {
         return localCacheBuilders;
@@ -30,5 +33,13 @@ public class AutoConfigureBeans {
 
     public void setRemoteCacheBuilders(Map<String, CacheBuilder> remoteCacheBuilders) {
         this.remoteCacheBuilders = remoteCacheBuilders;
+    }
+
+    public Map<String, Object> getCustomContainer() {
+        return customContainer;
+    }
+
+    public void setCustomContainer(Map<String, Object> customContainer) {
+        this.customContainer = customContainer;
     }
 }

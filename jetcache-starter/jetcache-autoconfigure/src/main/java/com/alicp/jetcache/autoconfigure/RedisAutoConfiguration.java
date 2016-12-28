@@ -5,17 +5,14 @@ import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.MutablePropertyValues;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.bind.RelaxedDataBinder;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Protocol;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,12 +28,8 @@ public class RedisAutoConfiguration extends ExternalCacheAutoConfiguration {
         super("redis");
     }
 
-    private Map jedisPools = Collections.synchronizedMap(new HashMap<>());
-
-    @Bean
-    public Map<String, JedisPool> jedisPools(){
-        return jedisPools;
-    }
+    @Autowired
+    private AutoConfigureBeans autoConfigureBeans;
 
     @Override
     protected CacheBuilder initCache(RelaxedPropertyResolver r, String cacheAreaWithPrefix) {
@@ -61,7 +54,8 @@ public class RedisAutoConfiguration extends ExternalCacheAutoConfiguration {
                 .jedisPool(jedisPool);
         parseGeneralConfig(externalCacheBuilder, r);
 
-        jedisPools.put(cacheAreaWithPrefix, jedisPool);
+        autoConfigureBeans.getCustomContainer().put("jedisPool." + cacheAreaWithPrefix, jedisPool);
+
         return externalCacheBuilder;
     }
 
