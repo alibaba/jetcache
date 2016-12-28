@@ -1,5 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +32,6 @@ public class JetCacheAutoConfiguration {
     @Autowired
     private JetCacheProperties props;
 
-    private Map localCacheBuilders = new HashMap<>();
-
-    private Map remoteCacheBuilders = new HashMap<>();
-
     @Bean
     @ConditionalOnMissingBean
     public SpringConfigProvider springConfigProvider() {
@@ -42,24 +39,19 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean
-    public GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider) {
+    public AutoConfigureBeans autoConfigureBeans(){
+        return new AutoConfigureBeans();
+    }
+
+    @Bean
+    public GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider,AutoConfigureBeans autoConfigureBeans) {
         GlobalCacheConfig c = new GlobalCacheConfig();
         c.setConfigProvider(configProvider);
         c.setHiddenPackages(props.getHidePackages());
         c.setStatIntervalMinutes(props.getStatIntervalMinutes());
-        c.setLocalCacheBuilders(localCacheBuilders);
-        c.setRemoteCacheBuilders(remoteCacheBuilders);
+        c.setLocalCacheBuilders(autoConfigureBeans.getLocalCacheBuilders());
+        c.setRemoteCacheBuilders(autoConfigureBeans.getRemoteCacheBuilders());
         return c;
-    }
-
-    @Bean
-    public Map localCacheBuilders() {
-        return localCacheBuilders;
-    }
-
-    @Bean
-    public Map remoteCacheBuilders() {
-        return remoteCacheBuilders;
     }
 
 }

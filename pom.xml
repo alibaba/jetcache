@@ -71,8 +71,14 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <spring.framework.version>4.3.4.RELEASE</spring.framework.version>
-        <spring.boot.version>1.4.2.RELEASE</spring.boot.version>
+        <!--
+        <spring.framework.version>4.3.5.RELEASE</spring.framework.version>
+        <spring.boot.version>1.4.3.RELEASE</spring.boot.version>
+        -->
+
+        <spring.framework.version>4.2.8.RELEASE</spring.framework.version>
+        <spring.boot.version>1.3.8.RELEASE</spring.boot.version>
+
     </properties>
 
     <dependencyManagement>
@@ -110,6 +116,7 @@
                 <artifactId>spring-boot-starter</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+            <!--
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
@@ -120,6 +127,7 @@
                 <artifactId>spring-boot-test-autoconfigure</artifactId>
                 <version>${spring.boot.version}</version>
             </dependency>
+            -->
 
             <dependency>
                 <groupId>com.alibaba</groupId>

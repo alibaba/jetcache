@@ -28,10 +28,7 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
     protected ApplicationContext applicationContext;
 
     @Autowired
-    protected Map localCacheBuilders;
-
-    @Autowired
-    protected Map remoteCacheBuilders;
+    protected AutoConfigureBeans autoConfigureBeans;
 
     @Autowired
     protected ConfigProvider configProvider;
@@ -49,8 +46,8 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
 
     @PostConstruct
     public void init() {
-        process("jetcache.local.", localCacheBuilders, true);
-        process("jetcache.remote.", remoteCacheBuilders, false);
+        process("jetcache.local.", autoConfigureBeans.getLocalCacheBuilders(), true);
+        process("jetcache.remote.", autoConfigureBeans.getRemoteCacheBuilders(), false);
     }
 
     private void process(String prefix, Map cacheBuilders, boolean local) {
