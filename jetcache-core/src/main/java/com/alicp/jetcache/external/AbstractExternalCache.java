@@ -4,7 +4,9 @@ import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created on 2016/10/8.
@@ -31,21 +33,42 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
     protected byte[] buildKey(Object key) {
         try {
             Object newKey = config.getKeyConvertor().apply(key);
-            if (newKey instanceof String) {
-                String s = config.getKeyPrefix() + newKey;
-                return s.getBytes("UTF-8");
-            } else if (newKey instanceof byte[]) {
-                byte[] bs1 = config.getKeyPrefix().getBytes("UTF-8");
-                byte[] bs2 = (byte[]) newKey;
-                byte[] rt = new byte[bs1.length + bs2.length];
-                System.arraycopy(bs1, 0, rt, 0, bs1.length);
-                System.arraycopy(bs2, 0, rt, bs1.length, bs2.length);
-                return rt;
-            } else {
-                throw new CacheException("type error");
-            }
-        } catch (UnsupportedEncodingException e) {
+            return buildKeyImpl(newKey, config.getKeyPrefix());
+        } catch (IOException e) {
             throw new CacheException(e);
         }
+    }
+
+    static byte[] buildKeyImpl(Object newKey, String prefix) throws IOException {
+        if (newKey == null) {
+            throw new NullPointerException("key can't be null");
+        }
+        byte[] keyBytesWithOutPrefix = null;
+        if (newKey instanceof String) {
+            keyBytesWithOutPrefix = newKey.toString().getBytes("UTF-8");
+        } else if (newKey instanceof byte[]) {
+            keyBytesWithOutPrefix = (byte[]) newKey;
+        } else if (newKey instanceof Number) {
+            keyBytesWithOutPrefix = (newKey.getClass().getSimpleName() + newKey).getBytes("UTF-8");
+        } else if (newKey instanceof Date) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss,SSS");
+            keyBytesWithOutPrefix = (newKey.getClass().getSimpleName() + sdf.format(newKey)).getBytes();
+        } else if (newKey instanceof Boolean) {
+            keyBytesWithOutPrefix = newKey.toString().getBytes("UTF-8");
+        } else if (newKey instanceof Serializable) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(bos);
+            os.writeObject(newKey);
+            os.close();
+            bos.close();
+            keyBytesWithOutPrefix = bos.toByteArray();
+        } else {
+            throw new CacheException("type error");
+        }
+        byte[] prefixBytes = prefix.getBytes("UTF-8");
+        byte[] rt = new byte[prefixBytes.length + keyBytesWithOutPrefix.length];
+        System.arraycopy(prefixBytes, 0, rt, 0, prefixBytes.length);
+        System.arraycopy(keyBytesWithOutPrefix, 0, rt, prefixBytes.length, keyBytesWithOutPrefix.length);
+        return rt;
     }
 }
