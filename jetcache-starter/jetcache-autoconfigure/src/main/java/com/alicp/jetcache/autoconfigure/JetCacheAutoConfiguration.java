@@ -42,7 +42,7 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean
-    public GlobalCacheConfig globalCacheConfig(@Autowired SpringConfigProvider configProvider) {
+    public GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider) {
         GlobalCacheConfig c = new GlobalCacheConfig();
         c.setConfigProvider(configProvider);
         c.setHiddenPackages(props.getHidePackages());

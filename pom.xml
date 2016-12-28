@@ -70,6 +70,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
+
+        <spring.framework.version>4.3.4.RELEASE</spring.framework.version>
+        <spring.boot.version>1.4.2.RELEASE</spring.boot.version>
     </properties>
 
     <dependencyManagement>
@@ -89,37 +92,33 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <!--<version>3.1.4.RELEASE</version>-->
-                <!--<version>3.2.17.RELEASE</version>-->
-                <version>4.3.4.RELEASE</version>
+                <version>${spring.framework.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
-                <!--<version>3.1.4.RELEASE</version>-->
-                <!--<version>3.2.17.RELEASE</version>-->
-                <version>4.3.4.RELEASE</version>
+                <version>${spring.framework.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
-                <version>1.4.2.RELEASE</version>
+                <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter</artifactId>
-                <version>1.4.2.RELEASE</version>
+                <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>1.4.2.RELEASE</version>
+                <version>${spring.boot.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test-autoconfigure</artifactId>
-                <version>1.4.2.RELEASE</version>
+                <version>${spring.boot.version}</version>
             </dependency>
 
             <dependency>

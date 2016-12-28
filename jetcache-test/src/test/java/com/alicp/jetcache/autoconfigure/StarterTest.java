@@ -26,7 +26,7 @@ public class StarterTest extends SpringTest {
 
     @Configuration
     public static class A {
-        @Bean("factoryBeanTarget")
+        @Bean(name = "factoryBeanTarget")
         public MyFactoryBean factoryBean() {
             return new MyFactoryBean();
         }

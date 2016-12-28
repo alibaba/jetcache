@@ -55,12 +55,12 @@ public class CreateCacheTest extends SpringTest {
         }
 
         @Bean
-        public GlobalCacheConfig config(@Autowired SpringConfigProvider configProvider) {
+        public GlobalCacheConfig config(SpringConfigProvider configProvider) {
             GlobalCacheConfig pc = TestUtil.createGloableConfig(configProvider);
             return pc;
         }
 
-        @Bean("factoryBeanTarget")
+        @Bean(name = "factoryBeanTarget")
         public MyFactoryBean factoryBean() {
             return new MyFactoryBean();
         }
