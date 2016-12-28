@@ -22,6 +22,8 @@ import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.Map;
@@ -77,7 +79,7 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
                 metadata = this.injectionMetadataCache.get(cacheKey);
                 if (InjectionMetadata.needsRefresh(metadata, clazz)) {
                     if (metadata != null) {
-                        metadata.clear(pvs);
+                        clear(metadata, pvs);
                     }
                     try {
                         metadata = buildAutowiringMetadata(clazz);
@@ -90,6 +92,31 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
             }
         }
         return metadata;
+    }
+
+    private volatile boolean clearInited = false;
+    private Method cleanMethod;
+
+    /**
+     * clear method not found in Spring 4.0.
+     * @param obj
+     * @param param
+     */
+    private void clear(InjectionMetadata obj, PropertyValues param) {
+        if(!clearInited){
+            try {
+                cleanMethod = InjectionMetadata.class.getMethod("clear", PropertyValues.class);
+            } catch (NoSuchMethodException e) {
+            }
+            clearInited = true;
+        }
+        if (cleanMethod != null) {
+            try {
+                cleanMethod.invoke(obj, param);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new IllegalStateException(e);
+            }
+        }
     }
 
     private InjectionMetadata buildAutowiringMetadata(final Class<?> clazz) {
