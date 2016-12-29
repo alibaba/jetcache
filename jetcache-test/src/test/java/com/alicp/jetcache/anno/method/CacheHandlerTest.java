@@ -5,6 +5,8 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.KeyConvertor;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -38,9 +40,21 @@ public class CacheHandlerTest {
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
-        globalCacheConfig.getCacheContext().getCacheManager().addCache(CacheConsts.DEFAULT_AREA, cache);
 
         cacheAnnoConfig = new CacheAnnoConfig();
+        cacheAnnoConfig.setArea(CacheConsts.DEFAULT_AREA);
+        cacheAnnoConfig.setName(CacheConsts.UNDEFINED_STRING);
+        cacheAnnoConfig.setEnabled(CacheConsts.DEFAULT_ENABLED);
+        cacheAnnoConfig.setExpire(CacheConsts.DEFAULT_EXPIRE);
+        cacheAnnoConfig.setCacheType(CacheType.REMOTE);
+        cacheAnnoConfig.setLocalLimit(CacheConsts.DEFAULT_LOCAL_LIMIT);
+        cacheAnnoConfig.setCacheNullValue(CacheConsts.DEFAULT_CACHE_NULL_VALUE);
+        cacheAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
+        cacheAnnoConfig.setUnless(CacheConsts.UNDEFINED_STRING);
+        cacheAnnoConfig.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
+        cacheAnnoConfig.setKeyConvertor(KeyConvertor.FASTJSON);
+
+
         cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
         count = new CountClass();

@@ -3,16 +3,16 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.test.anno.TestUtil;
+import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.test.anno.TestUtil;
+import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.testsupport.Count;
 import com.alicp.jetcache.testsupport.CountClass;
-import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,15 +24,11 @@ import org.junit.Test;
 public class ProxyUtilTest {
 
     private GlobalCacheConfig globalCacheConfig;
-    private CacheAnnoConfig cacheAnnoConfig;
 
     @Before
     public void setup() {
         globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
-        cacheAnnoConfig = new CacheAnnoConfig();
-        CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
-        cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
     }
 
     @After
@@ -42,8 +38,19 @@ public class ProxyUtilTest {
 
     @Test
     public void testGetProxy() {
+        CacheAnnoConfig cac = new CacheAnnoConfig();
+        cac.setArea(CacheConsts.DEFAULT_AREA);
+        cac.setCacheType(CacheType.REMOTE);
+        cac.setCondition(CacheConsts.UNDEFINED_STRING);
+        cac.setUnless(CacheConsts.UNDEFINED_STRING);
+        cac.setEnabled(true);
+        cac.setExpire(100);
+        cac.setName(CacheConsts.UNDEFINED_STRING);
+        cac.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
+        cac.setKeyConvertor(KeyConvertor.FASTJSON);
+
         Count c1 = new CountClass();
-        Count c2 = ProxyUtil.getProxy(c1, cacheAnnoConfig, globalCacheConfig);
+        Count c2 = ProxyUtil.getProxy(c1, cac, globalCacheConfig);
 
         Assert.assertNotEquals(c1.count(), c1.count());
         Assert.assertEquals(c2.count(), c2.count());
