@@ -20,7 +20,6 @@ import com.alicp.jetcache.support.JavaValueEncoder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -72,7 +71,10 @@ public class CreateCacheTest extends SpringTest {
 
         public static class Foo extends AbstractCacheTest {
             @CreateCache
-            private Cache cache;
+            private Cache cache1;
+
+            @CreateCache
+            private Cache cache2;
 
             @CreateCache(area = "A1")
             private Cache cache_A1;
@@ -95,21 +97,22 @@ public class CreateCacheTest extends SpringTest {
 
             @PostConstruct
             public void test() throws Exception {
-                super.cache = this.cache;
+                super.cache = this.cache1;
                 super.baseTest();
 
-                cache.put("K1", "V1");
-                Assert.assertNull(cache_A1.get("K1"));
+                cache1.put("KK1", "V1");
+                Assert.assertNull(cache_A1.get("KK1"));
+                Assert.assertNull(cache2.get("KK1"));
 
                 Assert.assertSame(getTarget(cacheSameName1), getTarget(cacheSameName2));
-                Assert.assertNotSame(getTarget(cacheSameName1), getTarget(cache));
+                Assert.assertNotSame(getTarget(cacheSameName1), getTarget(cache1));
 
                 cacheSameName1.put("SameKey", "SameValue");
                 Assert.assertEquals(cacheSameName1.get("SameKey"),cacheSameName2.get("SameKey"));
-                Assert.assertNotEquals(cache.get("SameKey"),cacheSameName2.get("SameKey"));
+                Assert.assertNull(cache1.get("SameKey"));
 
-                Assert.assertTrue(getTarget(cache) instanceof MockRemoteCache);
-                Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cache.config().getKeyConvertor());
+                Assert.assertTrue(getTarget(cache1) instanceof MockRemoteCache);
+                Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cache1.config().getKeyConvertor());
 
                 Assert.assertTrue(getTarget(cacheWithConfig) instanceof MultiLevelCache);
                 MultiLevelCache mc = (MultiLevelCache) getTarget(cacheWithConfig);
