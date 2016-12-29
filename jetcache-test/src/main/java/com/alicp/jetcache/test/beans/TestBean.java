@@ -29,6 +29,11 @@ public class TestBean {
         return count++;
     }
 
+    @Cached
+    public int count1() {
+        return count++;
+    }
+
     @Cached(cacheType = CacheType.LOCAL)
     public int countWithLocalCache(){
         return count++;
