@@ -104,6 +104,10 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertSame(getTarget(cacheSameName1), getTarget(cacheSameName2));
                 Assert.assertNotSame(getTarget(cacheSameName1), getTarget(cache));
 
+                cacheSameName1.put("SameKey", "SameValue");
+                Assert.assertEquals(cacheSameName1.get("SameKey"),cacheSameName2.get("SameKey"));
+                Assert.assertNotEquals(cache.get("SameKey"),cacheSameName2.get("SameKey"));
+
                 Assert.assertTrue(getTarget(cache) instanceof MockRemoteCache);
                 Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cache.config().getKeyConvertor());
 
