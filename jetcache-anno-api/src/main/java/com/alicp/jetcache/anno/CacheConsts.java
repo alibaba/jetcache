@@ -8,13 +8,15 @@ package com.alicp.jetcache.anno;
  */
 public interface CacheConsts {
     String DEFAULT_AREA = "default";
-    String DEFAULT_NAME = "";
     boolean DEFAULT_ENABLED = true;
     int DEFAULT_EXPIRE = Integer.MAX_VALUE;
     CacheType DEFAULT_CACHE_TYPE = CacheType.REMOTE;
     int DEFAULT_LOCAL_LIMIT = 100;
     boolean DEFAULT_CACHE_NULL_VALUE = false;
-    String DEFAULT_CONDITION = "";
-    String DEFAULT_UNLESS = "";
     String DEFAULT_SERIAL_POLICY = SerialPolicy.JAVA;
+
+    String UNDEFINED_STRING = "$$undefined$$";
+    int UNDEFINED_INT = Integer.MIN_VALUE;
+    long UNDEFINED_LONG = Long.MIN_VALUE;
+
 }

@@ -1,6 +1,9 @@
 package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
 
 import java.util.function.Function;
 
@@ -11,8 +14,8 @@ import java.util.function.Function;
  */
 public class ExternalCacheConfig extends CacheConfig {
     private String keyPrefix;
-    private Function<Object, byte[]> valueEncoder;
-    private Function<byte[], Object> valueDecoder;
+    private Function<Object, byte[]> valueEncoder = JavaValueEncoder.INSTANCE;
+    private Function<byte[], Object> valueDecoder = JavaValueDecoder.INSTANCE;
 
     public String getKeyPrefix() {
         return keyPrefix;

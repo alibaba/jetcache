@@ -2,6 +2,7 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,11 +70,9 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
     protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
         AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
         acb.keyConvertor(configProvider.parseKeyConvertor(resolver.getProperty("keyConvertor")));
-        String expire = resolver.getProperty("defaultExpireInMillis");
-        if (expire != null && !"".equalsIgnoreCase(expire.trim())) {
-            acb.setDefaultExpireInMillis(Long.parseLong(expire));
-        }
-        String expireAfterAccess = resolver.getProperty("defaultExpireInMillis", "false");
+        String expire = resolver.getProperty("defaultExpireInMillis", String.valueOf(CacheConsts.DEFAULT_EXPIRE * 1000L));
+        acb.setDefaultExpireInMillis(Long.parseLong(expire));
+        String expireAfterAccess = resolver.getProperty("expireAfterAccess", "false");
         acb.setExpireAfterAccess(Boolean.parseBoolean(expireAfterAccess));
     }
 

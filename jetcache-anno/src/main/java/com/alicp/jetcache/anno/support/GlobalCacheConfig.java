@@ -19,7 +19,7 @@ public class GlobalCacheConfig {
     private Map<String, CacheBuilder> remoteCacheBuilders;
 
     private ConfigProvider configProvider = new SpringConfigProvider();
-    protected int statIntervalMinutes = 60;
+    protected int statIntervalMinutes;
 
     private CacheContext cacheContext;
 

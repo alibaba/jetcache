@@ -12,11 +12,11 @@ import java.lang.annotation.*;
 @Target(ElementType.FIELD)
 public @interface CreateCache {
     String area() default CacheConsts.DEFAULT_AREA;
-    String name() default CacheConsts.DEFAULT_NAME;
-    int expire() default CacheConsts.DEFAULT_EXPIRE;
+    String name() default CacheConsts.UNDEFINED_STRING;
+    int expire() default CacheConsts.UNDEFINED_INT;
     CacheType cacheType() default CacheType.REMOTE;
-    int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
-    String serialPolicy() default CacheConsts.DEFAULT_SERIAL_POLICY;
+    int localLimit() default CacheConsts.UNDEFINED_INT;
+    String serialPolicy() default CacheConsts.UNDEFINED_STRING;
 
-    String keyConvertor() default KeyConvertor.FASTJSON;
+    String keyConvertor() default CacheConsts.UNDEFINED_STRING;
 }

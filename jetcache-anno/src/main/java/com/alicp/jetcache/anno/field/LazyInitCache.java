@@ -65,7 +65,7 @@ class LazyInitCache implements ProxyCache {
         cac.setKeyConvertor(ann.keyConvertor());
 
         String cacheName = cac.getName();
-        if (CacheConsts.DEFAULT_NAME.equalsIgnoreCase(cacheName)) {
+        if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
             StringBuilder sb = new StringBuilder();
             sb.append(field.getDeclaringClass().getName());
             sb.append(".").append(field.getName());

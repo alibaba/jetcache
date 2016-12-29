@@ -3,13 +3,18 @@ redis:
   host: localhost
 
 jetcache:
+  statIntervalMinutes: 15
+
   local:
     default:
       type: caffeine
-      limit: 100
+      limit: 200
+      defaultExpireInMillis: 300
     A1:
-      type: caffeine
+      type: linkedhashmap
       limit: 100
+      expireAfterAccess: true
+      defaultExpireInMillis: 100
   remote:
     default:
       type: redis
@@ -27,5 +32,7 @@ jetcache:
         maxTotal: 10
       host: ${redis.host}
       port: ${redis.port}
+      valueEncoder: kryo
+      valueDecoder: kryo
 
 

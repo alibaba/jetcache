@@ -12,17 +12,17 @@ import com.alicp.jetcache.anno.KeyConvertor;
  */
 public class CacheAnnoConfig {
 
-    private String area = CacheConsts.DEFAULT_AREA;
-    private String name = CacheConsts.DEFAULT_NAME;
-    private boolean enabled = CacheConsts.DEFAULT_ENABLED;
-    private int expire = CacheConsts.DEFAULT_EXPIRE;
-    private CacheType cacheType = CacheConsts.DEFAULT_CACHE_TYPE;
-    private int localLimit = CacheConsts.DEFAULT_LOCAL_LIMIT;
-    private boolean cacheNullValue = CacheConsts.DEFAULT_CACHE_NULL_VALUE;
-    private String condition = CacheConsts.DEFAULT_CONDITION;
-    private String unless = CacheConsts.DEFAULT_UNLESS;
-    private String serialPolicy = CacheConsts.DEFAULT_SERIAL_POLICY;
-    private String keyConvertor = KeyConvertor.FASTJSON;
+    private String area;
+    private String name;
+    private boolean enabled;
+    private int expire;
+    private CacheType cacheType;
+    private int localLimit;
+    private boolean cacheNullValue;
+    private String condition;
+    private String unless;
+    private String serialPolicy;
+    private String keyConvertor;
 
     public String getArea() {
         return area;

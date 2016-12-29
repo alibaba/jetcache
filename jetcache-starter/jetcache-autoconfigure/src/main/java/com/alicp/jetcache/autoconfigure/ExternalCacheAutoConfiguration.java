@@ -20,7 +20,7 @@ public abstract class ExternalCacheAutoConfiguration extends AbstractCacheAutoCo
         super.parseGeneralConfig(builder, resolver);
         ExternalCacheBuilder ecb = (ExternalCacheBuilder) builder;
         ecb.keyConvertor(configProvider.parseKeyConvertor(resolver.getProperty("keyConvertor", "fastjson")));
-        ecb.setKeyPrefix(resolver.getProperty("keyPrefix"));
+//        ecb.setKeyPrefix(resolver.getProperty("keyPrefix"));
         ecb.setValueEncoder(configProvider.parseValueEncoder(resolver.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
         ecb.setValueEncoder(configProvider.parseValueDecoder(resolver.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
     }

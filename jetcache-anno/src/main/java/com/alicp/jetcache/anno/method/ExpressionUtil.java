@@ -30,7 +30,7 @@ class ExpressionUtil {
 
     public static boolean evalCondition(CacheInvokeContext context) {
         String condition = context.cacheInvokeConfig.getCacheAnnoConfig().getCondition();
-        if (CacheConsts.DEFAULT_CONDITION.equals(condition)) {
+        if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
             return true;
         }
         try {
@@ -43,7 +43,7 @@ class ExpressionUtil {
 
     public static boolean evalUnless(CacheInvokeContext context) {
         String unless = context.cacheInvokeConfig.getCacheAnnoConfig().getUnless();
-        if (CacheConsts.DEFAULT_UNLESS.equals(unless)) {
+        if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
             return false;
         }
         try {

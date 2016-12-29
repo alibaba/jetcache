@@ -13,14 +13,14 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 public @interface Cached {
     String area() default CacheConsts.DEFAULT_AREA;
-    String name() default CacheConsts.DEFAULT_NAME;
+    String name() default CacheConsts.UNDEFINED_STRING;
     boolean enabled() default CacheConsts.DEFAULT_ENABLED;
-    int expire() default CacheConsts.DEFAULT_EXPIRE;
+    int expire() default CacheConsts.UNDEFINED_INT;
     CacheType cacheType() default CacheType.REMOTE;
-    int localLimit() default CacheConsts.DEFAULT_LOCAL_LIMIT;
-    String serialPolicy() default CacheConsts.DEFAULT_SERIAL_POLICY;
+    int localLimit() default CacheConsts.UNDEFINED_INT;
+    String serialPolicy() default CacheConsts.UNDEFINED_STRING;
 
-    String keyConvertor() default KeyConvertor.FASTJSON;
+    String keyConvertor() default CacheConsts.UNDEFINED_STRING;
 
     boolean cacheNullValue() default CacheConsts.DEFAULT_CACHE_NULL_VALUE;
 
@@ -28,7 +28,7 @@ public @interface Cached {
      * Expression attribute used for conditioning the method caching.
      * <p>Default is "", meaning the method is always cached.
      */
-    String condition() default CacheConsts.DEFAULT_CONDITION;
+    String condition() default CacheConsts.UNDEFINED_STRING;
 
     /**
      * Expression attribute used to veto method caching.
@@ -36,5 +36,5 @@ public @interface Cached {
      * has been called and can therefore refer to the {@code result}. Default is "",
      * meaning that caching is never vetoed.
      */
-    String unless() default CacheConsts.DEFAULT_UNLESS;
+    String unless() default CacheConsts.UNDEFINED_STRING;
 }

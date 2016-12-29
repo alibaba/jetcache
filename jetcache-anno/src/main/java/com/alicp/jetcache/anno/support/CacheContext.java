@@ -75,7 +75,7 @@ public class CacheContext {
             CacheAnnoConfig cacheAnnoConfig = invokeContext.getCacheInvokeConfig().getCacheAnnoConfig();
             String area = cacheAnnoConfig.getArea();
             String cacheName = cacheAnnoConfig.getName();
-            if (CacheConsts.DEFAULT_NAME.equalsIgnoreCase(cacheName)) {
+            if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
                 cacheName = ClassUtil.generateCacheName(
                         invokeContext.getMethod(), invokeContext.getHiddenPackages());
             }
@@ -129,14 +129,18 @@ public class CacheContext {
             throw new CacheConfigException("no remote cache builder: " + area);
         }
         cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
-        if (cacheBuilder == null) {
-            throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in remoteCacheFacotories");
+
+        if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
+            cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
         }
-        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
         cacheBuilder.setKeyPrefix(prefix);
-        cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
-        cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cacheAnnoConfig.getSerialPolicy()));
-        cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cacheAnnoConfig.getSerialPolicy()));
+        if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getKeyConvertor())) {
+            cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
+        }
+        if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getSerialPolicy())) {
+            cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cacheAnnoConfig.getSerialPolicy()));
+            cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cacheAnnoConfig.getSerialPolicy()));
+        }
         return cacheBuilder.buildCache();
     }
 
@@ -147,12 +151,16 @@ public class CacheContext {
             throw new CacheConfigException("no local cache builder: " + area);
         }
         cacheBuilder = (EmbeddedCacheBuilder) cacheBuilder.clone();
-        if (cacheBuilder == null) {
-            throw new CacheConfigException("no CacheFactory with name \"" + area + "\" defined in localCacheFactory");
+
+        if (cacheAnnoConfig.getLocalLimit() != CacheConsts.UNDEFINED_INT) {
+            cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
         }
-        cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
-        cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
-        cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
+        if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
+            cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
+        }
+        if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getKeyConvertor())) {
+            cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
+        }
         cache = cacheBuilder.buildCache();
         return cache;
     }
