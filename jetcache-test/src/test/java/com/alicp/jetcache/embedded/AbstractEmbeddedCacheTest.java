@@ -8,6 +8,8 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.test.support.DynamicQuery;
+import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.junit.Assert;
 
 import java.util.concurrent.TimeUnit;
@@ -42,7 +44,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
                 .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
-        if(testLru) {
+        if (testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                     .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
             lruTest();
@@ -52,20 +54,53 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
                 .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
         expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
-        if(testLru) {
+        if (testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                     .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
             lruTest();
         }
 
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
+        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc())
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
         fastjsonKeyCoverterTest();
 
         int thread = 10;
         int count = 100;
         int time = 5000;
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(thread * count).buildCache();
-        concurrentTest(thread ,time);
+        concurrentTest(thread, time);
+    }
+
+    protected void nullKeyConvertorTest() {
+        {
+            DynamicQuery d1 = new DynamicQuery();
+            DynamicQuery d2 = new DynamicQuery();
+            DynamicQuery d3 = new DynamicQuery();
+            d1.setId(100);
+            d2.setId(100);
+            d3.setId(101);
+            d1.setName("HL");
+            d2.setName("HL");
+
+            cache.put(d1, "V1");
+            Assert.assertNull(cache.get(d2));
+            Assert.assertNull(cache.get(d3));
+        }
+
+        {
+            DynamicQueryWithEquals d1 = new DynamicQueryWithEquals();
+            DynamicQueryWithEquals d2 = new DynamicQueryWithEquals();
+            DynamicQueryWithEquals d3 = new DynamicQueryWithEquals();
+            d1.setId(100);
+            d2.setId(100);
+            d3.setId(101);
+            d1.setName("HL");
+            d2.setName("HL2");
+
+            cache.put(d1, "V2");
+            Assert.assertEquals("V2", cache.get(d2));
+            Assert.assertNull(cache.get(d3));
+        }
     }
 
 }
