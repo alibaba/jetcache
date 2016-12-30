@@ -30,7 +30,7 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
             if (config.getKeyConvertor() != null) {
                 key = config.getKeyConvertor().apply(key);
             }
-            return ExternalKeyUtil.buildKeyImpl(key, config.getKeyPrefix());
+            return ExternalKeyUtil.buildKeyAfterConvert(key, config.getKeyPrefix());
         } catch (IOException e) {
             throw new CacheException(e);
         }

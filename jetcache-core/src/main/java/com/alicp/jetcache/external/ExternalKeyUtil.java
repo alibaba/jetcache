@@ -15,7 +15,7 @@ import java.util.Date;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class ExternalKeyUtil {
-    public static byte[] buildKeyImpl(Object newKey, String prefix) throws IOException {
+    public static byte[] buildKeyAfterConvert(Object newKey, String prefix) throws IOException {
         if (newKey == null) {
             throw new NullPointerException("key can't be null");
         }

@@ -50,6 +50,6 @@ public class ExternaKeyUtilTest {
     }
 
     private byte[] buildKey(Object key) throws Exception {
-        return ExternalKeyUtil.buildKeyImpl(key, "PRI");
+        return ExternalKeyUtil.buildKeyAfterConvert(key, "PRI");
     }
 }

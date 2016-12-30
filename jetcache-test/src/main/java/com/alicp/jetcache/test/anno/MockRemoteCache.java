@@ -56,7 +56,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
             if (config().getKeyConvertor() != null) {
                 newKey = config.getKeyConvertor().apply(key);
             }
-            byte[] keyBytes = ExternalKeyUtil.buildKeyImpl(newKey, config.getKeyPrefix());
+            byte[] keyBytes = ExternalKeyUtil.buildKeyAfterConvert(newKey, config.getKeyPrefix());
             Bytes bs = new Bytes();
             bs.bs = keyBytes;
             return bs;
