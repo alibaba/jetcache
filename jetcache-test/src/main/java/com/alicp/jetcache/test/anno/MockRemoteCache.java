@@ -4,11 +4,9 @@
 package com.alicp.jetcache.test.anno;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.method.SerializeUtil;
 import com.alicp.jetcache.embedded.SimpleLock;
-import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
+import com.alicp.jetcache.external.ExternalKeyUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,7 +56,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
             if (config().getKeyConvertor() != null) {
                 newKey = config.getKeyConvertor().apply(key);
             }
-            byte[] keyBytes = AbstractExternalCache.buildKeyImpl(newKey, config.getKeyPrefix());
+            byte[] keyBytes = ExternalKeyUtil.buildKeyImpl(newKey, config.getKeyPrefix());
             Bytes bs = new Bytes();
             bs.bs = keyBytes;
             return bs;

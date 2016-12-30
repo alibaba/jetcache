@@ -59,7 +59,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
-        keyCoverterTest();
+        fastjsonKeyCoverterTest();
 
         int thread = 10;
         int count = 100;

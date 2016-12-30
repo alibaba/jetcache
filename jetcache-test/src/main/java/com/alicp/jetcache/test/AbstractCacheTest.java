@@ -223,7 +223,7 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(r.getValue());
     }
 
-    protected void keyCoverterTest() {
+    protected void fastjsonKeyCoverterTest() {
         DynamicQuery d1 = new DynamicQuery();
         DynamicQuery d2 = new DynamicQuery();
         DynamicQuery d3 = new DynamicQuery();

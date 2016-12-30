@@ -1,19 +1,17 @@
 package com.alicp.jetcache.external;
 
-import com.alicp.jetcache.*;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/12/28.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class AbstractExternalCacheTest {
+public class ExternaKeyUtilTest {
 
     private static class C implements Serializable {
         private static final long serialVersionUID = 3412272275328699372L;
@@ -52,6 +50,6 @@ public class AbstractExternalCacheTest {
     }
 
     private byte[] buildKey(Object key) throws Exception {
-        return AbstractExternalCache.buildKeyImpl(key, "PRI");
+        return ExternalKeyUtil.buildKeyImpl(key, "PRI");
     }
 }

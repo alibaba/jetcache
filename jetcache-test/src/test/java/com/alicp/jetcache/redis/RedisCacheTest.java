@@ -53,7 +53,7 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
-        keyCoverterTest();
+        fastjsonKeyCoverterTest();
 
         int thread = 10;
         int count = 100;
