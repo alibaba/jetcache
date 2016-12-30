@@ -20,19 +20,11 @@ public final class CacheValueHolder<V> implements Serializable {
     public CacheValueHolder() {
     }
 
-    public CacheValueHolder(V value, long createTime, long initTtlInMillis){
+    public CacheValueHolder(V value, long createTime, long initTtlInMillis) {
         this.value = value;
         this.createTime = createTime;
         this.initTtlInMillis = initTtlInMillis;
         this.expireTime = createTime + initTtlInMillis;
-    }
-
-    public long getInitTtlInMillis() {
-        return initTtlInMillis;
-    }
-
-    public long getCreateTime() {
-        return createTime;
     }
 
     public V getValue() {
@@ -41,6 +33,22 @@ public final class CacheValueHolder<V> implements Serializable {
 
     public void setValue(V value) {
         this.value = value;
+    }
+
+    public long getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        this.createTime = createTime;
+    }
+
+    public long getInitTtlInMillis() {
+        return initTtlInMillis;
+    }
+
+    public void setInitTtlInMillis(long initTtlInMillis) {
+        this.initTtlInMillis = initTtlInMillis;
     }
 
     public long getExpireTime() {

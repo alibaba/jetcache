@@ -7,8 +7,10 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.method.SerializeUtil;
 import com.alicp.jetcache.embedded.SimpleLock;
+import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -28,8 +30,41 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         return config;
     }
 
+    static class Bytes {
+        byte[] bs;
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof Bytes){
+                return Arrays.equals(bs, ((Bytes) obj).bs);
+            }else{
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            int x = 0;
+            for(byte b: bs){
+                x += b;
+            }
+            return x;
+        }
+    }
+
     private Object buildKey(K key) {
-        return config().getKeyConvertor().apply(key);
+        try {
+            Object newKey = key;
+            if (config().getKeyConvertor() != null) {
+                newKey = config.getKeyConvertor().apply(key);
+            }
+            byte[] keyBytes = AbstractExternalCache.buildKeyImpl(newKey, config.getKeyPrefix());
+            Bytes bs = new Bytes();
+            bs.bs = keyBytes;
+            return bs;
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
     }
 
     public synchronized CacheGetResult<V> GET(K key) {

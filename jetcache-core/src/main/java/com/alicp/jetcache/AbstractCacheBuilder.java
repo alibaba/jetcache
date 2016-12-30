@@ -60,7 +60,7 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         AbstractCacheBuilder copy = null;
         try {
             copy = (AbstractCacheBuilder) super.clone();
-            copy.config = config.clone();
+            copy.config = getConfig().clone();
             return copy;
         } catch (CloneNotSupportedException e) {
             throw new CacheException(e);

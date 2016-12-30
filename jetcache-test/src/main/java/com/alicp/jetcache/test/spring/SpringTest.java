@@ -4,6 +4,7 @@ import com.alicp.jetcache.test.beans.FactoryBeanTarget;
 import com.alicp.jetcache.test.beans.Service;
 import com.alicp.jetcache.test.beans.TestBean;
 import com.alicp.jetcache.test.support.DynamicQuery;
+import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.junit.Assert;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -66,12 +67,36 @@ public class SpringTest implements ApplicationContextAware {
         DynamicQuery q3 = new DynamicQuery();
         q3.setId(1000);
         q3.setName("N1");
-        int x1;
-        int x2;
-        int x3;
-        x1 = bean.count(q1);
-        x2 = bean.count(q2);
-        x3 = bean.count(q3);
+        int x1 = bean.countLocalWithDynamicQuery(q1);
+        int x2 = bean.countLocalWithDynamicQuery(q2);
+        int x3 = bean.countLocalWithDynamicQuery(q3);
+        Assert.assertNotEquals(x1, x2);
+        Assert.assertNotEquals(x1, x3);
+
+        x1 = bean.countRemoteWithDynamicQuery(q1);
+        x2 = bean.countRemoteWithDynamicQuery(q2);
+        x3 = bean.countRemoteWithDynamicQuery(q3);
+        Assert.assertNotEquals(x1, x2);
+        Assert.assertEquals(x1, x3);
+
+        x1 = bean.countLocalWithDynamicQueryAndKeyConvertor(q1);
+        x2 = bean.countLocalWithDynamicQueryAndKeyConvertor(q2);
+        x3 = bean.countLocalWithDynamicQueryAndKeyConvertor(q3);
+        Assert.assertNotEquals(x1, x2);
+        Assert.assertEquals(x1, x3);
+
+        DynamicQueryWithEquals dqwe1 = new DynamicQueryWithEquals();
+        dqwe1.setId(1000);
+        dqwe1.setName("N1");
+        DynamicQueryWithEquals dqwe2 = new DynamicQueryWithEquals();
+        dqwe2.setId(1001);
+        dqwe2.setName("N2");
+        DynamicQueryWithEquals dqwe3 = new DynamicQueryWithEquals();
+        dqwe3.setId(1000);
+        dqwe3.setName("N1");
+        x1 = bean.countLocalWithDynamicQueryWithEquals(dqwe1);
+        x2 = bean.countLocalWithDynamicQueryWithEquals(dqwe2);
+        x3 = bean.countLocalWithDynamicQueryWithEquals(dqwe3);
         Assert.assertNotEquals(x1, x2);
         Assert.assertEquals(x1, x3);
 

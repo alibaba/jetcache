@@ -19,9 +19,6 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 
     public AbstractExternalCache(ExternalCacheConfig config) {
         this.config = config;
-        if (config.getKeyConvertor() == null) {
-            throw new CacheConfigException("no KeyConvertor");
-        }
         if (config.getValueEncoder() == null) {
             throw new CacheConfigException("no value encoder");
         }
@@ -32,14 +29,16 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 
     protected byte[] buildKey(Object key) {
         try {
-            Object newKey = config.getKeyConvertor().apply(key);
-            return buildKeyImpl(newKey, config.getKeyPrefix());
+            if (config.getKeyConvertor() != null) {
+                key = config.getKeyConvertor().apply(key);
+            }
+            return buildKeyImpl(key, config.getKeyPrefix());
         } catch (IOException e) {
             throw new CacheException(e);
         }
     }
 
-    static byte[] buildKeyImpl(Object newKey, String prefix) throws IOException {
+    public static byte[] buildKeyImpl(Object newKey, String prefix) throws IOException {
         if (newKey == null) {
             throw new NullPointerException("key can't be null");
         }
@@ -63,7 +62,7 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
             bos.close();
             keyBytesWithOutPrefix = bos.toByteArray();
         } else {
-            throw new CacheException("type error");
+            throw new CacheException("can't convert key of class: " + newKey.getClass());
         }
         byte[] prefixBytes = prefix.getBytes("UTF-8");
         byte[] rt = new byte[prefixBytes.length + keyBytesWithOutPrefix.length];

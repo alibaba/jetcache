@@ -6,6 +6,7 @@ package com.alicp.jetcache.test.beans;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.test.support.DynamicQuery;
+import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,8 +51,23 @@ public class TestBean {
         return count++;
     }
 
-    @Cached(area = "A1", cacheType = CacheType.BOTH)
-    public int count(DynamicQuery q) {
+    @Cached(area = "A1" , cacheType = CacheType.LOCAL)
+    public int countLocalWithDynamicQuery(DynamicQuery q) {
+        return count++;
+    }
+
+    @Cached(area = "A1" , cacheType = CacheType.LOCAL, keyConvertor = "fastjson")
+    public int countLocalWithDynamicQueryAndKeyConvertor(DynamicQuery q) {
+        return count++;
+    }
+
+    @Cached(area = "A1")
+    public int countRemoteWithDynamicQuery(DynamicQuery q) {
+        return count++;
+    }
+
+    @Cached(area = "A1")
+    public int countLocalWithDynamicQueryWithEquals(DynamicQueryWithEquals q) {
         return count++;
     }
 

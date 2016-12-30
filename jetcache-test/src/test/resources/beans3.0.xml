@@ -34,15 +34,9 @@
         </property>
     </bean>
     <bean id="localCacheBuilder" class="com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder">
-        <property name="keyConvertor">
-            <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
-        </property>
     </bean>
     <bean id="remoteCacheBuilder" class="com.alicp.jetcache.test.anno.MockRemoteCacheBuilder">
         <property name="keyPrefix" value="remote1"/>
-        <property name="keyConvertor">
-            <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
-        </property>
         <property name="valueEncoder">
             <util:constant static-field="com.alicp.jetcache.support.KryoValueEncoder.INSTANCE"/>
         </property>
@@ -52,9 +46,6 @@
     </bean>
     <bean id="remoteCacheBuilder2" class="com.alicp.jetcache.test.anno.MockRemoteCacheBuilder">
         <property name="keyPrefix" value="remote2"/>
-        <property name="keyConvertor">
-            <util:constant static-field="com.alicp.jetcache.support.FastjsonKeyConvertor.INSTANCE"/>
-        </property>
         <property name="valueEncoder">
             <util:constant static-field="com.alicp.jetcache.support.KryoValueEncoder.INSTANCE"/>
         </property>

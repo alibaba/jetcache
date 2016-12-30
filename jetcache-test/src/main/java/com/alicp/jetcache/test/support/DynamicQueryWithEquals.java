@@ -8,8 +8,8 @@ import java.io.Serializable;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class DynamicQuery implements Serializable {
-    private static final long serialVersionUID = 2446193386760839620L;
+public class DynamicQueryWithEquals implements Serializable {
+    private static final long serialVersionUID = -6817023498652881802L;
     private long id;
     private String name;
     private String email;
@@ -36,5 +36,18 @@ public class DynamicQuery implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DynamicQueryWithEquals) {
+            return ((DynamicQueryWithEquals) obj).id == id;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return new Long(id).hashCode();
     }
 }
