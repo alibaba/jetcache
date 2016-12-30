@@ -1,7 +1,7 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.support.*;
-import com.alicp.jetcache.test.AbstractCacheTest;
+import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
 import redis.clients.jedis.JedisPool;
@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class RedisCacheTest extends AbstractCacheTest {
+public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void test() throws Exception {
@@ -55,8 +55,16 @@ public class RedisCacheTest extends AbstractCacheTest {
                 .buildCache();
         fastjsonKeyCoverterTest();
 
+        cache = RedisCacheBuilder.createRedisCacheBuilder()
+                .keyConvertor(null)
+                .valueEncoder(KryoValueEncoder.INSTANCE)
+                .valueDecoder(KryoValueDecoder.INSTANCE)
+                .jedisPool(pool)
+                .keyPrefix(new Random().nextInt() + "")
+                .buildCache();
+        nullKeyConvertorTest();
+
         int thread = 10;
-        int count = 100;
         int time = 1000;
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
