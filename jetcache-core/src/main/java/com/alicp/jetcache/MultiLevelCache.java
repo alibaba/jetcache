@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
+public class MultiLevelCache<K, V> implements Cache<K, V> {
 
     private Cache[] caches;
 
@@ -26,7 +26,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    protected CacheGetResult<CacheValueHolder<V>> getHolder(K key) {
+    public CacheGetResult<V> GET(K key) {
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult<CacheValueHolder<V>> r1 = cache.GET(key);
@@ -39,7 +39,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
                     if (restTtl > 0) {
                         PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
                     }
-                    return new CacheGetResult(CacheResultCode.SUCCESS, null, h);
+                    return new CacheGetResult(CacheResultCode.SUCCESS, null, h.getValue());
                 }
             }
         }

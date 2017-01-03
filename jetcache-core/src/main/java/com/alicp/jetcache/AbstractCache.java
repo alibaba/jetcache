@@ -13,6 +13,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
 
+    protected abstract Object buildKey(K key);
+
     protected abstract CacheGetResult<CacheValueHolder<V>> getHolder(K key);
 
     @Override
@@ -25,7 +27,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                 result.setValue(holderResult.getValue().getValue());
             }
         } catch (ClassCastException ex) {
-            logger.warn("jetcache GET error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+            logError("GET", key, ex);
             result = new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
         return result;
