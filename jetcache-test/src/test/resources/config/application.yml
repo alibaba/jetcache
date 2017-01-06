@@ -9,12 +9,12 @@ jetcache:
     default:
       type: caffeine
       limit: 200
-      defaultExpireInMillis: 300
+      defaultExpireInMillis: 10000
     A1:
       type: linkedhashmap
       limit: 100
       expireAfterAccess: true
-      defaultExpireInMillis: 100
+      defaultExpireInMillis: 10000
   remote:
     default:
       type: redis
@@ -24,6 +24,7 @@ jetcache:
         maxTotal: 10
       host: ${redis.host}
       port: ${redis.port}
+      defaultExpireInMillis: 10000
     A1:
       type: redis
       poolConfig:
@@ -34,5 +35,6 @@ jetcache:
       port: ${redis.port}
       valueEncoder: kryo
       valueDecoder: kryo
+      defaultExpireInMillis: 10000
 
 
