@@ -26,7 +26,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
             if (holderResult.getValue() != null) {
                 result.setValue(holderResult.getValue().getValue());
             }
-        } catch (ClassCastException ex) {
+        } catch (Exception ex) {
             logError("GET", key, ex);
             result = new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
