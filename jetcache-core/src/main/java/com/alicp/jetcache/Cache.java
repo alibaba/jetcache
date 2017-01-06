@@ -3,6 +3,9 @@ package com.alicp.jetcache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -32,9 +35,13 @@ public interface Cache<K, V> {
         }
     }
 
+    //TODO Map<K, V> getAll(Set<? extends K> keys);
+
     default void put(K key, V value) {
         PUT(key, value);
     }
+
+    //TODO void putAll(Map<? extends K,? extends V> map);
 
     default boolean putIfAbsent(K key, V value){
         CacheResult result = PUT_IF_ABSENT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
@@ -44,6 +51,8 @@ public interface Cache<K, V> {
     default boolean remove(K key) {
         return REMOVE(key).isSuccess();
     }
+
+    //TODO void removeAll(Set<? extends K> keys);
 
     /**
      * Provides a standard way to access the underlying concrete cache entry
