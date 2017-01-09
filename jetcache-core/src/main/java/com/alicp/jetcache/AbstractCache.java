@@ -51,9 +51,10 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     }
 
     protected boolean needLogStackTrace(Throwable e) {
-        if (e instanceof CacheEncodeException) {
-            return true;
-        }
-        return false;
+//        if (e instanceof CacheEncodeException) {
+//            return true;
+//        }
+//        return false;
+        return true;
     }
 }
