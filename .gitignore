@@ -6,3 +6,4 @@ target/
 .classpath
 .project
 .idea
+*.versionsBackup
