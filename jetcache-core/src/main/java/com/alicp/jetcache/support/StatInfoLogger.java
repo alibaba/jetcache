@@ -20,6 +20,8 @@ public class StatInfoLogger implements Consumer<StatInfo> {
     private static Logger logger = LoggerFactory.getLogger(StatInfoLogger.class);
     private boolean verboseLog;
 
+    protected int maxNameLength = 65;
+
     public StatInfoLogger(boolean verboseLog) {
         this.verboseLog = verboseLog;
     }
@@ -67,14 +69,14 @@ public class StatInfoLogger implements Consumer<StatInfo> {
         StringBuilder sb = logTitle(2048, statInfo);
 
         List<CacheStat> stats = statInfo.getStats();
-        OptionalInt maxCacheNameLength = stats.stream().mapToInt((s) -> s.getCacheName().length()).max();
+        OptionalInt maxCacheNameLength = stats.stream().mapToInt((s) -> getName(s.getCacheName()).length()).max();
         int len = Math.max(5, maxCacheNameLength.orElse(0));
 
         String title = String.format("%-" + len + "s|%10s|%7s|%14s|%14s|%14s|%14s|%11s|%11s", "cache", "qps", "rate", "get", "hit", "fail", "expire", "avgLoadTime", "maxLoadTime");
         sb.append(title).append('\n');
         printSepLine(sb, title);
         for (CacheStat s : stats) {
-            sb.append(String.format("%-" + len + "s", s.getCacheName())).append('|');
+            sb.append(String.format("%-" + len + "s", getName(s.getCacheName()))).append('|');
             sb.append(String.format("%,10.2f", s.qps())).append('|');
             sb.append(String.format("%6.2f%%", s.hitRate() * 100)).append('|');
             sb.append(String.format("%,14d", s.getGetCount())).append('|');
@@ -86,6 +88,17 @@ public class StatInfoLogger implements Consumer<StatInfo> {
         }
         printSepLine(sb, title);
         return sb;
+    }
+
+    private String getName(String name) {
+        if (name == null) {
+            return null;
+        }
+        if (name.length() > maxNameLength) {
+            return "..." + name.substring(name.length() - maxNameLength + 3);
+        } else {
+            return name;
+        }
     }
 
 
