@@ -1,1 +1,1 @@
-JetCache是一个对缓存的包装框架，支持，文档详见Wiki。
+JetCache是一个通用的缓存包装框架，文档详见Wiki。
