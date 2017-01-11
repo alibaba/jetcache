@@ -21,9 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheInterceptorTest {
+public class JetCacheInterceptorTest {
     private CachePointcut pc;
-    private CacheInterceptor interceptor;
+    private JetCacheInterceptor interceptor;
     private GlobalCacheConfig globalCacheConfig;
 
     @Rule
@@ -36,7 +36,7 @@ public class CacheInterceptorTest {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
         ConcurrentHashMap<Method, CacheInvokeConfig> map = new ConcurrentHashMap();
         pc.setCacheConfigMap(map);
-        interceptor = new CacheInterceptor();
+        interceptor = new JetCacheInterceptor();
         interceptor.setCacheConfigMap(map);
         interceptor.setGlobalCacheConfig(globalCacheConfig);
     }

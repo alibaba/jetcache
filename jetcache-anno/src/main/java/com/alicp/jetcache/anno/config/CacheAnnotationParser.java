@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.anno.aop.CacheAdvisor;
-import com.alicp.jetcache.anno.aop.CacheInterceptor;
+import com.alicp.jetcache.anno.aop.JetCacheInterceptor;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -40,7 +40,7 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
             configMapDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             String configMapName = parserContext.getReaderContext().registerWithGeneratedName(configMapDef);
 
-            RootBeanDefinition interceptorDef = new RootBeanDefinition(CacheInterceptor.class);
+            RootBeanDefinition interceptorDef = new RootBeanDefinition(JetCacheInterceptor.class);
             interceptorDef.setSource(eleSource);
             interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             interceptorDef.getPropertyValues().addPropertyValue(new PropertyValue("globalCacheConfig", new RuntimeBeanReference("globalCacheConfig")));

@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheInterceptor implements MethodInterceptor {
+public class JetCacheInterceptor implements MethodInterceptor {
 
     private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap;
     private GlobalCacheConfig globalCacheConfig;
