@@ -88,8 +88,13 @@ public class CacheContext {
     public Cache __createOrGetCache(CacheAnnoConfig cacheAnnoConfig, String area, String fullCacheName) {
         Cache cache = cacheManager.getCache(fullCacheName);
         if (cache == null) {
-            cache = buildCache(cacheAnnoConfig, area, fullCacheName);
-            cacheManager.addCache(fullCacheName, cache);
+            synchronized (this) {
+                cache = cacheManager.getCache(fullCacheName);
+                if (cache == null) {
+                    cache = buildCache(cacheAnnoConfig, area, fullCacheName);
+                    cacheManager.addCache(fullCacheName, cache);
+                }
+            }
         }
         return cache;
     }
