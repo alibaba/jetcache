@@ -122,7 +122,7 @@ public class CacheContext {
 
         if (defaultCacheMonitorManager != null) {
             DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
-            cache = new MonitoredCache(cache, new DefaultCacheMonitor(fullCacheName));
+            cache = new MonitoredCache(cache, monitor);
             defaultCacheMonitorManager.add(monitor);
         }
         return cache;
