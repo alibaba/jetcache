@@ -36,6 +36,8 @@ public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
 
     protected String typeName;
 
+    private boolean inited = false;
+
     public AbstractCacheAutoInit(String typeName) {
         this.typeName = typeName;
     }
@@ -47,8 +49,15 @@ public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
 
     @PostConstruct
     public void init() {
-        process("jetcache.local.", autoConfigureBeans.getLocalCacheBuilders(), true);
-        process("jetcache.remote.", autoConfigureBeans.getRemoteCacheBuilders(), false);
+        if (!inited) {
+            synchronized (this) {
+                if (!inited) {
+                    process("jetcache.local.", autoConfigureBeans.getLocalCacheBuilders(), true);
+                    process("jetcache.remote.", autoConfigureBeans.getRemoteCacheBuilders(), false);
+                    inited = true;
+                }
+            }
+        }
     }
 
     private void process(String prefix, Map cacheBuilders, boolean local) {
