@@ -22,9 +22,9 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractCacheAutoConfiguration implements ApplicationContextAware {
+public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
 
-    private static Logger logger = LoggerFactory.getLogger(AbstractCacheAutoConfiguration.class);
+    private static Logger logger = LoggerFactory.getLogger(AbstractCacheAutoInit.class);
 
     protected ApplicationContext applicationContext;
 
@@ -36,7 +36,7 @@ public abstract class AbstractCacheAutoConfiguration implements ApplicationConte
 
     protected String typeName;
 
-    public AbstractCacheAutoConfiguration(String typeName) {
+    public AbstractCacheAutoInit(String typeName) {
         this.typeName = typeName;
     }
 

@@ -10,9 +10,9 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class EmbeddedCacheAutoConfiguration extends AbstractCacheAutoConfiguration {
+public abstract class EmbeddedCacheAutoInit extends AbstractCacheAutoInit {
 
-    public EmbeddedCacheAutoConfiguration(String typeName) {
+    public EmbeddedCacheAutoInit(String typeName) {
         super(typeName);
     }
 

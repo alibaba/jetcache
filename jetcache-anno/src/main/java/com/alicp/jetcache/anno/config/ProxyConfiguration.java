@@ -41,10 +41,10 @@ public class ProxyConfiguration implements ImportAware {
 
     @Bean(name = CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public CacheAdvisor cacheAdvisor() {
+    public CacheAdvisor jetcacheAdvisor() {
         CacheAdvisor advisor = new CacheAdvisor();
         advisor.setAdviceBeanName(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME);
-        advisor.setAdvice(cacheInterceptor());
+        advisor.setAdvice(jetcacheInterceptor());
         advisor.setBasePackages(this.enableJetCache.getStringArray("basePackages"));
         advisor.setCacheConfigMap(configMap);
         advisor.setOrder(this.enableJetCache.<Integer>getNumber("order"));
@@ -53,7 +53,7 @@ public class ProxyConfiguration implements ImportAware {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public CacheInterceptor cacheInterceptor() {
+    public CacheInterceptor jetcacheInterceptor() {
         CacheInterceptor interceptor = new CacheInterceptor();
         interceptor.setCacheConfigMap(configMap);
         interceptor.setGlobalCacheConfig(globalCacheConfig);

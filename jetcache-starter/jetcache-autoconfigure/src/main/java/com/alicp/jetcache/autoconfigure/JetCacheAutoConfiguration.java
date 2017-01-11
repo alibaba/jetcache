@@ -1,6 +1,5 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created on 2016/11/17.

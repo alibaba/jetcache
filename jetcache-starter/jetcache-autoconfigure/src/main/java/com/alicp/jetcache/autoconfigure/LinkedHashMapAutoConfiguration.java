@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Conditional(LinkedHashMapAutoConfiguration.LinkedHashMapCondition.class)
-public class LinkedHashMapAutoConfiguration extends EmbeddedCacheAutoConfiguration {
+public class LinkedHashMapAutoConfiguration extends EmbeddedCacheAutoInit {
     public LinkedHashMapAutoConfiguration() {
         super("linkedhashmap");
     }

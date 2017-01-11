@@ -11,13 +11,17 @@ import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.JedisPool;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Created on 2016/11/23.
@@ -60,6 +64,21 @@ public class StarterTest extends SpringTest {
         }
     }
 
+    @Component
+    public static class B {
+        @Autowired
+        private JedisPool defaultPool;
+
+        @Autowired
+        private JedisPool A1Pool;
+
+        @PostConstruct
+        public void init() {
+            Assert.assertNotNull(defaultPool);
+            Assert.assertNotNull(A1Pool);
+        }
+    }
+
     @Configuration
     public static class Config {
         @Bean(name = "factoryBeanTarget")
@@ -67,12 +86,14 @@ public class StarterTest extends SpringTest {
             return new MyFactoryBean();
         }
 
-        @Bean
+        @Bean(name = "defaultPool")
+        @DependsOn("redisAutoInit")
         public JedisPoolFactory defaultPool() {
             return new JedisPoolFactory("remote.default");
         }
 
-        @Bean
+        @Bean(name = "A1Pool")
+        @DependsOn("redisAutoInit")
         public JedisPoolFactory A1Pool() {
             return new JedisPoolFactory("remote.A1");
         }

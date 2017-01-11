@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Conditional(CaffeineAutoConfiguration.CaffeineCondition.class)
-public class CaffeineAutoConfiguration extends EmbeddedCacheAutoConfiguration {
+public class CaffeineAutoConfiguration extends EmbeddedCacheAutoInit {
     public CaffeineAutoConfiguration() {
         super("caffeine");
         System.out.println("CaffeineAutoConfiguration init");
