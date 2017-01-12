@@ -8,6 +8,9 @@ package com.alicp.jetcache.anno;
  */
 public interface SerialPolicy {
     String JAVA = "JAVA";
+
+    @Deprecated
     String FASTJSON = "FASTJSON";
+
     String KRYO = "KRYO";
 }
