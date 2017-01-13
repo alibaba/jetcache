@@ -1,11 +1,5 @@
 package com.alicp.jetcache;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -16,21 +10,13 @@ import java.util.function.Function;
  */
 public interface Cache<K, V> {
 
-    Logger CACHE_INTERNAL_LOGGER = LoggerFactory.getLogger(Cache.class);
-
-
     //-----------------------------JSR 107 API------------------------------------------------
 
     default V get(K key) {
-        try {
-            CacheGetResult<V> result = GET(key);
-            if (result.isSuccess()) {
-                return result.getValue();
-            } else {
-                return null;
-            }
-        } catch (ClassCastException ex) {
-            CACHE_INTERNAL_LOGGER.warn("jetcache get error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
+        CacheGetResult<V> result = GET(key);
+        if (result.isSuccess()) {
+            return result.getValue();
+        } else {
             return null;
         }
     }
@@ -96,40 +82,30 @@ public interface Cache<K, V> {
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
-        try {
-            CacheGetResult<V> r = GET(key);
-            if (r.isSuccess()) {
-                return r.getValue();
-            } else {
-                Object loadedValue = loader.apply(key);
-                V castedValue = (V) loadedValue;
-                if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
-                    put(key, castedValue);
-                }
-                return castedValue;
+        CacheGetResult<V> r = GET(key);
+        if (r.isSuccess()) {
+            return r.getValue();
+        } else {
+            Object loadedValue = loader.apply(key);
+            V castedValue = (V) loadedValue;
+            if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
+                put(key, castedValue);
             }
-        } catch (ClassCastException ex) {
-            CACHE_INTERNAL_LOGGER.warn("jetcache computeIfAbsent error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
-            return null;
+            return castedValue;
         }
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
-        try {
-            CacheGetResult<V> r = GET(key);
-            if (r.isSuccess()) {
-                return r.getValue();
-            } else {
-                Object loadedValue = loader.apply(key);
-                V castedValue = (V) loadedValue;
-                if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
-                    PUT(key, castedValue, expire, timeUnit);
-                }
-                return castedValue;
+        CacheGetResult<V> r = GET(key);
+        if (r.isSuccess()) {
+            return r.getValue();
+        } else {
+            Object loadedValue = loader.apply(key);
+            V castedValue = (V) loadedValue;
+            if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
+                PUT(key, castedValue, expire, timeUnit);
             }
-        } catch (ClassCastException ex) {
-            CACHE_INTERNAL_LOGGER.warn("jetcache computeIfAbsent error. key={}, Exception={}, Message:{}", key, ex.getClass(), ex.getMessage());
-            return null;
+            return castedValue;
         }
     }
 
