@@ -8,6 +8,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -205,5 +206,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             logError("PUT_IF_ABSENT", key, ex);
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
         }
+    }
+
+    @Override
+    protected boolean needLogStackTrace(Throwable e){
+        if (e instanceof JedisConnectionException) {
+            return false;
+        }
+        return true;
     }
 }
