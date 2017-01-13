@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import org.slf4j.Logger;
@@ -108,11 +109,7 @@ public class CacheHandler implements InvocationHandler {
 
     private static Object invokeWithCache(CacheInvokeContext context)
             throws Throwable {
-        if (!ExpressionUtil.evalCondition(context)) {
-            return invokeOrigin(context);
-        }
 
-        CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
         Cache cache = context.cacheFunction.apply(context);
         if (cache == null) {
             logger.error("no cache with name: " + context.method);
@@ -124,32 +121,46 @@ public class CacheHandler implements InvocationHandler {
             key = "_$JETCACHE_NULL_KEY$_";
         }
 
+        if (!ExpressionUtil.evalCondition(context)) {
+            return loadAndCount(context, cache, key);
+        }
+
         // the semantics of "unless" and "cacheNullValue" is not very accurate, we do our best to process it.
         CacheGetResult cacheGetResult = cache.GET(key);
         if (cacheGetResult.isSuccess()) {
             context.result = cacheGetResult.getValue();
         }
-        if (!cacheGetResult.isSuccess() || (context.result == null && !cacheAnnoConfig.isCacheNullValue())) {
-            context.result = invokeOrigin(context);
-            if (canNotCache(context)) {
-                if (cacheGetResult.isSuccess()) {
-                    cache.remove(key);
-                }
-            } else {
+        if (!cacheGetResult.isSuccess()) {//not hit
+            context.result = loadAndCount(context, cache, key);
+            if (!canNotCache(context)) {
                 cache.put(key, context.result);
             }
         } else { //cache hit
             if (canNotCache(context)) {
-                context.result = invokeOrigin(context);//reload
-                if (canNotCache(context)) {//eval again
-                    cache.remove(key);
-                } else {// new result can cache, do update
+                context.result = loadAndCount(context, cache, key);//reload
+                if (!canNotCache(context)) {//eval again
                     cache.put(key, context.result);
                 }
             }
         }
 
         return context.result;
+    }
+
+    private static Object loadAndCount(CacheInvokeContext context, Cache cache, Object key) throws Throwable {
+        long t = System.currentTimeMillis();
+        Object v = null;
+        boolean success = false;
+        try {
+            v = invokeOrigin(context);
+            success = true;
+        } finally {
+            t = System.currentTimeMillis() - t;
+            if(cache instanceof MonitoredCache){
+                ((MonitoredCache)cache).getMonitor().afterLoad(t, key, v, success);
+            }
+        }
+        return v;
     }
 
     private static boolean canNotCache(CacheInvokeContext context) {
