@@ -81,11 +81,13 @@ public class DefaultCacheMonitorManager {
         };
         long delay = firstDelay(resetTime, resetTimeUnit);
         future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
+        logger.info("cache stat period at " + resetTime + " " + resetTimeUnit);
     }
 
     @PreDestroy
     public synchronized void stop() {
         future.cancel(false);
+        logger.info("cache stat canceled");
         future = null;
     }
 
