@@ -44,6 +44,8 @@ public class DefaultCacheMonnitorTest {
         Assert.assertEquals(5, s.getGetMissCount());
         Assert.assertEquals(3, s.getPutCount());
         Assert.assertEquals(3, s.getInvalidateCount());
+        Assert.assertEquals(4, s.getLoadCount());
+        Assert.assertEquals(4, s.getLoadSuccessCount());
     }
 
     @Test
