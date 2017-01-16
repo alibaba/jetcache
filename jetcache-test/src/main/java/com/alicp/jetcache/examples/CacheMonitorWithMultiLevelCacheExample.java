@@ -36,7 +36,7 @@ public class CacheMonitorWithMultiLevelCacheExample {
         Cache<String, Integer> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
         Cache<String, Integer> orderCache = new MonitoredCache<>(multiLevelCache, orderCacheMonitor);
 
-        boolean verboseLog = false;
+        boolean verboseLog = true;
         DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
         statLogger.add(l1CacheMonitor, l2CacheMonitor, orderCacheMonitor);
         statLogger.start();
@@ -48,6 +48,7 @@ public class CacheMonitorWithMultiLevelCacheExample {
                 orderCache.get("20161212");
                 orderCache.remove("20161111");
                 orderCache.remove("20161212");
+                orderCache.computeIfAbsent("20161111", (k) -> 100000);
                 try {
                     Thread.sleep(100);
                 } catch (Exception e) {
