@@ -1,7 +1,9 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.external.ExternalCacheConfig;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.util.Pool;
 
 /**
  * Created on 2016/10/7.
@@ -10,13 +12,13 @@ import redis.clients.jedis.JedisPool;
  */
 public class RedisCacheConfig extends ExternalCacheConfig {
 
-    private JedisPool jedisPool;
+    private Pool<Jedis> jedisPool;
 
-    public JedisPool getJedisPool() {
+    public Pool<Jedis> getJedisPool() {
         return jedisPool;
     }
 
-    public void setJedisPool(JedisPool jedisPool) {
+    public void setJedisPool(Pool<Jedis> jedisPool) {
         this.jedisPool = jedisPool;
     }
 }

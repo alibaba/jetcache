@@ -2,24 +2,28 @@ package com.alicp.jetcache.autoconfigure;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.util.Pool;
 
 /**
  * Created on 2016/12/28.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class JedisPoolFactory implements FactoryBean<JedisPool> {
+public class JedisPoolFactory implements FactoryBean<Pool<Jedis>> {
     private String key;
+    private Class<?> poolClass;
 
     @Autowired
     private AutoConfigureBeans autoConfigureBeans;
 
     private boolean inited;
-    private JedisPool jedisPool;
+    private Pool<Jedis> jedisPool;
 
-    public JedisPoolFactory(String key){
+    public JedisPoolFactory(String key, Class<?> poolClass){
         this.key = key;
+        this.poolClass = poolClass;
     }
 
     public String getKey() {
@@ -27,9 +31,9 @@ public class JedisPoolFactory implements FactoryBean<JedisPool> {
     }
 
     @Override
-    public JedisPool getObject() throws Exception {
+    public Pool<Jedis> getObject() throws Exception {
         if (!inited) {
-            jedisPool = (JedisPool) autoConfigureBeans.getCustomContainer().get("jedisPool." + key);
+            jedisPool = (Pool<Jedis>) autoConfigureBeans.getCustomContainer().get("jedisPool." + key);
             inited = true;
         }
         return jedisPool;
@@ -37,7 +41,7 @@ public class JedisPoolFactory implements FactoryBean<JedisPool> {
 
     @Override
     public Class<?> getObjectType() {
-        return JedisPool.class;
+        return poolClass;
     }
 
     @Override

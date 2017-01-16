@@ -9,6 +9,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.exceptions.JedisConnectionException;
+import redis.clients.util.Pool;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -27,17 +28,17 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     Function<Object, byte[]> valueEncoder;
     Function<byte[], Object> valueDecoder;
-    private JedisPool jedisPool;
+    private Pool<Jedis> pool;
 
     public RedisCache(RedisCacheConfig config) {
         super(config);
         this.config = config;
-        this.jedisPool = config.getJedisPool();
+        this.pool = config.getJedisPool();
         this.valueEncoder = config.getValueEncoder();
         this.valueDecoder = config.getValueDecoder();
 
-        if (jedisPool == null) {
-            throw new CacheConfigException("no jedisPool");
+        if (pool == null) {
+            throw new CacheConfigException("no pool");
         }
     }
 
@@ -49,14 +50,14 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     @Override
     public <T> T unwrap(Class<T> clazz) {
         if (clazz.equals(JedisPool.class)) {
-            return (T) jedisPool;
+            return (T) pool;
         }
         throw new IllegalArgumentException(clazz.getName());
     }
 
     @Override
     protected CacheGetResult<CacheValueHolder<V>> getHolder(K key) {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             byte[] newKey = buildKey(key);
 
             if (!config.isExpireAfterAccess()) {
@@ -95,7 +96,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
             byte[] newKey = buildKey(key);
             String rt = jedis.psetex(newKey, timeUnit.toMillis(expire), valueEncoder.apply(holder));
@@ -116,7 +117,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     private CacheResult REMOVE_impl(Object key, byte[] newKey) {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             Long rt = jedis.del(newKey);
             if (rt == null) {
                 return CacheResult.FAIL_WITHOUT_MSG;
@@ -135,7 +136,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             final String uuid = UUID.randomUUID().toString();
             final byte[] newKey = buildKey(key);
             final long expireTimestamp = System.currentTimeMillis() + timeUnit.toMillis(expire);
@@ -191,7 +192,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis jedis = pool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
             byte[] newKey = buildKey(key);
             String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expire));

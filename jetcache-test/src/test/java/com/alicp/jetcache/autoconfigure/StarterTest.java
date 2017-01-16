@@ -89,13 +89,13 @@ public class StarterTest extends SpringTest {
         @Bean(name = "defaultPool")
         @DependsOn("redisAutoInit")
         public JedisPoolFactory defaultPool() {
-            return new JedisPoolFactory("remote.default");
+            return new JedisPoolFactory("remote.default", JedisPool.class);
         }
 
         @Bean(name = "A1Pool")
         @DependsOn("redisAutoInit")
         public JedisPoolFactory A1Pool() {
-            return new JedisPoolFactory("remote.A1");
+            return new JedisPoolFactory("remote.A1", JedisPool.class);
         }
     }
 

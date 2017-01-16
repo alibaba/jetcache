@@ -11,9 +11,14 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.Protocol;
+import redis.clients.util.Pool;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -60,7 +65,22 @@ public class RedisAutoConfiguration {
             String clientName = r.getProperty("clientName", (String) null);
             boolean ssl = Boolean.parseBoolean(r.getProperty("ssl", "false"));
 
-            JedisPool jedisPool = new JedisPool(poolConfig, host, port, timeout, password, database, clientName, ssl);
+            String masterName = r.getProperty("masterName", (String) null);
+            String sentinels = r.getProperty("sentinels", (String) null);//ip1:port,ip2:port
+
+            Pool<Jedis> jedisPool;
+            if (sentinels == null) {
+                jedisPool = new JedisPool(poolConfig, host, port, timeout, password, database, clientName, ssl);
+            } else {
+                String[] strings = sentinels.split(",");
+                HashSet<String> sentinelsSet = new HashSet<>();
+                for (String s : strings) {
+                    if (s != null && !s.trim().equals("")) {
+                        sentinelsSet.add(s);
+                    }
+                }
+                jedisPool = new JedisSentinelPool(masterName, sentinelsSet, poolConfig, timeout, password, database, clientName);
+            }
 
 
             ExternalCacheBuilder externalCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
