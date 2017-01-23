@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns="http://www.alibaba.com/schema/jetcache"
+<xsd:schema xmlns="http://www.alibaba.com/schema/jetcache2"
             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.alibaba.com/schema/jetcache"
+            targetNamespace="http://www.alibaba.com/schema/jetcache2"
             elementFormDefault="qualified"
             attributeFormDefault="unqualified">
 
