@@ -25,29 +25,38 @@ public class JetCacheAutoConfiguration {
     public JetCacheAutoConfiguration(){
     }
 
+    private SpringConfigProvider springConfigProvider = new SpringConfigProvider();
+
+    private AutoConfigureBeans autoConfigureBeans = new AutoConfigureBeans();
+
+    private GlobalCacheConfig globalCacheConfig;
+
     @Autowired
     private JetCacheProperties props;
 
     @Bean
     @ConditionalOnMissingBean
     public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
+        return springConfigProvider;
     }
 
     @Bean
     public AutoConfigureBeans autoConfigureBeans(){
-        return new AutoConfigureBeans();
+        return autoConfigureBeans;
     }
 
     @Bean
-    public GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider,AutoConfigureBeans autoConfigureBeans) {
-        GlobalCacheConfig c = new GlobalCacheConfig();
-        c.setConfigProvider(configProvider);
-        c.setHiddenPackages(props.getHidePackages());
-        c.setStatIntervalMinutes(props.getStatIntervalMinutes());
-        c.setLocalCacheBuilders(autoConfigureBeans.getLocalCacheBuilders());
-        c.setRemoteCacheBuilders(autoConfigureBeans.getRemoteCacheBuilders());
-        return c;
+    public synchronized GlobalCacheConfig globalCacheConfig() {
+        if (globalCacheConfig != null) {
+            return globalCacheConfig;
+        }
+        globalCacheConfig = new GlobalCacheConfig();
+        globalCacheConfig.setConfigProvider(springConfigProvider);
+        globalCacheConfig.setHiddenPackages(props.getHidePackages());
+        globalCacheConfig.setStatIntervalMinutes(props.getStatIntervalMinutes());
+        globalCacheConfig.setLocalCacheBuilders(autoConfigureBeans.getLocalCacheBuilders());
+        globalCacheConfig.setRemoteCacheBuilders(autoConfigureBeans.getRemoteCacheBuilders());
+        return globalCacheConfig;
     }
 
 }
