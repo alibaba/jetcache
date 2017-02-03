@@ -11,7 +11,7 @@ public interface CacheMonitor {
 
     void afterPUT(long millis, Object key, Object value, CacheResult result);
 
-    void afterINVALIDATE(long millis, Object key, CacheResult result);
+    void afterREMOVE(long millis, Object key, CacheResult result);
 
     void afterLoad(long millis, Object key, Object loadedValue, boolean success);
 }

@@ -94,7 +94,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         long t = System.currentTimeMillis();
         CacheResult result = cache.REMOVE(key);
         t = System.currentTimeMillis() - t;
-        monitor.afterINVALIDATE(t, key, result);
+        monitor.afterREMOVE(t, key, result);
         return result;
     }
 

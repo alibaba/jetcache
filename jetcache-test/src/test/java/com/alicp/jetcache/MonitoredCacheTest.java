@@ -26,7 +26,7 @@ public class MonitoredCacheTest extends AbstractCacheTest {
             }
 
             @Override
-            public void afterINVALIDATE(long millis, Object key, CacheResult result) {
+            public void afterREMOVE(long millis, Object key, CacheResult result) {
 
             }
 

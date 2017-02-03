@@ -85,7 +85,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
     }
 
     @Override
-    public synchronized void afterINVALIDATE(long millis, Object key, CacheResult result) {
+    public synchronized void afterREMOVE(long millis, Object key, CacheResult result) {
         cacheStat.minInvalidateTime = Math.min(cacheStat.minInvalidateTime, millis);
         cacheStat.maxInvalidateTime = Math.max(cacheStat.maxInvalidateTime, millis);
         cacheStat.invalidateTimeSum += millis;
