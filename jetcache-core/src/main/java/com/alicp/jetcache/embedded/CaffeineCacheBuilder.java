@@ -9,8 +9,8 @@ public class CaffeineCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Emb
     public static class CaffeineCacheBuilderImpl extends CaffeineCacheBuilder<CaffeineCacheBuilderImpl> {
     }
 
-    public static CaffeineCacheBuilder createCaffeineCacheBuilder() {
-        return new CaffeineCacheBuilder();
+    public static CaffeineCacheBuilderImpl createCaffeineCacheBuilder() {
+        return new CaffeineCacheBuilderImpl();
     }
 
     public CaffeineCacheBuilder() {
