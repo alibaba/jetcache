@@ -20,7 +20,7 @@ public class StatInfoLogger implements Consumer<StatInfo> {
     private static Logger logger = LoggerFactory.getLogger(StatInfoLogger.class);
     private boolean verboseLog;
 
-    protected int maxNameLength = 55;
+    protected int maxNameLength = 65;
 
     public StatInfoLogger(boolean verboseLog) {
         this.verboseLog = verboseLog;
