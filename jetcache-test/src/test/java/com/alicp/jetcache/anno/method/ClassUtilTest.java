@@ -76,15 +76,15 @@ public class ClassUtilTest {
         Method m3 = C1.class.getMethod("foo2", I1.class);
 
         String s1 = m1.getName() + "()V";
-        String s2 = ClassUtil.getMethodSig(m1, hidePack);
+        String s2 = ClassUtil.getMethodSig(m1);
         Assert.assertEquals(s1, s2);
 
-        s1 = m2.getName() + "(Lmethod/ClassUtilTest$I1;)Ljava/lang/String;";
-        s2 = ClassUtil.getMethodSig(m2, hidePack);
+        s1 = m2.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
+        s2 = ClassUtil.getMethodSig(m2);
         Assert.assertEquals(s1, s2);
 
         s1 = m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
-        s2 = ClassUtil.getMethodSig(m3, null);
+        s2 = ClassUtil.getMethodSig(m3);
         Assert.assertEquals(s1, s2);
     }
 

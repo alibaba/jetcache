@@ -64,14 +64,14 @@ public class ClassUtil {
         sb.append(Type.getType(m).getDescriptor());
     }
 
-    public static String getMethodSig(Method m, String[] hidePackages) {
+    public static String getMethodSig(Method m) {
         String sig = methodSigMap.get(m);
         if (sig != null) {
             return sig;
         } else {
             StringBuilder sb = new StringBuilder();
             getMethodSig(sb, m);
-            sig = removeHiddenPackage(hidePackages, sb);
+            sig = sb.toString();
             methodSigMap.put(m, sig);
             return sig;
         }

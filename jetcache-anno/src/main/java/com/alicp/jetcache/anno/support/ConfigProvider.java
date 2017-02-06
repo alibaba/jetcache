@@ -24,9 +24,6 @@ public class ConfigProvider {
             return KryoValueEncoder.INSTANCE;
         } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueEncoder)) {
             return JavaValueEncoder.INSTANCE;
-        } else if (SerialPolicy.FASTJSON.equalsIgnoreCase(valueEncoder)) {
-            //noinspection deprecation
-            return FastjsonValueEncoder.INSTANCE;
         } else {
             throw new CacheConfigException("not supported:" + valueEncoder);
         }
@@ -41,9 +38,6 @@ public class ConfigProvider {
             return KryoValueDecoder.INSTANCE;
         } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueDecoder)) {
             return JavaValueDecoder.INSTANCE;
-        } else if (SerialPolicy.FASTJSON.equalsIgnoreCase(valueDecoder)) {
-            //noinspection deprecation
-            return FastjsonValueDecoder.INSTANCE;
         } else {
             throw new CacheConfigException("not supported:" + valueDecoder);
         }

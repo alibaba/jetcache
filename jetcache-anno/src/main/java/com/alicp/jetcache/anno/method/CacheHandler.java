@@ -67,7 +67,7 @@ public class CacheHandler implements InvocationHandler {
             context = contextSupplier.get();
             context.cacheInvokeConfig = cacheInvokeConfig;
         } else {
-            String sig = ClassUtil.getMethodSig(method, hiddenPackages);
+            String sig = ClassUtil.getMethodSig(method);
             CacheInvokeConfig cac = configMap.get(sig);
             if (cac != null) {
                 context = contextSupplier.get();
