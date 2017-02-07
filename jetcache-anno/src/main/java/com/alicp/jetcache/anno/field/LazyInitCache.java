@@ -67,9 +67,11 @@ class LazyInitCache implements ProxyCache {
         String cacheName = cac.getName();
         if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
             StringBuilder sb = new StringBuilder();
-            sb.append(field.getDeclaringClass().getName());
+            String className = field.getDeclaringClass().getName();
+            className = ClassUtil.removeHiddenPackage(globalCacheConfig.getHiddenPackages(),className);
+            className = ClassUtil.getShortClassName(className);
+            sb.append(className);
             sb.append(".").append(field.getName());
-            ClassUtil.removeHiddenPackage(globalCacheConfig.getHiddenPackages(), sb);
             cacheName = sb.toString();
         }
         String fullCacheName = cac.getArea() + "_" + cacheName;

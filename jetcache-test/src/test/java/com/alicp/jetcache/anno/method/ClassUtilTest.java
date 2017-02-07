@@ -56,17 +56,33 @@ public class ClassUtilTest {
         Method m2 = C1.class.getMethod("foo", I1.class);
         Method m3 = C1.class.getMethod("foo2", I1.class);
 
-        String s1 = "method.ClassUtilTest$C1." + m1.getName() + "()V";
+        String s1 = "m.ClassUtilTest$C1." + m1.getName() + "()";
         String s2 = ClassUtil.generateCacheName(m1, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = "method.ClassUtilTest$C1." + m2.getName() + "(Lmethod/ClassUtilTest$I1;)Ljava/lang/String;";
+        s1 = "m.ClassUtilTest$C1." + m2.getName() + "(Lm.ClassUtilTest$I1;)";
         s2 = ClassUtil.generateCacheName(m2, hidePack);
         Assert.assertEquals(s1, s2);
 
-        s1 = C1.class.getName() + "." + m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
+        s1 = "c.a.j.a.m.ClassUtilTest$C1." + m3.getName() + "(Lc.a.j.a.m.ClassUtilTest$I1;)";
         s2 = ClassUtil.generateCacheName(m3, null);
         Assert.assertEquals(s1, s2);
+    }
+
+    @Test
+    public void removeHiddenPackageTest() {
+        String[] hs = {"com.foo", "com.bar."};
+        Assert.assertEquals("Foo", ClassUtil.removeHiddenPackage(hs, "com.foo.Foo"));
+        Assert.assertEquals("foo.Bar", ClassUtil.removeHiddenPackage(hs, "com.bar.foo.Bar"));
+        Assert.assertEquals("", ClassUtil.removeHiddenPackage(hs, "com.foo"));
+        Assert.assertEquals("com.bar.foo.Bar", ClassUtil.removeHiddenPackage(null, "com.bar.foo.Bar"));
+        Assert.assertEquals(null, ClassUtil.removeHiddenPackage(hs, null));
+    }
+
+    @Test
+    public void getShortClassNameTest() {
+        Assert.assertEquals("j.l.String",ClassUtil.getShortClassName("java.lang.String"));
+        Assert.assertEquals("String",ClassUtil.getShortClassName("String"));
     }
 
     @Test
