@@ -19,7 +19,7 @@ public class CaffeineCacheTest extends AbstractEmbeddedCacheTest {
 
     @Test
     public void test() throws Exception {
-        super.test(1000, false);
+        super.test(2000, false);
 
 //        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
 //                .buildFunc(getBuildFunc()).expireAfterWrite(100, TimeUnit.MILLISECONDS).limit(2).build();
