@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Configuration
 public class JetCacheProxyConfiguration implements ImportAware {
 
-    protected AnnotationAttributes enableJetCache;
+    protected AnnotationAttributes enableMethodCache;
 
     private ConcurrentHashMap configMap = new ConcurrentHashMap();
 
@@ -31,11 +31,11 @@ public class JetCacheProxyConfiguration implements ImportAware {
 
     @Override
     public void setImportMetadata(AnnotationMetadata importMetadata) {
-        this.enableJetCache = AnnotationAttributes.fromMap(
+        this.enableMethodCache = AnnotationAttributes.fromMap(
                 importMetadata.getAnnotationAttributes(EnableMethodCache.class.getName(), false));
-        if (this.enableJetCache == null) {
+        if (this.enableMethodCache == null) {
             throw new IllegalArgumentException(
-                    "@EnableJetCache is not present on importing class " + importMetadata.getClassName());
+                    "@EnableMethodCache is not present on importing class " + importMetadata.getClassName());
         }
     }
 
@@ -45,9 +45,9 @@ public class JetCacheProxyConfiguration implements ImportAware {
         CacheAdvisor advisor = new CacheAdvisor();
         advisor.setAdviceBeanName(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME);
         advisor.setAdvice(jetCacheInterceptor);
-        advisor.setBasePackages(this.enableJetCache.getStringArray("basePackages"));
+        advisor.setBasePackages(this.enableMethodCache.getStringArray("basePackages"));
         advisor.setCacheConfigMap(configMap);
-        advisor.setOrder(this.enableJetCache.<Integer>getNumber("order"));
+        advisor.setOrder(this.enableMethodCache.<Integer>getNumber("order"));
         return advisor;
     }
 
