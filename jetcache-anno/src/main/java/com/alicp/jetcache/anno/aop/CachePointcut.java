@@ -5,6 +5,8 @@ package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.method.CacheConfigUtil;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 
@@ -17,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(CachePointcut.class);
+
     private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap = new ConcurrentHashMap<>();
     private String[] basePackages;
 
@@ -26,6 +30,12 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     public boolean matches(Class clazz) {
+        boolean b = matchesImpl(clazz);
+        logger.debug("check class match [{}]: {}", b, clazz);
+        return b;
+    }
+
+    private boolean matchesImpl(Class clazz) {
         if (matchesThis(clazz)) {
             return true;
         }
@@ -77,6 +87,12 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     public boolean matches(Method method, Class targetClass) {
+        boolean b = matchesImpl(method, targetClass);
+        logger.debug("check method match [{}]: {} in {}", b, method, targetClass);
+        return b;
+    }
+
+    private boolean matchesImpl(Method method, Class targetClass) {
         CacheInvokeConfig cac = cacheConfigMap.get(method);
         if (cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
             return false;
