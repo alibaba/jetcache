@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.method.CacheConfigUtil;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.method.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.ClassFilter;
@@ -91,11 +92,17 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         boolean b = matchesImpl(method, targetClass);
         if (b) {
             if (logger.isDebugEnabled()) {
-                logger.debug("check method match [true]: method={}, declaringClass={}, targetClass={}", method.getName(), method.getDeclaringClass().getSimpleName(), targetClass == null ? null : targetClass.getSimpleName());
+                logger.debug("check method match [true]: method={}, declaringClass={}, targetClass={}",
+                        method.getName(),
+                        ClassUtil.getShortClassName(method.getDeclaringClass().getName()),
+                        targetClass == null ? null : ClassUtil.getShortClassName(targetClass.getName()));
             }
         } else {
             if (logger.isTraceEnabled()) {
-                logger.trace("check method match [false]: method={}, declaringClass={}, targetClass={}", method.getName(), method.getDeclaringClass().getSimpleName(), targetClass == null ? null : targetClass.getSimpleName());
+                logger.trace("check method match [false]: method={}, declaringClass={}, targetClass={}",
+                        method.getName(),
+                        ClassUtil.getShortClassName(method.getDeclaringClass().getName()),
+                        targetClass == null ? null : ClassUtil.getShortClassName(targetClass.getName()));
             }
         }
         return b;
