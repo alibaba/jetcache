@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component("testBean")
 public class TestBean {
 
-    private int count = 0;
+    private static int count = 0;
 
 
     public TestBean() {
@@ -23,6 +23,11 @@ public class TestBean {
 
     public int noCacheCount(){
         return count++;
+    }
+
+    @Cached
+    public static int staticCount() {
+        return count;
     }
 
     @Cached

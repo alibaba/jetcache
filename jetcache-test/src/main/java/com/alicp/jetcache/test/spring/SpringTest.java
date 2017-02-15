@@ -30,21 +30,9 @@ public class SpringTest implements ApplicationContextAware {
     }
 
     private void testService(Service service, TestBean bean) {
-        int x1;
-        int x2;
-        int x3;
         Assert.assertNotEquals(service.notCachedCount(), service.notCachedCount());
-
-        x1 = service.countWithAnnoOnClass();
-        x2 = service.countWithAnnoOnClass();
-        x3 = service.countWithAnnoOnClass();
-        Assert.assertEquals(x1, x2);
-        Assert.assertEquals(x1, x3);
-
-        x1 = service.countWithAnnoOnInterface();
-        x2 = service.countWithAnnoOnInterface();
-        Assert.assertEquals(x1, x2);
-
+        Assert.assertEquals(service.countWithAnnoOnClass(), service.countWithAnnoOnClass());
+        Assert.assertEquals(service.countWithAnnoOnInterface(), service.countWithAnnoOnInterface());
         Assert.assertNotEquals(service.enableCacheWithNoCacheCount(bean), service.enableCacheWithNoCacheCount(bean));
         Assert.assertEquals(service.enableCacheWithAnnoOnClass(bean), service.enableCacheWithAnnoOnClass(bean));
         Assert.assertEquals(service.enableCacheWithAnnoOnInterface(bean), service.enableCacheWithAnnoOnInterface(bean));
@@ -52,6 +40,7 @@ public class SpringTest implements ApplicationContextAware {
 
     private void testTestBean(TestBean bean) {
         Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
+        Assert.assertEquals(bean.staticCount(), bean.staticCount());
         Assert.assertEquals(bean.count(), bean.count());
         Assert.assertEquals(bean.countWithLocalCache(), bean.countWithLocalCache());
         Assert.assertEquals(bean.countWithBoth(), bean.countWithBoth());
