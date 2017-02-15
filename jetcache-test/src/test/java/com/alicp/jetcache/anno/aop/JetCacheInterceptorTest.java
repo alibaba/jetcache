@@ -34,7 +34,7 @@ public class JetCacheInterceptorTest {
         globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        ConcurrentHashMap<Method, CacheInvokeConfig> map = new ConcurrentHashMap();
+        ConcurrentHashMap<String, CacheInvokeConfig> map = new ConcurrentHashMap();
         pc.setCacheConfigMap(map);
         interceptor = new JetCacheInterceptor();
         interceptor.setCacheConfigMap(map);

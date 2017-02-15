@@ -18,25 +18,32 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class JetCacheInterceptor implements MethodInterceptor {
 
-    private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap;
+    private ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap;
     private GlobalCacheConfig globalCacheConfig;
 
     public Object invoke(final MethodInvocation invocation) throws Throwable {
-        final CacheInvokeConfig cac = cacheConfigMap.get(invocation.getMethod());
+        Method method = invocation.getMethod();
+        Object obj = invocation.getThis();
+        CacheInvokeConfig cac = null;
+        if (obj != null) {
+            String key = CachePointcut.getKey(method, obj.getClass());
+            cac  = cacheConfigMap.get(key);
+        }
+
         if (cac == null) {
             return invocation.proceed();
         }
 
         CacheInvokeContext context = globalCacheConfig.getCacheContext().createCacheInvokeContext();
         context.setInvoker(invocation::proceed);
-        context.setMethod(invocation.getMethod());
+        context.setMethod(method);
         context.setArgs(invocation.getArguments());
         context.setCacheInvokeConfig(cac);
         context.setHiddenPackages(globalCacheConfig.getHiddenPackages());
         return CacheHandler.invoke(context);
     }
 
-    public void setCacheConfigMap(ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap) {
+    public void setCacheConfigMap(ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 

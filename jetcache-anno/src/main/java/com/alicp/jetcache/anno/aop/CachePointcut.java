@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
+import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -21,7 +22,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
 
     private static final Logger logger = LoggerFactory.getLogger(CachePointcut.class);
 
-    private ConcurrentHashMap<Method, CacheInvokeConfig> cacheConfigMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap;
     private String[] basePackages;
 
     public CachePointcut(String[] basePackages) {
@@ -42,14 +43,14 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         Class[] cs = clazz.getInterfaces();
         if (cs != null) {
             for (Class c : cs) {
-                if (matches(c)) {
+                if (matchesImpl(c)) {
                     return true;
                 }
             }
         }
         if (!clazz.isInterface()) {
             Class sp = clazz.getSuperclass();
-            if(sp != null && matches(sp)){
+            if (sp != null && matchesImpl(sp)) {
                 return true;
             }
         }
@@ -89,22 +90,27 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     public boolean matches(Method method, Class targetClass) {
         boolean b = matchesImpl(method, targetClass);
         if (b) {
-            logger.debug("check method match [true]: {} in {}", method, targetClass);
+            if (logger.isDebugEnabled()) {
+                logger.debug("check method match [true]: method={}, declaringClass={}, targetClass={}", method.getName(), method.getDeclaringClass().getSimpleName(), targetClass == null ? null : targetClass.getSimpleName());
+            }
         } else {
-            logger.trace("check method match [false]: {} in {}", method, targetClass);
+            if (logger.isTraceEnabled()) {
+                logger.trace("check method match [false]: method={}, declaringClass={}, targetClass={}", method.getName(), method.getDeclaringClass().getSimpleName(), targetClass == null ? null : targetClass.getSimpleName());
+            }
         }
         return b;
     }
 
     private boolean matchesImpl(Method method, Class targetClass) {
-        CacheInvokeConfig cac = cacheConfigMap.get(method);
+        String key = getKey(method, targetClass);
+        CacheInvokeConfig cac = cacheConfigMap.get(key);
         if (cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
             return false;
         } else if (cac != null) {
             return true;
         } else {
             cac = new CacheInvokeConfig();
-            if (matchesThis(method.getClass())) {
+            if (matchesThis(method.getDeclaringClass())) {
                 CacheConfigUtil.parse(cac, method);
             }
 
@@ -113,13 +119,26 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             parseByTargetClass(cac, targetClass, name, paramTypes);
 
             if (!cac.isEnableCacheContext() && cac.getCacheAnnoConfig() == null) {
-                cacheConfigMap.put(method, CacheInvokeConfig.getNoCacheInvokeConfigInstance());
+                cacheConfigMap.put(key, CacheInvokeConfig.getNoCacheInvokeConfigInstance());
                 return false;
             } else {
-                cacheConfigMap.put(method, cac);
+                cacheConfigMap.put(key, cac);
                 return true;
             }
         }
+    }
+
+    public static String getKey(Method method, Class targetClass) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(method.getDeclaringClass().getName());
+        sb.append('.');
+        sb.append(method.getName());
+        sb.append(Type.getMethodDescriptor(method));
+        if (targetClass != null) {
+            sb.append('_');
+            sb.append(targetClass.getName());
+        }
+        return sb.toString();
     }
 
     private void parseByTargetClass(CacheInvokeConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {

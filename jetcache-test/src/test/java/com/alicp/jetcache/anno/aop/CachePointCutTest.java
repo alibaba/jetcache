@@ -7,6 +7,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CachePointCutTest {
     private CachePointcut pc;
-    private ConcurrentHashMap<Method, CacheInvokeConfig> map;
+    private ConcurrentHashMap<String, CacheInvokeConfig> map;
 
     @Before
     public void setup() {
@@ -41,40 +42,27 @@ public class CachePointCutTest {
         }
     }
 
-    class C1_2 implements OtherService {
-        public int bar() {
-            return 0;
-        }
-
-        @Cached
-        public int bar2(){
-            return 0;
-        }
-    }
-
     @Test
     public void testMatches1() throws Exception {
         Assert.assertTrue(pc.matches(C1.class));
         Assert.assertTrue(pc.matches(I1.class));
-        Assert.assertTrue(pc.matches(C1_2.class));
+
         Method m1 = I1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo");
-        Method m3 = OtherService.class.getMethod("bar");
-        Method m4 = C1_2.class.getMethod("bar");
+
         Assert.assertTrue(pc.matches(m1, C1.class));
         Assert.assertTrue(pc.matches(m2, C1.class));
         Assert.assertTrue(pc.matches(m1, I1.class));
         Assert.assertTrue(pc.matches(m2, I1.class));
-        Assert.assertFalse(pc.matches(m3, OtherService.class));
-        Assert.assertFalse(pc.matches(m4, OtherService.class));
-        Assert.assertFalse(pc.matches(m3, C1_2.class));
-        Assert.assertFalse(pc.matches(m4, C1_2.class));
-        Assert.assertTrue(pc.matches(C1_2.class.getMethod("bar2"), C1_2.class));
 
-        Assert.assertFalse(map.get(m1).isEnableCacheContext());
-        Assert.assertFalse(map.get(m2).isEnableCacheContext());
-        Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
-        Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
+        Assert.assertFalse(map.get(CachePointcut.getKey(m1, C1.class)).isEnableCacheContext());
+        Assert.assertFalse(map.get(CachePointcut.getKey(m1, I1.class)).isEnableCacheContext());
+        Assert.assertFalse(map.get(CachePointcut.getKey(m2, C1.class)).isEnableCacheContext());
+        Assert.assertFalse(map.get(CachePointcut.getKey(m2, I1.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, C1.class)).getCacheAnnoConfig());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, I1.class)).getCacheAnnoConfig());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, C1.class)).getCacheAnnoConfig());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, I1.class)).getCacheAnnoConfig());
 
         Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, (proxy, method, args) -> null);
         Assert.assertTrue(pc.matches(m1, o1.getClass()));
@@ -100,13 +88,19 @@ public class CachePointCutTest {
         Method m2 = C2.class.getMethod("foo");
         Assert.assertTrue(pc.matches(m1, C2.class));
         Assert.assertTrue(pc.matches(m2, C2.class));
-        Assert.assertTrue(pc.matches(m1, I2.class));
+        Assert.assertFalse(pc.matches(m1, I2.class));
         Assert.assertTrue(pc.matches(m2, I2.class));
 
-        Assert.assertFalse(map.get(m1).isEnableCacheContext());
-        Assert.assertFalse(map.get(m2).isEnableCacheContext());
-        Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
-        Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
+        Assert.assertSame(CacheInvokeConfig.getNoCacheInvokeConfigInstance(), map.get(CachePointcut.getKey(m1, I2.class)));
+
+        Assert.assertFalse(map.get(CachePointcut.getKey(m1, C2.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, C2.class)).getCacheAnnoConfig());
+
+        Assert.assertFalse(map.get(CachePointcut.getKey(m2, I2.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, I2.class)).getCacheAnnoConfig());
+
+        Assert.assertFalse(map.get(CachePointcut.getKey(m2, C2.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, C2.class)).getCacheAnnoConfig());
     }
 
     interface I3_Parent {
@@ -133,21 +127,30 @@ public class CachePointCutTest {
         Assert.assertTrue(pc.matches(m1, C3.class));
         Assert.assertTrue(pc.matches(m2, C3.class));
         Assert.assertTrue(pc.matches(m3, C3.class));
+        Assert.assertTrue(pc.matches(m1, I3.class));
+        Assert.assertTrue(pc.matches(m2, I3.class));
+        Assert.assertTrue(pc.matches(m3, I3.class));
 
-        Assert.assertTrue(map.get(m1).isEnableCacheContext());
-        Assert.assertTrue(map.get(m2).isEnableCacheContext());
-        Assert.assertTrue(map.get(m3).isEnableCacheContext());
-        Assert.assertEquals("A1", map.get(m1).getCacheAnnoConfig().getArea());
-        Assert.assertEquals(false, map.get(m1).getCacheAnnoConfig().isEnabled());
-        Assert.assertEquals(1, map.get(m1).getCacheAnnoConfig().getExpire());
-        Assert.assertEquals(CacheType.BOTH, map.get(m1).getCacheAnnoConfig().getCacheType());
-        Assert.assertEquals(2, map.get(m1).getCacheAnnoConfig().getLocalLimit());
 
+        Assert.assertTrue(map.get(CachePointcut.getKey(m1, I3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.get(CachePointcut.getKey(m1, C3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.get(CachePointcut.getKey(m2, I3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.get(CachePointcut.getKey(m2, C3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.get(CachePointcut.getKey(m3, I3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.get(CachePointcut.getKey(m3, C3.class)).isEnableCacheContext());
+
+
+        CacheAnnoConfig cac = map.get(CachePointcut.getKey(m1, I3.class)).getCacheAnnoConfig();
+        Assert.assertEquals("A1", cac.getArea());
+        Assert.assertEquals(false, cac.isEnabled());
+        Assert.assertEquals(1, cac.getExpire());
+        Assert.assertEquals(CacheType.BOTH, cac.getCacheType());
+        Assert.assertEquals(2, cac.getLocalLimit());
     }
 
 
     interface I4 {
-        @Cached
+        @Cached(enabled = false)
         int foo();
     }
 
@@ -155,6 +158,7 @@ public class CachePointCutTest {
     }
 
     class C4 implements I4_Sub {
+        @EnableCache
         public int foo() {
             return 0;
         }
@@ -169,10 +173,77 @@ public class CachePointCutTest {
         Assert.assertTrue(pc.matches(m1, I4.class));
         Assert.assertTrue(pc.matches(m2, I4.class));
 
-        Assert.assertFalse(map.get(m1).isEnableCacheContext());
-        Assert.assertFalse(map.get(m2).isEnableCacheContext());
-        Assert.assertNotNull(map.get(m1).getCacheAnnoConfig());
-        Assert.assertNotNull(map.get(m2).getCacheAnnoConfig());
+        Assert.assertFalse(map.get(CachePointcut.getKey(m1, I4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, I4.class)).getCacheAnnoConfig());
+
+        Assert.assertTrue(map.get(CachePointcut.getKey(m1, C4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, C4.class)).getCacheAnnoConfig());
+
+        Assert.assertTrue(map.get(CachePointcut.getKey(m2, I4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, I4.class)).getCacheAnnoConfig());
+
+        Assert.assertTrue(map.get(CachePointcut.getKey(m2, C4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, C4.class)).getCacheAnnoConfig());
 
     }
+
+    class C5 implements OtherService {
+        public int bar() {
+            return 0;
+        }
+
+        @Cached
+        public int bar2(){
+            return 0;
+        }
+    }
+
+    @Test
+    public void testMatches5()throws Exception{
+        Assert.assertTrue(pc.matches(C5.class));
+
+        Method m3 = OtherService.class.getMethod("bar");
+        Method m4 = C5.class.getMethod("bar");
+        Assert.assertFalse(pc.matches(m3, OtherService.class));
+        Assert.assertFalse(pc.matches(m4, OtherService.class));
+        Assert.assertFalse(pc.matches(m3, C5.class));
+        Assert.assertFalse(pc.matches(m4, C5.class));
+
+        Assert.assertTrue(pc.matches(C5.class.getMethod("bar2"), C5.class));
+    }
+
+
+    interface I6 {
+        int foo();
+    }
+
+    class C6_1 implements I6 {
+        public int foo() {
+            return 0;
+        }
+    }
+    class C6_2 implements I6 {
+        @Cached
+        public int foo() {
+            return 0;
+        }
+    }
+
+    @Test
+    public void testMatches6()throws Exception{
+        Method m1 = I6.class.getMethod("foo");
+        Method m2 = C6_1.class.getMethod("foo");
+        Method m3 = C6_2.class.getMethod("foo");
+
+        Assert.assertFalse(pc.matches(m1, I6.class));
+        Assert.assertFalse(pc.matches(m1, C6_1.class));
+        Assert.assertTrue(pc.matches(m1, C6_2.class));
+
+        Assert.assertFalse(pc.matches(m2, I6.class));
+        Assert.assertFalse(pc.matches(m2, C6_1.class));
+
+        Assert.assertTrue(pc.matches(m3, I6.class));
+        Assert.assertTrue(pc.matches(m3, C6_2.class));
+    }
+
 }
