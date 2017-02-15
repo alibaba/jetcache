@@ -14,13 +14,13 @@ public class ServiceImpl implements Service {
     private int count;
 
     @Override
-    public int m1() {
+    public int combinedTest1() {
         return count++;
     }
 
     @Override
     @Cached
-    public int m2() {
+    public int combinedTest2() {
         return count++;
     }
 }

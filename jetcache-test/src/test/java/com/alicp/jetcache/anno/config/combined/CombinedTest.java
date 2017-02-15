@@ -1,21 +1,15 @@
 package com.alicp.jetcache.anno.config.combined;
 
-import com.alicp.jetcache.anno.config.AnnoConfigTest;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.test.anno.TestUtil;
-import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * Created on 2017/2/14.
@@ -31,12 +25,12 @@ public class CombinedTest extends SpringTest {
         doTest();
 
         Service serviceDelegate = (Service) context.getBean("combinedServiceDelegate");
-        Assert.assertEquals(serviceDelegate.m1(), serviceDelegate.m1());
-        Assert.assertEquals(serviceDelegate.m2(), serviceDelegate.m2());
+        Assert.assertEquals(serviceDelegate.combinedTest1(), serviceDelegate.combinedTest1());
+        Assert.assertEquals(serviceDelegate.combinedTest2(), serviceDelegate.combinedTest2());
 
         Service service = (Service) context.getBean("combinedService");
-        Assert.assertEquals(service.m1(), service.m1());
-        Assert.assertEquals(service.m2(), service.m2());
+        Assert.assertEquals(service.combinedTest1(), service.combinedTest1());
+        Assert.assertEquals(service.combinedTest2(), service.combinedTest2());
     }
 
 

@@ -1,0 +1,19 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jetcache="http://www.alibaba.com/schema/jetcache2"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/util  http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        http://www.alibaba.com/schema/jetcache2 http://www.alibaba.com/schema/jetcache/jetcache2.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+    <aop:aspectj-autoproxy proxy-target-class="false">
+        <aop:include name="aspactjAspect"/>
+    </aop:aspectj-autoproxy>
+
+    <bean id="aspactjAspect" class="com.alicp.jetcache.anno.config.combined.AspectJAspect"/>
+
+</beans>

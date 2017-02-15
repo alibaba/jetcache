@@ -62,5 +62,6 @@
     <bean id="combinedServiceDelegate" class="com.alicp.jetcache.anno.config.combined.ServiceDelegate"/>
 
 
-
+    <import resource="combined-aop1.xml"/>
+    <import resource="combined-aop2.xml"/>
 </beans>

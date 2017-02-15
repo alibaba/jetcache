@@ -1,7 +1,6 @@
 package com.alicp.jetcache.anno.config.combined;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Created on 2017/2/14.
@@ -15,12 +14,12 @@ public class ServiceDelegate implements Service {
     private Service service;
 
     @Override
-    public int m1() {
-        return service.m1();
+    public int combinedTest1() {
+        return service.combinedTest1();
     }
 
     @Override
-    public int m2() {
-        return service.m2();
+    public int combinedTest2() {
+        return service.combinedTest2();
     }
 }

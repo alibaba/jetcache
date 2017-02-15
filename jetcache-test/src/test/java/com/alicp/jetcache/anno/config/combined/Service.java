@@ -9,7 +9,7 @@ import com.alicp.jetcache.anno.Cached;
  */
 public interface Service {
     @Cached
-    int m1();
+    int combinedTest1();
 
-    int m2();
+    int combinedTest2();
 }
