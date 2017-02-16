@@ -17,8 +17,5 @@ public class AspectJAspect {
     @Before("(target(com.alicp.jetcache.anno.config.combined.ServiceImpl) && execution(* *()))")
     public void after(JoinPoint jointPoint) {
         System.out.println("before " + jointPoint.getSignature());
-        if(jointPoint.getSignature().toString().contains("toString")){
-            new Exception().printStackTrace();
-        }
     }
 }
