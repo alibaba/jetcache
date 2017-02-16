@@ -9,6 +9,8 @@ import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,6 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class JetCacheInterceptor implements MethodInterceptor {
+
+    private static final Logger logger = LoggerFactory.getLogger(JetCacheInterceptor.class);
 
     private ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap;
     private GlobalCacheConfig globalCacheConfig;
@@ -28,6 +32,14 @@ public class JetCacheInterceptor implements MethodInterceptor {
         if (obj != null) {
             String key = CachePointcut.getKey(method, obj.getClass());
             cac  = cacheConfigMap.get(key);
+        }
+
+        if(logger.isTraceEnabled()){
+            logger.trace("JetCacheInterceptor invoke. foundJetCacheConfig={}, method={}.{}(), targetClass={}",
+                    cac != null,
+                    method.getDeclaringClass().getName(),
+                    method.getName(),
+                    invocation.getThis() == null ? null : invocation.getThis().getClass().getName());
         }
 
         if (cac == null) {
