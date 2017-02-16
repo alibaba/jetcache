@@ -33,7 +33,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
 
     public boolean matches(Class clazz) {
         boolean b = matchesImpl(clazz);
-        logger.debug("check class match {}: {}", b, clazz);
+        logger.trace("check class match {}: {}", b, clazz);
         return b;
     }
 
@@ -90,12 +90,20 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
 
     public boolean matches(Method method, Class targetClass) {
         boolean b = matchesImpl(method, targetClass);
-        if (logger.isDebugEnabled()) {
-            logger.debug("check method match {}: method={}, declaringClass={}, targetClass={}",
-                    b,
-                    method.getName(),
-                    ClassUtil.getShortClassName(method.getDeclaringClass().getName()),
-                    targetClass == null ? null : ClassUtil.getShortClassName(targetClass.getName()));
+        if (b) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("check method match true: method={}, declaringClass={}, targetClass={}",
+                        method.getName(),
+                        ClassUtil.getShortClassName(method.getDeclaringClass().getName()),
+                        targetClass == null ? null : ClassUtil.getShortClassName(targetClass.getName()));
+            }
+        } else {
+            if (logger.isTraceEnabled()) {
+                logger.trace("check method match false: method={}, declaringClass={}, targetClass={}",
+                        method.getName(),
+                        ClassUtil.getShortClassName(method.getDeclaringClass().getName()),
+                        targetClass == null ? null : ClassUtil.getShortClassName(targetClass.getName()));
+            }
         }
         return b;
     }

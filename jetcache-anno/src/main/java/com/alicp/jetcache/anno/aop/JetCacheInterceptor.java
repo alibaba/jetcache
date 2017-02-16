@@ -34,6 +34,7 @@ public class JetCacheInterceptor implements MethodInterceptor {
             cac  = cacheConfigMap.get(key);
         }
 
+        /*
         if(logger.isTraceEnabled()){
             logger.trace("JetCacheInterceptor invoke. foundJetCacheConfig={}, method={}.{}(), targetClass={}",
                     cac != null,
@@ -41,6 +42,7 @@ public class JetCacheInterceptor implements MethodInterceptor {
                     method.getName(),
                     invocation.getThis() == null ? null : invocation.getThis().getClass().getName());
         }
+        */
 
         if (cac == null) {
             return invocation.proceed();
