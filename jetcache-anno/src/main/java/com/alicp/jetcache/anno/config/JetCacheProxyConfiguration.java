@@ -2,9 +2,12 @@ package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.anno.aop.CacheAdvisor;
 import com.alicp.jetcache.anno.aop.JetCacheInterceptor;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportAware;
@@ -20,14 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @Configuration
-public class JetCacheProxyConfiguration implements ImportAware {
+public class JetCacheProxyConfiguration implements ImportAware, ApplicationContextAware {
 
     protected AnnotationAttributes enableMethodCache;
-
-    private ConcurrentHashMap configMap = new ConcurrentHashMap();
-
-    @Autowired
-    private GlobalCacheConfig globalCacheConfig;
+    private ApplicationContext applicationContext;
 
     @Override
     public void setImportMetadata(AnnotationMetadata importMetadata) {
@@ -39,9 +38,20 @@ public class JetCacheProxyConfiguration implements ImportAware {
         }
     }
 
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
     @Bean(name = CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public CacheAdvisor jetcacheAdvisor(JetCacheInterceptor jetCacheInterceptor) {
+    public CacheAdvisor jetcacheAdvisor() {
+        ConcurrentHashMap configMap = new ConcurrentHashMap();
+
+        JetCacheInterceptor jetCacheInterceptor = new JetCacheInterceptor();
+        jetCacheInterceptor.setCacheConfigMap(configMap);
+        jetCacheInterceptor.setApplicationContext(applicationContext);
+
         CacheAdvisor advisor = new CacheAdvisor();
         advisor.setAdviceBeanName(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME);
         advisor.setAdvice(jetCacheInterceptor);
@@ -49,15 +59,6 @@ public class JetCacheProxyConfiguration implements ImportAware {
         advisor.setCacheConfigMap(configMap);
         advisor.setOrder(this.enableMethodCache.<Integer>getNumber("order"));
         return advisor;
-    }
-
-    @Bean
-    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public JetCacheInterceptor jetcacheInterceptor() {
-        JetCacheInterceptor interceptor = new JetCacheInterceptor();
-        interceptor.setCacheConfigMap(configMap);
-        interceptor.setGlobalCacheConfig(globalCacheConfig);
-        return interceptor;
     }
 
 }

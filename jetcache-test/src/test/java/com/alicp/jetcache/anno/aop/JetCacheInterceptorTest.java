@@ -38,7 +38,7 @@ public class JetCacheInterceptorTest {
         pc.setCacheConfigMap(map);
         interceptor = new JetCacheInterceptor();
         interceptor.setCacheConfigMap(map);
-        interceptor.setGlobalCacheConfig(globalCacheConfig);
+        interceptor.globalCacheConfig = globalCacheConfig;
     }
 
     @After

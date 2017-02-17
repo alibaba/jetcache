@@ -11,6 +11,9 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,12 +21,18 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class JetCacheInterceptor implements MethodInterceptor {
+public class JetCacheInterceptor implements MethodInterceptor, ApplicationContextAware {
 
     private static final Logger logger = LoggerFactory.getLogger(JetCacheInterceptor.class);
 
     private ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap;
-    private GlobalCacheConfig globalCacheConfig;
+    private ApplicationContext applicationContext;
+    GlobalCacheConfig globalCacheConfig;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
 
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         Method method = invocation.getMethod();
@@ -48,6 +57,9 @@ public class JetCacheInterceptor implements MethodInterceptor {
             return invocation.proceed();
         }
 
+        if (globalCacheConfig == null) {
+            globalCacheConfig = applicationContext.getBean(GlobalCacheConfig.class);
+        }
         CacheInvokeContext context = globalCacheConfig.getCacheContext().createCacheInvokeContext();
         context.setInvoker(invocation::proceed);
         context.setMethod(method);
@@ -61,7 +73,4 @@ public class JetCacheInterceptor implements MethodInterceptor {
         this.cacheConfigMap = cacheConfigMap;
     }
 
-    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
-        this.globalCacheConfig = globalCacheConfig;
-    }
 }
