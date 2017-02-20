@@ -16,12 +16,16 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = CombinedTest.A.class)
 public class CombinedTest extends SpringTest {
     @Test
     public void test() {
-        context = new ClassPathXmlApplicationContext("combined/combined.xml");
+        context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop2.xml");
+        testImpl();
+        context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop3.xml");
+        testImpl();
+    }
+
+    private void testImpl() {
         doTest();
 
         Service serviceDelegate = (Service) context.getBean("combinedServiceDelegate");
@@ -35,7 +39,6 @@ public class CombinedTest extends SpringTest {
 
 
     @Configuration
-//    @ComponentScan({"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.config.combined"})
     @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.config.combined"})
     public static class A {
         @Bean
@@ -47,9 +50,5 @@ public class CombinedTest extends SpringTest {
             GlobalCacheConfig pc = TestUtil.createGloableConfig(configProvider);
             return pc;
         }
-//        @Bean(name = "factoryBeanTarget")
-//        public MyFactoryBean factoryBean(){
-//            return new MyFactoryBean();
-//        }
     }
 }

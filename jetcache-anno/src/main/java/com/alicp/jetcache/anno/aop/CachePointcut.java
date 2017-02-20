@@ -81,8 +81,10 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         if (name.startsWith("java")) {
             return true;
         }
-        //noinspection RedundantIfStatement
         if (name.startsWith("org.springframework")) {
+            return true;
+        }
+        if (name.indexOf("$$EnhancerBySpringCGLIB$$") >= 0) {
             return true;
         }
         return false;
@@ -109,6 +111,9 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     private boolean matchesImpl(Method method, Class targetClass) {
+        if (!matchesThis(method.getDeclaringClass())) {
+            return false;
+        }
         String key = getKey(method, targetClass);
         CacheInvokeConfig cac = cacheConfigMap.get(key);
         if (cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
@@ -117,9 +122,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             return true;
         } else {
             cac = new CacheInvokeConfig();
-            if (matchesThis(method.getDeclaringClass())) {
-                CacheConfigUtil.parse(cac, method);
-            }
+            CacheConfigUtil.parse(cac, method);
 
             String name = method.getName();
             Class<?>[] paramTypes = method.getParameterTypes();
