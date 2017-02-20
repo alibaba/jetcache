@@ -1,5 +1,7 @@
 package com.alicp.jetcache;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -40,6 +42,26 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         t = System.currentTimeMillis() - t;
         monitor.afterGET(t, key, result);
         return result;
+    }
+
+    @Override
+    public Map<K, V> getAll(Set<? extends K> keys) {
+        //TODO
+        long t = System.currentTimeMillis();
+        Map<K, V> r = cache.getAll(keys);
+        t = System.currentTimeMillis() - t;
+        CacheGetResult cacheGetResult = new CacheGetResult(CacheResultCode.SUCCESS, null, null);
+        boolean first = true;
+        for (K key : keys) {
+            //set value?
+            if (first) {
+                monitor.afterGET(t, key, cacheGetResult);
+            } else {
+                monitor.afterGET(0, key, cacheGetResult);
+            }
+            first = false;
+        }
+        return r;
     }
 
     private Function<K, V> createProxyLoader(K key, Function<K, V> loader) {
@@ -90,12 +112,45 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     }
 
     @Override
+    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        long t = System.currentTimeMillis();
+        cache.putAll(map, expire, timeUnit);
+        t = System.currentTimeMillis() - t;
+        boolean first = true;
+        for (Map.Entry en : map.entrySet()) {
+            if (first) {
+                monitor.afterPUT(t, en.getKey(), en.getValue(), CacheResult.SUCCESS_WITHOUT_MSG);
+            } else {
+                monitor.afterPUT(0, en.getKey(), en.getValue(), CacheResult.SUCCESS_WITHOUT_MSG);
+            }
+            first = false;
+        }
+    }
+
+    @Override
     public CacheResult REMOVE(K key) {
         long t = System.currentTimeMillis();
         CacheResult result = cache.REMOVE(key);
         t = System.currentTimeMillis() - t;
         monitor.afterREMOVE(t, key, result);
         return result;
+    }
+
+    @Override
+    public void removeAll(Set<? extends K> keys) {
+        long t = System.currentTimeMillis();
+        cache.removeAll(keys);
+        t = System.currentTimeMillis() - t;
+        boolean first = true;
+        for (K key : keys) {
+            //set value?
+            if (first) {
+                monitor.afterINVALIDATE(t, key, CacheResult.SUCCESS_WITHOUT_MSG);
+            } else {
+                monitor.afterINVALIDATE(0, key, CacheResult.SUCCESS_WITHOUT_MSG);
+            }
+            first = false;
+        }
     }
 
     @Override

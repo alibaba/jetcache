@@ -2,6 +2,10 @@ package com.alicp.jetcache.embedded;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,13 +46,31 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
             }
 
             @Override
+            public List getAllValues(List keys) {
+                Map m  = cache.getAllPresent((Iterable<?>) keys.iterator());
+                List values = new ArrayList(keys.size());
+                keys.stream().forEach((key) -> values.add(m.get(key)));
+                return values;
+            }
+
+            @Override
             public void putValue(Object key, Object value) {
                 cache.put(key, value);
             }
 
             @Override
+            public void putAllValues(Map map) {
+                cache.putAll(map);
+            }
+
+            @Override
             public boolean removeValue(Object key) {
                 return cache.asMap().remove(key) != null;
+            }
+
+            @Override
+            public void removeAllValues(Set keys) {
+                cache.invalidateAll((Iterable<?>) keys.iterator());
             }
 
             @Override

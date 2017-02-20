@@ -11,9 +11,10 @@ import redis.clients.jedis.Response;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
 
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2016/10/7.
@@ -95,6 +96,34 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
+    protected List<CacheValueHolder<V>> getHolder(List<? extends K> keys) {
+        byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[len][]);
+        List<CacheValueHolder<V>> result = new ArrayList<>(keys.size());
+        try (Jedis jedis = pool.getResource()) {
+            List mgetResults = jedis.mget(newKeys);
+            for (Object value : mgetResults) {
+                if (value != null) {
+                    CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
+                    if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                        result.add(null);
+                    } else {
+                        result.add(holder);
+                    }
+                } else {
+                    result.add(null);
+                }
+            }
+        } catch (Exception ex) {
+            logError("getAll", "keys(" + keys.size() + ")", ex);
+            result.clear();
+            for (K k : keys) {
+                result.add(null);
+            }
+        }
+        return result;
+    }
+
+    @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         try (Jedis jedis = pool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
@@ -108,6 +137,18 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         } catch (Exception ex) {
             logError("PUT", key, ex);
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        try (Jedis jedis = pool.getResource()) {
+            for (Map.Entry e : map.entrySet()) {
+                CacheValueHolder<V> holder = new CacheValueHolder(e.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
+                jedis.psetex(buildKey(e.getKey()), timeUnit.toMillis(expire), valueEncoder.apply(holder));
+            }
+        } catch (Exception ex) {
+            logError("putAll", "map(" + map.size() + ")", ex);
         }
     }
 
@@ -131,6 +172,17 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         } catch (Exception ex) {
             logError("REMOVE", key, ex);
             return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void removeAll(Set<? extends K> keys) {
+        try (Jedis jedis = pool.getResource()) {
+            for (K key : keys) {
+                jedis.del(buildKey(key));
+            }
+        } catch (Exception ex) {
+            logError("removeAll", "keys(" + keys.size() + ")", ex);
         }
     }
 
@@ -210,7 +262,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    protected boolean needLogStackTrace(Throwable e){
+    protected boolean needLogStackTrace(Throwable e) {
         if (e instanceof JedisConnectionException) {
             return false;
         }

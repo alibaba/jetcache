@@ -3,8 +3,7 @@
  */
 package com.alicp.jetcache.embedded;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -51,15 +50,46 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
             }
         }
 
+        @Override
+        public List getAllValues(List keys) {
+            List values = new ArrayList(keys.size());
+            synchronized (lock) {
+                for (Object key : keys) {
+                    values.add(get(key));
+                }
+            }
+            return values;
+        }
+
         public void putValue(Object key, Object value) {
             synchronized (lock) {
                 put(key, value);
             }
         }
 
+        @Override
+        public void putAllValues(Map map) {
+            synchronized (lock){
+                Set<Map.Entry> set = map.entrySet();
+                for (Map.Entry en : set){
+                    put(en.getKey(), en.getValue());
+                }
+            }
+        }
+
+        @Override
         public boolean removeValue(Object key) {
             synchronized (lock) {
                 return remove(key) != null;
+            }
+        }
+
+        @Override
+        public void removeAllValues(Set keys) {
+            synchronized (lock) {
+                for(Object k: keys){
+                    remove(k);
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.alicp.jetcache;
 
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -21,13 +22,27 @@ public interface Cache<K, V> {
         }
     }
 
-    //TODO Map<K, V> getAll(Set<? extends K> keys);
+    default Map<K, V> getAll(Set<? extends K> keys) {
+        List<? extends K> keysList = new ArrayList<>(keys);
+        List<CacheGetResult<V>> cacheGetResults = GET_ALL(keysList);
+        HashMap<K, V> m = new HashMap<K, V>();
+        for (int i = 0; i < keysList.size(); i++) {
+            K key = keysList.get(i);
+            CacheGetResult<V> r = cacheGetResults.get(i);
+            if (r.isSuccess()) {
+                m.put(key, r.getValue());
+            }
+        }
+        return m;
+    }
 
     default void put(K key, V value) {
         PUT(key, value);
     }
 
-    //TODO void putAll(Map<? extends K,? extends V> map);
+    default void putAll(Map<? extends K, ? extends V> map) {
+        putAll(map, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+    }
 
     default boolean putIfAbsent(K key, V value){
         CacheResult result = PUT_IF_ABSENT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
@@ -38,7 +53,7 @@ public interface Cache<K, V> {
         return REMOVE(key).isSuccess();
     }
 
-    //TODO void removeAll(Set<? extends K> keys);
+    void removeAll(Set<? extends K> keys);
 
     /**
      * Provides a standard way to access the underlying concrete cache entry
@@ -76,6 +91,8 @@ public interface Cache<K, V> {
     AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit);
 
     CacheGetResult<V> GET(K key);
+
+    List<CacheGetResult<V>> GET_ALL(List<? extends K> keys);
 
     default V computeIfAbsent(K key, Function<K, V> loader) {
         return computeIfAbsent(key, loader, false);
@@ -118,6 +135,8 @@ public interface Cache<K, V> {
     }
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
+
+    void putAll(Map<? extends K,? extends V> map, long expire, TimeUnit timeUnit);
 
     CacheResult REMOVE(K key);
 

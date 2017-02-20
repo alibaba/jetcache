@@ -1,5 +1,6 @@
 package com.alicp.jetcache;
 
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +47,43 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
     }
 
+    private static class IndexObject {
+        int index;
+        Object key;
+        Object value;
+    }
+
+    @Override
+    public Map<K, V> getAll(Set<? extends K> keys) {
+        Map m = new HashMap();
+        for (K key : keys) {
+            CacheGetResult<V> r = GET(key);
+            if (r.isSuccess()) {
+                m.put(key, r.getValue());
+            }
+        }
+        return m;
+
+        //TODO complete it
+//        List<? extends V> result = new ArrayList<>(keys.size());
+//        List<? extends K> keysList = new ArrayList<>(keys);
+//        List<List<IndexObject>> subCacheResults = new ArrayList<>(caches.length);
+//        int hitCount = 0;
+//
+//        //get
+//        for (Cache cache: caches) {
+//            List<? extends K> currentCacheKeys = new ArrayList<>();
+//            for (int i = 0; i < result.size(); i++) {
+//                if(result.get())
+//            }
+//            if (cache instanceof AbstractCache) {
+//
+//            } else {
+//
+//            }
+//        }
+    }
+
     @Override
     public CacheResult PUT(K key, V value) {
         //override to prevent NullPointerException when config() is null
@@ -55,6 +93,21 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
         return PUT_caches(false, caches.length, key, value, expire, timeUnit);
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends V> map) {
+        //override to prevent NullPointerException when config() is null
+        for (Cache c : caches) {
+            c.putAll(map);
+        }
+    }
+
+    @Override
+    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        for (Cache c : caches) {
+            c.putAll(map, expire, timeUnit);
+        }
     }
 
     private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
@@ -84,6 +137,13 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
             }
         }
         return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
+    }
+
+    @Override
+    public void removeAll(Set<? extends K> keys) {
+        for (Cache cache : caches) {
+            cache.removeAll(keys);
+        }
     }
 
     @Override

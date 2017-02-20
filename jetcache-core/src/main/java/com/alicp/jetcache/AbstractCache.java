@@ -4,6 +4,8 @@ import com.alicp.jetcache.support.CacheEncodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.*;
+
 /**
  * Created on 2016/10/7.
  *
@@ -16,6 +18,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     protected abstract Object buildKey(K key);
 
     protected abstract CacheGetResult<CacheValueHolder<V>> getHolder(K key);
+
+    protected abstract List<CacheGetResult<CacheValueHolder<V>>> getHolder(List<? extends K> keys);
 
     @Override
     public CacheGetResult<V> GET(K key) {
@@ -31,6 +35,20 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
             result = new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
         }
         return result;
+    }
+
+    @Override
+    public List<CacheGetResult<V>> GET_ALL(List<? extends K> keys) {
+        try {
+            List holders = getHolder(keys);
+            for (int i = 0; i < holders.size(); i++) {
+                CacheGetResult<CacheValueHolder<V>> r = (CacheGetResult<CacheValueHolder<V>>) holders.get(i);
+
+            }
+        } catch (Exception ex) {
+            logError("GET", "keys(" + keys.size() + ")", ex);
+            CacheGetResult<Object> getResult = new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
+        }
     }
 
     protected void logError(String oper, Object key, Throwable e) {

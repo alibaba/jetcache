@@ -5,8 +5,13 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -48,6 +53,20 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         }
     }
 
+    @Override
+    protected List<CacheValueHolder<V>> getHolder(List<? extends K> keys) {
+        List newKeys = keys.stream().map((k)-> buildKey(k)).collect(Collectors.toList());
+        List<CacheValueHolder<V>> result = innerMap.getAllValues(newKeys);
+        for (int i = 0; i < result.size(); i++) {
+            CacheValueHolder<V> h = result.get(i);
+            Object newKey = newKeys.get(i);
+            if(!getImpl(newKey, h).isSuccess()){
+                result.set(i, null);
+            }
+        }
+        return result;
+    }
+
     private CacheGetResult<CacheValueHolder<V>> getImpl(Object newKey, CacheValueHolder<V> cacheObject) {
         if (System.currentTimeMillis() >= cacheObject.getExpireTime()) {
             innerMap.removeValue(newKey);
@@ -69,9 +88,25 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
+    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        HashMap m = new HashMap(map);
+        for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+            CacheValueHolder<V> cacheObject = new CacheValueHolder(en.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
+            m.put(buildKey(en.getKey()), cacheObject);
+        }
+        innerMap.putAllValues(m);
+    }
+
+    @Override
     public CacheResult REMOVE(K key) {
         innerMap.removeValue(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
+    }
+
+    @Override
+    public void removeAll(Set<? extends K> keys) {
+        Set newKeys = keys.stream().map((key) -> buildKey(key)).collect(Collectors.toSet());
+        innerMap.removeAllValues(newKeys);
     }
 
     @Override
