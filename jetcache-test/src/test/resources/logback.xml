@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.alicp" level="TRACE">
+    <logger name="com.alicp" level="INFO">
         <appender-ref ref="STDOUT"/>
     </logger>
 
