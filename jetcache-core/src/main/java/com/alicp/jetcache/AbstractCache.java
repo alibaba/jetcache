@@ -1,10 +1,7 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.support.CacheEncodeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 /**
  * Created on 2016/10/7.
@@ -17,9 +14,10 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     protected abstract Object buildKey(K key);
 
+    /*
     protected abstract CacheGetResult<CacheValueHolder<V>> getHolder(K key);
 
-    protected abstract List<CacheGetResult<CacheValueHolder<V>>> getHolder(List<? extends K> keys);
+    protected abstract MultiGetResult<K, CacheValueHolder<V>> getHolder(Set<? extends K> keys);
 
     @Override
     public CacheGetResult<V> GET(K key) {
@@ -38,18 +36,27 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public List<CacheGetResult<V>> GET_ALL(List<? extends K> keys) {
+    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         try {
-            List holders = getHolder(keys);
-            for (int i = 0; i < holders.size(); i++) {
-                CacheGetResult<CacheValueHolder<V>> r = (CacheGetResult<CacheValueHolder<V>>) holders.get(i);
-
+            MultiGetResult<K, CacheValueHolder<V>> holders = getHolder(keys);
+            if (holders.getValues() != null) {
+                Set<Map.Entry<K, CacheGetResult<CacheValueHolder<V>>>> entries = holders.getValues().entrySet();
+                for (Map.Entry<K, CacheGetResult<CacheValueHolder<V>>> e : entries) {
+                    CacheGetResult<CacheValueHolder<V>> r = e.getValue();
+                    V v = r.getValue().getValue();
+                    ((CacheGetResult) r).setValue(v);
+                }
             }
+            return (MultiGetResult<K, V>) holders;
         } catch (Exception ex) {
             logError("GET", "keys(" + keys.size() + ")", ex);
-            CacheGetResult<Object> getResult = new CacheGetResult<>(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
+            return new MultiGetResult<>(ex);
         }
     }
+    */
 
     protected void logError(String oper, Object key, Throwable e) {
         StringBuilder sb = new StringBuilder(64);

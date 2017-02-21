@@ -2,10 +2,7 @@ package com.alicp.jetcache.embedded;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,11 +30,8 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
     protected InnerMap createAreaCache() {
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
         builder.maximumSize(config.getLimit());
-        if (config.isExpireAfterAccess()) {
-            builder.expireAfterAccess(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
-        } else {
-            builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
-        }
+        builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+
         cache = builder.build();
         return new InnerMap() {
             @Override
@@ -46,11 +40,8 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
             }
 
             @Override
-            public List getAllValues(List keys) {
-                Map m  = cache.getAllPresent((Iterable<?>) keys.iterator());
-                List values = new ArrayList(keys.size());
-                keys.stream().forEach((key) -> values.add(m.get(key)));
-                return values;
+            public Map getAllValues(Collection keys) {
+                return cache.getAllPresent((Iterable<?>) keys.iterator());
             }
 
             @Override
@@ -69,7 +60,7 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
             }
 
             @Override
-            public void removeAllValues(Set keys) {
+            public void removeAllValues(Collection keys) {
                 cache.invalidateAll((Iterable<?>) keys.iterator());
             }
 

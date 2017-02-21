@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.embedded;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +14,7 @@ import java.util.Set;
 public interface InnerMap {
     Object getValue(Object key);
 
-    List getAllValues(List keys);
+    Map getAllValues(Collection keys);
 
     void putValue(Object key, Object value);
 
@@ -23,5 +24,5 @@ public interface InnerMap {
 
     boolean putIfAbsentValue(Object key, Object value);
 
-    void removeAllValues(Set keys);
+    void removeAllValues(Collection keys);
 }

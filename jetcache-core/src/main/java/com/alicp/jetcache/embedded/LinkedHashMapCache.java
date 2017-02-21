@@ -51,11 +51,14 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         }
 
         @Override
-        public List getAllValues(List keys) {
-            List values = new ArrayList(keys.size());
+        public Map getAllValues(Collection keys) {
+            Map values = new HashMap();
             synchronized (lock) {
                 for (Object key : keys) {
-                    values.add(get(key));
+                    Object v = get(key);
+                    if (v != null) {
+                        values.put(key, v);
+                    }
                 }
             }
             return values;
@@ -85,7 +88,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         }
 
         @Override
-        public void removeAllValues(Set keys) {
+        public void removeAllValues(Collection keys) {
             synchronized (lock) {
                 for(Object k: keys){
                     remove(k);

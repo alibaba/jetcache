@@ -5,10 +5,7 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,6 +30,9 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     protected Object buildKey(K key) {
+        if (key == null) {
+            return null;
+        }
         Object newKey = key;
         Function<Object, Object> keyConvertor = config.getKeyConvertor();
         if (keyConvertor != null) {
@@ -42,80 +42,116 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    protected CacheGetResult<CacheValueHolder<V>> getHolder(K key) {
+    public CacheGetResult<V> GET(K key) {
+        if (key == null) {
+            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         Object newKey = buildKey(key);
+        CacheValueHolder<V> holder = (CacheValueHolder<V>) innerMap.getValue(newKey);
+        return getImpl(newKey, holder);
+    }
 
-        CacheValueHolder<V> cacheObject = (CacheValueHolder<V>) innerMap.getValue(newKey);
-        if (cacheObject == null) {
+    private CacheGetResult<V> getImpl(Object newKey, CacheValueHolder<V> holder) {
+        if (holder == null) {
             return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+        } else if (System.currentTimeMillis() >= holder.getExpireTime()) {
+            // innerMap.removeValue(newKey);
+            return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
-            return getImpl(newKey, cacheObject);
+            if (config.isExpireAfterAccess()) {
+                long ttlInMillis = holder.getInitTtlInMillis();
+                holder.setExpireTime(System.currentTimeMillis() + ttlInMillis);
+            }
+            return new CacheGetResult(CacheResultCode.SUCCESS, null, holder.getValue());
         }
     }
 
     @Override
-    protected List<CacheValueHolder<V>> getHolder(List<? extends K> keys) {
-        List newKeys = keys.stream().map((k)-> buildKey(k)).collect(Collectors.toList());
-        List<CacheValueHolder<V>> result = innerMap.getAllValues(newKeys);
-        for (int i = 0; i < result.size(); i++) {
-            CacheValueHolder<V> h = result.get(i);
-            Object newKey = newKeys.get(i);
-            if(!getImpl(newKey, h).isSuccess()){
-                result.set(i, null);
-            }
+    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
+        ArrayList<K> keyList = new ArrayList<K>(keys.size());
+        ArrayList<Object> newKeyList = new ArrayList<Object>(keys.size());
+        keys.stream().forEach((k) -> {
+            Object newKey = buildKey(k);
+            keyList.add(k);
+            newKeyList.add(newKey);
+        });
+        Map<Object, CacheValueHolder<V>> innerResultMap = innerMap.getAllValues(newKeyList);
+        Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
+        for (int i = 0; i < keyList.size(); i++) {
+            K key = keyList.get(i);
+            Object newKey = newKeyList.get(i);
+            CacheValueHolder<V> holder = innerResultMap.get(newKey);
+            resultMap.put(key, getImpl(newKey, holder));
+        }
+        MultiGetResult<K, V> result = new MultiGetResult<>(CacheResultCode.SUCCESS, null, resultMap);
         return result;
-    }
-
-    private CacheGetResult<CacheValueHolder<V>> getImpl(Object newKey, CacheValueHolder<V> cacheObject) {
-        if (System.currentTimeMillis() >= cacheObject.getExpireTime()) {
-            innerMap.removeValue(newKey);
-            return CacheGetResult.EXPIRED_WITHOUT_MSG;
-        } else {
-            if (config.isExpireAfterAccess()) {
-                long ttlInMillis = cacheObject.getInitTtlInMillis();
-                cacheObject.setExpireTime(System.currentTimeMillis() + ttlInMillis);
-            }
-            return new CacheGetResult(CacheResultCode.SUCCESS, null, cacheObject);
-        }
     }
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
         innerMap.putValue(buildKey(key), cacheObject);
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
-        HashMap m = new HashMap(map);
+    public MultiOpResult<K> PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        if (map == null) {
+            return new MultiOpResult(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
+        HashMap newKeyMap = new HashMap();
         for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
             CacheValueHolder<V> cacheObject = new CacheValueHolder(en.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
-            m.put(buildKey(en.getKey()), cacheObject);
+            newKeyMap.put(buildKey(en.getKey()), cacheObject);
         }
-        innerMap.putAllValues(m);
+        innerMap.putAllValues(newKeyMap);
+
+        final HashMap resultMap = new HashMap();
+        map.keySet().forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
+        return new MultiOpResult<K>(CacheResultCode.SUCCESS, null, resultMap);
     }
 
     @Override
     public CacheResult REMOVE(K key) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         innerMap.removeValue(buildKey(key));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
-    public void removeAll(Set<? extends K> keys) {
+    public MultiOpResult<K> REMOVE_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return new MultiOpResult(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         Set newKeys = keys.stream().map((key) -> buildKey(key)).collect(Collectors.toSet());
         innerMap.removeAllValues(newKeys);
+
+        final HashMap resultMap = new HashMap();
+        keys.forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
+        return new MultiOpResult<K>(CacheResultCode.SUCCESS, null, resultMap);
     }
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return null;
+        }
         return SimpleLock.tryLock(this, buildKey(key), expire, timeUnit);
     }
 
     @Override
     public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
         if (innerMap.putIfAbsentValue(buildKey(key), cacheObject)) {
             return CacheResult.SUCCESS_WITHOUT_MSG;

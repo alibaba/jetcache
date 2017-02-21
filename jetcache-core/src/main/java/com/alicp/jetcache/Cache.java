@@ -23,17 +23,8 @@ public interface Cache<K, V> {
     }
 
     default Map<K, V> getAll(Set<? extends K> keys) {
-        List<? extends K> keysList = new ArrayList<>(keys);
-        List<CacheGetResult<V>> cacheGetResults = GET_ALL(keysList);
-        HashMap<K, V> m = new HashMap<K, V>();
-        for (int i = 0; i < keysList.size(); i++) {
-            K key = keysList.get(i);
-            CacheGetResult<V> r = cacheGetResults.get(i);
-            if (r.isSuccess()) {
-                m.put(key, r.getValue());
-            }
-        }
-        return m;
+        MultiGetResult<K, V> cacheGetResults = GET_ALL(keys);
+        return cacheGetResults.unwrapValues();
     }
 
     default void put(K key, V value) {
@@ -41,7 +32,7 @@ public interface Cache<K, V> {
     }
 
     default void putAll(Map<? extends K, ? extends V> map) {
-        putAll(map, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        PUT_ALL(map);
     }
 
     default boolean putIfAbsent(K key, V value){
@@ -53,7 +44,9 @@ public interface Cache<K, V> {
         return REMOVE(key).isSuccess();
     }
 
-    void removeAll(Set<? extends K> keys);
+    default void removeAll(Set<? extends K> keys){
+        removeAll(keys);
+    }
 
     /**
      * Provides a standard way to access the underlying concrete cache entry
@@ -92,7 +85,7 @@ public interface Cache<K, V> {
 
     CacheGetResult<V> GET(K key);
 
-    List<CacheGetResult<V>> GET_ALL(List<? extends K> keys);
+    MultiGetResult<K, V> GET_ALL(Set<? extends K> keys);
 
     default V computeIfAbsent(K key, Function<K, V> loader) {
         return computeIfAbsent(key, loader, false);
@@ -136,9 +129,19 @@ public interface Cache<K, V> {
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
 
-    void putAll(Map<? extends K,? extends V> map, long expire, TimeUnit timeUnit);
+    default void putAll(Map<? extends K,? extends V> map, long expire, TimeUnit timeUnit){
+        PUT_ALL(map, expire, timeUnit);
+    }
+
+    default MultiOpResult<K> PUT_ALL(Map<? extends K,? extends V> map) {
+        return PUT_ALL(map, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    MultiOpResult<K> PUT_ALL(Map<? extends K,? extends V> map, long expire, TimeUnit timeUnit);
 
     CacheResult REMOVE(K key);
+
+    MultiOpResult<K> REMOVE_ALL(Set<? extends K> keys);
 
     /**
      * If the specified key is not already associated

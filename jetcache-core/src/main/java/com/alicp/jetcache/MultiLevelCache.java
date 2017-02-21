@@ -47,41 +47,15 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
     }
 
-    private static class IndexObject {
-        int index;
-        Object key;
-        Object value;
-    }
-
     @Override
-    public Map<K, V> getAll(Set<? extends K> keys) {
-        Map m = new HashMap();
-        for (K key : keys) {
-            CacheGetResult<V> r = GET(key);
-            if (r.isSuccess()) {
-                m.put(key, r.getValue());
-            }
+    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        return m;
+        Set<K>[] fillArray = new Set[caches.length];
+        for (int i = 0; i < caches.length; i++) {
 
-        //TODO complete it
-//        List<? extends V> result = new ArrayList<>(keys.size());
-//        List<? extends K> keysList = new ArrayList<>(keys);
-//        List<List<IndexObject>> subCacheResults = new ArrayList<>(caches.length);
-//        int hitCount = 0;
-//
-//        //get
-//        for (Cache cache: caches) {
-//            List<? extends K> currentCacheKeys = new ArrayList<>();
-//            for (int i = 0; i < result.size(); i++) {
-//                if(result.get())
-//            }
-//            if (cache instanceof AbstractCache) {
-//
-//            } else {
-//
-//            }
-//        }
+        }
     }
 
     @Override
