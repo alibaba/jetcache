@@ -28,23 +28,31 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
 
     @Override
     public CacheGetResult<V> GET(K key) {
+        if (key == null) {
+            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
-            CacheGetResult<CacheValueHolder<V>> r1 = cache.GET(key);
-            if (r1.isSuccess() && r1.getValue() != null) {
-                CacheValueHolder<V> h = r1.getValue();
-                long currentExpire = h.getExpireTime();
-                long now = System.currentTimeMillis();
-                if (now <= currentExpire) {
-                    long restTtl = currentExpire - now;
-                    if (restTtl > 0) {
-                        PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
-                    }
-                    return new CacheGetResult(CacheResultCode.SUCCESS, null, h.getValue());
-                }
-            }
+            CacheValueHolder<V> h = (CacheValueHolder<V>) cache.get(key);
+            if (checkResultAndFillUpperCache(key, i, h))
+                return new CacheGetResult(CacheResultCode.SUCCESS, null, h.getValue());
         }
         return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+    }
+
+    private boolean checkResultAndFillUpperCache(K key, int i, CacheValueHolder<V> h) {
+        if (h != null) {
+            long currentExpire = h.getExpireTime();
+            long now = System.currentTimeMillis();
+            if (now <= currentExpire) {
+                long restTtl = currentExpire - now;
+                if (restTtl > 0) {
+                    PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -52,40 +60,83 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        Set<K>[] fillArray = new Set[caches.length];
+        HashMap<K, CacheGetResult<V>> resultMap = new HashMap<>();
+        Set<K> restKeys = new HashSet<K>(keys);
         for (int i = 0; i < caches.length; i++) {
-
+            if (restKeys.size() == 0) {
+                break;
+            }
+            Cache<K, CacheValueHolder<V>> c = caches[i];
+            Map<K, CacheValueHolder<V>> someResult = c.getAll(restKeys);
+            for (Map.Entry<K, CacheValueHolder<V>> en : someResult.entrySet()) {
+                K key = en.getKey();
+                CacheValueHolder<V> holder = en.getValue();
+                if (checkResultAndFillUpperCache(key, i, holder)) {
+                    resultMap.put(key, new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue()));
+                    restKeys.remove(key);
+                }
+            }
         }
+        return new MultiGetResult<>(CacheResultCode.SUCCESS, null, resultMap);
     }
 
     @Override
     public CacheResult PUT(K key, V value) {
         //override to prevent NullPointerException when config() is null
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return PUT_caches(true, caches.length, key, value, Integer.MIN_VALUE, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return PUT_caches(false, caches.length, key, value, expire, timeUnit);
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> map) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
         //override to prevent NullPointerException when config() is null
-        for (Cache c : caches) {
-            c.putAll(map);
-        }
+        return PUT_ALL_impl(true, map, Integer.MIN_VALUE, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
-        for (Cache c : caches) {
-            c.putAll(map, expire, timeUnit);
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        return PUT_ALL_impl(false, map, expire, timeUnit);
+    }
+
+    private CacheResult PUT_ALL_impl(boolean useDefaultExpire,
+                                     Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        if (map == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
+        Map newMap = new HashMap();
+        for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+            CacheValueHolder<V> h = new CacheValueHolder<>(en.getValue(),
+                    System.currentTimeMillis(), timeUnit.toMillis(expire));
+            newMap.put(en.getKey(), h);
+        }
+        int failCount = 0;
+        for (Cache c : caches) {
+            CacheResult r;
+            if (useDefaultExpire) {
+                r = c.PUT_ALL(newMap);
+            } else {
+                r = c.PUT_ALL(newMap, expire, timeUnit);
+            }
+            if (!r.isSuccess()) {
+                failCount++;
+            }
+        }
+        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
+                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
     }
 
     private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
-        boolean fail = false;
+        int failCount = 0;
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
             if (useDefaultExpire) {
@@ -95,29 +146,43 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
             CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
             CacheResult r = cache.PUT(key, h, expire, timeUnit);
             if (!r.isSuccess()) {
-                fail = true;
+                failCount++;
             }
         }
-        return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
+        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
+                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
     }
 
     @Override
     public CacheResult REMOVE(K key) {
-        boolean fail = false;
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
+        int failCount = 0;
         for (Cache cache : caches) {
             CacheResult r = cache.REMOVE(key);
             if (!r.isSuccess()) {
-                fail = true;
+                failCount++;
             }
         }
-        return fail ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.SUCCESS_WITHOUT_MSG;
+        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
+                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
     }
 
     @Override
-    public void removeAll(Set<? extends K> keys) {
-        for (Cache cache : caches) {
-            cache.removeAll(keys);
+    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
+        int failCount = 0;
+        for (Cache cache : caches) {
+            CacheResult r = cache.REMOVE_ALL(keys);
+            if (!r.isSuccess()) {
+                failCount++;
+            }
+        }
+        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
+                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
     }
 
     @Override
@@ -127,6 +192,9 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return null;
+        }
         return caches[caches.length - 1].tryLock(key, expire, timeUnit);
     }
 

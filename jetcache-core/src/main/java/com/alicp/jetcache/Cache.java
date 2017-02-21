@@ -35,7 +35,7 @@ public interface Cache<K, V> {
         PUT_ALL(map);
     }
 
-    default boolean putIfAbsent(K key, V value){
+    default boolean putIfAbsent(K key, V value) {
         CacheResult result = PUT_IF_ABSENT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
         return result.getResultCode() == CacheResultCode.SUCCESS;
     }
@@ -44,7 +44,7 @@ public interface Cache<K, V> {
         return REMOVE(key).isSuccess();
     }
 
-    default void removeAll(Set<? extends K> keys){
+    default void removeAll(Set<? extends K> keys) {
         removeAll(keys);
     }
 
@@ -76,8 +76,9 @@ public interface Cache<K, V> {
      *      }
      *   }
      * </code></pre>
-     * @param key lockKey
-     * @param expire lock expire time
+     *
+     * @param key      lockKey
+     * @param expire   lock expire time
      * @param timeUnit lock expire time unit
      * @return an java.lang.AutoCloseable instance, or null if lock fail
      */
@@ -123,36 +124,43 @@ public interface Cache<K, V> {
         PUT(key, value, expire, timeUnit);
     }
 
-    default CacheResult PUT(K key, V value){
+    default CacheResult PUT(K key, V value) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return PUT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
     }
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
 
-    default void putAll(Map<? extends K,? extends V> map, long expire, TimeUnit timeUnit){
+    default void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
         PUT_ALL(map, expire, timeUnit);
     }
 
-    default MultiOpResult<K> PUT_ALL(Map<? extends K,? extends V> map) {
+    default CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
+        if (map == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return PUT_ALL(map, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
     }
 
-    MultiOpResult<K> PUT_ALL(Map<? extends K,? extends V> map, long expire, TimeUnit timeUnit);
+    CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit);
 
     CacheResult REMOVE(K key);
 
-    MultiOpResult<K> REMOVE_ALL(Set<? extends K> keys);
+    CacheResult REMOVE_ALL(Set<? extends K> keys);
 
     /**
      * If the specified key is not already associated
      * with a value, associate it with the given value.
+     *
      * @param key
      * @param value
      * @param expire
      * @param timeUnit
      * @return SUCCESS if the specified key is not already associated with a value,
-     *         or EXISTS if the specified key is not already associated with a value,
-     *         or FAIL if error occurs.
+     * or EXISTS if the specified key is not already associated with a value,
+     * or FAIL if error occurs.
      */
     CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit);
 

@@ -101,9 +101,9 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public MultiOpResult<K> PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
         if (map == null) {
-            return new MultiOpResult(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         HashMap newKeyMap = new HashMap();
         for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
@@ -114,7 +114,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
 
         final HashMap resultMap = new HashMap();
         map.keySet().forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
-        return new MultiOpResult<K>(CacheResultCode.SUCCESS, null, resultMap);
+        return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
@@ -127,16 +127,16 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public MultiOpResult<K> REMOVE_ALL(Set<? extends K> keys) {
+    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
         if (keys == null) {
-            return new MultiOpResult(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         Set newKeys = keys.stream().map((key) -> buildKey(key)).collect(Collectors.toSet());
         innerMap.removeAllValues(newKeys);
 
         final HashMap resultMap = new HashMap();
         keys.forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
-        return new MultiOpResult<K>(CacheResultCode.SUCCESS, null, resultMap);
+        return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
