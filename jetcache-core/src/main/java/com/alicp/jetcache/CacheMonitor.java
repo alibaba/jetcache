@@ -10,6 +10,6 @@ import com.alicp.jetcache.event.CacheEvent;
 @FunctionalInterface
 public interface CacheMonitor {
 
-    void afterOpetation(CacheEvent event);
+    void afterOperation(CacheEvent event);
 
 }
