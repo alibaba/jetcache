@@ -12,11 +12,4 @@ public interface CacheMonitor {
 
     void afterOpetation(CacheEvent event);
 
-//    void afterGET(long millis, Object key, CacheGetResult result);
-//
-//    void afterPUT(long millis, Object key, Object value, CacheResult result);
-//
-//    void afterREMOVE(long millis, Object key, CacheResult result);
-//
-//    void afterLoad(long millis, Object key, Object loadedValue, boolean success);
 }
