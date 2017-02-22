@@ -1,5 +1,7 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.event.*;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -40,28 +42,19 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         long t = System.currentTimeMillis();
         CacheGetResult<V> result = cache.GET(key);
         t = System.currentTimeMillis() - t;
-        monitor.afterGET(t, key, result);
+        CacheGetEvent event = new CacheGetEvent(cache, t, key, result);
+        monitor.afterOpetation(event);
         return result;
     }
 
     @Override
-    public Map<K, V> getAll(Set<? extends K> keys) {
-        //TODO
+    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
         long t = System.currentTimeMillis();
-        Map<K, V> r = cache.getAll(keys);
+        MultiGetResult<K, V> result = cache.GET_ALL(keys);
         t = System.currentTimeMillis() - t;
-        CacheGetResult cacheGetResult = new CacheGetResult(CacheResultCode.SUCCESS, null, null);
-        boolean first = true;
-        for (K key : keys) {
-            //set value?
-            if (first) {
-                monitor.afterGET(t, key, cacheGetResult);
-            } else {
-                monitor.afterGET(0, key, cacheGetResult);
-            }
-            first = false;
-        }
-        return r;
+        CacheGetAllEvent event = new CacheGetAllEvent(cache, t, keys, result);
+        monitor.afterOpetation(event);
+        return result;
     }
 
     private Function<K, V> createProxyLoader(K key, Function<K, V> loader) {
@@ -74,7 +67,8 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
                 success = true;
             } finally {
                 t = System.currentTimeMillis() - t;
-                monitor.afterLoad(t, key, v, success);
+                CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
+                monitor.afterOpetation(event);
             }
             return v;
         };
@@ -98,7 +92,8 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT(key, value);
         t = System.currentTimeMillis() - t;
-        monitor.afterPUT(t, key, value, result);
+        CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
+        monitor.afterOpetation(event);
         return result;
     }
 
@@ -107,24 +102,30 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT(key, value, expire, timeUnit);
         t = System.currentTimeMillis() - t;
-        monitor.afterPUT(t, key, value, result);
+        CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
+        monitor.afterOpetation(event);
         return result;
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
+        //override to prevent NullPointerException when config() is null
         long t = System.currentTimeMillis();
-        cache.putAll(map, expire, timeUnit);
+        CacheResult result = cache.PUT_ALL(map);
         t = System.currentTimeMillis() - t;
-        boolean first = true;
-        for (Map.Entry en : map.entrySet()) {
-            if (first) {
-                monitor.afterPUT(t, en.getKey(), en.getValue(), CacheResult.SUCCESS_WITHOUT_MSG);
-            } else {
-                monitor.afterPUT(0, en.getKey(), en.getValue(), CacheResult.SUCCESS_WITHOUT_MSG);
-            }
-            first = false;
-        }
+        CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
+        monitor.afterOpetation(event);
+        return result;
+    }
+
+    @Override
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        long t = System.currentTimeMillis();
+        CacheResult result = cache.PUT_ALL(map, expire, timeUnit);
+        t = System.currentTimeMillis() - t;
+        CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
+        monitor.afterOpetation(event);
+        return result;
     }
 
     @Override
@@ -132,25 +133,19 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         long t = System.currentTimeMillis();
         CacheResult result = cache.REMOVE(key);
         t = System.currentTimeMillis() - t;
-        monitor.afterREMOVE(t, key, result);
+        CacheRemoveEvent event = new CacheRemoveEvent(cache, t, key, result);
+        monitor.afterOpetation(event);
         return result;
     }
 
     @Override
-    public void removeAll(Set<? extends K> keys) {
+    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
         long t = System.currentTimeMillis();
-        cache.removeAll(keys);
+        CacheResult result = cache.REMOVE_ALL(keys);
         t = System.currentTimeMillis() - t;
-        boolean first = true;
-        for (K key : keys) {
-            //set value?
-            if (first) {
-                monitor.afterINVALIDATE(t, key, CacheResult.SUCCESS_WITHOUT_MSG);
-            } else {
-                monitor.afterINVALIDATE(0, key, CacheResult.SUCCESS_WITHOUT_MSG);
-            }
-            first = false;
-        }
+        CacheRemoveAllEvent event = new CacheRemoveAllEvent(cache, t, keys, result);
+        monitor.afterOpetation(event);
+        return result;
     }
 
     @Override
@@ -163,7 +158,8 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
         t = System.currentTimeMillis() - t;
-        monitor.afterPUT(t, key, value, result);
+        CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
+        monitor.afterOpetation(event);
         return result;
     }
 }
