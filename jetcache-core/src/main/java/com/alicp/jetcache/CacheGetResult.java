@@ -17,6 +17,11 @@ public class CacheGetResult<V> extends CacheResult {
         this.value = value;
     }
 
+    public CacheGetResult(Throwable ex) {
+        super(ex);
+    }
+
+
     public V getValue() {
         return value;
     }

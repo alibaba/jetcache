@@ -41,6 +41,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (pool == null) {
             throw new CacheConfigException("no pool");
         }
+        if (config.isExpireAfterAccess()) {
+            throw new CacheConfigException("expireAfterAccess is not supported by tair");
+        }
     }
 
     @Override
@@ -57,74 +60,67 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    protected CacheGetResult<CacheValueHolder<V>> getHolder(K key) {
+    public CacheGetResult<V> GET(K key) {
+        if (key == null) {
+            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         try (Jedis jedis = pool.getResource()) {
             byte[] newKey = buildKey(key);
-
-            if (!config.isExpireAfterAccess()) {
-                byte[] bytes = jedis.get(newKey);
-                if (bytes != null) {
-                    CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(bytes);
-                    if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                        return CacheGetResult.EXPIRED_WITHOUT_MSG;
-                    }
-                    return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
-                } else {
-                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+            byte[] bytes = jedis.get(newKey);
+            if (bytes != null) {
+                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(bytes);
+                if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                    return CacheGetResult.EXPIRED_WITHOUT_MSG;
                 }
+                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder.getValue());
             } else {
-                Pipeline p = jedis.pipelined();
-                Response<byte[]> valueResp = p.get(newKey);
-                Response<Long> pttlResp = p.pttl(newKey);
-                p.sync();
-                if (valueResp.get() != null) {
-                    CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueResp.get());
-                    Long restTtl = pttlResp.get();
-                    if (restTtl != null) {
-                        holder.setExpireTime(System.currentTimeMillis() + restTtl);
-                    }
-                    jedis.pexpire(newKey, holder.getInitTtlInMillis());
-                    return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
-                } else {
-                    return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-                }
+                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
             }
         } catch (Exception ex) {
             logError("GET", key, ex);
-            return new CacheGetResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage(), null);
+            return new CacheGetResult(ex);
         }
     }
 
     @Override
-    protected List<CacheValueHolder<V>> getHolder(List<? extends K> keys) {
-        byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[len][]);
-        List<CacheValueHolder<V>> result = new ArrayList<>(keys.size());
+    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
+        ArrayList<K> keyList = new ArrayList<K>(keys.size());
+        byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[len][]);
+
+        Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
         try (Jedis jedis = pool.getResource()) {
             List mgetResults = jedis.mget(newKeys);
-            for (Object value : mgetResults) {
+            for (int i = 0; i < mgetResults.size(); i++) {
+                Object value = mgetResults.get(i);
+                K key = keyList.get(i);
                 if (value != null) {
                     CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
                     if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                        result.add(null);
+                        resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
                     } else {
-                        result.add(holder);
+                        CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue());
+                        resultMap.put(key, r);
                     }
                 } else {
-                    result.add(null);
+                    resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
                 }
             }
+            return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
         } catch (Exception ex) {
             logError("getAll", "keys(" + keys.size() + ")", ex);
-            result.clear();
-            for (K k : keys) {
-                result.add(null);
-            }
+            return new MultiGetResult<K, V>(ex);
         }
-        return result;
     }
+
 
     @Override
     public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         try (Jedis jedis = pool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
             byte[] newKey = buildKey(key);
@@ -136,24 +132,43 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             }
         } catch (Exception ex) {
             logError("PUT", key, ex);
-            return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
+            return new CacheResult(ex);
         }
     }
 
     @Override
-    public void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+        if (map == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         try (Jedis jedis = pool.getResource()) {
-            for (Map.Entry e : map.entrySet()) {
-                CacheValueHolder<V> holder = new CacheValueHolder(e.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
-                jedis.psetex(buildKey(e.getKey()), timeUnit.toMillis(expire), valueEncoder.apply(holder));
+            int failCount = 0;
+            List<Response<String>> responses = new ArrayList<>();
+            Pipeline p = jedis.pipelined();
+            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
+                Response<String> resp = p.psetex(buildKey(en.getKey()), timeUnit.toMillis(expire), valueEncoder.apply(holder));
+                responses.add(resp);
             }
+            p.sync();
+            for (Response<String> resp : responses) {
+                if(!"OK".equals(resp.get())){
+                    failCount++;
+                }
+            }
+            return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
+                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
             logError("putAll", "map(" + map.size() + ")", ex);
+            return new CacheResult(ex);
         }
     }
 
     @Override
     public CacheResult REMOVE(K key) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return REMOVE_impl(key, buildKey(key));
     }
 
@@ -171,23 +186,30 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             }
         } catch (Exception ex) {
             logError("REMOVE", key, ex);
-            return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
+            return new CacheResult(ex);
         }
     }
 
     @Override
-    public void removeAll(Set<? extends K> keys) {
+    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         try (Jedis jedis = pool.getResource()) {
-            for (K key : keys) {
-                jedis.del(buildKey(key));
-            }
+            byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
+            jedis.del(newKeys);
+            return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
             logError("removeAll", "keys(" + keys.size() + ")", ex);
+            return new CacheResult(ex);
         }
     }
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return null;
+        }
         try (Jedis jedis = pool.getResource()) {
             final String uuid = UUID.randomUUID().toString();
             final byte[] newKey = buildKey(key);
@@ -244,6 +266,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         try (Jedis jedis = pool.getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
             byte[] newKey = buildKey(key);
@@ -257,7 +282,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             }
         } catch (Exception ex) {
             logError("PUT_IF_ABSENT", key, ex);
-            return new CacheResult(CacheResultCode.FAIL, ex.getClass() + ":" + ex.getMessage());
+            return new CacheResult(ex);
         }
     }
 
