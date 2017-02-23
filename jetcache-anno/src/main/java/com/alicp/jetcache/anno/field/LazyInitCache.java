@@ -9,6 +9,8 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -19,7 +21,7 @@ import java.util.function.Function;
  */
 class LazyInitCache implements ProxyCache {
 
-    private transient boolean inited;
+    private boolean inited;
     private Cache cache;
 
     private ConfigurableListableBeanFactory beanFactory;
@@ -91,9 +93,21 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
+    public Map getAll(Set keys) {
+        checkInit();
+        return cache.getAll(keys);
+    }
+
+    @Override
     public CacheGetResult GET(Object key) {
         checkInit();
         return cache.GET(key);
+    }
+
+    @Override
+    public MultiGetResult GET_ALL(Set keys) {
+        checkInit();
+        return cache.GET_ALL(keys);
     }
 
     @Override
@@ -121,6 +135,12 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
+    public void putAll(Map map) {
+        checkInit();
+        cache.putAll(map);
+    }
+
+    @Override
     public void put(Object key, Object value, long expire, TimeUnit timeUnit) {
         checkInit();
         cache.put(key, value, expire, timeUnit);
@@ -139,9 +159,39 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
+    public void putAll(Map map, long expire, TimeUnit timeUnit) {
+        checkInit();
+        cache.putAll(map, expire, timeUnit);
+    }
+
+    @Override
+    public CacheResult PUT_ALL(Map map) {
+        checkInit();
+        return cache.PUT_ALL(map);
+    }
+
+    @Override
+    public CacheResult PUT_ALL(Map map, long expire, TimeUnit timeUnit) {
+        checkInit();
+        return cache.PUT_ALL(map, expire, timeUnit);
+    }
+
+    @Override
     public boolean remove(Object key) {
         checkInit();
         return cache.remove(key);
+    }
+
+    @Override
+    public void removeAll(Set keys) {
+        checkInit();
+        cache.removeAll(keys);
+    }
+
+    @Override
+    public Object unwrap(Class clazz) {
+        checkInit();
+        return cache.unwrap(clazz);
     }
 
     @Override
@@ -151,9 +201,21 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
+    public CacheResult REMOVE_ALL(Set keys) {
+        checkInit();
+        return cache.REMOVE_ALL(keys);
+    }
+
+    @Override
     public AutoReleaseLock tryLock(Object key, long expire, TimeUnit timeUnit) {
         checkInit();
         return cache.tryLock(key, expire, timeUnit);
+    }
+
+    @Override
+    public boolean tryLockAndRun(Object key, long expire, TimeUnit timeUnit, Runnable action) {
+        checkInit();
+        return cache.tryLockAndRun(key, expire, timeUnit, action);
     }
 
     @Override
@@ -167,4 +229,6 @@ class LazyInitCache implements ProxyCache {
         checkInit();
         return cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
     }
+
+
 }
