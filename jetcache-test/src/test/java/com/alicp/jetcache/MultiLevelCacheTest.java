@@ -1,6 +1,7 @@
 package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
+import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
@@ -9,6 +10,7 @@ import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -97,13 +99,14 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         AbstractCache c1 = getAbstractCache(l1Cache);
         AbstractCache c2 = getAbstractCache(l2Cache);
 
-        CacheGetResult<CacheValueHolder<Object>> r1 = c1.getHolder("KK1");
-        CacheGetResult<CacheValueHolder<Object>> r2 = c2.getHolder("KK1");
+        CacheValueHolder<Object> h1 = (CacheValueHolder<Object>)
+                ((com.github.benmanes.caffeine.cache.Cache) c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class))
+                        .getIfPresent("KK1");
+        CacheValueHolder<Object> h2 = (CacheValueHolder<Object>)
+                ((LinkedHashMap) c1.unwrap(LinkedHashMap.class)).get("KK1");
 
-        long x = r1.getValue().getExpireTime() - r2.getValue().getExpireTime();
+        long x = h1.getExpireTime() - h2.getExpireTime();
         if (Math.abs(x) > 10) {
-            CacheValueHolder h1 = r1.getValue();
-            CacheValueHolder h2 = r2.getValue();
             System.out.println(h1.getCreateTime() + "," + h1.getExpireTime() + "," + ((CacheValueHolder) h1.getValue()).getCreateTime() + "," + ((CacheValueHolder) h1.getValue()).getExpireTime());
             System.out.println(h2.getCreateTime() + "," + h2.getExpireTime() + "," + ((CacheValueHolder) h2.getValue()).getCreateTime() + "," + ((CacheValueHolder) h2.getValue()).getExpireTime());
             Assert.fail();
@@ -111,7 +114,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     }
 
     private AbstractCache getAbstractCache(Cache c) {
-        while(c instanceof MonitoredCache){
+        while (c instanceof MonitoredCache) {
             c = ((MonitoredCache) c).getTargetCache();
         }
         return (AbstractCache) c;

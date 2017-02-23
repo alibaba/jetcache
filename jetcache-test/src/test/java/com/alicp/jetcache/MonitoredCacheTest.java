@@ -14,27 +14,7 @@ public class MonitoredCacheTest extends AbstractCacheTest {
     public void test() throws Exception {
         Cache target = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .buildCache();
-        cache = new MonitoredCache(target, new CacheMonitor() {
-            @Override
-            public void afterGET(long millis, Object key, CacheGetResult result) {
-
-            }
-
-            @Override
-            public void afterPUT(long millis, Object key, Object value, CacheResult result) {
-
-            }
-
-            @Override
-            public void afterREMOVE(long millis, Object key, CacheResult result) {
-
-            }
-
-            @Override
-            public void afterLoad(long millis, Object key, Object loadedValue, boolean success) {
-
-            }
-        });
+        cache = new MonitoredCache(target, event -> {});
 
         baseTest();
     }
