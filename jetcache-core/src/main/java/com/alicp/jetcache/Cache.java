@@ -75,6 +75,17 @@ public interface Cache<K, V> {
      */
     AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit);
 
+    default boolean tryLockAndRun(K key, long expire, TimeUnit timeUnit, Runnable action){
+        try (AutoReleaseLock lock = tryLock(key, expire, timeUnit)) {
+            if (lock != null) {
+                action.run();
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     CacheGetResult<V> GET(K key);
 
     default V computeIfAbsent(K key, Function<K, V> loader) {
