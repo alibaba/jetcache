@@ -144,7 +144,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             AutoReleaseLock lock = () -> {
                 if (System.currentTimeMillis() < expireTimestamp) {
                     CacheResult cacheResult = REMOVE_impl(key, newKey);
-                    if (cacheResult.getResultCode() == CacheResultCode.FAIL) {
+                    if (cacheResult.getResultCode() == CacheResultCode.FAIL && System.currentTimeMillis() < expireTimestamp) {
                         logger.warn("unlock key {} + failed, retry. msg = {}", key, cacheResult.getMessage());
                         cacheResult = REMOVE_impl(key, newKey);
                         if (cacheResult.getResultCode() == CacheResultCode.FAIL) {
