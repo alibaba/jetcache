@@ -3,6 +3,7 @@ package com.alicp.jetcache;
 import com.alicp.jetcache.event.*;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -14,13 +15,14 @@ import java.util.function.Function;
  */
 public class MonitoredCache<K, V> implements ProxyCache<K, V> {
 
-    private CacheMonitor monitor;
+    private CacheMonitor[] monitors;
 
     private Cache<K, V> cache;
 
-    public MonitoredCache(Cache<K, V> cache, CacheMonitor monitor) {
+    public MonitoredCache(Cache<K, V> cache, CacheMonitor... monitor) {
         this.cache = cache;
-        this.monitor = monitor;
+        Objects.requireNonNull(monitor);
+        this.monitors = monitor;
     }
 
     @Override
@@ -28,13 +30,19 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         return cache;
     }
 
-    public CacheMonitor getMonitor() {
-        return monitor;
+    public CacheMonitor[] getMonitors() {
+        return monitors;
     }
 
     @Override
     public CacheConfig config() {
         return cache.config();
+    }
+
+    public void notity(CacheEvent e) {
+        for (CacheMonitor m : monitors) {
+            m.afterOperation(e);
+        }
     }
 
     @Override
@@ -43,7 +51,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheGetResult<V> result = cache.GET(key);
         t = System.currentTimeMillis() - t;
         CacheGetEvent event = new CacheGetEvent(cache, t, key, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -53,7 +61,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         MultiGetResult<K, V> result = cache.GET_ALL(keys);
         t = System.currentTimeMillis() - t;
         CacheGetAllEvent event = new CacheGetAllEvent(cache, t, keys, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -68,7 +76,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
             } finally {
                 t = System.currentTimeMillis() - t;
                 CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
-                monitor.afterOperation(event);
+                notity(event);
             }
             return v;
         };
@@ -93,7 +101,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.PUT(key, value);
         t = System.currentTimeMillis() - t;
         CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -103,7 +111,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.PUT(key, value, expire, timeUnit);
         t = System.currentTimeMillis() - t;
         CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -114,7 +122,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.PUT_ALL(map);
         t = System.currentTimeMillis() - t;
         CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -124,7 +132,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.PUT_ALL(map, expire, timeUnit);
         t = System.currentTimeMillis() - t;
         CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -134,7 +142,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.REMOVE(key);
         t = System.currentTimeMillis() - t;
         CacheRemoveEvent event = new CacheRemoveEvent(cache, t, key, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -144,7 +152,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.REMOVE_ALL(keys);
         t = System.currentTimeMillis() - t;
         CacheRemoveAllEvent event = new CacheRemoveAllEvent(cache, t, keys, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 
@@ -159,7 +167,7 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         CacheResult result = cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
         t = System.currentTimeMillis() - t;
         CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
-        monitor.afterOperation(event);
+        notity(event);
         return result;
     }
 }

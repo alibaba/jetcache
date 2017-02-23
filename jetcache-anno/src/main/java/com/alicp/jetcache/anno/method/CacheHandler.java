@@ -8,6 +8,7 @@ import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.event.CacheLoadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -156,8 +157,9 @@ public class CacheHandler implements InvocationHandler {
             success = true;
         } finally {
             t = System.currentTimeMillis() - t;
-            if(cache instanceof MonitoredCache){
-                ((MonitoredCache)cache).getMonitor().afterLoad(t, key, v, success);
+            if(cache instanceof MonitoredCache) {
+                CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
+                ((MonitoredCache)cache).notity(event);
             }
         }
         return v;
