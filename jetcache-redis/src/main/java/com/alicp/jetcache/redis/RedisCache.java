@@ -42,7 +42,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             throw new CacheConfigException("no pool");
         }
         if (config.isExpireAfterAccess()) {
-            throw new CacheConfigException("expireAfterAccess is not supported by tair");
+            throw new CacheConfigException("expireAfterAccess is not supported");
         }
     }
 

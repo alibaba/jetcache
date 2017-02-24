@@ -30,7 +30,11 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
     protected InnerMap createAreaCache() {
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
         builder.maximumSize(config.getLimit());
-        builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        if (config.isExpireAfterAccess()) {
+            builder.expireAfterAccess(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        } else {
+            builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        }
 
         cache = builder.build();
         return new InnerMap() {

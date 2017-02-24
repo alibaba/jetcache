@@ -7,7 +7,13 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.external.ExternalKeyUtil;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
+import com.alicp.jetcache.test.AbstractCacheTest;
+import org.junit.Test;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -18,6 +24,20 @@ import java.util.stream.Collectors;
 public class MockRemoteCache<K, V> implements Cache<K, V> {
     private Cache<Bytes, byte[]> cache;
     private ExternalCacheConfig config;
+
+    public static class MockRemoteCacheTest extends AbstractCacheTest {
+        @Test
+        public void Test() throws Exception {
+            MockRemoteCacheBuilder b = new MockRemoteCacheBuilder();
+            b.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+            b.setValueDecoder(JavaValueDecoder.INSTANCE);
+            b.setValueEncoder(JavaValueEncoder.INSTANCE);
+            b.setKeyPrefix("PREFIX");
+            cache = b.buildCache();
+            baseTest();
+        }
+    }
+
 
     public MockRemoteCache(ExternalCacheConfig config) {
         this.config = config;
@@ -63,7 +83,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
             Bytes bs = new Bytes();
             bs.bs = keyBytes;
             return bs;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new CacheException(e);
         }
     }
@@ -85,8 +105,10 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     @Override
     public CacheGetResult<V> GET(K key) {
         CacheGetResult r = cache.GET(buildKey(key));
-        V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
-        r.setValue(v);
+        if (r.isSuccess()) {
+            V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
+            r.setValue(v);
+        }
         return r;
     }
 
@@ -101,15 +123,17 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         });
         MultiGetResult<Bytes, byte[]> result = cache.GET_ALL(new HashSet(keys));
         Map<Bytes, CacheGetResult<byte[]>> resultMap = result.getValues();
-        Map<K, CacheGetResult<V>> returnMap = new HashMap<>();
-        for (int i = 0; i < keyList.size(); i++) {
-            K key = keyList.get(i);
-            Bytes newKey = newKeyList.get(i);
-            CacheGetResult r = resultMap.get(newKey);
-            r.setValue(config.getValueDecoder().apply((byte[]) r.getValue()));
-            returnMap.put(key, r);
+        if (resultMap != null) {
+            Map<K, CacheGetResult<V>> returnMap = new HashMap<>();
+            for (int i = 0; i < keyList.size(); i++) {
+                K key = keyList.get(i);
+                Bytes newKey = newKeyList.get(i);
+                CacheGetResult r = resultMap.get(newKey);
+                r.setValue(config.getValueDecoder().apply((byte[]) r.getValue()));
+                returnMap.put(key, r);
+            }
+            result.setValues((Map) returnMap);
         }
-        result.setValues((Map) returnMap);
         return (MultiGetResult) result;
     }
 

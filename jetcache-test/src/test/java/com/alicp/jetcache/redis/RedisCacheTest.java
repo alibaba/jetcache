@@ -41,17 +41,6 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .expireAfterAccess(200, TimeUnit.MILLISECONDS)
-                .buildCache();
-        baseTest();
-        expireAfterAccessTest(cache.config().getDefaultExpireInMillis());
-
-        cache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .valueEncoder(KryoValueEncoder.INSTANCE)
-                .valueDecoder(KryoValueDecoder.INSTANCE)
-                .jedisPool(pool)
-                .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         fastjsonKeyCoverterTest();
 

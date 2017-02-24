@@ -103,7 +103,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 ((com.github.benmanes.caffeine.cache.Cache) c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class))
                         .getIfPresent("KK1");
         CacheValueHolder<Object> h2 = (CacheValueHolder<Object>)
-                ((LinkedHashMap) c1.unwrap(LinkedHashMap.class)).get("KK1");
+                ((LinkedHashMap) c2.unwrap(LinkedHashMap.class)).get("KK1");
 
         long x = h1.getExpireTime() - h2.getExpireTime();
         if (Math.abs(x) > 10) {
