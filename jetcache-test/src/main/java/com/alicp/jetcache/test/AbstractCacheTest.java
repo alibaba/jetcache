@@ -6,7 +6,9 @@ import org.junit.Assert;
 
 import java.io.Serializable;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -175,6 +177,29 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
         Thread.sleep(50);
         Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
+
+        int count =10;
+        CountDownLatch countDownLatch = new CountDownLatch(count);
+        int[] runCount = new int[2];
+        Runnable runnable = () -> {
+            boolean b = cache.tryLockAndRun("LockKeyAndRunKey", 1, TimeUnit.SECONDS,
+                    () -> {
+                        runCount[1]++;
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                        }
+                    });
+            if (b)
+                runCount[0]++;
+            countDownLatch.countDown();
+        };
+        for (int i = 0; i < count; i++) {
+            new Thread(runnable).start();
+        }
+        countDownLatch.await();
+        Assert.assertEquals(1, runCount[0]);
+        Assert.assertEquals(1, runCount[1]);
     }
 
     protected void expireAfterWriteTest(long ttl) throws InterruptedException {
