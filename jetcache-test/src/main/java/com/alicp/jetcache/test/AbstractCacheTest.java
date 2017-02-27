@@ -5,10 +5,7 @@ import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
@@ -79,6 +76,43 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals(0, cache.getAll(Collections.emptySet()).size());
     }
 
+    private void putAllTest() throws Exception {
+        String k1 = "putAllTest_K1", k2 = "putAllTest_K2", k3 = "putAllTest_K3";
+        String k4 = "putAllTest_K4", k5 = "putAllTest_K5", k6 = "putAllTest_K6";
+        String k7 = "putAllTest_K7", k8 = "putAllTest_K8", k9 = "putAllTest_K9";
+        Map m = new HashMap();
+        m.put(k1 , "V1");
+        m.put(k2 , "V2");
+        m.put(k3 , "V3");
+        cache.putAll(m);
+        Assert.assertEquals("V1", cache.get(k1));
+        Assert.assertEquals("V2", cache.get(k2));
+        Assert.assertEquals("V3", cache.get(k3));
+
+        m.clear();
+        m.put(k4, "V4");
+        m.put(k5, "V5");
+        m.put(k6, "V6");
+        Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
+        Assert.assertEquals("V4", cache.get(k4));
+        Assert.assertEquals("V5", cache.get(k5));
+        Assert.assertEquals("V6", cache.get(k6));
+
+        m.clear();
+        m.put(k7, "V7");
+        m.put(k8, "V8");
+        m.put(k9, "V9");
+        Assert.assertTrue(cache.PUT_ALL(m, 30, TimeUnit.MILLISECONDS).isSuccess());
+        Assert.assertEquals("V7", cache.get(k7));
+        Assert.assertEquals("V8", cache.get(k8));
+        Assert.assertEquals("V9", cache.get(k9));
+
+        Thread.sleep(31);
+        Assert.assertNull(cache.get(k7));
+        Assert.assertNull(cache.get(k8));
+        Assert.assertNull(cache.get(k9));
+    }
+
     private boolean isMultiLevelCache() {
         Cache c = cache;
         while (c instanceof ProxyCache) {
@@ -147,8 +181,9 @@ public abstract class AbstractCacheTest {
     static class A implements Serializable {
         private static final long serialVersionUID = 1692575072446353143L;
 
-        public A(){
+        public A() {
         }
+
         int id;
         String name;
 
@@ -181,6 +216,7 @@ public abstract class AbstractCacheTest {
             return ((A) obj).id == id;
         }
     }
+
     private void complextValueTest() {
         A a1 = new A();
         A a2 = new A();
@@ -210,7 +246,7 @@ public abstract class AbstractCacheTest {
         Thread.sleep(50);
         Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
 
-        int count =10;
+        int count = 10;
         CountDownLatch countDownLatch = new CountDownLatch(count);
         int[] runCount = new int[2];
         Runnable runnable = () -> {
