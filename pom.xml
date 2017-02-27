@@ -10,7 +10,7 @@
     <groupId>com.alicp.jetcache</groupId>
     <artifactId>jetcache-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.0.9</version>
+    <version>2.1.0-SNAPSHOT</version>
 
     <build>
         <plugins>
