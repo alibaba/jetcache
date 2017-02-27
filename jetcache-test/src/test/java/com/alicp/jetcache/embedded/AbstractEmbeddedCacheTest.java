@@ -70,7 +70,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
 
         int thread = 10;
         int count = 100;
-        int time = 5000;
+        int time = 3000;
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(thread * count).buildCache();
         concurrentTest(thread, time);
     }

@@ -116,14 +116,19 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        Map newMap = new HashMap();
-        for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-            CacheValueHolder<V> h = new CacheValueHolder<>(en.getValue(),
-                    System.currentTimeMillis(), timeUnit.toMillis(expire));
-            newMap.put(en.getKey(), h);
-        }
         int failCount = 0;
         for (Cache c : caches) {
+            Map newMap = new HashMap();
+            if (useDefaultExpire) {
+                expire = c.config().getDefaultExpireInMillis();
+                timeUnit = TimeUnit.MILLISECONDS;
+            }
+            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+                CacheValueHolder<V> h = new CacheValueHolder<>(en.getValue(),
+                        System.currentTimeMillis(), timeUnit.toMillis(expire));
+                newMap.put(en.getKey(), h);
+            }
+
             CacheResult r;
             if (useDefaultExpire) {
                 r = c.PUT_ALL(newMap);
@@ -147,7 +152,12 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
                 timeUnit = TimeUnit.MILLISECONDS;
             }
             CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
-            CacheResult r = cache.PUT(key, h, expire, timeUnit);
+            CacheResult r;
+            if (useDefaultExpire) {
+                r = cache.PUT(key, h);
+            } else {
+                r = cache.PUT(key, h, expire, timeUnit);
+            }
             if (!r.isSuccess()) {
                 failCount++;
             }

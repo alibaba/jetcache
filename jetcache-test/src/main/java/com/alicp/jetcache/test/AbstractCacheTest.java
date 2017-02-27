@@ -42,6 +42,7 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(r.getValue());
 
         getAllTest();
+        putAllTest();
 
         computeIfAbsentTest();
         lockTest();
@@ -57,11 +58,6 @@ public abstract class AbstractCacheTest {
         s.add(k3);
         cache.put(k1, "V1");
         cache.put(k2, "V2");
-        Map<Object, Object> map = cache.getAll(s);
-        Assert.assertEquals(2, map.size());
-        Assert.assertEquals("V1", map.get(k1));
-        Assert.assertEquals("V2", map.get(k2));
-        Assert.assertNull(map.get(k3));
 
         MultiGetResult<Object, Object> r = cache.GET_ALL(s);
         Assert.assertTrue(r.isSuccess());
@@ -72,6 +68,12 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V2", r.getValues().get(k2).getValue());
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, r.getValues().get(k3).getResultCode());
         Assert.assertNull(r.getValues().get(k3).getValue());
+
+        Map<Object, Object> map = cache.getAll(s);
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals("V1", map.get(k1));
+        Assert.assertEquals("V2", map.get(k2));
+        Assert.assertNull(map.get(k3));
 
         Assert.assertEquals(0, cache.getAll(Collections.emptySet()).size());
     }
@@ -84,7 +86,7 @@ public abstract class AbstractCacheTest {
         m.put(k1 , "V1");
         m.put(k2 , "V2");
         m.put(k3 , "V3");
-        cache.putAll(m);
+        Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
         Assert.assertEquals("V1", cache.get(k1));
         Assert.assertEquals("V2", cache.get(k2));
         Assert.assertEquals("V3", cache.get(k3));
@@ -93,7 +95,7 @@ public abstract class AbstractCacheTest {
         m.put(k4, "V4");
         m.put(k5, "V5");
         m.put(k6, "V6");
-        Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
+        cache.putAll(m);
         Assert.assertEquals("V4", cache.get(k4));
         Assert.assertEquals("V5", cache.get(k5));
         Assert.assertEquals("V6", cache.get(k6));
@@ -102,15 +104,10 @@ public abstract class AbstractCacheTest {
         m.put(k7, "V7");
         m.put(k8, "V8");
         m.put(k9, "V9");
-        Assert.assertTrue(cache.PUT_ALL(m, 30, TimeUnit.MILLISECONDS).isSuccess());
+        Assert.assertTrue(cache.PUT_ALL(m, 5000, TimeUnit.MILLISECONDS).isSuccess());
         Assert.assertEquals("V7", cache.get(k7));
         Assert.assertEquals("V8", cache.get(k8));
         Assert.assertEquals("V9", cache.get(k9));
-
-        Thread.sleep(31);
-        Assert.assertNull(cache.get(k7));
-        Assert.assertNull(cache.get(k8));
-        Assert.assertNull(cache.get(k9));
     }
 
     private boolean isMultiLevelCache() {
@@ -272,46 +269,68 @@ public abstract class AbstractCacheTest {
 
     protected void expireAfterWriteTest(long ttl) throws InterruptedException {
         cache.put("EXPIRE_W_K1", "V1");
-        expireAfterWriteTestImpl(ttl);
+        expireAfterWriteTestImpl("EXPIRE_W_K1", ttl);
+
+        HashMap m = new HashMap();
+        m.put("EXPIRE_W_K2", "V1");
+        cache.PUT_ALL(m);
+        expireAfterWriteTestImpl("EXPIRE_W_K2" ,ttl);
 
         ttl = ttl / 2;
-        cache.put("EXPIRE_W_K1", "V1", ttl, TimeUnit.MILLISECONDS);
-        expireAfterWriteTestImpl(ttl);
+
+        cache.put("EXPIRE_W_K3", "V1", ttl, TimeUnit.MILLISECONDS);
+        expireAfterWriteTestImpl("EXPIRE_W_K3" ,ttl);
+
+        m = new HashMap();
+        m.put("EXPIRE_W_K4", "V1");
+        cache.PUT_ALL(m, ttl, TimeUnit.MILLISECONDS);
+        expireAfterWriteTestImpl("EXPIRE_W_K4" ,ttl);
     }
 
     protected void expireAfterAccessTest(long ttl) throws InterruptedException {
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("EXPIRE_A_K1", "V1").getResultCode());
-        expireAfterAccessTestImpl(ttl);
+        expireAfterAccessTestImpl("EXPIRE_A_K1", ttl);
+
+        HashMap m = new HashMap();
+        m.put("EXPIRE_W_K2", "V1");
+        cache.PUT_ALL(m);
+        expireAfterAccessTestImpl("EXPIRE_W_K2" ,ttl);
 
         ttl = ttl / 2;
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("EXPIRE_A_K1", "V1", ttl, TimeUnit.MILLISECONDS).getResultCode());
-        expireAfterAccessTestImpl(ttl);
+
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("EXPIRE_A_K3", "V1", ttl, TimeUnit.MILLISECONDS).getResultCode());
+        expireAfterAccessTestImpl("EXPIRE_A_K3", ttl);
+
+        m = new HashMap();
+        m.put("EXPIRE_W_K4", "V1");
+        cache.PUT_ALL(m, ttl, TimeUnit.MILLISECONDS);
+        expireAfterAccessTestImpl("EXPIRE_W_K4" ,ttl);
     }
 
-    protected void expireAfterWriteTestImpl(long ttl) throws InterruptedException {
-        CacheGetResult r = cache.GET("EXPIRE_W_K1");
+    protected void expireAfterWriteTestImpl(String key, long ttl) throws InterruptedException {
+        CacheGetResult r = cache.GET(key);
         Assert.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
         Assert.assertEquals("V1", r.getValue());
 
         Thread.sleep(ttl / 2);
-        r = cache.GET("EXPIRE_W_K1");
+        r = cache.GET(key);
         Assert.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
         Assert.assertEquals("V1", r.getValue());
 
         Thread.sleep(ttl / 2 + 2);
-        r = cache.GET("EXPIRE_W_K1");
+        r = cache.GET(key);
         Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
         Assert.assertNull(r.getValue());
     }
 
-    protected void expireAfterAccessTestImpl(long ttl) throws InterruptedException {
-        Assert.assertEquals("V1", cache.get("EXPIRE_A_K1"));
+    protected void expireAfterAccessTestImpl(String key, long ttl) throws InterruptedException {
+        Assert.assertEquals("V1", cache.get(key));
         Thread.sleep(ttl / 2);
-        Assert.assertEquals("V1", cache.get("EXPIRE_A_K1"));
+        Assert.assertEquals("V1", cache.get(key));
         Thread.sleep(ttl / 2 + 2);
-        Assert.assertEquals("V1", cache.get("EXPIRE_A_K1"));
+        Assert.assertEquals("V1", cache.get(key));
         Thread.sleep(ttl + 1);
-        CacheGetResult<Object> r = cache.GET("EXPIRE_A_K1");
+        CacheGetResult<Object> r = cache.GET(key);
         Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
         Assert.assertNull(r.getValue());
     }
