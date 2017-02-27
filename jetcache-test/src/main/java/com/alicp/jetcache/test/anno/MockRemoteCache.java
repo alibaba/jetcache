@@ -14,6 +14,7 @@ import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class MockRemoteCache<K, V> implements Cache<K, V> {
-    private Cache<Bytes, byte[]> cache;
+    private Cache<ByteBuffer, byte[]> cache;
     private ExternalCacheConfig config;
 
     public static class MockRemoteCacheTest extends AbstractCacheTest {
@@ -51,38 +52,14 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         return config;
     }
 
-    static class Bytes {
-        byte[] bs;
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof Bytes) {
-                return Arrays.equals(bs, ((Bytes) obj).bs);
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public int hashCode() {
-            int x = 0;
-            for (byte b : bs) {
-                x += b;
-            }
-            return x;
-        }
-    }
-
-    private Bytes buildKey(K key) {
+    private ByteBuffer buildKey(K key) {
         try {
             Object newKey = key;
             if (config().getKeyConvertor() != null) {
                 newKey = config.getKeyConvertor().apply(key);
             }
             byte[] keyBytes = ExternalKeyUtil.buildKeyAfterConvert(newKey, config.getKeyPrefix());
-            Bytes bs = new Bytes();
-            bs.bs = keyBytes;
-            return bs;
+            return ByteBuffer.wrap(keyBytes);
         } catch (IOException e) {
             throw new CacheException(e);
         }
@@ -115,21 +92,23 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     @Override
     public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
         ArrayList<K> keyList = new ArrayList<>(keys.size());
-        ArrayList<Bytes> newKeyList = new ArrayList<>(keys.size());
+        ArrayList<ByteBuffer> newKeyList = new ArrayList<>(keys.size());
         keys.stream().forEach((k) -> {
-            Bytes newKey = buildKey(k);
+            ByteBuffer newKey = buildKey(k);
             keyList.add(k);
             newKeyList.add(newKey);
         });
-        MultiGetResult<Bytes, byte[]> result = cache.GET_ALL(new HashSet(keys));
-        Map<Bytes, CacheGetResult<byte[]>> resultMap = result.getValues();
+        MultiGetResult<ByteBuffer, byte[]> result = cache.GET_ALL(new HashSet(newKeyList));
+        Map<ByteBuffer, CacheGetResult<byte[]>> resultMap = result.getValues();
         if (resultMap != null) {
             Map<K, CacheGetResult<V>> returnMap = new HashMap<>();
             for (int i = 0; i < keyList.size(); i++) {
                 K key = keyList.get(i);
-                Bytes newKey = newKeyList.get(i);
+                ByteBuffer newKey = newKeyList.get(i);
                 CacheGetResult r = resultMap.get(newKey);
-                r.setValue(config.getValueDecoder().apply((byte[]) r.getValue()));
+                if (r.getValue() != null) {
+                    r.setValue(config.getValueDecoder().apply((byte[]) r.getValue()));
+                }
                 returnMap.put(key, r);
             }
             result.setValues((Map) returnMap);
@@ -144,7 +123,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
 
     @Override
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
-        Map<Bytes, byte[]> newMap = new HashMap<>();
+        Map<ByteBuffer, byte[]> newMap = new HashMap<>();
         map.entrySet().forEach((e) -> newMap.put(buildKey(e.getKey()), config.getValueEncoder().apply(e.getValue())));
         return cache.PUT_ALL(newMap, expire, timeUnit);
     }

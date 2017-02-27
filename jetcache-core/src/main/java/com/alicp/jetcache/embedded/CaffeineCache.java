@@ -45,7 +45,7 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
             @Override
             public Map getAllValues(Collection keys) {
-                return cache.getAllPresent((Iterable<?>) keys.iterator());
+                return cache.getAllPresent(keys);
             }
 
             @Override

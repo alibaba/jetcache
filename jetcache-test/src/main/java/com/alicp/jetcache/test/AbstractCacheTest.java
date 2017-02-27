@@ -5,6 +5,9 @@ import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
@@ -41,10 +44,39 @@ public abstract class AbstractCacheTest {
         Assert.assertTrue(r.isSuccess());
         Assert.assertNull(r.getValue());
 
+        getAllTest();
+
         computeIfAbsentTest();
         lockTest();
         putIfAbsentTest();
         complextValueTest();
+    }
+
+    private void getAllTest() {
+        String k1 = "getAllTest_K1", k2 = "getAllTest_K2", k3 = "getAllTest_K3";
+        HashSet s = new HashSet();
+        s.add(k1);
+        s.add(k2);
+        s.add(k3);
+        cache.put(k1, "V1");
+        cache.put(k2, "V2");
+        Map<Object, Object> map = cache.getAll(s);
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals("V1", map.get(k1));
+        Assert.assertEquals("V2", map.get(k2));
+        Assert.assertNull(map.get(k3));
+
+        MultiGetResult<Object, Object> r = cache.GET_ALL(s);
+        Assert.assertTrue(r.isSuccess());
+        Assert.assertEquals(3, r.getValues().size());
+        Assert.assertTrue(r.getValues().get(k1).isSuccess());
+        Assert.assertEquals("V1", r.getValues().get(k1).getValue());
+        Assert.assertTrue(r.getValues().get(k2).isSuccess());
+        Assert.assertEquals("V2", r.getValues().get(k2).getValue());
+        Assert.assertEquals(CacheResultCode.NOT_EXISTS, r.getValues().get(k3).getResultCode());
+        Assert.assertNull(r.getValues().get(k3).getValue());
+
+        Assert.assertEquals(0, cache.getAll(Collections.emptySet()).size());
     }
 
     private boolean isMultiLevelCache() {

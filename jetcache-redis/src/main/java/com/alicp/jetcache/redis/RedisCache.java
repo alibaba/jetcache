@@ -87,25 +87,27 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        ArrayList<K> keyList = new ArrayList<K>(keys.size());
-        byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[len][]);
+        ArrayList<K> keyList = new ArrayList<K>(keys);
+        byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
 
         Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
         try (Jedis jedis = pool.getResource()) {
-            List mgetResults = jedis.mget(newKeys);
-            for (int i = 0; i < mgetResults.size(); i++) {
-                Object value = mgetResults.get(i);
-                K key = keyList.get(i);
-                if (value != null) {
-                    CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
-                    if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                        resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
+            if (newKeys.length > 0) {
+                List mgetResults = jedis.mget(newKeys);
+                for (int i = 0; i < mgetResults.size(); i++) {
+                    Object value = mgetResults.get(i);
+                    K key = keyList.get(i);
+                    if (value != null) {
+                        CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
+                        if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                            resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
+                        } else {
+                            CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue());
+                            resultMap.put(key, r);
+                        }
                     } else {
-                        CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue());
-                        resultMap.put(key, r);
+                        resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
                     }
-                } else {
-                    resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
                 }
             }
             return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);

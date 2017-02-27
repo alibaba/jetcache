@@ -38,7 +38,6 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
     @Test
     public void test() throws Exception {
-
         initL1L2(200);
         cache = new MultiLevelCache(l1Cache, l2Cache);
         doTest(200);

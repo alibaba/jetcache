@@ -77,6 +77,9 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
                 }
             }
         }
+        for (K k : restKeys) {
+            resultMap.put(k, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
+        }
         return new MultiGetResult<>(CacheResultCode.SUCCESS, null, resultMap);
     }
 
