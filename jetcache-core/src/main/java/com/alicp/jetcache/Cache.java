@@ -45,7 +45,7 @@ public interface Cache<K, V> {
     }
 
     default void removeAll(Set<? extends K> keys) {
-        removeAll(keys);
+        REMOVE_ALL(keys);
     }
 
     /**

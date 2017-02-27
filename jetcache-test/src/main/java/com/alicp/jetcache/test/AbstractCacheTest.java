@@ -43,6 +43,7 @@ public abstract class AbstractCacheTest {
 
         getAllTest();
         putAllTest();
+        removeAllTest();
 
         computeIfAbsentTest();
         lockTest();
@@ -108,6 +109,29 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V7", cache.get(k7));
         Assert.assertEquals("V8", cache.get(k8));
         Assert.assertEquals("V9", cache.get(k9));
+    }
+
+    private void removeAllTest() {
+        String k1 = "removeAllTest_K1", k2 = "removeAllTest_K2", k3 = "removeAllTest_K3";
+        cache.put(k1, "V1");
+        cache.put(k2, "V2");
+        cache.put(k3, "V3");
+
+        HashSet s = new HashSet();
+        s.add(k1);
+        s.add(k2);
+        cache.removeAll(s);
+        Assert.assertNull(cache.get(k1));
+        Assert.assertNull(cache.get(k2));
+        Assert.assertNotNull(cache.get(k3));
+
+        s = new HashSet();
+        s.add(k1);
+        s.add(k3);
+        Assert.assertTrue(cache.REMOVE_ALL(s).isSuccess());
+        Assert.assertNull(cache.get(k1));
+        Assert.assertNull(cache.get(k2));
+        Assert.assertNull(cache.get(k3));
     }
 
     private boolean isMultiLevelCache() {

@@ -65,7 +65,7 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
             @Override
             public void removeAllValues(Collection keys) {
-                cache.invalidateAll((Iterable<?>) keys.iterator());
+                cache.invalidateAll(keys);
             }
 
             @Override
