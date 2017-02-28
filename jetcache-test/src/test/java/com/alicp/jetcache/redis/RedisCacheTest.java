@@ -54,7 +54,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         nullKeyConvertorTest();
 
         int thread = 10;
-        int time = 1000;
+        int time = 3000;
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
@@ -62,6 +62,6 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
-        concurrentTest(thread, time);
+        concurrentTest(thread, 500 , time);
     }
 }

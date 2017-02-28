@@ -69,10 +69,10 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         nullKeyConvertorTest();
 
         int thread = 10;
-        int count = 100;
+        int limit = 1000;
         int time = 3000;
-        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(thread * count).buildCache();
-        concurrentTest(thread, time);
+        cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()).limit(limit).buildCache();
+        concurrentTest(thread, limit, time);
     }
 
     protected void nullKeyConvertorTest() {

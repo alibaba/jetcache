@@ -84,9 +84,9 @@ public abstract class AbstractCacheTest {
         String k4 = "putAllTest_K4", k5 = "putAllTest_K5", k6 = "putAllTest_K6";
         String k7 = "putAllTest_K7", k8 = "putAllTest_K8", k9 = "putAllTest_K9";
         Map m = new HashMap();
-        m.put(k1 , "V1");
-        m.put(k2 , "V2");
-        m.put(k3 , "V3");
+        m.put(k1, "V1");
+        m.put(k2, "V2");
+        m.put(k3, "V3");
         Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
         Assert.assertEquals("V1", cache.get(k1));
         Assert.assertEquals("V2", cache.get(k2));
@@ -298,17 +298,17 @@ public abstract class AbstractCacheTest {
         HashMap m = new HashMap();
         m.put("EXPIRE_W_K2", "V1");
         cache.PUT_ALL(m);
-        expireAfterWriteTestImpl("EXPIRE_W_K2" ,ttl);
+        expireAfterWriteTestImpl("EXPIRE_W_K2", ttl);
 
         ttl = ttl / 2;
 
         cache.put("EXPIRE_W_K3", "V1", ttl, TimeUnit.MILLISECONDS);
-        expireAfterWriteTestImpl("EXPIRE_W_K3" ,ttl);
+        expireAfterWriteTestImpl("EXPIRE_W_K3", ttl);
 
         m = new HashMap();
         m.put("EXPIRE_W_K4", "V1");
         cache.PUT_ALL(m, ttl, TimeUnit.MILLISECONDS);
-        expireAfterWriteTestImpl("EXPIRE_W_K4" ,ttl);
+        expireAfterWriteTestImpl("EXPIRE_W_K4", ttl);
     }
 
     protected void expireAfterAccessTest(long ttl) throws InterruptedException {
@@ -318,7 +318,7 @@ public abstract class AbstractCacheTest {
         HashMap m = new HashMap();
         m.put("EXPIRE_W_K2", "V1");
         cache.PUT_ALL(m);
-        expireAfterAccessTestImpl("EXPIRE_W_K2" ,ttl);
+        expireAfterAccessTestImpl("EXPIRE_W_K2", ttl);
 
         ttl = ttl / 2;
 
@@ -328,7 +328,7 @@ public abstract class AbstractCacheTest {
         m = new HashMap();
         m.put("EXPIRE_W_K4", "V1");
         cache.PUT_ALL(m, ttl, TimeUnit.MILLISECONDS);
-        expireAfterAccessTestImpl("EXPIRE_W_K4" ,ttl);
+        expireAfterAccessTestImpl("EXPIRE_W_K4", ttl);
     }
 
     protected void expireAfterWriteTestImpl(String key, long ttl) throws InterruptedException {
@@ -383,8 +383,8 @@ public abstract class AbstractCacheTest {
     private volatile AtomicLong lockAtommicCount1;
     private volatile AtomicLong lockAtommicCount2;
 
-    protected void concurrentTest(int threadCount, int timeInMillis) throws Exception {
-        int count = 100;
+    protected void concurrentTest(int threadCount, int limit, int timeInMillis) throws Exception {
+        int count = 2 * limit / threadCount;
         lockAtommicCount1 = new AtomicLong();
         lockAtommicCount2 = new AtomicLong();
         lockCount1 = new AtomicLong();
@@ -412,22 +412,25 @@ public abstract class AbstractCacheTest {
 
                         cache.PUT(key, value, 10000, TimeUnit.SECONDS);
                         CacheGetResult result = cache.GET(key);
-                        if (result == null || result.getResultCode() != CacheResultCode.SUCCESS) {
-                            if (result == null) {
-                                System.out.println("key:" + key + ",result is null");
-                            } else {
-                                System.out.println("key:" + key + ",code:" + result.getResultCode());
-                            }
-                            cocurrentFail = true;
-                        } else if (!result.getValue().equals(value)) {
-                            System.out.println("key:" + key + ",value:" + result.getValue());
-                            cocurrentFail = true;
-                        }
-                        Assert.assertTrue(cache.remove(key));
+                        checkResult(key, value, result);
+                        CacheResult removeResult = cache.REMOVE(key);
+                        Assert.assertTrue(removeResult.isSuccess() || removeResult.getResultCode() == CacheResultCode.NOT_EXISTS);
 
                         if (!isMultiLevelCache()) {
                             cache.putIfAbsent(String.valueOf(i), i);
                         }
+
+                        String k1 = String.valueOf(i);
+                        String k2 = key;
+                        HashMap m = new HashMap();
+                        m.put(k1, value);
+                        value = value + 1;
+                        m.put(k2, value);
+                        Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
+                        MultiGetResult<Object, Object> multiGetResult = cache.GET_ALL(m.keySet());
+                        Assert.assertTrue(multiGetResult.isSuccess());
+                        checkResult(k2, value, multiGetResult.getValues().get(k2));
+                        Assert.assertTrue(cache.REMOVE_ALL(m.keySet()).isSuccess());
 
                         boolean b = random.nextBoolean();
                         String lockKey = b ? "locka" : "lockb";
@@ -439,6 +442,7 @@ public abstract class AbstractCacheTest {
                                 String shareKey = lockKey + "_share";
 
                                 lockAtomicCount.addAndGet(x);
+                                long lockCountNum = lockCount.get();
 
                                 cache.put(shareKey, x);
                                 Assert.assertEquals(x, cache.get(shareKey));
@@ -447,8 +451,7 @@ public abstract class AbstractCacheTest {
                                     putIfAbsentTest();
                                 }
 
-                                lockCount.set(lockCount.get() + x);
-
+                                lockCount.set(lockCountNum + x);
                             }
                         }
                     }
@@ -457,6 +460,17 @@ public abstract class AbstractCacheTest {
                     cocurrentFail = true;
                 }
                 countDownLatch.countDown();
+            }
+
+            private void checkResult(String key, Integer value, CacheGetResult result) {
+                if (result.getResultCode() != CacheResultCode.SUCCESS && result.getResultCode() != CacheResultCode.NOT_EXISTS) {
+                    System.out.println("key:" + key + ",code:" + result.getResultCode());
+                    cocurrentFail = true;
+                }
+                if (result.isSuccess() && !result.getValue().equals(value)) {
+                    System.out.println("key:" + key + ",value:" + result.getValue());
+                    cocurrentFail = true;
+                }
             }
         }
 

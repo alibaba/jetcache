@@ -23,6 +23,8 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     private Cache<Object, Object> l1Cache;
     private Cache<Object, Object> l2Cache;
 
+    private static final int LIMIT = 1000;
+
     private void initL1L2(int expireMillis) {
         l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
@@ -30,7 +32,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
         l2Cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                .limit(100000)
+                .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -44,7 +46,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
         initL1L2(2000);
         cache = new MultiLevelCache(l1Cache, l2Cache);
-        concurrentTest(200, 3000);
+        concurrentTest(200, LIMIT ,3000);
 
 
         doMonitoredTest(200, () -> {
@@ -58,7 +60,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
         doMonitoredTest(2000, () -> {
             try {
-                concurrentTest(200, 3000);
+                concurrentTest(200, LIMIT , 3000);
             } catch (Exception e) {
                 e.printStackTrace();
                 Assert.fail();
