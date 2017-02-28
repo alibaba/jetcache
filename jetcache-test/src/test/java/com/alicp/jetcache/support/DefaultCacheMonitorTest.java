@@ -1,5 +1,8 @@
 package com.alicp.jetcache.support;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.MultiLevelCache;
@@ -14,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class DefaultCacheMonnitorTest {
+public class DefaultCacheMonitorTest {
 
     public Cache createCache() {
         return LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
@@ -43,9 +46,29 @@ public class DefaultCacheMonnitorTest {
         Assert.assertEquals(3, s.getGetHitCount());
         Assert.assertEquals(5, s.getGetMissCount());
         Assert.assertEquals(3, s.getPutCount());
-        Assert.assertEquals(3, s.getInvalidateCount());
+        Assert.assertEquals(3, s.getRemoveCount());
         Assert.assertEquals(4, s.getLoadCount());
         Assert.assertEquals(4, s.getLoadSuccessCount());
+
+        monitor.resetStat();
+        Map m = new HashMap();
+        m.put("multi_k1", "V1");
+        m.put("multi_k2", "V2");
+        cache.putAll(m);
+        HashSet keys = new HashSet(m.keySet());
+        keys.add("multi_k3");
+        cache.getAll(keys);
+        cache.removeAll(keys);
+        s = monitor.getCacheStat();
+        Assert.assertEquals(3, s.getGetCount());
+        Assert.assertEquals(2, s.getGetHitCount());
+        Assert.assertEquals(1, s.getGetMissCount());
+        Assert.assertEquals(2, s.getPutCount());
+        Assert.assertEquals(2, s.getPutSuccessCount());
+        Assert.assertEquals(3, s.getRemoveCount());
+        Assert.assertEquals(3, s.getRemoveSuccessCount());
+        Assert.assertEquals(0, s.getLoadCount());
+        Assert.assertEquals(0, s.getLoadSuccessCount());
     }
 
     @Test
@@ -57,7 +80,7 @@ public class DefaultCacheMonnitorTest {
     }
 
     @Test
-    public void testWithLogger() throws Exception {
+    public void testWithManager() throws Exception {
         Cache c1 = createCache();
         DefaultCacheMonitor m1 = new DefaultCacheMonitor("cache1");
         Cache c2 = createCache();
@@ -65,9 +88,9 @@ public class DefaultCacheMonnitorTest {
 
         c1 = new MonitoredCache(c1, m1);
         c2 = new MonitoredCache(c2, m2);
-        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(2, TimeUnit.SECONDS);
-        logger.start();
-        logger.add(m1, m2);
+        DefaultCacheMonitorManager manager = new DefaultCacheMonitorManager(2, TimeUnit.SECONDS);
+        manager.start();
+        manager.add(m1, m2);
 
         basetest(c1, m1);
         basetest(c2, m2);
@@ -75,10 +98,10 @@ public class DefaultCacheMonnitorTest {
         Cache mc = new MultiLevelCache(c1, c2);
         DefaultCacheMonitor mcm = new DefaultCacheMonitor("multiCache");
         mc = new MonitoredCache(mc, mcm);
-        logger.add(mcm);
+        manager.add(mcm);
         basetest(mc, mcm);
 
-        logger.stop();
+        manager.stop();
 //        Thread.sleep(10000);
     }
 }

@@ -117,16 +117,16 @@ public class DefaultCacheMonitor implements CacheMonitor {
     }
 
     private void afterRemove(long millis, Object key, CacheResult result) {
-        cacheStat.minInvalidateTime = Math.min(cacheStat.minInvalidateTime, millis);
-        cacheStat.maxInvalidateTime = Math.max(cacheStat.maxInvalidateTime, millis);
-        cacheStat.invalidateTimeSum += millis;
-        cacheStat.invalidateCount++;
+        cacheStat.minRemoveTime = Math.min(cacheStat.minRemoveTime, millis);
+        cacheStat.maxRemoveTime = Math.max(cacheStat.maxRemoveTime, millis);
+        cacheStat.removeTimeSum += millis;
+        cacheStat.removeCount++;
         switch (result.getResultCode()) {
             case SUCCESS:
-                cacheStat.invalidateSuccessCount++;
+                cacheStat.removeSuccessCount++;
                 break;
             case FAIL:
-                cacheStat.invalidateFailCount++;
+                cacheStat.removeFailCount++;
                 break;
             default:
                 logger.warn("jetcache REMOVE return unexpected code: " + result.getResultCode());
@@ -170,14 +170,14 @@ public class DefaultCacheMonitor implements CacheMonitor {
             return;
         }
         int keyCount = keys.size();
-        cacheStat.minInvalidateTime = Math.min(cacheStat.minInvalidateTime, millis);
-        cacheStat.maxInvalidateTime = Math.max(cacheStat.maxInvalidateTime, millis);
-        cacheStat.invalidateTimeSum += millis;
-        cacheStat.invalidateCount += keyCount;
+        cacheStat.minRemoveTime = Math.min(cacheStat.minRemoveTime, millis);
+        cacheStat.maxRemoveTime = Math.max(cacheStat.maxRemoveTime, millis);
+        cacheStat.removeTimeSum += millis;
+        cacheStat.removeCount += keyCount;
         if (result.isSuccess()) {
-            cacheStat.invalidateSuccessCount += keyCount;
+            cacheStat.removeSuccessCount += keyCount;
         } else {
-            cacheStat.invalidateFailCount += keyCount;
+            cacheStat.removeFailCount += keyCount;
         }
     }
 

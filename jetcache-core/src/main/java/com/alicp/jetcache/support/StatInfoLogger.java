@@ -139,15 +139,15 @@ public class StatInfoLogger implements Consumer<StatInfo> {
             sb.append(String.format("%,7d", s.getMaxPutTime())).append('\n');
 
             sb.append(String.format("%-10s", "remove")).append('|');
-            sb.append(String.format("%,10.2f", s.invalidateTps())).append('|');
-            sb.append(String.format("%,14d", s.getInvalidateCount())).append('|');
-            sb.append(String.format("%,14d", s.getInvalidateSuccessCount())).append('|');
-            sb.append(String.format("%,14d", s.getInvalidateFailCount())).append('|');
+            sb.append(String.format("%,10.2f", s.removeTps())).append('|');
+            sb.append(String.format("%,14d", s.getRemoveCount())).append('|');
+            sb.append(String.format("%,14d", s.getRemoveSuccessCount())).append('|');
+            sb.append(String.format("%,14d", s.getRemoveFailCount())).append('|');
             sb.append(String.format("%14s", "N/A")).append('|');
             sb.append(String.format("%14s", "N/A")).append('|');
-            sb.append(String.format("%,9.1f", s.avgInvalidateTime())).append('|');
-            sb.append(String.format("%,7d", s.getMinInvalidateTime() == Long.MAX_VALUE ? 0 : s.getMinInvalidateTime())).append('|');
-            sb.append(String.format("%,7d", s.getMaxInvalidateTime())).append('\n');
+            sb.append(String.format("%,9.1f", s.avgRemoveTime())).append('|');
+            sb.append(String.format("%,7d", s.getMinRemoveTime() == Long.MAX_VALUE ? 0 : s.getMinRemoveTime())).append('|');
+            sb.append(String.format("%,7d", s.getMaxRemoveTime())).append('\n');
 
             sb.append(String.format("%-10s", "load")).append('|');
             sb.append(String.format("%,10.2f", s.loadQps())).append('|');

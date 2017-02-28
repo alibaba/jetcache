@@ -33,12 +33,12 @@ public class CacheStat implements Serializable, Cloneable {
     protected long minPutTime = Long.MAX_VALUE;
     protected long maxPutTime = 0;
 
-    protected long invalidateCount;
-    protected long invalidateSuccessCount;
-    protected long invalidateFailCount;
-    protected long invalidateTimeSum;
-    protected long minInvalidateTime = Long.MAX_VALUE;
-    protected long maxInvalidateTime = 0;
+    protected long removeCount;
+    protected long removeSuccessCount;
+    protected long removeFailCount;
+    protected long removeTimeSum;
+    protected long minRemoveTime = Long.MAX_VALUE;
+    protected long maxRemoveTime = 0;
 
     protected long loadCount;
     protected long loadSuccessCount;
@@ -77,8 +77,8 @@ public class CacheStat implements Serializable, Cloneable {
         return tps(putCount);
     }
 
-    public double invalidateTps() {
-        return tps(invalidateCount);
+    public double removeTps() {
+        return tps(removeCount);
     }
 
     public double loadQps() {
@@ -106,11 +106,11 @@ public class CacheStat implements Serializable, Cloneable {
         return 1.0 * putTimeSum / putCount;
     }
 
-    public double avgInvalidateTime() {
-        if (invalidateCount == 0) {
+    public double avgRemoveTime() {
+        if (removeCount == 0) {
             return 0;
         }
-        return 1.0 * invalidateTimeSum / invalidateCount;
+        return 1.0 * removeTimeSum / removeCount;
     }
 
     public double avgLoadTime() {
@@ -235,52 +235,52 @@ public class CacheStat implements Serializable, Cloneable {
         this.maxPutTime = maxPutTime;
     }
 
-    public long getInvalidateCount() {
-        return invalidateCount;
+    public long getRemoveCount() {
+        return removeCount;
     }
 
-    public void setInvalidateCount(long invalidateCount) {
-        this.invalidateCount = invalidateCount;
+    public void setRemoveCount(long removeCount) {
+        this.removeCount = removeCount;
     }
 
-    public long getInvalidateSuccessCount() {
-        return invalidateSuccessCount;
+    public long getRemoveSuccessCount() {
+        return removeSuccessCount;
     }
 
-    public void setInvalidateSuccessCount(long invalidateSuccessCount) {
-        this.invalidateSuccessCount = invalidateSuccessCount;
+    public void setRemoveSuccessCount(long removeSuccessCount) {
+        this.removeSuccessCount = removeSuccessCount;
     }
 
-    public long getInvalidateFailCount() {
-        return invalidateFailCount;
+    public long getRemoveFailCount() {
+        return removeFailCount;
     }
 
-    public void setInvalidateFailCount(long invalidateFailCount) {
-        this.invalidateFailCount = invalidateFailCount;
+    public void setRemoveFailCount(long removeFailCount) {
+        this.removeFailCount = removeFailCount;
     }
 
-    public long getInvalidateTimeSum() {
-        return invalidateTimeSum;
+    public long getRemoveTimeSum() {
+        return removeTimeSum;
     }
 
-    public void setInvalidateTimeSum(long invalidateTimeSum) {
-        this.invalidateTimeSum = invalidateTimeSum;
+    public void setRemoveTimeSum(long removeTimeSum) {
+        this.removeTimeSum = removeTimeSum;
     }
 
-    public long getMinInvalidateTime() {
-        return minInvalidateTime;
+    public long getMinRemoveTime() {
+        return minRemoveTime;
     }
 
-    public void setMinInvalidateTime(long minInvalidateTime) {
-        this.minInvalidateTime = minInvalidateTime;
+    public void setMinRemoveTime(long minRemoveTime) {
+        this.minRemoveTime = minRemoveTime;
     }
 
-    public long getMaxInvalidateTime() {
-        return maxInvalidateTime;
+    public long getMaxRemoveTime() {
+        return maxRemoveTime;
     }
 
-    public void setMaxInvalidateTime(long maxInvalidateTime) {
-        this.maxInvalidateTime = maxInvalidateTime;
+    public void setMaxRemoveTime(long maxRemoveTime) {
+        this.maxRemoveTime = maxRemoveTime;
     }
 
     public long getLoadCount() {
