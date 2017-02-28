@@ -2,7 +2,6 @@ package com.alicp.jetcache.anno.config.combined;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.reflect.MethodSignature;
 
 /**
  * Created on 2017/2/15.

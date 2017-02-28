@@ -8,7 +8,6 @@ import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.testsupport.Count;

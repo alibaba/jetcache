@@ -4,11 +4,11 @@
 package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.test.anno.TestUtil;
 import org.aopalliance.intercept.MethodInvocation;
 import org.jmock.Expectations;
 import org.jmock.integration.junit4.JUnitRuleMockery;

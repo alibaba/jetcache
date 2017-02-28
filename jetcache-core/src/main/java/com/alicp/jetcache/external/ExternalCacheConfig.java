@@ -1,7 +1,6 @@
 package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.CacheConfig;
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 

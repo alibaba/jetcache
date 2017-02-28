@@ -3,11 +3,11 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.junit.Assert;

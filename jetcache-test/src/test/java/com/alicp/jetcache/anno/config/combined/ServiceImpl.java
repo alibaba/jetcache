@@ -1,7 +1,6 @@
 package com.alicp.jetcache.anno.config.combined;
 
 import com.alicp.jetcache.anno.Cached;
-import org.springframework.stereotype.Component;
 
 /**
  * Created on 2017/2/14.

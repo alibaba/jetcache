@@ -2,7 +2,8 @@ package com.alicp.jetcache.embedded;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**

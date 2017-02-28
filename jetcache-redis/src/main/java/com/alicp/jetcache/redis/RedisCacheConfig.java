@@ -2,7 +2,6 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.util.Pool;
 
 /**

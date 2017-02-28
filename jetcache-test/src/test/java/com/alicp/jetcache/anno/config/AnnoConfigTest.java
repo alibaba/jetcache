@@ -1,13 +1,12 @@
 package com.alicp.jetcache.anno.config;
 
-import com.alicp.jetcache.test.anno.TestUtil;
-import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
+import com.alicp.jetcache.test.anno.TestUtil;
+import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

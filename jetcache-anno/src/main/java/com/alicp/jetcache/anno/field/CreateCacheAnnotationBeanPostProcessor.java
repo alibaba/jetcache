@@ -1,21 +1,15 @@
 package com.alicp.jetcache.anno.field;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CreateCache;
-import com.alicp.jetcache.anno.method.ClassUtil;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.*;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.beans.factory.annotation.InjectionMetadata;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;

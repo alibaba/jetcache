@@ -17,7 +17,6 @@ import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.Protocol;
 import redis.clients.util.Pool;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 

@@ -4,7 +4,7 @@ import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
 
-import java.io.*;
+import java.io.IOException;
 
 /**
  * Created on 2016/10/8.

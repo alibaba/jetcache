@@ -1,7 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;

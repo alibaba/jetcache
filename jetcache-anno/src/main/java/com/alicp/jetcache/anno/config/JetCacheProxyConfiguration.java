@@ -3,8 +3,6 @@ package com.alicp.jetcache.anno.config;
 import com.alicp.jetcache.anno.aop.CacheAdvisor;
 import com.alicp.jetcache.anno.aop.JetCacheInterceptor;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

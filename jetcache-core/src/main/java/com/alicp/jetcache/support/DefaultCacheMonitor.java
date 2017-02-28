@@ -1,6 +1,9 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheMonitor;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.event.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

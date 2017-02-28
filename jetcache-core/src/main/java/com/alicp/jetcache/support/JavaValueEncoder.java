@@ -1,7 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.CacheException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;

@@ -14,7 +14,6 @@ import redis.clients.util.Pool;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Created on 2016/10/7.

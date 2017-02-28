@@ -1,8 +1,5 @@
 package com.alicp.jetcache.support;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.MultiLevelCache;
@@ -10,6 +7,9 @@ import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**

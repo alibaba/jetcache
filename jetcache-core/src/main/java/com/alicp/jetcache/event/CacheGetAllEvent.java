@@ -1,7 +1,6 @@
 package com.alicp.jetcache.event;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.MultiGetResult;
 
 import java.util.Set;

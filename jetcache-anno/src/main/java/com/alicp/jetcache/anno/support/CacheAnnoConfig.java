@@ -3,9 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.KeyConvertor;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
