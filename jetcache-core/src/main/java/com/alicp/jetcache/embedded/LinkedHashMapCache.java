@@ -3,6 +3,10 @@
  */
 package com.alicp.jetcache.embedded;
 
+import com.alicp.jetcache.CacheValueHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.*;
 
 /**
@@ -10,9 +14,15 @@ import java.util.*;
  */
 public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
+    private static Logger logger = LoggerFactory.getLogger(LinkedHashMapCache.class);
 
     public LinkedHashMapCache(EmbeddedCacheConfig config) {
         super(config);
+        addToCleaner();
+    }
+
+    protected void addToCleaner() {
+        Cleaner.add(this);
     }
 
     @Override
@@ -28,7 +38,11 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         throw new IllegalArgumentException(clazz.getName());
     }
 
-    private static final class LRUMap extends LinkedHashMap implements InnerMap {
+    public void cleanExpiredEntry() {
+        ((LRUMap) innerMap).cleanExpiredEntry();
+    }
+
+    static final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
         private Object lock;
@@ -42,6 +56,28 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         @Override
         protected boolean removeEldestEntry(Map.Entry eldest) {
             return size() > max;
+        }
+
+        void cleanExpiredEntry() {
+            synchronized (lock) {
+                for (Iterator it = entrySet().iterator(); it.hasNext();) {
+                    Map.Entry en = (Map.Entry) it.next();
+                    Object value = en.getValue();
+                    if (value != null && value instanceof CacheValueHolder) {
+                        CacheValueHolder h = (CacheValueHolder) value;
+                        if (System.currentTimeMillis() >= h.getExpireTime()) {
+                            it.remove();
+                        }
+                    } else {
+                        // assert false
+                        if (value == null) {
+                            logger.error("key " + en.getKey() + " is null");
+                        } else {
+                            logger.error("value of key " + en.getKey() + " is not a CacheValueHolder. type=" + value.getClass());
+                        }
+                    }
+                }
+            }
         }
 
         public Object getValue(Object key) {
@@ -72,9 +108,9 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void putAllValues(Map map) {
-            synchronized (lock){
+            synchronized (lock) {
                 Set<Map.Entry> set = map.entrySet();
-                for (Map.Entry en : set){
+                for (Map.Entry en : set) {
                     put(en.getKey(), en.getValue());
                 }
             }
@@ -90,7 +126,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         @Override
         public void removeAllValues(Collection keys) {
             synchronized (lock) {
-                for(Object k: keys){
+                for (Object k : keys) {
                     remove(k);
                 }
             }

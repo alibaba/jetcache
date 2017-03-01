@@ -51,14 +51,13 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         }
         Object newKey = buildKey(key);
         CacheValueHolder<V> holder = (CacheValueHolder<V>) innerMap.getValue(newKey);
-        return getImpl(newKey, holder);
+        return getImpl(holder);
     }
 
-    private CacheGetResult<V> getImpl(Object newKey, CacheValueHolder<V> holder) {
+    private CacheGetResult<V> getImpl(CacheValueHolder<V> holder) {
         if (holder == null) {
             return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
         } else if (System.currentTimeMillis() >= holder.getExpireTime()) {
-            // innerMap.removeValue(newKey);
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
             if (config.isExpireAfterAccess()) {
@@ -87,7 +86,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
             K key = keyList.get(i);
             Object newKey = newKeyList.get(i);
             CacheValueHolder<V> holder = innerResultMap.get(newKey);
-            resultMap.put(key, getImpl(newKey, holder));
+            resultMap.put(key, getImpl(holder));
         }
         MultiGetResult<K, V> result = new MultiGetResult<>(CacheResultCode.SUCCESS, null, resultMap);
         return result;
