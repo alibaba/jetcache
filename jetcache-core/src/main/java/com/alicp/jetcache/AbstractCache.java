@@ -1,5 +1,6 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                 .append(this.getClass().getSimpleName()).append(") ")
                 .append(oper)
                 .append(" error. key=")
-                .append(key)
+                .append(FastjsonKeyConvertor.INSTANCE.apply(key))
                 .append(".");
         if (needLogStackTrace(e)) {
             logger.error(sb.toString(), e);
