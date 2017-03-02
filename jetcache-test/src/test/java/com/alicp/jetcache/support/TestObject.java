@@ -1,5 +1,7 @@
 package com.alicp.jetcache.support;
 
+import java.math.BigDecimal;
+import java.util.Map;
 import java.io.Serializable;
 
 /**
@@ -14,6 +16,8 @@ public class TestObject implements Serializable {
     private String name;
     private String email;
     private Object data;
+
+    private Map<String, BigDecimal> map;
 
     public long getId() {
         return id;
@@ -45,5 +49,13 @@ public class TestObject implements Serializable {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public Map<String, BigDecimal> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, BigDecimal> map) {
+        this.map = map;
     }
 }
