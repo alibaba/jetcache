@@ -66,8 +66,8 @@ public class AbstractEncoderTest {
         Assert.assertEquals(q.getId(), q2.getId());
         Assert.assertEquals(q.getName(), q2.getName());
         Assert.assertEquals(q.getEmail(), q2.getEmail());
-        Assert.assertArrayEquals(new byte[]{1, 2, 3}, (byte[]) q2.getData());
-        Assert.assertEquals(new BigDecimal(12345), q2.getMap().get("12345"));
+        Assert.assertArrayEquals((byte[])q.getData(), (byte[]) q2.getData());
+        Assert.assertEquals(q.getMap().get("12345"), q2.getMap().get("12345"));
     }
 
     public static class A implements Serializable {
