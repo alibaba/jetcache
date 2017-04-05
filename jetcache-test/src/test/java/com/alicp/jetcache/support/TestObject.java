@@ -17,8 +17,6 @@ public class TestObject implements Serializable {
     private String email;
     private Object data;
 
-    private Map<String, BigDecimal> map;
-
     public long getId() {
         return id;
     }
@@ -51,11 +49,4 @@ public class TestObject implements Serializable {
         this.data = data;
     }
 
-    public Map<String, BigDecimal> getMap() {
-        return map;
-    }
-
-    public void setMap(Map<String, BigDecimal> map) {
-        this.map = map;
-    }
 }

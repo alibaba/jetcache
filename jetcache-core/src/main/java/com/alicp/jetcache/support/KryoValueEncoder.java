@@ -3,6 +3,7 @@ package com.alicp.jetcache.support;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
+import org.objenesis.strategy.StdInstantiatorStrategy;
 
 import java.io.ByteArrayOutputStream;
 
@@ -17,14 +18,13 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 
     protected static int IDENTITY_NUMBER = 0x4A953A82;
 
-    static ThreadLocal<Kryo> kryoThreadLocal = new ThreadLocal<Kryo>() {
-        @Override
-        protected Kryo initialValue() {
-            Kryo kryo = new Kryo();
-            kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-            return kryo;
-        }
-    };
+    static ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
+        Kryo kryo = new Kryo();
+        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+//        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
+//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        return kryo;
+    });
 
     @Override
     public byte[] apply(Object value) {
