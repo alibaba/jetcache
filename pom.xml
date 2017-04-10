@@ -62,7 +62,6 @@
         <module>jetcache-test</module>
 
         <module>jetcache-starter/jetcache-autoconfigure</module>
-        <module>jetcache-starter/jetcache-starter-caffeine</module>
         <module>jetcache-starter/jetcache-starter-redis</module>
 
         <module>jetcache-ali/jetcache-tair</module>
