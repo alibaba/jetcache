@@ -144,7 +144,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>1.2.27</version>
+                <version>1.2.31</version>
             </dependency>
             <dependency>
                 <groupId>org.mvel</groupId>
@@ -153,7 +153,7 @@
             </dependency>
             <dependency>
                 <groupId>com.esotericsoftware</groupId>
-                <artifactId>kryo-shaded</artifactId>
+                <artifactId>kryo</artifactId>
                 <version>4.0.0</version>
             </dependency>
             <dependency>
