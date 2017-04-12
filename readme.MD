@@ -1,4 +1,4 @@
-# introduce
+# introduction
 JetCache is a Java cache abstraction which provides consistent use for various caching solutions. 
 Presently it support Redis and Alibaba Tair and Caffeine cache as embedded cache.
 It simplifies cache operation with these key features:  
