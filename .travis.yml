@@ -3,7 +3,10 @@ jdk:
   - oraclejdk8
 services:
   - redis-server
-before_install:
-  - pip install --user codecov
+script: "mvn cobertura:cobertura"
 after_success:
-  - codecov
+  - bash <(curl -s https://codecov.io/bash)
+#before_install:
+#  - pip install --user codecov
+#after_success:
+#  - codecov
