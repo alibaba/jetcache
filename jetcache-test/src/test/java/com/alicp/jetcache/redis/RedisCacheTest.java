@@ -4,9 +4,14 @@ import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.util.Pool;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -17,13 +22,33 @@ import java.util.concurrent.TimeUnit;
 public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
-    public void test() throws Exception {
+    public void testWithJedisPool() throws Exception {
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
         pc.setMaxTotal(10);
         JedisPool pool = new JedisPool(pc, "localhost", 6379);
 
+        testWithPool(pool);
+    }
+
+    @Test
+    public void test() throws Exception {
+        GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
+        pc.setMinIdle(2);
+        pc.setMaxIdle(10);
+        pc.setMaxTotal(10);
+
+        Set<String> sentinels = new HashSet<>();
+        sentinels.add("127.0.0.1:26379");
+        sentinels.add("127.0.0.1:26380");
+        sentinels.add("127.0.0.1:26381");
+        JedisSentinelPool pool = new JedisSentinelPool("mymaster", sentinels, pc);
+
+        testWithPool(pool);
+    }
+
+    private void testWithPool(Pool<Jedis> pool) throws Exception {
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
