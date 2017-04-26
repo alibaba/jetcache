@@ -1,7 +1,3 @@
-redis:
-  port: 6379
-  host: localhost
-
 jetcache:
   statIntervalMinutes: 15
 
@@ -22,8 +18,8 @@ jetcache:
         minIdle: 2
         maxIdle: 5
         maxTotal: 10
-      host: ${redis.host}
-      port: ${redis.port}
+      host: 127.0.0.1
+      port: 6379
       defaultExpireInMillis: 10000
     A1:
       type: redis
@@ -31,8 +27,8 @@ jetcache:
         minIdle: 2
         maxIdle: 5
         maxTotal: 10
-      host: ${redis.host}
-      port: ${redis.port}
+      sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
+      masterName: mymaster
       valueEncoder: kryo
       valueDecoder: kryo
       defaultExpireInMillis: 10000

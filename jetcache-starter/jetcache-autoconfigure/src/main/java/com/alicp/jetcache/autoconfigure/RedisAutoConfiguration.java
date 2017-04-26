@@ -19,6 +19,7 @@ import redis.clients.util.Pool;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created on 2016/11/25.
@@ -56,8 +57,8 @@ public class RedisAutoConfiguration {
             RelaxedDataBinder binder = new RelaxedDataBinder(poolConfig);
             binder.bind(new MutablePropertyValues(props));
 
-            String host = r.getRequiredProperty("host");
-            int port = Integer.parseInt(r.getRequiredProperty("port"));
+            String host = r.getProperty("host", (String)null);
+            int port = Integer.parseInt(r.getProperty("port", "0"));
             int timeout = Integer.parseInt(r.getProperty("timeout", String.valueOf(Protocol.DEFAULT_TIMEOUT)));
             String password = r.getProperty("password", (String) null);
             int database = Integer.parseInt(r.getProperty("database", String.valueOf(Protocol.DEFAULT_DATABASE)));
@@ -69,13 +70,18 @@ public class RedisAutoConfiguration {
 
             Pool<Jedis> jedisPool;
             if (sentinels == null) {
+                Objects.requireNonNull(host, "host/port or sentinels/masterName is required");
+                if (port == 0) {
+                    throw new IllegalStateException("host/port or sentinels/masterName is required");
+                }
                 jedisPool = new JedisPool(poolConfig, host, port, timeout, password, database, clientName, ssl);
             } else {
+                Objects.requireNonNull(masterName, "host/port or sentinels/masterName is required");
                 String[] strings = sentinels.split(",");
                 HashSet<String> sentinelsSet = new HashSet<>();
                 for (String s : strings) {
                     if (s != null && !s.trim().equals("")) {
-                        sentinelsSet.add(s);
+                        sentinelsSet.add(s.trim());
                     }
                 }
                 jedisPool = new JedisSentinelPool(masterName, sentinelsSet, poolConfig, timeout, password, database, clientName);

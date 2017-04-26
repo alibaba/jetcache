@@ -18,7 +18,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.util.Pool;
 
 import javax.annotation.PostConstruct;
 
@@ -41,8 +43,8 @@ public class StarterTest extends SpringTest {
         A bean = context.getBean(A.class);
 //        bean.test();
 
-        JedisPool t1 = (JedisPool) context.getBean("defaultPool");
-        JedisPool t2 = (JedisPool) context.getBean("A1Pool");
+        Pool<Jedis> t1 = (Pool<Jedis>) context.getBean("defaultPool");
+        Pool<Jedis> t2 = (Pool<Jedis>) context.getBean("A1Pool");
         Assert.assertNotNull(t1);
         Assert.assertNotNull(t2);
         Assert.assertNotSame(t1, t2);
@@ -66,10 +68,10 @@ public class StarterTest extends SpringTest {
     @Component
     public static class B {
         @Autowired
-        private JedisPool defaultPool;
+        private Pool<Jedis> defaultPool;
 
         @Autowired
-        private JedisPool A1Pool;
+        private Pool<Jedis> A1Pool;
 
         @PostConstruct
         public void init() {
