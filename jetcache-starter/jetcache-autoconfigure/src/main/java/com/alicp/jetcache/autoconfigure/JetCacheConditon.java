@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
  */
 public abstract class JetCacheConditon extends SpringBootCondition {
 
-    private String cacheArea;
+    private String cacheType;
 
-    protected JetCacheConditon(String cacheArea) {
-        this.cacheArea = cacheArea;
+    protected JetCacheConditon(String cacheType) {
+        this.cacheType = cacheType;
     }
 
     @Override
@@ -30,13 +30,13 @@ public abstract class JetCacheConditon extends SpringBootCondition {
         if (match(resolver, "local.") || match(resolver, "remote.")) {
             return ConditionOutcome.match();
         } else {
-            return ConditionOutcome.noMatch("no match " + cacheArea);
+            return ConditionOutcome.noMatch("no match " + cacheType);
         }
     }
 
     private boolean match(RelaxedPropertyResolver resolver, String prefix) {
         Map<String, Object> m = resolver.getSubProperties(prefix);
         Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
-        return cacheAreaNames.stream().anyMatch((s) -> cacheArea.equals(m.get(s + ".type")));
+        return cacheAreaNames.stream().anyMatch((s) -> cacheType.equals(m.get(s + ".type")));
     }
 }

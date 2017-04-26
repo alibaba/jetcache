@@ -38,8 +38,8 @@ public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
 
     private boolean inited = false;
 
-    public AbstractCacheAutoInit(String typeName) {
-        this.typeName = typeName;
+    public AbstractCacheAutoInit(String cacheType) {
+        this.typeName = cacheType;
     }
 
     @Override

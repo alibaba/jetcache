@@ -11,8 +11,8 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
-    public ExternalCacheAutoInit(String typeName) {
-        super(typeName);
+    public ExternalCacheAutoInit(String cacheType) {
+        super(cacheType);
     }
 
     @Override
