@@ -262,7 +262,7 @@ public abstract class AbstractCacheTest {
         }
         Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
         Assert.assertNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
-        Thread.sleep(50);
+        Thread.sleep(51);
         Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
 
         int count = 10;
