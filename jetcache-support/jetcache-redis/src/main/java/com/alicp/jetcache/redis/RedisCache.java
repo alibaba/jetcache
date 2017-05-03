@@ -86,11 +86,11 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        ArrayList<K> keyList = new ArrayList<K>(keys);
-        byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
-
-        Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
         try (Jedis jedis = pool.getResource()) {
+            ArrayList<K> keyList = new ArrayList<K>(keys);
+            byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
+
+            Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
             if (newKeys.length > 0) {
                 List mgetResults = jedis.mget(newKeys);
                 for (int i = 0; i < mgetResults.size(); i++) {
