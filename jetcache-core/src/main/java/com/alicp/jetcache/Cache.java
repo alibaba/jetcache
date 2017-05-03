@@ -12,7 +12,7 @@ import java.util.function.Function;
  */
 public interface Cache<K, V> {
 
-    //-----------------------------JSR 107 API------------------------------------------------
+    //-----------------------------JSR 107 style API------------------------------------------------
 
     default V get(K key) {
         CacheGetResult<V> result = GET(key);

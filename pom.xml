@@ -71,6 +71,7 @@
         <module>jetcache-test</module>
 
         <module>jetcache-support/jetcache-redis</module>
+        <module>jetcache-support/jetcache-redis-luttece</module>
 
         <module>jetcache-starter/jetcache-autoconfigure</module>
         <module>jetcache-starter/jetcache-starter-redis</module>
