@@ -20,6 +20,8 @@ requirements:
 * Spring Framework 4.0.8 or above. If you do not use declarative caching, it's not necessary.
 * Spring Boot 1.1.9 or above, optional, only need if you are using Spring Boot.
 
+Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents (currently in Chinese only).
+
 # getting started
 
 ## method cache
@@ -147,3 +149,6 @@ public class JetCacheConfig {
 
 }
 ```
+
+## more docs
+Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents (currently in Chinese only).
