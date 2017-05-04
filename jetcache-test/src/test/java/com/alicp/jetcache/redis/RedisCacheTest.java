@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
-    public void testWithJedisPool() throws Exception {
+    public void testSimplePool() throws Exception {
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
@@ -33,7 +33,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
     }
 
     @Test
-    public void test() throws Exception {
+    public void testSentinel() throws Exception {
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
