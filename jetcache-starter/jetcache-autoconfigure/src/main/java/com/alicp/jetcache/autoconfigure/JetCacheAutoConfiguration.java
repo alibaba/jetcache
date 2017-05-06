@@ -22,17 +22,13 @@ import org.springframework.context.annotation.Import;
 @Import({RedisAutoConfiguration.class, CaffeineAutoConfiguration.class, LinkedHashMapAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
-    public JetCacheAutoConfiguration() {
-    }
+    public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";
 
     private SpringConfigProvider _springConfigProvider = new SpringConfigProvider();
 
     private AutoConfigureBeans _autoConfigureBeans = new AutoConfigureBeans();
 
     private GlobalCacheConfig _globalCacheConfig;
-
-    @Autowired
-    private JetCacheProperties props;
 
     @Bean
     @ConditionalOnMissingBean
@@ -46,7 +42,14 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean
-    public synchronized GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider, AutoConfigureBeans autoConfigureBeans) {
+    public BeanDependencyManager beanDependencyManager(){
+        return new BeanDependencyManager();
+    }
+
+    @Bean(GLOBAL_CACHE_CONFIG_NAME)
+    public GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider,
+                                                            AutoConfigureBeans autoConfigureBeans,
+                                                            JetCacheProperties props) {
         if (_globalCacheConfig != null) {
             return _globalCacheConfig;
         }

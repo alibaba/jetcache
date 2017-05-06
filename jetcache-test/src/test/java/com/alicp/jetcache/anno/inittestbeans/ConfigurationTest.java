@@ -12,14 +12,22 @@ import org.springframework.context.annotation.Configuration;
 public class ConfigurationTest {
 
     @Bean
-    public InitTestBean postConstructorTest() {
-        return new PostConstructorTestBean();
+    public MethodCacheInitTestBean postConstructorTest1() {
+        return new PostConstructorBean1();
     }
 
     @Bean
-    public InitTestBean afterPropertiesSetTest() {
-        return new AfterPropertiesSetTestBean();
+    public CreateCacheInitTestBean postConstructorTest2() {
+        return new PostConstructorBean2();
     }
 
+    @Bean
+    public MethodCacheInitTestBean afterPropertiesSetTest1() {
+        return new AfterPropertiesSetBean1();
+    }
 
+    @Bean
+    public CreateCacheInitTestBean afterPropertiesSetTest2() {
+        return new AfterPropertiesSetBean2();
+    }
 }

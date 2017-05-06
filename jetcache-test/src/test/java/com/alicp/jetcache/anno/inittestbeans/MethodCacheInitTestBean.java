@@ -1,23 +1,21 @@
 package com.alicp.jetcache.anno.inittestbeans;
 
 import com.alicp.jetcache.test.beans.TestBean;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
 
 /**
- * Created on 2017/5/4.
+ * Created on 2017/5/5.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-@Component
-public class PostConstructorTestBean extends InitTestBean {
+public class MethodCacheInitTestBean {
 
-    @PostConstruct
+    @Autowired
+    private TestBean testBean;
+
     public void doTest() {
-        super.doTest();
+        Assert.assertEquals(testBean.count(), testBean.count());
     }
-
 
 }

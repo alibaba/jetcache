@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 @Component
-public class AfterPropertiesSetTestBean extends InitTestBean implements InitializingBean {
+public class AfterPropertiesSetBean2 extends CreateCacheInitTestBean implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         super.doTest();
