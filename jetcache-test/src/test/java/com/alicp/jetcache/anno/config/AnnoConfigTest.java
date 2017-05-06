@@ -27,8 +27,9 @@ public class AnnoConfigTest extends SpringTest {
     }
 
     @Configuration
-    @ComponentScan(basePackages = "com.alicp.jetcache.test.beans")
-    @EnableMethodCache(basePackages = "com.alicp.jetcache.test.beans")
+    @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
+    @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
+    @EnableCreateCacheAnnotation
     public static class A {
 
         @Bean
@@ -37,13 +38,13 @@ public class AnnoConfigTest extends SpringTest {
         }
 
         @Bean
-        public GlobalCacheConfig config(SpringConfigProvider configProvider){
+        public GlobalCacheConfig config(SpringConfigProvider configProvider) {
             GlobalCacheConfig pc = TestUtil.createGloableConfig(configProvider);
             return pc;
         }
 
         @Bean(name = "factoryBeanTarget")
-        public MyFactoryBean factoryBean(){
+        public MyFactoryBean factoryBean() {
             return new MyFactoryBean();
         }
     }

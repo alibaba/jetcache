@@ -31,8 +31,8 @@ import javax.annotation.PostConstruct;
  */
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan("com.alicp.jetcache.test.beans")
-@EnableMethodCache(basePackages = "com.alicp.jetcache.test.beans")
+@ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
+@EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
 public class StarterTest extends SpringTest {
 
