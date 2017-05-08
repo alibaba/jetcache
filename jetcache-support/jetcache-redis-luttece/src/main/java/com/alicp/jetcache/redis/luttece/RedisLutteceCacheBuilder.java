@@ -12,12 +12,12 @@ public class RedisLutteceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
     public static class RedisLutteceCacheBuilderImpl extends RedisLutteceCacheBuilder<RedisLutteceCacheBuilderImpl> {
     }
 
-    public static RedisLutteceCacheBuilderImpl createRedisCacheLutteceBuilder() {
+    public static RedisLutteceCacheBuilderImpl createRedisLutteceCacheBuilder() {
         return new RedisLutteceCacheBuilderImpl();
     }
 
     public RedisLutteceCacheBuilder() {
-//        buildFunc(config -> new RedisCache((RedisCacheLutteceConfig) config));
+        buildFunc(config -> new RedisLutteceCache((RedisLutteceCacheConfig) config));
     }
 
     @Override

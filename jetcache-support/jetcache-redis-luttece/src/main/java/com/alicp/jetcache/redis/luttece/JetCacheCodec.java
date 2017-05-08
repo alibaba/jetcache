@@ -35,9 +35,7 @@ public class JetCacheCodec implements RedisCodec {
 
     private Object convert(ByteBuffer bytes){
         byte[] bs = new byte[bytes.remaining()];
-        int pos =  bytes.position();
-        System.arraycopy(bytes.array(), pos, bs, 0, bs.length);
-        bytes.position(pos + bs.length);
+        bytes.get(bs);
         return bs;
     }
 
