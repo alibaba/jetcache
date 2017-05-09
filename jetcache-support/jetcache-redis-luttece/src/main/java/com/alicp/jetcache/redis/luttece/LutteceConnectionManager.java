@@ -7,6 +7,9 @@ import com.lambdaworks.redis.api.StatefulConnection;
 import com.lambdaworks.redis.api.StatefulRedisConnection;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
 import com.lambdaworks.redis.cluster.api.StatefulRedisClusterConnection;
+import com.lambdaworks.redis.cluster.api.async.RedisClusterAsyncCommands;
+import com.lambdaworks.redis.cluster.api.rx.RedisClusterReactiveCommands;
+import com.lambdaworks.redis.cluster.api.sync.RedisClusterCommands;
 
 import java.util.Collections;
 import java.util.Map;
@@ -17,7 +20,7 @@ import java.util.WeakHashMap;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class LutteceFactory {
+public class LutteceConnectionManager {
 
     private static class LutteceObjects {
         private StatefulConnection connection;
@@ -26,13 +29,22 @@ class LutteceFactory {
         private Object reactiveCommands;
     }
 
-    private static Map map = Collections.synchronizedMap(new WeakHashMap());
+    private static final LutteceConnectionManager defaultManager = new LutteceConnectionManager();
+
+    private Map map = Collections.synchronizedMap(new WeakHashMap());
+
+    private LutteceConnectionManager() {
+    }
+
+    public static LutteceConnectionManager defaultManager() {
+        return defaultManager;
+    }
 
     private LutteceObjects getLutteceObjectsFromMap(AbstractRedisClient redisClient) {
         return (LutteceObjects) map.computeIfAbsent(redisClient, key -> new LutteceObjects());
     }
 
-    public StatefulConnection connection(AbstractRedisClient redisClient) {
+    private StatefulConnection connection(AbstractRedisClient redisClient) {
         LutteceObjects lo = getLutteceObjectsFromMap(redisClient);
         if (lo.connection == null) {
             if (redisClient instanceof RedisClient) {
@@ -90,5 +102,24 @@ class LutteceFactory {
             }
         }
         return lo.reactiveCommands;
+    }
+
+    public void removeAndClose(AbstractRedisClient redisClient) {
+        LutteceObjects lo = (LutteceObjects) map.remove(redisClient);
+        if (lo == null) {
+            return;
+        }
+        if (lo.commands != null && lo.commands instanceof RedisClusterCommands) {
+            ((RedisClusterCommands) lo.commands).close();
+        }
+        if (lo.asyncCommands != null && lo.asyncCommands instanceof RedisClusterAsyncCommands) {
+            ((RedisClusterAsyncCommands) lo.asyncCommands).close();
+        }
+        if (lo.reactiveCommands != null && lo.reactiveCommands instanceof RedisClusterReactiveCommands) {
+            ((RedisClusterReactiveCommands) lo.reactiveCommands).close();
+        }
+        if (lo.connection != null) {
+            lo.connection.close();
+        }
     }
 }

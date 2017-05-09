@@ -4,13 +4,10 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.support.JetCacheExecutor;
 import com.lambdaworks.redis.AbstractRedisClient;
-import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisFuture;
 import com.lambdaworks.redis.SetArgs;
 import com.lambdaworks.redis.api.async.RedisKeyAsyncCommands;
 import com.lambdaworks.redis.api.async.RedisStringAsyncCommands;
-import com.lambdaworks.redis.api.rx.RedisReactiveCommands;
-import com.lambdaworks.redis.api.sync.RedisCommands;
 import com.lambdaworks.redis.api.sync.RedisStringCommands;
 import com.lambdaworks.redis.cluster.api.async.RedisClusterAsyncCommands;
 import com.lambdaworks.redis.cluster.api.rx.RedisClusterReactiveCommands;
@@ -22,7 +19,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -40,7 +36,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
     private Function<byte[], Object> valueDecoder;
 
     private final AbstractRedisClient client;
-    private LutteceFactory lutteceFactory;
+    private LutteceConnectionManager lutteceConnectionManager;
     private RedisStringCommands<byte[], byte[]> stringCommands;
     private RedisStringAsyncCommands<byte[], byte[]> stringAsyncCommands;
     private RedisKeyAsyncCommands<byte[], byte[]> keyAsyncCommands;
@@ -58,10 +54,10 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
         }
 
         client = config.getRedisClient();
-        lutteceFactory = new LutteceFactory();
+        lutteceConnectionManager = LutteceConnectionManager.defaultManager();
 
-        stringCommands = (RedisStringCommands<byte[], byte[]>) lutteceFactory.commands(client);
-        stringAsyncCommands = (RedisStringAsyncCommands<byte[], byte[]>) lutteceFactory.asyncCommands(client);
+        stringCommands = (RedisStringCommands<byte[], byte[]>) lutteceConnectionManager.commands(client);
+        stringAsyncCommands = (RedisStringAsyncCommands<byte[], byte[]>) lutteceConnectionManager.asyncCommands(client);
         keyAsyncCommands = (RedisKeyAsyncCommands<byte[], byte[]>) stringAsyncCommands;
     }
 
@@ -78,7 +74,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             return (T) stringAsyncCommands;
         } else if (RedisClusterReactiveCommands.class.isAssignableFrom(clazz)) {
             // RedisReactiveCommands extends RedisClusterReactiveCommands
-            return (T) lutteceFactory.reactiveCommands(client);
+            return (T) lutteceConnectionManager.reactiveCommands(client);
         }
         throw new IllegalArgumentException(clazz.getName());
     }

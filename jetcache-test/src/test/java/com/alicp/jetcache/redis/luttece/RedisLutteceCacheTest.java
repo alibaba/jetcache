@@ -5,7 +5,14 @@ import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import com.lambdaworks.redis.AbstractRedisClient;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
+import com.lambdaworks.redis.api.async.RedisAsyncCommands;
+import com.lambdaworks.redis.api.rx.RedisReactiveCommands;
+import com.lambdaworks.redis.api.sync.RedisCommands;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
+import com.lambdaworks.redis.cluster.api.async.RedisClusterAsyncCommands;
+import com.lambdaworks.redis.cluster.api.rx.RedisClusterReactiveCommands;
+import com.lambdaworks.redis.cluster.api.sync.RedisClusterCommands;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -18,6 +25,16 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
+    public static boolean checkOS() {
+        String os = System.getProperty("os.name");
+        if (os.contains("Mac") || os.contains("Windows")) {
+            // redis cluster must run with --net=host, but this can't work in Docker for Mac
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     @Test
     public void testSimple() throws Exception {
         RedisClient client = RedisClient.create("redis://127.0.0.1");
@@ -37,9 +54,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void testCluster() throws Exception {
-        String os = System.getProperty("os.name");
-        if (os.contains("Mac") || os.contains("Windows")) {
-            // redis cluster must run with --net=host, but this can't work in Docker for Mac
+        if (!checkOS()) {
             return;
         }
         RedisURI node1 = RedisURI.create("127.0.0.1", 7000);
@@ -61,6 +76,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
         baseTest();
         expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
         fastjsonKeyCoverterTest();
+        testUnwrap(client);
 
         cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
                 .redisClient(client)
@@ -81,5 +97,20 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         concurrentTest(thread, 500, time);
+    }
+
+    private void testUnwrap(AbstractRedisClient client) {
+        Assert.assertTrue(cache.unwrap(AbstractRedisClient.class) instanceof AbstractRedisClient);
+        if (client instanceof RedisClient) {
+            Assert.assertTrue(cache.unwrap(RedisClient.class) instanceof RedisClient);
+            Assert.assertTrue(cache.unwrap(RedisCommands.class) instanceof RedisCommands);
+            Assert.assertTrue(cache.unwrap(RedisAsyncCommands.class) instanceof RedisAsyncCommands);
+            Assert.assertTrue(cache.unwrap(RedisReactiveCommands.class) instanceof RedisReactiveCommands);
+        } else {
+            Assert.assertTrue(cache.unwrap(RedisClusterClient.class) instanceof RedisClusterClient);
+            Assert.assertTrue(cache.unwrap(RedisClusterCommands.class) instanceof RedisClusterCommands);
+            Assert.assertTrue(cache.unwrap(RedisClusterAsyncCommands.class) instanceof RedisClusterAsyncCommands);
+            Assert.assertTrue(cache.unwrap(RedisClusterReactiveCommands.class) instanceof RedisClusterReactiveCommands);
+        }
     }
 }
