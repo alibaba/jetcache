@@ -35,8 +35,13 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
         test(client);
     }
 
-//    @Test
+    @Test
     public void testCluster() throws Exception {
+        String os = System.getProperty("os.name");
+        if (os.contains("Mac") || os.contains("Windows")) {
+            // redis cluster must run with --net=host, but this can't work in Docker for Mac
+            return;
+        }
         RedisURI node1 = RedisURI.create("127.0.0.1", 7000);
         RedisURI node2 = RedisURI.create("127.0.0.1", 7001);
         RedisURI node3 = RedisURI.create("127.0.0.1", 7002);
@@ -75,6 +80,6 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
-        concurrentTest(thread, 500 , time);
+        concurrentTest(thread, 500, time);
     }
 }
