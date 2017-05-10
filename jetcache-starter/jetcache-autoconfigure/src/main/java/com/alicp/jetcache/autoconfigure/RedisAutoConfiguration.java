@@ -92,6 +92,7 @@ public class RedisAutoConfiguration {
                     .jedisPool(jedisPool);
             parseGeneralConfig(externalCacheBuilder, r);
 
+            // eg: "jedisPool.remote.default"
             autoConfigureBeans.getCustomContainer().put("jedisPool." + cacheAreaWithPrefix, jedisPool);
 
             return externalCacheBuilder;

@@ -44,7 +44,7 @@ public class LutteceConnectionManager {
         return (LutteceObjects) map.computeIfAbsent(redisClient, key -> new LutteceObjects());
     }
 
-    private StatefulConnection connection(AbstractRedisClient redisClient) {
+    public StatefulConnection connection(AbstractRedisClient redisClient) {
         LutteceObjects lo = getLutteceObjectsFromMap(redisClient);
         if (lo.connection == null) {
             if (redisClient instanceof RedisClient) {
