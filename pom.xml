@@ -68,9 +68,10 @@
         <module>jetcache-core</module>
         <module>jetcache-anno</module>
         <module>jetcache-anno-api</module>
-        <module>jetcache-redis</module>
-
         <module>jetcache-test</module>
+
+        <module>jetcache-support/jetcache-redis</module>
+        <module>jetcache-support/jetcache-redis-luttece</module>
 
         <module>jetcache-starter/jetcache-autoconfigure</module>
         <module>jetcache-starter/jetcache-starter-redis</module>

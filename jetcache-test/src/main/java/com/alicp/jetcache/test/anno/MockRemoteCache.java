@@ -84,7 +84,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         CacheGetResult r = cache.GET(buildKey(key));
         if (r.isSuccess()) {
             V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
-            r.setValue(v);
+            r = new CacheGetResult(CacheResultCode.SUCCESS, null, v);
         }
         return r;
     }
@@ -107,11 +107,12 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
                 ByteBuffer newKey = newKeyList.get(i);
                 CacheGetResult r = resultMap.get(newKey);
                 if (r.getValue() != null) {
-                    r.setValue(config.getValueDecoder().apply((byte[]) r.getValue()));
+                    V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
+                    r = new CacheGetResult(r.getResultCode(), null, v);
                 }
                 returnMap.put(key, r);
             }
-            result.setValues((Map) returnMap);
+            result = new MultiGetResult<ByteBuffer, byte[]>(result.getResultCode(), null, (Map) returnMap);
         }
         return (MultiGetResult) result;
     }

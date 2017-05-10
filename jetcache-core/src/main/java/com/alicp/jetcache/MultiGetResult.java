@@ -2,6 +2,8 @@ package com.alicp.jetcache;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 /**
  * Created on 2017/2/21.
@@ -11,9 +13,12 @@ import java.util.Map;
 public class MultiGetResult<K, V> extends CacheResult {
     private Map<K, CacheGetResult<V>> values;
 
+    public MultiGetResult(CompletionStage<ResultData> future) {
+        super(future);
+    }
+
     public MultiGetResult(CacheResultCode resultCode, String message, Map<K, CacheGetResult<V>> values) {
-        super(resultCode, message);
-        this.values = values;
+        super(CompletableFuture.completedFuture(new ResultData(resultCode, message, values)));
     }
 
     public MultiGetResult(Throwable e) {
@@ -21,14 +26,24 @@ public class MultiGetResult<K, V> extends CacheResult {
     }
 
     public Map<K, CacheGetResult<V>> getValues() {
+        waitForResult();
         return values;
     }
 
-    public void setValues(Map<K, CacheGetResult<V>> values) {
-        this.values = values;
+    @Override
+    protected void fetchResultSuccess(ResultData resultData) {
+        super.fetchResultSuccess(resultData);
+        values = (Map<K, CacheGetResult<V>>) resultData.getData();
+    }
+
+    @Override
+    protected void fetchResultFail() {
+        super.fetchResultFail();
+        values = null;
     }
 
     public Map<K, V> unwrapValues() {
+        waitForResult();
         if (values == null) {
             return null;
         }

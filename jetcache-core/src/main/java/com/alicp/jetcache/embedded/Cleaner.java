@@ -1,6 +1,7 @@
 package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.JetCacheExecutor;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -18,7 +19,7 @@ class Cleaner {
     static LinkedList<WeakReference<LinkedHashMapCache>> linkedHashMapCaches = new LinkedList<>();
 
     static {
-        ScheduledExecutorService executorService = DefaultCacheMonitorManager.executorService();
+        ScheduledExecutorService executorService = JetCacheExecutor.executor();
         executorService.scheduleWithFixedDelay(() -> run(), 60, 60, TimeUnit.SECONDS);
     }
 

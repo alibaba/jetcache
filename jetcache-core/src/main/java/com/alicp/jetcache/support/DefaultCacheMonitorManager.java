@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 public class DefaultCacheMonitorManager {
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorManager.class);
 
-    protected static ScheduledExecutorService executorService;
     protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
 
     private ScheduledFuture<?> future;
@@ -51,9 +50,6 @@ public class DefaultCacheMonitorManager {
         if (future != null) {
             return;
         }
-        if (executorService == null) {
-            initExecutor();
-        }
         Runnable cmd = new Runnable() {
             private long time = System.currentTimeMillis();
 
@@ -80,7 +76,8 @@ public class DefaultCacheMonitorManager {
             }
         };
         long delay = firstDelay(resetTime, resetTimeUnit);
-        future = executorService.scheduleAtFixedRate(cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
+        future = JetCacheExecutor.executor().scheduleAtFixedRate(
+                cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
         logger.info("cache stat period at " + resetTime + " " + resetTimeUnit);
     }
 
@@ -99,27 +96,6 @@ public class DefaultCacheMonitorManager {
     public DefaultCacheMonitorManager remove(DefaultCacheMonitor... monitor) {
         monitorList.remove(monitor);
         return this;
-    }
-
-    public static ScheduledExecutorService executorService() {
-        if (executorService != null) {
-            return executorService;
-        }
-        initExecutor();
-        return executorService;
-    }
-
-    private static void initExecutor() {
-        synchronized (DefaultCacheMonitor.class) {
-            if (executorService == null) {
-                executorService = Executors.newSingleThreadScheduledExecutor(
-                        r -> {
-                            Thread t = new Thread(r, "JetCacheMonitorThread");
-                            t.setDaemon(true);
-                            return t;
-                        });
-            }
-        }
     }
 
     protected static long firstDelay(int resetTime, TimeUnit resetTimeUnit) {
