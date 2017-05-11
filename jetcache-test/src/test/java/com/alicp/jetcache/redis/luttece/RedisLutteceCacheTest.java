@@ -46,7 +46,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
         RedisURI redisUri = RedisURI.Builder
                 .sentinel("127.0.0.1", 26379, "mymaster")
                 .withSentinel("127.0.0.1", 26380)
-                .withSentinel("127.0.0.1, 26381")
+                .withSentinel("127.0.0.1", 26381)
                 .build();
         RedisClient client = RedisClient.create(redisUri);
         test(client);
