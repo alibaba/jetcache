@@ -34,14 +34,15 @@ import javax.annotation.PostConstruct;
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
-public class StarterTest extends SpringTest {
+public class RedisStarterTest extends SpringTest {
 
     @Test
     public void tests() {
-        context = SpringApplication.run(StarterTest.class);
+        System.setProperty("spring.profiles.active", "redis");
+        context = SpringApplication.run(RedisStarterTest.class);
         doTest();
         A bean = context.getBean(A.class);
-//        bean.test();
+        bean.test();
 
         Pool<Jedis> t1 = (Pool<Jedis>) context.getBean("defaultPool");
         Pool<Jedis> t2 = (Pool<Jedis>) context.getBean("A1Pool");
@@ -59,7 +60,7 @@ public class StarterTest extends SpringTest {
             Assert.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
             EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) c1.config();
             Assert.assertEquals(200, cc1.getLimit());
-            Assert.assertEquals(300, cc1.getDefaultExpireInMillis());
+            Assert.assertEquals(10000, cc1.getDefaultExpireInMillis());
             Assert.assertFalse(cc1.isExpireAfterAccess());
             Assert.assertNull(cc1.getKeyConvertor());
         }

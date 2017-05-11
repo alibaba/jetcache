@@ -20,7 +20,7 @@ public class JedisPoolFactory implements FactoryBean<Pool<Jedis>> {
     private boolean inited;
     private Pool<Jedis> jedisPool;
 
-    public JedisPoolFactory(String key, Class<?> poolClass){
+    public JedisPoolFactory(String key, Class<? extends Pool<Jedis>> poolClass){
         this.key = key;
         this.poolClass = poolClass;
     }

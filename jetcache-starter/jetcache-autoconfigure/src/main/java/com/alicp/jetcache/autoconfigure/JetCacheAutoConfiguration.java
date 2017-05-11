@@ -19,7 +19,10 @@ import org.springframework.context.annotation.Import;
 @ConditionalOnClass(GlobalCacheConfig.class)
 @ConditionalOnMissingBean(GlobalCacheConfig.class)
 @EnableConfigurationProperties(JetCacheProperties.class)
-@Import({RedisAutoConfiguration.class, CaffeineAutoConfiguration.class, LinkedHashMapAutoConfiguration.class})
+@Import({RedisAutoConfiguration.class,
+        CaffeineAutoConfiguration.class,
+        LinkedHashMapAutoConfiguration.class,
+        RedisLutteceAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
     public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";

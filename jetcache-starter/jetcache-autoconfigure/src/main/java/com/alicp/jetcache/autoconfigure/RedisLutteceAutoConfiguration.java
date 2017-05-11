@@ -12,6 +12,7 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import java.net.URI;
 
@@ -23,14 +24,16 @@ import java.net.URI;
 @Configuration
 @Conditional(RedisLutteceAutoConfiguration.RedisLutteceCondition.class)
 public class RedisLutteceAutoConfiguration {
+    public static final String AUTO_INIT_BEAN_NAME = "redisLutteceAutoInit";
+
     public static class RedisLutteceCondition extends JetCacheConditon {
         public RedisLutteceCondition() {
             super("redis.luttece");
         }
     }
 
-    @Bean(name="redisLutteceAutoInit")
-    public RedisLutteceAutoInit redisLutteceAutoInit(){
+    @Bean(name = AUTO_INIT_BEAN_NAME)
+    public RedisLutteceAutoInit redisLutteceAutoInit() {
         return new RedisLutteceAutoInit();
     }
 
@@ -57,7 +60,7 @@ public class RedisLutteceAutoConfiguration {
                     .redisClient(client);
             parseGeneralConfig(externalCacheBuilder, resolver);
 
-            // eg: "jedisPool.remote.default"
+            // eg: "remote.default.client"
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".client", client);
             LutteceConnectionManager m = LutteceConnectionManager.defaultManager();
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".connection", m.connection(client));
