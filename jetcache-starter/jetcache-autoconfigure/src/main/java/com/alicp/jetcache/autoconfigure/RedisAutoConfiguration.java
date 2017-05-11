@@ -30,7 +30,9 @@ import java.util.Objects;
 @Conditional(RedisAutoConfiguration.RedisCondition.class)
 public class RedisAutoConfiguration {
 
-    @Bean(name="redisAutoInit")
+    public static final String AUTO_INIT_BEAN_NAME = "redisAutoInit";
+
+    @Bean(name = AUTO_INIT_BEAN_NAME)
     public RedisAutoInit redisAutoInit(){
         return new RedisAutoInit();
     }

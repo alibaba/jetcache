@@ -22,6 +22,13 @@ public class LutteceFactory implements FactoryBean {
     private Class<?> clazz;
     private String key;
 
+    // for unit test
+    LutteceFactory(AutoConfigureBeans autoConfigureBeans, String key, Class<?> clazz) {
+        this(key, clazz);
+        this.autoConfigureBeans = autoConfigureBeans;
+    }
+
+
     public LutteceFactory(String key, Class<?> clazz) {
         this.clazz = clazz;
         if (AbstractRedisClient.class.isAssignableFrom(clazz)) {

@@ -7,9 +7,18 @@ import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.luttece.RedisLutteceCacheConfig;
+import com.alicp.jetcache.redis.luttece.RedisLutteceCacheTest;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import com.lambdaworks.redis.RedisClient;
+import com.lambdaworks.redis.api.StatefulRedisConnection;
+import com.lambdaworks.redis.api.async.RedisAsyncCommands;
+import com.lambdaworks.redis.api.rx.RedisReactiveCommands;
+import com.lambdaworks.redis.api.sync.RedisCommands;
+import com.lambdaworks.redis.cluster.RedisClusterClient;
+import com.lambdaworks.redis.cluster.api.async.RedisClusterAsyncCommands;
+import com.lambdaworks.redis.cluster.api.rx.RedisClusterReactiveCommands;
+import com.lambdaworks.redis.cluster.api.sync.RedisClusterCommands;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +36,7 @@ import redis.clients.util.Pool;
 import javax.annotation.PostConstruct;
 
 /**
- * Created on 2016/11/23.
+ * Created on 2017/05/11.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -39,8 +48,12 @@ import javax.annotation.PostConstruct;
 public class RedisLutteceStarterTest extends SpringTest {
 
     @Test
-    public void tests() {
-        System.setProperty("spring.profiles.active", "redisluttece");
+    public void tests() throws Exception {
+        if (RedisLutteceCacheTest.checkOS()) {
+            System.setProperty("spring.profiles.active", "redisluttece-cluster");
+        } else {
+            System.setProperty("spring.profiles.active", "redisluttece");
+        }
         context = SpringApplication.run(RedisLutteceStarterTest.class);
         doTest();
         A bean = context.getBean(A.class);
@@ -51,6 +64,22 @@ public class RedisLutteceStarterTest extends SpringTest {
         Assert.assertNotNull(t1);
         Assert.assertNotNull(t2);
         Assert.assertNotSame(t1, t2);
+
+        AutoConfigureBeans acb = context.getBean(AutoConfigureBeans.class);
+
+        String key = "remote.A1";
+        Assert.assertTrue(new LutteceFactory(acb, key, StatefulRedisConnection.class).getObject() instanceof StatefulRedisConnection);
+        Assert.assertTrue(new LutteceFactory(acb, key, RedisCommands.class).getObject() instanceof RedisCommands);
+        Assert.assertTrue(new LutteceFactory(acb, key, RedisAsyncCommands.class).getObject() instanceof RedisAsyncCommands);
+        Assert.assertTrue(new LutteceFactory(acb, key, RedisReactiveCommands.class).getObject() instanceof RedisReactiveCommands);
+
+        if (RedisLutteceCacheTest.checkOS()) {
+            key = "remote.A2";
+            Assert.assertTrue(new LutteceFactory(acb, key , RedisClusterClient.class).getObject() instanceof RedisClusterClient);
+            Assert.assertTrue(new LutteceFactory(acb, key , RedisClusterCommands.class).getObject() instanceof RedisClusterCommands);
+            Assert.assertTrue(new LutteceFactory(acb, key , RedisClusterAsyncCommands.class).getObject() instanceof RedisClusterAsyncCommands);
+            Assert.assertTrue(new LutteceFactory(acb, key , RedisClusterReactiveCommands.class).getObject() instanceof RedisClusterReactiveCommands);
+        }
     }
 
     @Component

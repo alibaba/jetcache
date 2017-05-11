@@ -1,0 +1,34 @@
+jetcache:
+  statIntervalMinutes: 15
+
+  local:
+    default:
+      type: caffeine
+      limit: 200
+      defaultExpireInMillis: 10000
+    A1:
+      type: linkedhashmap
+      limit: 100
+      expireAfterAccess: true
+      defaultExpireInMillis: 10000
+    A2:
+      type: linkedhashmap
+      limit: 100
+      expireAfterAccess: true
+      defaultExpireInMillis: 10000
+  remote:
+    default:
+      type: redis.luttece
+      uri: redis://127.0.0.1:6379/
+      defaultExpireInMillis: 20000
+    A1:
+      type: redis.luttece
+      uri: redis-sentinel://127.0.0.1:26379,127.0.0.1:26380,127.0.0.1:26381/?sentinelMasterId=mymaster
+    A2:
+      type: redis.luttece
+      uri:
+        - redis://127.0.0.1:7000
+        - redis://127.0.0.1:7001
+        - redis://127.0.0.1:7002
+
+
