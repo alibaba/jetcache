@@ -21,6 +21,7 @@ jetcache:
       host: 127.0.0.1
       port: 6379
       defaultExpireInMillis: 10000
+      keyPrefix: jedisTest
     A1:
       type: redis
       poolConfig:
@@ -32,5 +33,6 @@ jetcache:
       valueEncoder: kryo
       valueDecoder: kryo
       defaultExpireInMillis: 10000
+      keyPrefix: jedisTest
 
 

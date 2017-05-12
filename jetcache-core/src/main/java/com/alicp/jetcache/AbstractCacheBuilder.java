@@ -23,7 +23,7 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     protected AbstractCacheBuilder() {
     }
 
-    protected CacheConfig getConfig() {
+    public CacheConfig getConfig() {
         if (config == null) {
             config = new CacheConfig();
         }

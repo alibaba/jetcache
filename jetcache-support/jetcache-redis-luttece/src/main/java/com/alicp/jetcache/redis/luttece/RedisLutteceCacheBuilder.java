@@ -21,7 +21,7 @@ public class RedisLutteceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
     }
 
     @Override
-    protected RedisLutteceCacheConfig getConfig() {
+    public RedisLutteceCacheConfig getConfig() {
         if (config == null) {
             config = new RedisLutteceCacheConfig();
         }

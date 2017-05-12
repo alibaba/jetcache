@@ -23,7 +23,7 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
     }
 
     @Override
-    protected RedisCacheConfig getConfig() {
+    public RedisCacheConfig getConfig() {
         if (config == null) {
             config = new RedisCacheConfig();
         }

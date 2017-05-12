@@ -20,7 +20,7 @@ public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Abs
     }
 
     @Override
-    protected EmbeddedCacheConfig getConfig() {
+    public EmbeddedCacheConfig getConfig() {
         if (config == null) {
             config = new EmbeddedCacheConfig();
         }

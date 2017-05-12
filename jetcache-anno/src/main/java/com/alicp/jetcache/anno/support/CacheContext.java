@@ -128,7 +128,7 @@ public class CacheContext {
         return cache;
     }
 
-    protected Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String prefix) {
+    protected Cache buildRemote(CacheAnnoConfig cacheAnnoConfig, String area, String cacheName) {
         ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
         if (cacheBuilder == null) {
             throw new CacheConfigException("no remote cache builder: " + area);
@@ -138,7 +138,11 @@ public class CacheContext {
         if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
             cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
         }
-        cacheBuilder.setKeyPrefix(prefix);
+        if (cacheBuilder.getConfig().getKeyPrefix() != null) {
+            cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + cacheName);
+        } else {
+            cacheBuilder.setKeyPrefix(cacheName);
+        }
         if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
         }

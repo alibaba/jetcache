@@ -12,7 +12,7 @@ import java.util.function.Function;
 public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends AbstractCacheBuilder<T> {
 
     @Override
-    protected ExternalCacheConfig getConfig() {
+    public ExternalCacheConfig getConfig() {
         if (config == null) {
             config = new ExternalCacheConfig();
         }
