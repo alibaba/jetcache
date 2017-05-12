@@ -71,7 +71,7 @@ public class CacheResult {
         return message;
     }
 
-    public CompletionStage<ResultData> getFuture() {
+    public CompletionStage<ResultData> future() {
         return future;
     }
 }
