@@ -318,14 +318,9 @@ public abstract class AbstractCacheTest {
         cache.PUT_ALL(m);
         expireAfterAccessTestImpl("EXPIRE_W_K2", ttl);
 
-        ttl = ttl / 2;
-
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("EXPIRE_A_K3", "V1", ttl, TimeUnit.MILLISECONDS).getResultCode());
-        expireAfterAccessTestImpl("EXPIRE_A_K3", ttl);
-
         m = new HashMap();
         m.put("EXPIRE_W_K4", "V1");
-        cache.PUT_ALL(m, ttl, TimeUnit.MILLISECONDS);
+        cache.PUT_ALL(m);
         expireAfterAccessTestImpl("EXPIRE_W_K4", ttl);
     }
 

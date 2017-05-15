@@ -37,7 +37,7 @@ public interface Cache<K, V> {
     }
 
     default boolean putIfAbsent(K key, V value) {
-        CacheResult result = PUT_IF_ABSENT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        CacheResult result = PUT_IF_ABSENT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
         return result.getResultCode() == CacheResultCode.SUCCESS;
     }
 
@@ -140,7 +140,7 @@ public interface Cache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        return PUT(key, value, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
     CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
@@ -153,7 +153,7 @@ public interface Cache<K, V> {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        return PUT_ALL(map, config().getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+        return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
     CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit);

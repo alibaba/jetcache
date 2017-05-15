@@ -77,23 +77,21 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     }
 
     public T expireAfterAccess(long defaultExpire, TimeUnit timeUnit) {
-        getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
-        getConfig().setExpireAfterAccess(true);
+        getConfig().setExpireAfterAccessInMillis(timeUnit.toMillis(defaultExpire));
         return self();
     }
 
     public T expireAfterWrite(long defaultExpire, TimeUnit timeUnit) {
-        getConfig().setDefaultExpireInMillis(timeUnit.toMillis(defaultExpire));
-        getConfig().setExpireAfterAccess(false);
+        getConfig().setExpireAfterWriteInMillis(timeUnit.toMillis(defaultExpire));
         return self();
     }
 
-    public void setDefaultExpireInMillis(long defaultExpireInMillis) {
-        getConfig().setDefaultExpireInMillis(defaultExpireInMillis);
+    public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
+        getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
     }
 
-    public void setExpireAfterAccess(boolean expireAfterAccess) {
-        getConfig().setExpireAfterAccess(expireAfterAccess);
+    public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
+        getConfig().setExpireAfterAccessInMillis(expireAfterAccessInMillis);
     }
 
 }

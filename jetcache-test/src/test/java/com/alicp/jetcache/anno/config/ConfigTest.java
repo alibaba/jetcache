@@ -52,13 +52,15 @@ public class ConfigTest implements ApplicationContextAware {
             Assert.assertSame(JavaValueEncoder.INSTANCE, c.getValueEncoder());
             Assert.assertSame(JavaValueDecoder.INSTANCE, c.getValueDecoder());
             Assert.assertFalse(c.isExpireAfterAccess());
-            Assert.assertEquals(90, c.getDefaultExpireInMillis());
+            Assert.assertEquals(90, c.getExpireAfterWriteInMillis());
 
             c = (ExternalCacheConfig) bean.a1Remote.config();
-            Assert.assertEquals(110, c.getDefaultExpireInMillis());
+            Assert.assertEquals(CacheConsts.DEFAULT_EXPIRE * 1000L, c.getExpireAfterWriteInMillis());
+            Assert.assertEquals(110, c.getExpireAfterAccessInMillis());
 
             c = (ExternalCacheConfig) bean.customRemote.config();
-            Assert.assertEquals(1000, c.getDefaultExpireInMillis());
+            Assert.assertFalse(c.isExpireAfterAccess());
+            Assert.assertEquals(1000, c.getExpireAfterWriteInMillis());
             Assert.assertSame(KryoValueEncoder.INSTANCE, c.getValueEncoder());
             Assert.assertSame(KryoValueDecoder.INSTANCE, c.getValueDecoder());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
@@ -68,14 +70,16 @@ public class ConfigTest implements ApplicationContextAware {
             EmbeddedCacheConfig c = (EmbeddedCacheConfig) bean.defaultLocal.config();
             Assert.assertNull(c.getKeyConvertor());
             Assert.assertEquals(20, c.getLimit());
-            Assert.assertEquals(50, c.getDefaultExpireInMillis());
             Assert.assertFalse(c.isExpireAfterAccess());
+            Assert.assertEquals(50, c.getExpireAfterWriteInMillis());
 
             c = (EmbeddedCacheConfig) bean.a1Local.config();
-            Assert.assertEquals(60, c.getDefaultExpireInMillis());
+            Assert.assertEquals(CacheConsts.DEFAULT_EXPIRE * 1000L, c.getExpireAfterWriteInMillis());
+            Assert.assertEquals(60, c.getExpireAfterAccessInMillis());
 
             c = (EmbeddedCacheConfig) bean.customLocal.config();
-            Assert.assertEquals(1000, c.getDefaultExpireInMillis());
+            Assert.assertFalse(c.isExpireAfterAccess());
+            Assert.assertEquals(1000, c.getExpireAfterWriteInMillis());
             Assert.assertEquals(123, c.getLimit());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
         }
@@ -118,16 +122,14 @@ public class ConfigTest implements ApplicationContextAware {
             remoteBuilder.setKeyConvertor(null);
             remoteBuilder.setValueEncoder(JavaValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(JavaValueDecoder.INSTANCE);
-            remoteBuilder.setExpireAfterAccess(false);
-            remoteBuilder.setDefaultExpireInMillis(90);
+            remoteBuilder.setExpireAfterWriteInMillis(90);
             remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
             remoteBuilder = new MockRemoteCacheBuilder();
             remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
             remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
-            remoteBuilder.setExpireAfterAccess(true);
-            remoteBuilder.setDefaultExpireInMillis(110);
+            remoteBuilder.setExpireAfterAccessInMillis(110);
             remoteFactories.put("A1", remoteBuilder);
 
             GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();

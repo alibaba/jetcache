@@ -90,7 +90,7 @@ public class RedisLutteceStarterTest extends SpringTest {
         public void test() {
             Assert.assertNotNull(c1.unwrap(RedisClient.class));
             RedisLutteceCacheConfig cc1 = (RedisLutteceCacheConfig) c1.config();
-            Assert.assertEquals(20000, cc1.getDefaultExpireInMillis());
+            Assert.assertEquals(20000, cc1.getExpireAfterWriteInMillis());
             Assert.assertNull(cc1.getKeyConvertor());
         }
     }

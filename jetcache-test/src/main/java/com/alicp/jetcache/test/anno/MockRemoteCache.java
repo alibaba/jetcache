@@ -43,7 +43,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     public MockRemoteCache(ExternalCacheConfig config) {
         this.config = config;
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                .expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS)
+                .expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                 .buildCache();
     }
 

@@ -60,7 +60,7 @@ public class RedisStarterTest extends SpringTest {
             Assert.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
             EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) c1.config();
             Assert.assertEquals(200, cc1.getLimit());
-            Assert.assertEquals(10000, cc1.getDefaultExpireInMillis());
+            Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
             Assert.assertFalse(cc1.isExpireAfterAccess());
             Assert.assertNull(cc1.getKeyConvertor());
         }

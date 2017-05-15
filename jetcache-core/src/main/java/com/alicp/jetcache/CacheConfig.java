@@ -10,8 +10,10 @@ import java.util.function.Function;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheConfig implements Cloneable {
-    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
-    private boolean expireAfterAccess = false;
+//    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
+//    private boolean expireAfterAccess = false;
+    private long expireAfterWriteInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
+    private long expireAfterAccessInMillis = -1;
     private Function<Object,Object> keyConvertor;
 
     @Override
@@ -32,18 +34,36 @@ public class CacheConfig implements Cloneable {
     }
 
     public boolean isExpireAfterAccess() {
-        return expireAfterAccess;
+        return expireAfterAccessInMillis > 0;
     }
 
-    public void setExpireAfterAccess(boolean expireAfterAccess) {
-        this.expireAfterAccess = expireAfterAccess;
+    public boolean isExpireAfterWrite() {
+        return expireAfterWriteInMillis > 0;
     }
 
+    @Deprecated
     public long getDefaultExpireInMillis() {
-        return defaultExpireInMillis;
+        return expireAfterWriteInMillis;
     }
 
+    @Deprecated
     public void setDefaultExpireInMillis(long defaultExpireInMillis) {
-        this.defaultExpireInMillis = defaultExpireInMillis;
+        this.expireAfterWriteInMillis = defaultExpireInMillis;
+    }
+
+    public long getExpireAfterWriteInMillis() {
+        return expireAfterWriteInMillis;
+    }
+
+    public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
+        this.expireAfterWriteInMillis = expireAfterWriteInMillis;
+    }
+
+    public long getExpireAfterAccessInMillis() {
+        return expireAfterAccessInMillis;
+    }
+
+    public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
+        this.expireAfterAccessInMillis = expireAfterAccessInMillis;
     }
 }

@@ -55,14 +55,19 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     private CacheGetResult<V> getImpl(CacheValueHolder<V> holder) {
+        long now = System.currentTimeMillis();
         if (holder == null) {
             return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-        } else if (System.currentTimeMillis() >= holder.getExpireTime()) {
+        } else if (now >= holder.getExpireTime()) {
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
+            long accessTime = holder.getAccessTime();
+            holder.setAccessTime(now);
             if (config.isExpireAfterAccess()) {
-                long ttlInMillis = holder.getInitTtlInMillis();
-                holder.setExpireTime(System.currentTimeMillis() + ttlInMillis);
+                long expireAfterAccess = config.getExpireAfterAccessInMillis();
+                if (now >= accessTime + expireAfterAccess) {
+                    return CacheGetResult.EXPIRED_WITHOUT_MSG;
+                }
             }
             return new CacheGetResult(CacheResultCode.SUCCESS, null, holder.getValue());
         }
@@ -97,7 +102,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value ,timeUnit.toMillis(expire));
         innerMap.putValue(buildKey(key), cacheObject);
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
@@ -109,7 +114,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         }
         HashMap newKeyMap = new HashMap();
         for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-            CacheValueHolder<V> cacheObject = new CacheValueHolder(en.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
+            CacheValueHolder<V> cacheObject = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expire));
             newKeyMap.put(buildKey(en.getKey()), cacheObject);
         }
         innerMap.putAllValues(newKeyMap);
@@ -154,7 +159,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, timeUnit.toMillis(expire));
         if (innerMap.putIfAbsentValue(buildKey(key), cacheObject)) {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } else {

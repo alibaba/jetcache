@@ -127,8 +127,8 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertTrue(remoteCache instanceof MockRemoteCache);
                 EmbeddedCacheConfig localConfig = (EmbeddedCacheConfig) localCache.config();
                 ExternalCacheConfig remoteConfig = (ExternalCacheConfig) remoteCache.config();
-                Assert.assertEquals(5000, localConfig.getDefaultExpireInMillis());
-                Assert.assertEquals(5000, remoteConfig.getDefaultExpireInMillis());
+                Assert.assertEquals(5000, localConfig.getExpireAfterWriteInMillis());
+                Assert.assertEquals(5000, remoteConfig.getExpireAfterWriteInMillis());
                 Assert.assertEquals(10, localConfig.getLimit());
                 Assert.assertSame(JavaValueEncoder.INSTANCE, remoteConfig.getValueEncoder());
                 Assert.assertSame(JavaValueDecoder.INSTANCE, remoteConfig.getValueDecoder());

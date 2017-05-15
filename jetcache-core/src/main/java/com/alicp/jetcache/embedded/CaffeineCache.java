@@ -32,9 +32,10 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
         builder.maximumSize(config.getLimit());
         if (config.isExpireAfterAccess()) {
-            builder.expireAfterAccess(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
-        } else {
-            builder.expireAfterWrite(config.getDefaultExpireInMillis(), TimeUnit.MILLISECONDS);
+            builder.expireAfterAccess(config.getExpireAfterAccessInMillis(), TimeUnit.MILLISECONDS);
+        }
+        if (config.isExpireAfterWrite()) {
+            builder.expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
         }
 
         cache = builder.build();

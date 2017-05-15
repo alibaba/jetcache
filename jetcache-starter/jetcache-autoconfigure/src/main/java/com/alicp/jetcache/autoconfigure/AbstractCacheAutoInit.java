@@ -79,10 +79,21 @@ public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
     protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
         AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
         acb.keyConvertor(configProvider.parseKeyConvertor(resolver.getProperty("keyConvertor")));
-        String expire = resolver.getProperty("defaultExpireInMillis", String.valueOf(CacheConsts.DEFAULT_EXPIRE * 1000L));
-        acb.setDefaultExpireInMillis(Long.parseLong(expire));
-        String expireAfterAccess = resolver.getProperty("expireAfterAccess", "false");
-        acb.setExpireAfterAccess(Boolean.parseBoolean(expireAfterAccess));
+
+        String expireAfterWriteInMillis = resolver.getProperty("expireAfterWriteInMillis");
+        if (expireAfterWriteInMillis == null) {
+            // compatible with 2.1
+            expireAfterWriteInMillis = resolver.getProperty("defaultExpireInMillis");
+        }
+        if (expireAfterWriteInMillis != null) {
+            acb.setExpireAfterWriteInMillis(Long.parseLong(expireAfterWriteInMillis));
+        }
+
+        String expireAfterAccessInMillis = resolver.getProperty("expireAfterAccessInMillis");
+        if (expireAfterAccessInMillis != null) {
+            acb.setExpireAfterAccessInMillis(Long.parseLong(expireAfterAccessInMillis));
+        }
+
     }
 
     protected abstract CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheAreaWithPrefix);

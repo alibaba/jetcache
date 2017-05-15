@@ -58,7 +58,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .buildCache();
         baseTest();
-        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
+        expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)

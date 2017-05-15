@@ -123,12 +123,11 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         for (Cache c : caches) {
             Map newMap = new HashMap();
             if (useDefaultExpire) {
-                expire = c.config().getDefaultExpireInMillis();
+                expire = c.config().getExpireAfterWriteInMillis();
                 timeUnit = TimeUnit.MILLISECONDS;
             }
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> h = new CacheValueHolder<>(en.getValue(),
-                        System.currentTimeMillis(), timeUnit.toMillis(expire));
+                CacheValueHolder<V> h = new CacheValueHolder<>(en.getValue(), timeUnit.toMillis(expire));
                 newMap.put(en.getKey(), h);
             }
 
@@ -151,10 +150,10 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
             if (useDefaultExpire) {
-                expire = cache.config().getDefaultExpireInMillis();
+                expire = cache.config().getExpireAfterWriteInMillis();
                 timeUnit = TimeUnit.MILLISECONDS;
             }
-            CacheValueHolder<V> h = new CacheValueHolder<>(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+            CacheValueHolder<V> h = new CacheValueHolder<>(value, timeUnit.toMillis(expire));
             CacheResult r;
             if (useDefaultExpire) {
                 r = cache.PUT(key, h);

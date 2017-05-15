@@ -74,7 +74,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .buildCache();
         baseTest();
-        expireAfterWriteTest(cache.config().getDefaultExpireInMillis());
+        expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
         fastjsonKeyCoverterTest();
         testUnwrap(client);
 

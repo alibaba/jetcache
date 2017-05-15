@@ -90,7 +90,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expire));
             byte[] newKey = buildKey(key);
             RedisFuture<String> future = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expire), valueEncoder.apply(holder));
             return new CacheResult(future.handle((rt, ex) -> {
@@ -119,7 +119,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             CompletionStage<Integer> future = CompletableFuture.completedFuture(0);
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), System.currentTimeMillis(), timeUnit.toMillis(expire));
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expire));
                 RedisFuture<String> resp = stringAsyncCommands.psetex(buildKey(en.getKey()), timeUnit.toMillis(expire), valueEncoder.apply(holder));
                 future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
             }
@@ -274,7 +274,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, System.currentTimeMillis(), timeUnit.toMillis(expire));
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expire));
             byte[] newKey = buildKey(key);
             RedisFuture<String> future = stringAsyncCommands.set(newKey, valueEncoder.apply(holder), SetArgs.Builder.nx().px(timeUnit.toMillis(expire)));
             return new CacheResult(future.handle((rt, ex) -> {

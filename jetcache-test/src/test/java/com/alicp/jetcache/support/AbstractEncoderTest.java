@@ -64,8 +64,7 @@ public class AbstractEncoderTest {
         a.setList(new ArrayList<>());
         a.getList().add(q);
         CacheValueHolder<CacheValueHolder<A>> h = new CacheValueHolder(
-                new CacheValueHolder(a, System.currentTimeMillis(), 1000)
-                , System.currentTimeMillis()
+                new CacheValueHolder(a, 1000)
                 , 1000);
         bs = encoder.apply(h);
         CacheValueHolder<CacheValueHolder<A>> h2 = (CacheValueHolder<CacheValueHolder<A>>) decoder.apply(bs);

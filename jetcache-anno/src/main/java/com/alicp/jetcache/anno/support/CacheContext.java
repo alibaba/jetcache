@@ -136,7 +136,7 @@ public class CacheContext {
         cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
 
         if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
-            cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
+            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getExpire() * 1000L);
         }
         if (cacheBuilder.getConfig().getKeyPrefix() != null) {
             cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + cacheName);
@@ -165,7 +165,7 @@ public class CacheContext {
             cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
         }
         if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
-            cacheBuilder.setDefaultExpireInMillis(cacheAnnoConfig.getExpire() * 1000L);
+            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getExpire() * 1000L);
         }
         if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));
