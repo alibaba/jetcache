@@ -49,9 +49,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public CacheGetResult<V> GET(K key) {
         long t = System.currentTimeMillis();
         CacheGetResult<V> result = cache.GET(key);
-        t = System.currentTimeMillis() - t;
-        CacheGetEvent event = new CacheGetEvent(cache, t, key, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CacheGetEvent event = new CacheGetEvent(cache, System.currentTimeMillis() - t, key, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -59,9 +60,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
         long t = System.currentTimeMillis();
         MultiGetResult<K, V> result = cache.GET_ALL(keys);
-        t = System.currentTimeMillis() - t;
-        CacheGetAllEvent event = new CacheGetAllEvent(cache, t, keys, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CacheGetAllEvent event = new CacheGetAllEvent(cache, System.currentTimeMillis() - t, keys, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -99,9 +101,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         //override to prevent NullPointerException when config() is null
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT(key, value);
-        t = System.currentTimeMillis() - t;
-        CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CachePutEvent event = new CachePutEvent(cache, System.currentTimeMillis() - t, key, value, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -109,9 +112,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT(key, value, expireAfterWrite, timeUnit);
-        t = System.currentTimeMillis() - t;
-        CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CachePutEvent event = new CachePutEvent(cache, System.currentTimeMillis() - t, key, value, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -120,9 +124,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         //override to prevent NullPointerException when config() is null
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT_ALL(map);
-        t = System.currentTimeMillis() - t;
-        CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CachePutAllEvent event = new CachePutAllEvent(cache, System.currentTimeMillis() - t, map, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -130,9 +135,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT_ALL(map, expireAfterWrite, timeUnit);
-        t = System.currentTimeMillis() - t;
-        CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CachePutAllEvent event = new CachePutAllEvent(cache, System.currentTimeMillis() - t, map, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -140,9 +146,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public CacheResult REMOVE(K key) {
         long t = System.currentTimeMillis();
         CacheResult result = cache.REMOVE(key);
-        t = System.currentTimeMillis() - t;
-        CacheRemoveEvent event = new CacheRemoveEvent(cache, t, key, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CacheRemoveEvent event = new CacheRemoveEvent(cache, System.currentTimeMillis() - t, key, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -150,9 +157,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public CacheResult REMOVE_ALL(Set<? extends K> keys) {
         long t = System.currentTimeMillis();
         CacheResult result = cache.REMOVE_ALL(keys);
-        t = System.currentTimeMillis() - t;
-        CacheRemoveAllEvent event = new CacheRemoveAllEvent(cache, t, keys, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CacheRemoveAllEvent event = new CacheRemoveAllEvent(cache, System.currentTimeMillis() - t, keys, result);
+            notify(event);
+        });
         return result;
     }
 
@@ -165,9 +173,10 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         long t = System.currentTimeMillis();
         CacheResult result = cache.PUT_IF_ABSENT(key, value, expireAfterWrite, timeUnit);
-        t = System.currentTimeMillis() - t;
-        CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
-        notify(event);
+        result.future().thenRun(() -> {
+            CachePutEvent event = new CachePutEvent(cache, System.currentTimeMillis() - t, key, value, result);
+            notify(event);
+        });
         return result;
     }
 }
