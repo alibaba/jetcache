@@ -25,23 +25,12 @@ public class CacheGetEvent extends CacheEvent {
         return millis;
     }
 
-    public void setMillis(long millis) {
-        this.millis = millis;
-    }
-
     public Object getKey() {
         return key;
-    }
-
-    public void setKey(Object key) {
-        this.key = key;
     }
 
     public CacheGetResult getResult() {
         return result;
     }
 
-    public void setResult(CacheGetResult result) {
-        this.result = result;
-    }
 }

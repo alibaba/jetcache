@@ -19,7 +19,4 @@ public class CacheEvent {
         return cache;
     }
 
-    public void setCache(Cache cache) {
-        this.cache = cache;
-    }
 }
