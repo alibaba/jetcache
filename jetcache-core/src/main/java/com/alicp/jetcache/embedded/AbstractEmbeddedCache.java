@@ -98,23 +98,23 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        CacheValueHolder<V> cacheObject = new CacheValueHolder(value ,timeUnit.toMillis(expire));
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value ,timeUnit.toMillis(expireAfterWrite));
         innerMap.putValue(buildKey(key), cacheObject);
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         HashMap newKeyMap = new HashMap();
         for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-            CacheValueHolder<V> cacheObject = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expire));
+            CacheValueHolder<V> cacheObject = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
             newKeyMap.put(buildKey(en.getKey()), cacheObject);
         }
         innerMap.putAllValues(newKeyMap);
@@ -155,11 +155,11 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, timeUnit.toMillis(expire));
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
         if (innerMap.putIfAbsentValue(buildKey(key), cacheObject)) {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } else {

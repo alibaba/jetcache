@@ -118,7 +118,7 @@ public interface Cache<K, V> {
         }
     }
 
-    default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
+    default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
         CacheGetResult<V> r = GET(key);
         if (r.isSuccess()) {
             return r.getValue();
@@ -126,14 +126,14 @@ public interface Cache<K, V> {
             Object loadedValue = loader.apply(key);
             V castedValue = (V) loadedValue;
             if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
-                PUT(key, castedValue, expire, timeUnit);
+                PUT(key, castedValue, expireAfterWrite, timeUnit);
             }
             return castedValue;
         }
     }
 
-    default void put(K key, V value, long expire, TimeUnit timeUnit) {
-        PUT(key, value, expire, timeUnit);
+    default void put(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        PUT(key, value, expireAfterWrite, timeUnit);
     }
 
     default CacheResult PUT(K key, V value) {
@@ -143,10 +143,10 @@ public interface Cache<K, V> {
         return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
-    CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit);
+    CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
 
-    default void putAll(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
-        PUT_ALL(map, expire, timeUnit);
+    default void putAll(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+        PUT_ALL(map, expireAfterWrite, timeUnit);
     }
 
     default CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
@@ -156,7 +156,7 @@ public interface Cache<K, V> {
         return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
-    CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit);
+    CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit);
 
     CacheResult REMOVE(K key);
 
@@ -168,12 +168,12 @@ public interface Cache<K, V> {
      *
      * @param key
      * @param value
-     * @param expire
+     * @param expireAfterWrite
      * @param timeUnit
      * @return SUCCESS if the specified key is not already associated with a value,
      * or EXISTS if the specified key is not already associated with a value,
      * or FAIL if error occurs.
      */
-    CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit);
+    CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
 
 }

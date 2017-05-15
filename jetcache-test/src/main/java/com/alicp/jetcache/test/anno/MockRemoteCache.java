@@ -118,15 +118,15 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
-        return cache.PUT(buildKey(key), config.getValueEncoder().apply(value), expire, timeUnit);
+    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        return cache.PUT(buildKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         Map<ByteBuffer, byte[]> newMap = new HashMap<>();
         map.entrySet().forEach((e) -> newMap.put(buildKey(e.getKey()), config.getValueEncoder().apply(e.getValue())));
-        return cache.PUT_ALL(newMap, expire, timeUnit);
+        return cache.PUT_ALL(newMap, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
-        return cache.PUT_IF_ABSENT(buildKey(key), config.getValueEncoder().apply(value), expire, timeUnit);
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        return cache.PUT_IF_ABSENT(buildKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
     }
 }

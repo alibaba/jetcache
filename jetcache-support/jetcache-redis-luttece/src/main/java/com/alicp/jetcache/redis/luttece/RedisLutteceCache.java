@@ -85,14 +85,14 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expire));
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
-            RedisFuture<String> future = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expire), valueEncoder.apply(holder));
+            RedisFuture<String> future = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
             return new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.executor().execute(() -> logError("PUT", key, ex));
@@ -112,15 +112,15 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try {
             CompletionStage<Integer> future = CompletableFuture.completedFuture(0);
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expire));
-                RedisFuture<String> resp = stringAsyncCommands.psetex(buildKey(en.getKey()), timeUnit.toMillis(expire), valueEncoder.apply(holder));
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+                RedisFuture<String> resp = stringAsyncCommands.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
                 future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
             }
             return new CacheResult(future.handle((failCount, ex) -> {
@@ -269,14 +269,14 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expire));
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
-            RedisFuture<String> future = stringAsyncCommands.set(newKey, valueEncoder.apply(holder), SetArgs.Builder.nx().px(timeUnit.toMillis(expire)));
+            RedisFuture<String> future = stringAsyncCommands.set(newKey, valueEncoder.apply(holder), SetArgs.Builder.nx().px(timeUnit.toMillis(expireAfterWrite)));
             return new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.executor().execute(() -> logError("PUT_IF_ABSENT", key, ex));

@@ -118,14 +118,14 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try (Jedis jedis = pool.getResource()) {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expire));
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
-            String rt = jedis.psetex(newKey, timeUnit.toMillis(expire), valueEncoder.apply(holder));
+            String rt = jedis.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
             if ("OK".equals(rt)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             } else {
@@ -138,7 +138,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -147,8 +147,8 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             List<Response<String>> responses = new ArrayList<>();
             Pipeline p = jedis.pipelined();
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expire));
-                Response<String> resp = p.psetex(buildKey(en.getKey()), timeUnit.toMillis(expire), valueEncoder.apply(holder));
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+                Response<String> resp = p.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
                 responses.add(resp);
             }
             p.sync();
@@ -266,14 +266,14 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         try (Jedis jedis = pool.getResource()) {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expire));
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
-            String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expire));
+            String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expireAfterWrite));
             if ("OK".equals(rt)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             } else if (rt == null) {

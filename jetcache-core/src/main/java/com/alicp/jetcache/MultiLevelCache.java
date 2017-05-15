@@ -96,11 +96,11 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        return PUT_caches(false, caches.length, key, value, expire, timeUnit);
+        return PUT_caches(false, caches.length, key, value, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -110,8 +110,8 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
-        return PUT_ALL_impl(false, map, expire, timeUnit);
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+        return PUT_ALL_impl(false, map, expireAfterWrite, timeUnit);
     }
 
     private CacheResult PUT_ALL_impl(boolean useDefaultExpire,
@@ -219,7 +219,7 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         throw new UnsupportedOperationException("PUT_IF_ABSENT is not supported by MultiLevelCache");
     }
 }

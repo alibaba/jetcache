@@ -123,9 +123,9 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
-    public Object computeIfAbsent(Object key, Function loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
+    public Object computeIfAbsent(Object key, Function loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
         checkInit();
-        return cache.computeIfAbsent(key, loader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
+        return cache.computeIfAbsent(key, loader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -141,9 +141,9 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
-    public void put(Object key, Object value, long expire, TimeUnit timeUnit) {
+    public void put(Object key, Object value, long expireAfterWrite, TimeUnit timeUnit) {
         checkInit();
-        cache.put(key, value, expire, timeUnit);
+        cache.put(key, value, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -153,15 +153,15 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
-    public CacheResult PUT(Object key, Object value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT(Object key, Object value, long expireAfterWrite, TimeUnit timeUnit) {
         checkInit();
-        return cache.PUT(key, value, expire, timeUnit);
+        return cache.PUT(key, value, expireAfterWrite, timeUnit);
     }
 
     @Override
-    public void putAll(Map map, long expire, TimeUnit timeUnit) {
+    public void putAll(Map map, long expireAfterWrite, TimeUnit timeUnit) {
         checkInit();
-        cache.putAll(map, expire, timeUnit);
+        cache.putAll(map, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -171,9 +171,9 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map map, long expireAfterWrite, TimeUnit timeUnit) {
         checkInit();
-        return cache.PUT_ALL(map, expire, timeUnit);
+        return cache.PUT_ALL(map, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -225,9 +225,9 @@ class LazyInitCache implements ProxyCache {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(Object key, Object value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_IF_ABSENT(Object key, Object value, long expireAfterWrite, TimeUnit timeUnit) {
         checkInit();
-        return cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
+        return cache.PUT_IF_ABSENT(key, value, expireAfterWrite, timeUnit);
     }
 
 

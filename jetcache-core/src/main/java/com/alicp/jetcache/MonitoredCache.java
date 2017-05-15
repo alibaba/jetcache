@@ -89,9 +89,9 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     }
 
     @Override
-    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expire, TimeUnit timeUnit) {
+    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
         Function<K, V> newLoader = createProxyLoader(key, loader);
-        return ProxyCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expire, timeUnit);
+        return ProxyCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -106,9 +106,9 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         long t = System.currentTimeMillis();
-        CacheResult result = cache.PUT(key, value, expire, timeUnit);
+        CacheResult result = cache.PUT(key, value, expireAfterWrite, timeUnit);
         t = System.currentTimeMillis() - t;
         CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
         notity(event);
@@ -127,9 +127,9 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         long t = System.currentTimeMillis();
-        CacheResult result = cache.PUT_ALL(map, expire, timeUnit);
+        CacheResult result = cache.PUT_ALL(map, expireAfterWrite, timeUnit);
         t = System.currentTimeMillis() - t;
         CachePutAllEvent event = new CachePutAllEvent(cache, t, map, result);
         notity(event);
@@ -162,9 +162,9 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expire, TimeUnit timeUnit) {
+    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         long t = System.currentTimeMillis();
-        CacheResult result = cache.PUT_IF_ABSENT(key, value, expire, timeUnit);
+        CacheResult result = cache.PUT_IF_ABSENT(key, value, expireAfterWrite, timeUnit);
         t = System.currentTimeMillis() - t;
         CachePutEvent event = new CachePutEvent(cache, t, key, value, result);
         notity(event);
