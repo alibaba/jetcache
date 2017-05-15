@@ -159,7 +159,7 @@ public class CacheHandler implements InvocationHandler {
             t = System.currentTimeMillis() - t;
             if(cache instanceof MonitoredCache) {
                 CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
-                ((MonitoredCache)cache).notity(event);
+                ((MonitoredCache)cache).notify(event);
             }
         }
         return v;
