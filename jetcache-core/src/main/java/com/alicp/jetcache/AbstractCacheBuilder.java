@@ -16,13 +16,6 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     public static class CacheBuilderImpl extends AbstractCacheBuilder<CacheBuilderImpl> {
     }
 
-    public static CacheBuilderImpl createCacheBuilder() {
-        return new CacheBuilderImpl();
-    }
-
-    protected AbstractCacheBuilder() {
-    }
-
     public CacheConfig getConfig() {
         if (config == null) {
             config = new CacheConfig();
@@ -86,6 +79,16 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return self();
     }
 
+    public <K, V> T loader(Function<K, V> loader) {
+        getConfig().setLoader(loader);
+        return self();
+    }
+
+    public <K, V> T batchLoader(Function<K, V> batchLoader) {
+        getConfig().setBatchLoader(batchLoader);
+        return self();
+    }
+
     public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
         getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
     }
@@ -94,4 +97,11 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         getConfig().setExpireAfterAccessInMillis(expireAfterAccessInMillis);
     }
 
+    public <K, V> void setLoader(Function<K, V> loader) {
+        getConfig().setLoader(loader);
+    }
+
+    public <K, V> void setBatchLoader(Function<K, V> batchLoader) {
+        getConfig().setBatchLoader(batchLoader);
+    }
 }

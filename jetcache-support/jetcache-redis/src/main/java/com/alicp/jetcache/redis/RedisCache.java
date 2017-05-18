@@ -24,13 +24,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
-    private RedisCacheConfig config;
+    private RedisCacheConfig<K, V> config;
 
     Function<Object, byte[]> valueEncoder;
     Function<byte[], Object> valueDecoder;
     private Pool<Jedis> pool;
 
-    public RedisCache(RedisCacheConfig config) {
+    public RedisCache(RedisCacheConfig<K, V> config) {
         super(config);
         this.config = config;
         this.pool = config.getJedisPool();
@@ -46,7 +46,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheConfig config() {
+    public CacheConfig<K, V> config() {
         return config;
     }
 

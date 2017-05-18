@@ -9,12 +9,15 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class CacheConfig implements Cloneable {
-//    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
+public class CacheConfig<K, V> implements Cloneable {
+    //    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
 //    private boolean expireAfterAccess = false;
     private long expireAfterWriteInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
     private long expireAfterAccessInMillis = -1;
-    private Function<Object,Object> keyConvertor;
+    private Function<K, Object> keyConvertor;
+
+    private Function<K, V> loader;
+    private Function<Iterable<K>, Iterable<V>> batchLoader;
 
     @Override
     public CacheConfig clone() {
@@ -25,11 +28,11 @@ public class CacheConfig implements Cloneable {
         }
     }
 
-    public Function<Object,Object> getKeyConvertor() {
+    public Function<K, Object> getKeyConvertor() {
         return keyConvertor;
     }
 
-    public void setKeyConvertor(Function<Object,Object> keyConvertor) {
+    public void setKeyConvertor(Function<K, Object> keyConvertor) {
         this.keyConvertor = keyConvertor;
     }
 
@@ -65,5 +68,21 @@ public class CacheConfig implements Cloneable {
 
     public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
         this.expireAfterAccessInMillis = expireAfterAccessInMillis;
+    }
+
+    public Function<K, V> getLoader() {
+        return loader;
+    }
+
+    public void setLoader(Function<K, V> loader) {
+        this.loader = loader;
+    }
+
+    public Function<Iterable<K>, Iterable<V>> getBatchLoader() {
+        return batchLoader;
+    }
+
+    public void setBatchLoader(Function<Iterable<K>, Iterable<V>> batchLoader) {
+        this.batchLoader = batchLoader;
     }
 }

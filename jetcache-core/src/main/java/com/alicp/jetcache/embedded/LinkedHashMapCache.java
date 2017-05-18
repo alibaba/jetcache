@@ -16,7 +16,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(LinkedHashMapCache.class);
 
-    public LinkedHashMapCache(EmbeddedCacheConfig config) {
+    public LinkedHashMapCache(EmbeddedCacheConfig<K, V> config) {
         super(config);
         addToCleaner();
     }

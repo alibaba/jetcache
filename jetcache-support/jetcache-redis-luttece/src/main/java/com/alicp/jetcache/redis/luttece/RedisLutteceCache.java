@@ -30,7 +30,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisLutteceCache.class);
 
-    private RedisLutteceCacheConfig config;
+    private RedisLutteceCacheConfig<K, V> config;
 
     private Function<Object, byte[]> valueEncoder;
     private Function<byte[], Object> valueDecoder;
@@ -41,7 +41,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
     private RedisStringAsyncCommands<byte[], byte[]> stringAsyncCommands;
     private RedisKeyAsyncCommands<byte[], byte[]> keyAsyncCommands;
 
-    public RedisLutteceCache(RedisLutteceCacheConfig config) {
+    public RedisLutteceCache(RedisLutteceCacheConfig<K, V> config) {
         super(config);
         this.config = config;
         this.valueEncoder = config.getValueEncoder();
@@ -80,7 +80,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheConfig config() {
+    public CacheConfig<K, V> config() {
         return config;
     }
 

@@ -9,7 +9,7 @@ import redis.clients.util.Pool;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class RedisCacheConfig extends ExternalCacheConfig {
+public class RedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     private Pool<Jedis> jedisPool;
 

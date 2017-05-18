@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  */
 public class MockRemoteCache<K, V> implements Cache<K, V> {
     private Cache<ByteBuffer, byte[]> cache;
-    private ExternalCacheConfig config;
+    private ExternalCacheConfig<K, V> config;
 
     public static class MockRemoteCacheTest extends AbstractCacheTest {
         @Test
@@ -40,7 +40,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
 
-    public MockRemoteCache(ExternalCacheConfig config) {
+    public MockRemoteCache(ExternalCacheConfig<K, V> config) {
         this.config = config;
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
@@ -48,7 +48,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheConfig config() {
+    public CacheConfig<K, V> config() {
         return config;
     }
 

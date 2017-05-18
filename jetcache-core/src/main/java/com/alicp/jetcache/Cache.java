@@ -66,7 +66,7 @@ public interface Cache<K, V> {
 
     //--------------------------JetCache API---------------------------------------------
 
-    CacheConfig config();
+    CacheConfig<K, V> config();
 
     /**
      * examples:

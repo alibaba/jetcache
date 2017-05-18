@@ -8,7 +8,7 @@ import com.lambdaworks.redis.AbstractRedisClient;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class RedisLutteceCacheConfig extends ExternalCacheConfig {
+public class RedisLutteceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     private AbstractRedisClient redisClient;
 

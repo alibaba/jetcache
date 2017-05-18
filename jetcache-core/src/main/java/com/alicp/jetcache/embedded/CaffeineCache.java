@@ -15,7 +15,7 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
     private com.github.benmanes.caffeine.cache.Cache cache;
 
-    public CaffeineCache(EmbeddedCacheConfig config) {
+    public CaffeineCache(EmbeddedCacheConfig<K, V> config) {
         super(config);
     }
 

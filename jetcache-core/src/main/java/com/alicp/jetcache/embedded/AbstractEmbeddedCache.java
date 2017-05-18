@@ -17,18 +17,18 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
-    protected EmbeddedCacheConfig config;
+    protected EmbeddedCacheConfig<K, V> config;
     protected InnerMap innerMap;
 
     protected abstract InnerMap createAreaCache();
 
-    public AbstractEmbeddedCache(EmbeddedCacheConfig config) {
+    public AbstractEmbeddedCache(EmbeddedCacheConfig<K, V> config) {
         this.config = config;
         innerMap = createAreaCache();
     }
 
     @Override
-    public CacheConfig config() {
+    public CacheConfig<K, V> config() {
         return config;
     }
 
@@ -37,7 +37,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
             return null;
         }
         Object newKey = key;
-        Function<Object, Object> keyConvertor = config.getKeyConvertor();
+        Function<K, Object> keyConvertor = config.getKeyConvertor();
         if (keyConvertor != null) {
             newKey = keyConvertor.apply(key);
         }

@@ -13,9 +13,9 @@ import java.io.IOException;
  */
 public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 
-    private ExternalCacheConfig config;
+    private ExternalCacheConfig<K, V> config;
 
-    public AbstractExternalCache(ExternalCacheConfig config) {
+    public AbstractExternalCache(ExternalCacheConfig<K, V> config) {
         this.config = config;
         if (config.getValueEncoder() == null) {
             throw new CacheConfigException("no value encoder");
@@ -25,12 +25,13 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
         }
     }
 
-    protected byte[] buildKey(Object key) {
+    protected byte[] buildKey(K key) {
         try {
+            Object newKey = key;
             if (config.getKeyConvertor() != null) {
-                key = config.getKeyConvertor().apply(key);
+                newKey = config.getKeyConvertor().apply(key);
             }
-            return ExternalKeyUtil.buildKeyAfterConvert(key, config.getKeyPrefix());
+            return ExternalKeyUtil.buildKeyAfterConvert(newKey, config.getKeyPrefix());
         } catch (IOException e) {
             throw new CacheException(e);
         }

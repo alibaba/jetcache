@@ -11,7 +11,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class ExternalCacheConfig extends CacheConfig {
+public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
     private String keyPrefix;
     private Function<Object, byte[]> valueEncoder = JavaValueEncoder.INSTANCE;
     private Function<byte[], Object> valueDecoder = JavaValueDecoder.INSTANCE;
