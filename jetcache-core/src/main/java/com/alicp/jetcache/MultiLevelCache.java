@@ -1,7 +1,10 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.event.*;
+
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Created on 16/9/13.
@@ -11,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 public class MultiLevelCache<K, V> implements Cache<K, V> {
 
     private ConfigAwareCache[] caches;
+
+    private List<CacheMonitor> monitors = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
@@ -29,8 +34,28 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         return caches;
     }
 
+    public List<CacheMonitor> getMonitors() {
+        return monitors;
+    }
+
+    public void notify(CacheEvent e) {
+        for (CacheMonitor m : monitors) {
+            m.afterOperation(e);
+        }
+    }
+
     @Override
-    public CacheGetResult<V> GET(K key) {
+    public final CacheGetResult<V> GET(K key) {
+        long t = System.currentTimeMillis();
+        CacheGetResult<V> result = do_GET(key);
+        result.future().thenRun(() -> {
+            CacheGetEvent event = new CacheGetEvent(this, System.currentTimeMillis() - t, key, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheGetResult<V> do_GET(K key) {
         if (key == null) {
             return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
@@ -59,7 +84,17 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+    public final MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+        long t = System.currentTimeMillis();
+        MultiGetResult<K, V> result = do_GET_ALL(keys);
+        result.future().thenRun(() -> {
+            CacheGetAllEvent event = new CacheGetAllEvent(this, System.currentTimeMillis() - t, keys, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
@@ -86,9 +121,47 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
         return new MultiGetResult<>(CacheResultCode.SUCCESS, null, resultMap);
     }
 
+    private Function<K, V> createProxyLoader(K key, Function<K, V> loader) {
+        return (k) -> {
+            long t = System.currentTimeMillis();
+            V v = null;
+            boolean success = false;
+            try {
+                v = loader.apply(k);
+                success = true;
+            } finally {
+                t = System.currentTimeMillis() - t;
+                CacheLoadEvent event = new CacheLoadEvent(this, t, key, v, success);
+                notify(event);
+            }
+            return v;
+        };
+    }
+
     @Override
-    public CacheResult PUT(K key, V value) {
-        //override to prevent NullPointerException when config() is null
+    public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
+        Function<K, V> newLoader = createProxyLoader(key, loader);
+        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
+    }
+
+    @Override
+    public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
+        Function<K, V> newLoader = createProxyLoader(key, loader);
+        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
+    }
+
+    @Override
+    public final CacheResult PUT(K key, V value) {
+        long t = System.currentTimeMillis();
+        CacheResult result = do_PUT(key, value);
+        result.future().thenRun(() -> {
+            CachePutEvent event = new CachePutEvent(this, System.currentTimeMillis() - t, key, value, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheResult do_PUT(K key, V value) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -96,7 +169,17 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+    public final CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        long t = System.currentTimeMillis();
+        CacheResult result = do_PUT(key, value, expireAfterWrite, timeUnit);
+        result.future().thenRun(() -> {
+            CachePutEvent event = new CachePutEvent(this, System.currentTimeMillis() - t, key, value, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -104,13 +187,32 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
-        //override to prevent NullPointerException when config() is null
+    public final CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
+        long t = System.currentTimeMillis();
+        CacheResult result = do_PUT_ALL(map);
+        result.future().thenRun(() -> {
+            CachePutAllEvent event = new CachePutAllEvent(this, System.currentTimeMillis() - t, map, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map) {
         return PUT_ALL_impl(true, map, Integer.MIN_VALUE, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+    public final CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+        long t = System.currentTimeMillis();
+        CacheResult result = do_PUT_ALL(map, expireAfterWrite, timeUnit);
+        result.future().thenRun(() -> {
+            CachePutAllEvent event = new CachePutAllEvent(this, System.currentTimeMillis() - t, map, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         return PUT_ALL_impl(false, map, expireAfterWrite, timeUnit);
     }
 
@@ -169,7 +271,17 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult REMOVE(K key) {
+    public final CacheResult REMOVE(K key) {
+        long t = System.currentTimeMillis();
+        CacheResult result = do_REMOVE(key);
+        result.future().thenRun(() -> {
+            CacheRemoveEvent event = new CacheRemoveEvent(this, System.currentTimeMillis() - t, key, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheResult do_REMOVE(K key) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -185,7 +297,17 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
+    public final CacheResult REMOVE_ALL(Set<? extends K> keys) {
+        long t = System.currentTimeMillis();
+        CacheResult result = do_REMOVE_ALL(keys);
+        result.future().thenRun(() -> {
+            CacheRemoveAllEvent event = new CacheRemoveAllEvent(this, System.currentTimeMillis() - t, keys, result);
+            notify(event);
+        });
+        return result;
+    }
+
+    private CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
         if (keys == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }

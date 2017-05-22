@@ -59,7 +59,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheGetResult<V> GET(K key) {
+    protected CacheGetResult<V> do_GET(K key) {
         if (key == null) {
             return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
@@ -82,7 +82,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+    protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
@@ -118,7 +118,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
 
     @Override
-    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+    protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -138,7 +138,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+    protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -166,7 +166,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult REMOVE(K key) {
+    protected CacheResult do_REMOVE(K key) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -192,7 +192,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
+    protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
         if (keys == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
@@ -266,7 +266,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+    protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }

@@ -3,9 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheGetResult;
-import com.alicp.jetcache.MonitoredCache;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.event.CacheLoadEvent;
@@ -157,9 +155,14 @@ public class CacheHandler implements InvocationHandler {
             success = true;
         } finally {
             t = System.currentTimeMillis() - t;
-            if(cache instanceof MonitoredCache) {
-                CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
-                ((MonitoredCache)cache).notify(event);
+            CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
+            while(cache instanceof ProxyCache){
+                cache = ((ProxyCache) cache).getTargetCache();
+            }
+            if (cache instanceof MultiLevelCache) {
+                ((MultiLevelCache) cache).notify(event);
+            } else if (cache instanceof AbstractCache) {
+                ((AbstractCache) cache).notify(event);
             }
         }
         return v;

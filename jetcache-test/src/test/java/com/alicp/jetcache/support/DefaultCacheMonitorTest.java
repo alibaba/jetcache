@@ -26,49 +26,94 @@ public class DefaultCacheMonitorTest {
                 .buildCache();
     }
 
-    private void basetest(Cache cache, DefaultCacheMonitor monitor) {
+    private void basetest(Cache cache, DefaultCacheMonitor m) {
+        CacheStat oldStat = m.getCacheStat().clone();
         cache.get("K1");
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetMissCount() + 1 , m.getCacheStat().getGetMissCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.put("K1", "V1");
+        Assert.assertEquals(oldStat.getPutCount() +1 , m.getCacheStat().getPutCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.get("K1");
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetHitCount() + 1 , m.getCacheStat().getGetHitCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.remove("K1");
+        Assert.assertEquals(oldStat.getRemoveCount() + 1 , m.getCacheStat().getRemoveCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.computeIfAbsent("K1", (k) -> null);
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetMissCount() + 1 , m.getCacheStat().getGetMissCount());
+        Assert.assertEquals(oldStat.getPutCount() , m.getCacheStat().getPutCount());
+        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
+        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.computeIfAbsent("K1", (k) -> null, true);
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetMissCount() + 1 , m.getCacheStat().getGetMissCount());
+        Assert.assertEquals(oldStat.getPutCount() + 1, m.getCacheStat().getPutCount());
+        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
+        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.get("K1");
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetHitCount() + 1 , m.getCacheStat().getGetHitCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.remove("K1");
+        Assert.assertEquals(oldStat.getRemoveCount() + 1 , m.getCacheStat().getRemoveCount());
 
+        oldStat = m.getCacheStat().clone();
         cache.computeIfAbsent("K2", (k) -> null, false, 10, TimeUnit.SECONDS);
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetMissCount() + 1 , m.getCacheStat().getGetMissCount());
+        Assert.assertEquals(oldStat.getPutCount() , m.getCacheStat().getPutCount());
+        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
+        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.computeIfAbsent("K2", (k) -> null, true, 10, TimeUnit.SECONDS);
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetMissCount() + 1 , m.getCacheStat().getGetMissCount());
+        Assert.assertEquals(oldStat.getPutCount() + 1, m.getCacheStat().getPutCount());
+        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
+        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.get("K2");
+        Assert.assertEquals(oldStat.getGetCount() + 1 , m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetHitCount() + 1 , m.getCacheStat().getGetHitCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.remove("K2");
+        Assert.assertEquals(oldStat.getRemoveCount() + 1 , m.getCacheStat().getRemoveCount());
 
-        CacheStat s = monitor.getCacheStat();
-        Assert.assertEquals(8, s.getGetCount());
-        Assert.assertEquals(3, s.getGetHitCount());
-        Assert.assertEquals(5, s.getGetMissCount());
-        Assert.assertEquals(3, s.getPutCount());
-        Assert.assertEquals(3, s.getRemoveCount());
-        Assert.assertEquals(4, s.getLoadCount());
-        Assert.assertEquals(4, s.getLoadSuccessCount());
+        oldStat = m.getCacheStat().clone();
+        Map map = new HashMap();
+        map.put("multi_k1", "V1");
+        map.put("multi_k2", "V2");
+        cache.putAll(map);
+        Assert.assertEquals(oldStat.getPutCount() + 2, m.getCacheStat().getPutCount());
 
-        monitor.resetStat();
-        Map m = new HashMap();
-        m.put("multi_k1", "V1");
-        m.put("multi_k2", "V2");
-        cache.putAll(m);
-        HashSet keys = new HashSet(m.keySet());
+        oldStat = m.getCacheStat().clone();
+        HashSet keys = new HashSet(map.keySet());
         keys.add("multi_k3");
         cache.getAll(keys);
+        Assert.assertEquals(oldStat.getGetCount() + 3, m.getCacheStat().getGetCount());
+        Assert.assertEquals(oldStat.getGetHitCount() + 2, m.getCacheStat().getGetHitCount());
+        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
+
+        oldStat = m.getCacheStat().clone();
         cache.removeAll(keys);
-        s = monitor.getCacheStat();
-        Assert.assertEquals(3, s.getGetCount());
-        Assert.assertEquals(2, s.getGetHitCount());
-        Assert.assertEquals(1, s.getGetMissCount());
-        Assert.assertEquals(2, s.getPutCount());
-        Assert.assertEquals(2, s.getPutSuccessCount());
-        Assert.assertEquals(3, s.getRemoveCount());
-        Assert.assertEquals(3, s.getRemoveSuccessCount());
-        Assert.assertEquals(0, s.getLoadCount());
-        Assert.assertEquals(0, s.getLoadSuccessCount());
+        Assert.assertEquals(oldStat.getRemoveCount() + 3 , m.getCacheStat().getRemoveCount());
+        Assert.assertEquals(oldStat.getRemoveCount() + 3 , m.getCacheStat().getRemoveSuccessCount());
     }
 
     @Test
