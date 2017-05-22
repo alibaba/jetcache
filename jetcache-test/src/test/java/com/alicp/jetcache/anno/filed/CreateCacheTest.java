@@ -1,6 +1,7 @@
 package com.alicp.jetcache.anno.filed;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.anno.CacheType;
@@ -76,19 +77,19 @@ public class CreateCacheTest extends SpringTest {
 
         public static class Foo extends AbstractCacheTest {
             @CreateCache
-            private Cache cache1;
+            private ConfigAwareCache cache1;
 
             @CreateCache
-            private Cache cache2;
+            private ConfigAwareCache cache2;
 
             @CreateCache(area = "A1")
-            private Cache cache_A1;
+            private ConfigAwareCache cache_A1;
 
             @CreateCache(name = "sameCacheName")
-            private Cache cacheSameName1;
+            private ConfigAwareCache cacheSameName1;
 
             @CreateCache(name = "sameCacheName")
-            private Cache cacheSameName2;
+            private ConfigAwareCache cacheSameName2;
 
             @CreateCache(area = "A1", name = "name1", expire = 5, cacheType = CacheType.BOTH, localLimit = 10, serialPolicy = SerialPolicy.JAVA, keyConvertor = KeyConvertor.NONE)
             private Cache cacheWithConfig;
@@ -121,8 +122,8 @@ public class CreateCacheTest extends SpringTest {
 
                 Assert.assertTrue(getTarget(cacheWithConfig) instanceof MultiLevelCache);
                 MultiLevelCache mc = (MultiLevelCache) getTarget(cacheWithConfig);
-                Cache localCache = getTarget(mc.caches()[0]);
-                Cache remoteCache = getTarget(mc.caches()[1]);
+                ConfigAwareCache localCache = (ConfigAwareCache) getTarget(mc.caches()[0]);
+                ConfigAwareCache remoteCache = (ConfigAwareCache) getTarget(mc.caches()[1]);
                 Assert.assertTrue(localCache instanceof LinkedHashMapCache);
                 Assert.assertTrue(remoteCache instanceof MockRemoteCache);
                 EmbeddedCacheConfig localConfig = (EmbeddedCacheConfig) localCache.config();

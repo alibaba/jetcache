@@ -1,9 +1,6 @@
 package com.alicp.jetcache;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -13,20 +10,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class MultiLevelCache<K, V> implements Cache<K, V> {
 
-    private Cache[] caches;
+    private ConfigAwareCache[] caches;
 
     @SuppressWarnings("unchecked")
     public MultiLevelCache(Cache... caches) {
-        this.caches = caches;
+        this.caches = new ConfigAwareCache[caches.length];
+        for (int i = 0; i < caches.length; i++) {
+            Cache c = caches[i];
+            if (!(c instanceof ConfigAwareCache)) {
+                throw new CacheException("need ConfigAwareCache instance, but is " + c);
+            } else {
+                this.caches[i] = (ConfigAwareCache) c;
+            }
+        }
     }
 
     public Cache[] caches() {
         return caches;
-    }
-
-    @Override
-    public CacheConfig config() {
-        return null;
     }
 
     @Override
@@ -120,7 +120,7 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
         int failCount = 0;
-        for (Cache c : caches) {
+        for (ConfigAwareCache c : caches) {
             Map newMap = new HashMap();
             if (useDefaultExpire) {
                 expire = c.config().getExpireAfterWriteInMillis();
@@ -148,7 +148,7 @@ public class MultiLevelCache<K, V> implements Cache<K, V> {
     private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         int failCount = 0;
         for (int i = 0; i < lastIndex; i++) {
-            Cache cache = caches[i];
+            ConfigAwareCache cache = caches[i];
             if (useDefaultExpire) {
                 expire = cache.config().getExpireAfterWriteInMillis();
                 timeUnit = TimeUnit.MILLISECONDS;

@@ -6,6 +6,7 @@ package com.alicp.jetcache.embedded;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.test.support.DynamicQuery;
@@ -43,7 +44,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
-        expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
+        expireAfterWriteTest(((ConfigAwareCache)cache).config().getExpireAfterWriteInMillis());
         if (testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                     .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
@@ -53,7 +54,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
-        expireAfterAccessTest(cache.config().getExpireAfterAccessInMillis());
+        expireAfterAccessTest(((ConfigAwareCache)cache).config().getExpireAfterAccessInMillis());
         if (testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                     .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();

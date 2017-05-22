@@ -34,11 +34,6 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
         return monitors;
     }
 
-    @Override
-    public CacheConfig config() {
-        return cache.config();
-    }
-
     public void notify(CacheEvent e) {
         for (CacheMonitor m : monitors) {
             m.afterOperation(e);
@@ -167,6 +162,22 @@ public class MonitoredCache<K, V> implements ProxyCache<K, V> {
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
         return cache.tryLock(key, expire, timeUnit);
+    }
+
+    @Override
+    public boolean putIfAbsent(K key, V value) {
+        //override to prevent NullPointerException when config() is null
+        if (cache instanceof ConfigAwareCache) {
+            CacheResult result = PUT_IF_ABSENT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+            return result.getResultCode() == CacheResultCode.SUCCESS;
+        } else {
+            long t = System.currentTimeMillis();
+            boolean b = cache.putIfAbsent(key, value);
+            CacheResult result = b ? CacheResult.SUCCESS_WITHOUT_MSG : CacheResult.FAIL_WITHOUT_MSG;
+            CachePutEvent event = new CachePutEvent(cache, System.currentTimeMillis() - t, key, value, result);
+            notify(event);
+            return b;
+        }
     }
 
     @Override

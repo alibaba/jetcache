@@ -1,6 +1,7 @@
 package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
@@ -144,21 +145,21 @@ public class ConfigTest implements ApplicationContextAware {
 
     public static class ConfigTestBean {
         @CreateCache
-        Cache defualtRemote;
+        ConfigAwareCache defualtRemote;
 
         @CreateCache(cacheType = CacheType.LOCAL)
-        Cache defaultLocal;
+        ConfigAwareCache defaultLocal;
 
         @CreateCache(area = "A1")
-        Cache a1Remote;
+        ConfigAwareCache a1Remote;
 
         @CreateCache(area = "A1", cacheType = CacheType.LOCAL)
-        Cache a1Local;
+        ConfigAwareCache a1Local;
 
         @CreateCache(expire = 1, serialPolicy = SerialPolicy.KRYO, keyConvertor = KeyConvertor.FASTJSON)
-        Cache customRemote;
+        ConfigAwareCache customRemote;
 
         @CreateCache(expire = 1, keyConvertor = KeyConvertor.FASTJSON, cacheType = CacheType.LOCAL, localLimit = 123)
-        Cache customLocal;
+        ConfigAwareCache customLocal;
     }
 }

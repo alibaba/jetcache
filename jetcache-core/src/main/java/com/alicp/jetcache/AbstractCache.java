@@ -4,12 +4,15 @@ import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created on 2016/10/7.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractCache<K, V> implements Cache<K, V> {
+public abstract class AbstractCache<K, V> implements ConfigAwareCache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
 

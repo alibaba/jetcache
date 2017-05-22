@@ -13,9 +13,6 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     protected CacheConfig config;
     private Function<CacheConfig, Cache> buildFunc;
 
-    public static class CacheBuilderImpl extends AbstractCacheBuilder<CacheBuilderImpl> {
-    }
-
     public CacheConfig getConfig() {
         if (config == null) {
             config = new CacheConfig();
@@ -79,6 +76,11 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return self();
     }
 
+    public T cacheNullValueByDefault(boolean cacheNullValueByDefault) {
+        getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
+        return self();
+    }
+
     public <K, V> T loader(Function<K, V> loader) {
         getConfig().setLoader(loader);
         return self();
@@ -95,6 +97,10 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
 
     public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
         getConfig().setExpireAfterAccessInMillis(expireAfterAccessInMillis);
+    }
+
+    public void setCacheNullValueByDefault(boolean cacheNullValueByDefault) {
+        getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
     }
 
     public <K, V> void setLoader(Function<K, V> loader) {

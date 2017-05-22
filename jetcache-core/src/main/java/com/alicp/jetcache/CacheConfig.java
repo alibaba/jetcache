@@ -2,6 +2,9 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.anno.CacheConsts;
 
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -17,7 +20,11 @@ public class CacheConfig<K, V> implements Cloneable {
     private Function<K, Object> keyConvertor;
 
     private Function<K, V> loader;
-    private Function<Iterable<K>, Iterable<V>> batchLoader;
+    private Function<Iterable<K>, Map<K, V>> batchLoader;
+
+    private List<CacheMonitor> monitors = new ArrayList<>();
+
+    private boolean cacheNullValueByDefault = false;
 
     @Override
     public CacheConfig clone() {
@@ -78,11 +85,27 @@ public class CacheConfig<K, V> implements Cloneable {
         this.loader = loader;
     }
 
-    public Function<Iterable<K>, Iterable<V>> getBatchLoader() {
+    public Function<Iterable<K>, Map<K, V>> getBatchLoader() {
         return batchLoader;
     }
 
-    public void setBatchLoader(Function<Iterable<K>, Iterable<V>> batchLoader) {
+    public void setBatchLoader(Function<Iterable<K>, Map<K, V>> batchLoader) {
         this.batchLoader = batchLoader;
+    }
+
+    public boolean isCacheNullValueByDefault() {
+        return cacheNullValueByDefault;
+    }
+
+    public void setCacheNullValueByDefault(boolean cacheNullValueByDefault) {
+        this.cacheNullValueByDefault = cacheNullValueByDefault;
+    }
+
+    public List<CacheMonitor> getMonitors() {
+        return monitors;
+    }
+
+    public void setMonitors(List<CacheMonitor> monitors) {
+        this.monitors = monitors;
     }
 }

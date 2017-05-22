@@ -1,6 +1,7 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
@@ -89,7 +90,7 @@ public class RedisLutteceStarterTest extends SpringTest {
 
         public void test() {
             Assert.assertNotNull(c1.unwrap(RedisClient.class));
-            RedisLutteceCacheConfig cc1 = (RedisLutteceCacheConfig) c1.config();
+            RedisLutteceCacheConfig cc1 = (RedisLutteceCacheConfig) ((ConfigAwareCache) c1).config();
             Assert.assertEquals(20000, cc1.getExpireAfterWriteInMillis());
             Assert.assertNull(cc1.getKeyConvertor());
         }

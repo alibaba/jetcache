@@ -1,5 +1,6 @@
 package com.alicp.jetcache.redis;
 
+import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -58,7 +59,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .buildCache();
         baseTest();
-        expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
+        expireAfterWriteTest(((ConfigAwareCache)cache).config().getExpireAfterWriteInMillis());
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
