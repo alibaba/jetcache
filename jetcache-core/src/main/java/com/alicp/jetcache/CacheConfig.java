@@ -5,6 +5,7 @@ import com.alicp.jetcache.anno.CacheConsts;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -20,7 +21,7 @@ public class CacheConfig<K, V> implements Cloneable {
     private Function<K, Object> keyConvertor;
 
     private Function<K, V> loader;
-    private Function<Iterable<K>, Map<K, V>> batchLoader;
+    private Function<Set<K>, Map<K, V>> batchLoader;
 
     private List<CacheMonitor> monitors = new ArrayList<>();
 
@@ -85,11 +86,11 @@ public class CacheConfig<K, V> implements Cloneable {
         this.loader = loader;
     }
 
-    public Function<Iterable<K>, Map<K, V>> getBatchLoader() {
+    public Function<Set<K>, Map<K, V>> getBatchLoader() {
         return batchLoader;
     }
 
-    public void setBatchLoader(Function<Iterable<K>, Map<K, V>> batchLoader) {
+    public void setBatchLoader(Function<Set<K>, Map<K, V>> batchLoader) {
         this.batchLoader = batchLoader;
     }
 

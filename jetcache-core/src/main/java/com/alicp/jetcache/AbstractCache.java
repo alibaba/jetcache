@@ -78,32 +78,15 @@ public abstract class AbstractCache<K, V> implements ConfigAwareCache<K, V> {
 
     protected abstract MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys);
 
-    private Function<K, V> createProxyLoader(K key, Function<K, V> loader) {
-        return (k) -> {
-            long t = System.currentTimeMillis();
-            V v = null;
-            boolean success = false;
-            try {
-                v = loader.apply(k);
-                success = true;
-            } finally {
-                t = System.currentTimeMillis() - t;
-                CacheLoadEvent event = new CacheLoadEvent(this, t, key, v, success);
-                notify(event);
-            }
-            return v;
-        };
-    }
-
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
-        Function<K, V> newLoader = createProxyLoader(key, loader);
+        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, key, loader, this::notify);
         return ConfigAwareCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
     }
 
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
-        Function<K, V> newLoader = createProxyLoader(key, loader);
+        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, key, loader, this::notify);
         return ConfigAwareCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
     }
 

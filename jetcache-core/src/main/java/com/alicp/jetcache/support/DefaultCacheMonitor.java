@@ -64,6 +64,9 @@ public class DefaultCacheMonitor implements CacheMonitor {
         } else if (event instanceof CacheGetAllEvent) {
             CacheGetAllEvent e = (CacheGetAllEvent) event;
             afterGetAll(e.getMillis(), e.getKeys(), e.getResult());
+        } else if (event instanceof CacheLoadAllEvent) {
+            CacheLoadAllEvent e = (CacheLoadAllEvent) event;
+            afterLoadAll(e.getMillis(), e.getKeys(), e.getLoadedValue(), e.isSuccess());
         } else if (event instanceof CachePutAllEvent) {
             CachePutAllEvent e = (CachePutAllEvent) event;
             afterPutAll(e.getMillis(), e.getMap(), e.getResult());
@@ -145,6 +148,22 @@ public class DefaultCacheMonitor implements CacheMonitor {
             cacheStat.loadSuccessCount++;
         } else {
             cacheStat.loadFailCount++;
+        }
+    }
+
+    private void afterLoadAll(long millis, Set keys, Map loadedValue, boolean success) {
+        if (keys == null) {
+            return;
+        }
+        int count = keys.size();
+        cacheStat.minLoadTime = Math.min(cacheStat.minLoadTime, millis);
+        cacheStat.maxLoadTime = Math.max(cacheStat.maxLoadTime, millis);
+        cacheStat.loadTimeSum += millis;
+        cacheStat.loadCount += count;
+        if (success) {
+            cacheStat.loadSuccessCount += count;
+        } else {
+            cacheStat.loadFailCount += count;
         }
     }
 
