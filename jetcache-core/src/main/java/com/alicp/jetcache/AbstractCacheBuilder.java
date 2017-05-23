@@ -42,7 +42,12 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
             throw new CacheConfigException("no buildFunc");
         }
         beforeBuild();
-        return buildFunc.apply(getConfig().clone());
+        CacheConfig c = getConfig().clone();
+        Cache<K, V> cache = buildFunc.apply(c);
+        if (c.getLoader() != null || c.getBatchLoader() != null) {
+            cache = new LoadingCache<>(cache);
+        }
+        return cache;
     }
 
     @Override
