@@ -45,7 +45,17 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
             if (eventConsumer != null) {
                 loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
             }
-            return computeIfAbsent(key, loader);
+            CacheGetResult<V> r = GET(key);
+            if (r.isSuccess()) {
+                return r.getValue();
+            } else {
+                Object loadedValue = loader.apply(key);
+                V castedValue = (V) loadedValue;
+                if (loadedValue != null || config.isCacheNullValueByDefault()) {
+                    put(key, castedValue);
+                }
+                return castedValue;
+            }
         } else {
             return super.get(key);
         }
