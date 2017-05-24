@@ -45,7 +45,7 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
         }
         if (loader != null) {
             if (eventConsumer != null) {
-                loader = CacheUtil.createProxyLoader(cache, key, loader, eventConsumer);
+                loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
             }
             return computeIfAbsent(key, loader);
         } else {
@@ -72,7 +72,7 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
         }
         if (batchLoader != null) {
             if (eventConsumer != null) {
-                batchLoader = CacheUtil.createProxyBatchLoader(cache, (Set<K>) keys, batchLoader, eventConsumer);
+                batchLoader = CacheUtil.createProxyBatchLoader(cache, batchLoader, eventConsumer);
             }
             MultiGetResult<K, V> r = GET_ALL(keys);
             if (r.isSuccess() || r.getResultCode() == CacheResultCode.PART_SUCCESS) {

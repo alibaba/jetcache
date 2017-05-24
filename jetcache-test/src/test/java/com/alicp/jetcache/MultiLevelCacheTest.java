@@ -4,6 +4,7 @@ import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.DefaultCacheMonitorTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
@@ -42,6 +43,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         initL1L2(200);
         cache = new MultiLevelCache(l1Cache, l2Cache);
         doTest(200);
+        DefaultCacheMonitorTest.testMonitor(cache);
 
         initL1L2(2000);
         cache = new MultiLevelCache(l1Cache, l2Cache);

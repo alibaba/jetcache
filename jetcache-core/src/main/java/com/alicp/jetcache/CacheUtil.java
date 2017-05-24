@@ -17,7 +17,6 @@ import java.util.function.Function;
 class CacheUtil {
 
     public static <K, V> Function<K, V> createProxyLoader(Cache<K, V> cache,
-                                                          K key,
                                                           Function<K, V> loader,
                                                           Consumer<CacheEvent> eventConsumer) {
         return (k) -> {
@@ -29,7 +28,7 @@ class CacheUtil {
                 success = true;
             } finally {
                 t = System.currentTimeMillis() - t;
-                CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
+                CacheLoadEvent event = new CacheLoadEvent(cache, t, k, v, success);
                 eventConsumer.accept(event);
             }
             return v;
@@ -37,7 +36,6 @@ class CacheUtil {
     }
 
     public static <K, V> Function<Set<K>, Map<K, V>> createProxyBatchLoader(Cache<K, V> cache,
-                                                                                 Set<K> keys,
                                                                                  Function<Set<K>, Map<K, V>> batchLoader,
                                                                                  Consumer<CacheEvent> eventConsumer) {
         return (k) -> {
@@ -45,11 +43,11 @@ class CacheUtil {
             boolean success = false;
             Map<K, V> kvMap = null;
             try {
-                kvMap = batchLoader.apply(keys);
+                kvMap = batchLoader.apply(k);
                 success = true;
             } finally {
                 t = System.currentTimeMillis() - t;
-                CacheLoadAllEvent event = new CacheLoadAllEvent(cache, t, keys, kvMap, success);
+                CacheLoadAllEvent event = new CacheLoadAllEvent(cache, t, k, kvMap, success);
                 eventConsumer.accept(event);
             }
             return kvMap;

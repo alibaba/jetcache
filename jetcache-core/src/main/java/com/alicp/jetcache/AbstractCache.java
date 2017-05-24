@@ -80,13 +80,13 @@ public abstract class AbstractCache<K, V> implements ConfigAwareCache<K, V> {
 
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
-        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, key, loader, this::notify);
+        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, loader, this::notify);
         return ConfigAwareCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
     }
 
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
-        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, key, loader, this::notify);
+        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, loader, this::notify);
         return ConfigAwareCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
     }
 
