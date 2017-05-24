@@ -16,7 +16,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public abstract class AbstractCache<K, V> implements ConfigAwareCache<K, V> {
+public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
 
@@ -81,13 +81,13 @@ public abstract class AbstractCache<K, V> implements ConfigAwareCache<K, V> {
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
         Function<K, V> newLoader = CacheUtil.createProxyLoader(this, loader, this::notify);
-        return ConfigAwareCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
+        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
     }
 
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
         Function<K, V> newLoader = CacheUtil.createProxyLoader(this, loader, this::notify);
-        return ConfigAwareCache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
+        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
     }
 
     @Override

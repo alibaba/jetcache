@@ -13,7 +13,7 @@ public class LinkedHashMapCacheBuilder<T extends EmbeddedCacheBuilder<T>> extend
         return new LinkedHashMapCacheBuilderImpl();
     }
 
-    public LinkedHashMapCacheBuilder() {
+    protected LinkedHashMapCacheBuilder() {
         buildFunc((c) -> new LinkedHashMapCache((EmbeddedCacheConfig) c));
     }
 }

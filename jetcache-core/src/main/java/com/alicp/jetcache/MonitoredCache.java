@@ -17,11 +17,7 @@ public class MonitoredCache<K, V> extends SimpleProxyCache<K, V> {
         super(cache);
         this.monitors = monitors;
         Objects.requireNonNull(monitors);
-        if (cache instanceof AbstractCache) {
-            ((AbstractCache) cache).config().getMonitors().addAll(Arrays.asList(monitors));
-        } else if (cache instanceof MultiLevelCache) {
-            ((MultiLevelCache) cache).getMonitors().addAll(Arrays.asList(monitors));
-        }
+        cache.config().getMonitors().addAll(Arrays.asList(monitors));
     }
 
     public CacheMonitor[] getMonitors() {

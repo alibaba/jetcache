@@ -36,7 +36,10 @@ public interface Cache<K, V> {
         PUT_ALL(map);
     }
 
-    boolean putIfAbsent(K key, V value);
+    default boolean putIfAbsent(K key, V value) {
+        CacheResult result = PUT_IF_ABSENT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+        return result.getResultCode() == CacheResultCode.SUCCESS;
+    }
 
     default boolean remove(K key) {
         return REMOVE(key).isSuccess();
@@ -62,6 +65,8 @@ public interface Cache<K, V> {
     <T> T unwrap(Class<T> clazz);
 
     //--------------------------JetCache API---------------------------------------------
+
+    CacheConfig<K, V> config();
 
     /**
      * examples:
@@ -96,7 +101,7 @@ public interface Cache<K, V> {
     MultiGetResult<K, V> GET_ALL(Set<? extends K> keys);
 
     default V computeIfAbsent(K key, Function<K, V> loader) {
-        return computeIfAbsent(key, loader, false);
+        return computeIfAbsent(key, loader, config().isCacheNullValueByDefault());
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
@@ -131,7 +136,12 @@ public interface Cache<K, V> {
         PUT(key, value, expireAfterWrite, timeUnit);
     }
 
-    CacheResult PUT(K key, V value);
+    default CacheResult PUT(K key, V value) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
+        return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+    }
 
     CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
 
@@ -139,7 +149,12 @@ public interface Cache<K, V> {
         PUT_ALL(map, expireAfterWrite, timeUnit);
     }
 
-    CacheResult PUT_ALL(Map<? extends K, ? extends V> map);
+    default CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
+        if (map == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
+        return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+    }
 
     CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit);
 

@@ -159,9 +159,7 @@ public class CacheHandler implements InvocationHandler {
             while(cache instanceof ProxyCache){
                 cache = ((ProxyCache) cache).getTargetCache();
             }
-            if (cache instanceof MultiLevelCache) {
-                ((MultiLevelCache) cache).notify(event);
-            } else if (cache instanceof AbstractCache) {
+            if (cache instanceof AbstractCache) {
                 ((AbstractCache) cache).notify(event);
             }
         }

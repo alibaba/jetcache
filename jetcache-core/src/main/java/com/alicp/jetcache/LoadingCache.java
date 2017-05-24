@@ -21,9 +21,7 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
             cache = ((ProxyCache) cache).getTargetCache();
         }
         final Cache c = cache;
-        if (cache instanceof MultiLevelCache) {
-            eventConsumer = (event) -> ((MultiLevelCache) c).notify(event);
-        } else if (cache instanceof AbstractCache) {
+        if (cache instanceof AbstractCache) {
             eventConsumer = (event) -> ((AbstractCache) c).notify(event);
         }
     }

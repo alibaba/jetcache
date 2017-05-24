@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MockRemoteCache<K, V> implements ConfigAwareCache<K, V> {
+public class MockRemoteCache<K, V> implements Cache<K, V> {
     private Cache<ByteBuffer, byte[]> cache;
     private ExternalCacheConfig<K, V> config;
 

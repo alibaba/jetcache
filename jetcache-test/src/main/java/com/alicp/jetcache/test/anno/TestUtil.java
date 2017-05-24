@@ -20,30 +20,30 @@ import java.util.Map;
  */
 public class TestUtil {
     public static GlobalCacheConfig createGloableConfig(ConfigProvider configProvider) {
-        Map localFactories = new HashMap();
-        EmbeddedCacheBuilder localFactory = new LinkedHashMapCacheBuilder();
-//        localFactory.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-        localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
-        localFactories.put("A1", localFactory);
+        Map localBuilders = new HashMap();
+        EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder();
+//        localBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
+        localBuilders.put("A1", localBuilder);
 
-        Map remoteFactories = new HashMap();
+        Map remoteBuilders = new HashMap();
 
         MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
         remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
-        remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
+        remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
         remoteBuilder = new MockRemoteCacheBuilder();
 //        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
-        remoteFactories.put("A1", remoteBuilder);
+        remoteBuilders.put("A1", remoteBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
         globalCacheConfig.setConfigProvider(configProvider);
-        globalCacheConfig.setLocalCacheBuilders(localFactories);
-        globalCacheConfig.setRemoteCacheBuilders(remoteFactories);
+        globalCacheConfig.setLocalCacheBuilders(localBuilders);
+        globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
 
 //        globalCacheConfig.init();
         return globalCacheConfig;

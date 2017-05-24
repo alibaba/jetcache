@@ -19,6 +19,11 @@ public class SimpleProxyCache<K, V> implements ProxyCache<K, V> {
     }
 
     @Override
+    public CacheConfig<K, V> config() {
+        return cache.config();
+    }
+
+    @Override
     public Cache<K, V> getTargetCache() {
         return cache;
     }

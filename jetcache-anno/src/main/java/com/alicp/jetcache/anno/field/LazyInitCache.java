@@ -83,7 +83,7 @@ class LazyInitCache implements ProxyCache {
     @Override
     public CacheConfig config() {
         checkInit();
-        return ProxyCache.super.config();
+        return cache.config();
     }
 
     @Override

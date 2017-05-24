@@ -13,7 +13,7 @@ public class CaffeineCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends Emb
         return new CaffeineCacheBuilderImpl();
     }
 
-    public CaffeineCacheBuilder() {
+    protected CaffeineCacheBuilder() {
         buildFunc((c) -> new CaffeineCache((EmbeddedCacheConfig) c));
     }
 }

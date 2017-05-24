@@ -46,7 +46,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         DefaultCacheMonitorTest.testMonitor(cache);
 
         initL1L2(2000);
-        cache = new MultiLevelCache(l1Cache, l2Cache);
+        cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
         concurrentTest(200, LIMIT ,3000);
 
 

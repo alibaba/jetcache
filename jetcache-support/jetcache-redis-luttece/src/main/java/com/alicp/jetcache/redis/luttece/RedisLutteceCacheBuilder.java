@@ -16,7 +16,7 @@ public class RedisLutteceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
         return new RedisLutteceCacheBuilderImpl();
     }
 
-    public RedisLutteceCacheBuilder() {
+    protected RedisLutteceCacheBuilder() {
         buildFunc(config -> new RedisLutteceCache((RedisLutteceCacheConfig) config));
     }
 

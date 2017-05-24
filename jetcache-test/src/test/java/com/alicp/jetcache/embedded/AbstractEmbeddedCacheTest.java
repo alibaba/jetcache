@@ -42,7 +42,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
-        expireAfterWriteTest(((ConfigAwareCache)cache).config().getExpireAfterWriteInMillis());
+        expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
         if (testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                     .buildFunc(getBuildFunc()).expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();
@@ -52,7 +52,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(200).buildCache();
         baseTest();
-        expireAfterAccessTest(((ConfigAwareCache)cache).config().getExpireAfterAccessInMillis());
+        expireAfterAccessTest(cache.config().getExpireAfterAccessInMillis());
         if (testLru) {
             cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                     .buildFunc(getBuildFunc()).expireAfterAccess(expireMillis, TimeUnit.MILLISECONDS).limit(2).buildCache();

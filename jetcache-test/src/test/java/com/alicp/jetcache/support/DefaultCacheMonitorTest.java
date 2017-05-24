@@ -124,15 +124,7 @@ public class DefaultCacheMonitorTest {
         }
         {
             // new style test
-            while (cache instanceof ProxyCache) {
-                cache = ((ProxyCache) cache).getTargetCache();
-            }
-            List monitors = null;
-            if (cache instanceof MultiLevelCache) {
-                monitors = ((MultiLevelCache) cache).getMonitors();
-            } else if (cache instanceof AbstractCache) {
-                monitors = ((AbstractCache) cache).config().getMonitors();
-            }
+            List monitors = cache.config().getMonitors();
             monitors.clear();
             DefaultCacheMonitor monitor = new DefaultCacheMonitor("Test");
             monitors.add(monitor);

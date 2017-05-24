@@ -1,6 +1,5 @@
 package com.alicp.jetcache.redis.luttece;
 
-import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import com.lambdaworks.redis.AbstractRedisClient;
@@ -75,7 +74,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .buildCache();
         baseTest();
-        expireAfterWriteTest(((ConfigAwareCache)cache).config().getExpireAfterWriteInMillis());
+        expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
         fastjsonKeyCoverterTest();
         testUnwrap(client);
 

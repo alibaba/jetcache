@@ -1,7 +1,6 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
@@ -59,7 +58,7 @@ public class RedisStarterTest extends SpringTest {
 
         public void test() {
             Assert.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
-            EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) ((ConfigAwareCache) c1).config();
+            EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) c1.config();
             Assert.assertEquals(200, cc1.getLimit());
             Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
             Assert.assertFalse(cc1.isExpireAfterAccess());

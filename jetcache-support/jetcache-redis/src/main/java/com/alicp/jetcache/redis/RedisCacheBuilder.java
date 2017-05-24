@@ -18,7 +18,7 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
         return new RedisCacheBuilderImpl();
     }
 
-    public RedisCacheBuilder() {
+    protected RedisCacheBuilder() {
         buildFunc(config -> new RedisCache((RedisCacheConfig) config));
     }
 

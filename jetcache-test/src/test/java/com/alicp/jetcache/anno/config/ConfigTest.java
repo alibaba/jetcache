@@ -1,7 +1,6 @@
 package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.ConfigAwareCache;
 import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
@@ -109,9 +108,9 @@ public class ConfigTest implements ApplicationContextAware {
         @Bean
         public GlobalCacheConfig config(SpringConfigProvider configProvider) {
             Map localFactories = new HashMap();
-            EmbeddedCacheBuilder localFactory = new LinkedHashMapCacheBuilder().createLinkedHashMapCacheBuilder()
+            EmbeddedCacheBuilder localFactory = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                     .limit(20).keyConvertor(null).expireAfterWrite(50, TimeUnit.MILLISECONDS);
-            EmbeddedCacheBuilder localFactory2 = new LinkedHashMapCacheBuilder().createLinkedHashMapCacheBuilder()
+            EmbeddedCacheBuilder localFactory2 = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                     .limit(10).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterAccess(60, TimeUnit.MILLISECONDS);
             localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
             localFactories.put("A1", localFactory2);
@@ -145,21 +144,21 @@ public class ConfigTest implements ApplicationContextAware {
 
     public static class ConfigTestBean {
         @CreateCache
-        ConfigAwareCache defualtRemote;
+        Cache defualtRemote;
 
         @CreateCache(cacheType = CacheType.LOCAL)
-        ConfigAwareCache defaultLocal;
+        Cache defaultLocal;
 
         @CreateCache(area = "A1")
-        ConfigAwareCache a1Remote;
+        Cache a1Remote;
 
         @CreateCache(area = "A1", cacheType = CacheType.LOCAL)
-        ConfigAwareCache a1Local;
+        Cache a1Local;
 
         @CreateCache(expire = 1, serialPolicy = SerialPolicy.KRYO, keyConvertor = KeyConvertor.FASTJSON)
-        ConfigAwareCache customRemote;
+        Cache customRemote;
 
         @CreateCache(expire = 1, keyConvertor = KeyConvertor.FASTJSON, cacheType = CacheType.LOCAL, localLimit = 123)
-        ConfigAwareCache customLocal;
+        Cache customLocal;
     }
 }

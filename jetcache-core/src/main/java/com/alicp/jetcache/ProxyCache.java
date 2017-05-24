@@ -7,17 +7,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public interface ProxyCache<K, V> extends ConfigAwareCache<K, V> {
+public interface ProxyCache<K, V> extends Cache<K, V> {
     Cache<K, V> getTargetCache();
-
-    @Override
-    default CacheConfig<K, V> config() {
-        if (getTargetCache() instanceof ConfigAwareCache) {
-            return ((ConfigAwareCache) getTargetCache()).config();
-        } else {
-            return null;
-        }
-    }
 
     @Override
     default <T> T unwrap(Class<T> clazz) {
