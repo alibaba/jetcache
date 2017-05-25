@@ -30,7 +30,9 @@ public class CacheConfig<K, V> implements Cloneable {
     @Override
     public CacheConfig clone() {
         try {
-            return (CacheConfig) super.clone();
+            CacheConfig copy = (CacheConfig) super.clone();
+            copy.monitors = new ArrayList(monitors);
+            return copy;
         } catch (CloneNotSupportedException e) {
             throw new CacheException(e);
         }

@@ -3,10 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.MonitoredCache;
-import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
@@ -111,18 +108,21 @@ public class CacheContext {
 
             if (defaultCacheMonitorManager != null) {
                 DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(fullCacheName + "_local");
-                local = new MonitoredCache(local, localMonitor);
+                local.config().getMonitors().add(localMonitor);
                 DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(fullCacheName + "_remote");
-                remote = new MonitoredCache(remote, remoteMonitor);
+                remote.config().getMonitors().add(remoteMonitor);
                 defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
             }
 
-            cache = new MultiLevelCache(local, remote);
+            cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
+                    .expireAfterWrite(local.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
+                    .addCache(local, remote)
+                    .buildCache();
         }
 
         if (defaultCacheMonitorManager != null) {
             DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
-            cache = new MonitoredCache(cache, monitor);
+            cache.config().getMonitors().add(monitor);
             defaultCacheMonitorManager.add(monitor);
         }
         return cache;

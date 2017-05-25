@@ -11,6 +11,13 @@ import java.util.List;
 public class MultiLevelCacheConfig<K, V> extends CacheConfig<K, V> {
     private List<Cache<K, V>> caches = new ArrayList<>();
 
+    @Override
+    public MultiLevelCacheConfig clone() {
+        MultiLevelCacheConfig copy = (MultiLevelCacheConfig) super.clone();
+        copy.caches = new ArrayList(this.caches);
+        return copy;
+    }
+
     public List<Cache<K, V>> getCaches() {
         return caches;
     }
