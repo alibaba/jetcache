@@ -2,6 +2,7 @@ package com.alicp.jetcache.support;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Created on 2017/5/3.
@@ -11,7 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 public class JetCacheExecutor {
     protected static ScheduledExecutorService executorService;
 
-    public static ScheduledExecutorService executor() {
+    public static ScheduledExecutorService defaultExecutor() {
         if (executorService != null) {
             return executorService;
         }
@@ -22,13 +23,16 @@ public class JetCacheExecutor {
     private static void initExecutor() {
         synchronized (DefaultCacheMonitor.class) {
             if (executorService == null) {
-                executorService = Executors.newSingleThreadScheduledExecutor(
-                        r -> {
-                            Thread t = new Thread(r, "JetCacheExecutorThread");
-                            t.setDaemon(true);
-                            return t;
-                        });
+                executorService = new ScheduledThreadPoolExecutor(10, r -> {
+                    Thread t = new Thread(r, "JetCacheExecutorThread");
+                    t.setDaemon(true);
+                    return t;
+                });
             }
         }
+    }
+
+    public static void setDefaultExecutor(ScheduledExecutorService executor) {
+        JetCacheExecutor.executorService = executor;
     }
 }

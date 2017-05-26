@@ -32,7 +32,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         return config;
     }
 
-    protected Object buildKey(K key) {
+    public Object buildKey(K key) {
         if (key == null) {
             return null;
         }

@@ -27,11 +27,18 @@ public class CacheConfig<K, V> implements Cloneable {
 
     private boolean cacheNullValueByDefault = false;
 
+    private RefreshPolicy refreshPolicy;
+
     @Override
     public CacheConfig clone() {
         try {
             CacheConfig copy = (CacheConfig) super.clone();
-            copy.monitors = new ArrayList(monitors);
+            if (monitors != null) {
+                copy.monitors = new ArrayList(this.monitors);
+            }
+            if (refreshPolicy != null) {
+                copy.refreshPolicy = this.refreshPolicy.clone();
+            }
             return copy;
         } catch (CloneNotSupportedException e) {
             throw new CacheException(e);
@@ -110,5 +117,13 @@ public class CacheConfig<K, V> implements Cloneable {
 
     public void setMonitors(List<CacheMonitor> monitors) {
         this.monitors = monitors;
+    }
+
+    public RefreshPolicy getRefreshPolicy() {
+        return refreshPolicy;
+    }
+
+    public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
+        this.refreshPolicy = refreshPolicy;
     }
 }

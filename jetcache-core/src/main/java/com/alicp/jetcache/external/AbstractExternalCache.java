@@ -5,6 +5,7 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/10/8.
@@ -25,8 +26,11 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
         }
     }
 
-    protected byte[] buildKey(K key) {
+    public byte[] buildKey(K key) {
         try {
+            if (key instanceof byte[]) {
+                return (byte[]) key;
+            }
             Object newKey = key;
             if (config.getKeyConvertor() != null) {
                 newKey = config.getKeyConvertor().apply(key);

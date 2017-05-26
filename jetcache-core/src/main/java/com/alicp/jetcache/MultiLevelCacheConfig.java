@@ -14,7 +14,9 @@ public class MultiLevelCacheConfig<K, V> extends CacheConfig<K, V> {
     @Override
     public MultiLevelCacheConfig clone() {
         MultiLevelCacheConfig copy = (MultiLevelCacheConfig) super.clone();
-        copy.caches = new ArrayList(this.caches);
+        if (caches != null) {
+            copy.caches = new ArrayList(this.caches);
+        }
         return copy;
     }
 

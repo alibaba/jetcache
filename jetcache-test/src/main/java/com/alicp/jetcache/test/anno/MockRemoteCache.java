@@ -5,6 +5,7 @@ package com.alicp.jetcache.test.anno;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
+import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.external.ExternalKeyUtil;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class MockRemoteCache<K, V> implements Cache<K, V> {
+public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     private Cache<ByteBuffer, byte[]> cache;
     private ExternalCacheConfig<K, V> config;
 
@@ -41,6 +42,7 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
 
 
     public MockRemoteCache(ExternalCacheConfig<K, V> config) {
+        super(config);
         this.config = config;
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
@@ -52,19 +54,9 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
         return config;
     }
 
-    private ByteBuffer buildKey(K key) {
-        try {
-            Object newKey = key;
-            if (config().getKeyConvertor() != null) {
-                newKey = config.getKeyConvertor().apply(key);
-            }
-            byte[] keyBytes = ExternalKeyUtil.buildKeyAfterConvert(newKey, config.getKeyPrefix());
-            return ByteBuffer.wrap(keyBytes);
-        } catch (IOException e) {
-            throw new CacheException(e);
-        }
+    private ByteBuffer genKey(K key) {
+        return ByteBuffer.wrap(buildKey(key));
     }
-
 
     //-------------------------------
 
@@ -76,12 +68,12 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        return cache.tryLock(buildKey(key), expire, timeUnit);
+        return cache.tryLock(genKey(key), expire, timeUnit);
     }
 
     @Override
-    public CacheGetResult<V> GET(K key) {
-        CacheGetResult r = cache.GET(buildKey(key));
+    protected CacheGetResult<V> do_GET(K key) {
+        CacheGetResult r = cache.GET(genKey(key));
         if (r.isSuccess()) {
             V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
             r = new CacheGetResult(CacheResultCode.SUCCESS, null, v);
@@ -90,11 +82,11 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
+    protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
         ArrayList<K> keyList = new ArrayList<>(keys.size());
         ArrayList<ByteBuffer> newKeyList = new ArrayList<>(keys.size());
         keys.stream().forEach((k) -> {
-            ByteBuffer newKey = buildKey(k);
+            ByteBuffer newKey = genKey(k);
             keyList.add(k);
             newKeyList.add(newKey);
         });
@@ -118,29 +110,29 @@ public class MockRemoteCache<K, V> implements Cache<K, V> {
     }
 
     @Override
-    public CacheResult PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        return cache.PUT(buildKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
+    protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        return cache.PUT(genKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
     }
 
     @Override
-    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+    protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         Map<ByteBuffer, byte[]> newMap = new HashMap<>();
-        map.entrySet().forEach((e) -> newMap.put(buildKey(e.getKey()), config.getValueEncoder().apply(e.getValue())));
+        map.entrySet().forEach((e) -> newMap.put(genKey(e.getKey()), config.getValueEncoder().apply(e.getValue())));
         return cache.PUT_ALL(newMap, expireAfterWrite, timeUnit);
     }
 
     @Override
-    public CacheResult REMOVE(K key) {
-        return cache.REMOVE(buildKey(key));
+    protected CacheResult do_REMOVE(K key) {
+        return cache.REMOVE(genKey(key));
     }
 
     @Override
-    public CacheResult REMOVE_ALL(Set<? extends K> keys) {
-        return cache.REMOVE_ALL(keys.stream().map((k) -> buildKey(k)).collect(Collectors.toSet()));
+    protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
+        return cache.REMOVE_ALL(keys.stream().map((k) -> genKey(k)).collect(Collectors.toSet()));
     }
 
     @Override
-    public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        return cache.PUT_IF_ABSENT(buildKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
+    protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        return cache.PUT_IF_ABSENT(genKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
     }
 }

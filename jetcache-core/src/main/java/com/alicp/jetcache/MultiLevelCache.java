@@ -21,12 +21,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         if (caches == null || caches.length == 0) {
             throw new IllegalArgumentException();
         }
-        CacheConfig firstConfig = caches[0].config();
+        CacheConfig lastConfig = caches[caches.length - 1].config();
         config = new MultiLevelCacheConfig<>();
         config.setCaches(Arrays.asList(caches));
-        config.setExpireAfterAccessInMillis(firstConfig.getExpireAfterAccessInMillis());
-        config.setExpireAfterWriteInMillis(firstConfig.getExpireAfterWriteInMillis());
-        config.setCacheNullValueByDefault(firstConfig.isCacheNullValueByDefault());
+        config.setExpireAfterAccessInMillis(lastConfig.getExpireAfterAccessInMillis());
+        config.setExpireAfterWriteInMillis(lastConfig.getExpireAfterWriteInMillis());
+        config.setCacheNullValueByDefault(lastConfig.isCacheNullValueByDefault());
     }
 
     @SuppressWarnings("unchecked")

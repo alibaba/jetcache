@@ -95,7 +95,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             RedisFuture<String> future = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
             return new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("PUT", key, ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("PUT", key, ex));
                     return new ResultData(ex);
                 } else {
                     if ("OK".equals(rt)) {
@@ -125,7 +125,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             }
             return new CacheResult(future.handle((failCount, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("PUT_ALL", "map(" + map.size() + ")", ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("PUT_ALL", "map(" + map.size() + ")", ex));
                     return new ResultData(ex);
                 } else {
                     if (failCount == 0) {
@@ -153,7 +153,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             RedisFuture<byte[]> future = stringAsyncCommands.get(newKey);
             return new CacheGetResult(future.handle((valueBytes, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("GET", key, ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("GET", key, ex));
                     return new ResultData(ex);
                 } else {
                     if (valueBytes != null) {
@@ -190,7 +190,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             RedisFuture<List<byte[]>> mgetResults = stringAsyncCommands.mget(newKeys);
             return new MultiGetResult<K, V>(mgetResults.handle((list, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("GET_ALL", "keys(" + keys.size() + ")", ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("GET_ALL", "keys(" + keys.size() + ")", ex));
                     return new ResultData(ex);
                 } else {
                     for (int i = 0; i < list.size(); i++) {
@@ -226,7 +226,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             RedisFuture<Long> future = keyAsyncCommands.del(buildKey(key));
             return new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("REMOVE", key, ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("REMOVE", key, ex));
                     return new ResultData(ex);
                 } else {
                     if (rt == null) {
@@ -256,7 +256,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             RedisFuture<Long> future = keyAsyncCommands.del(newKeys);
             return new CacheResult(future.handle((v, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex));
                     return new ResultData(ex);
                 } else {
                     return new ResultData(CacheResultCode.SUCCESS, null, null);
@@ -279,7 +279,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             RedisFuture<String> future = stringAsyncCommands.set(newKey, valueEncoder.apply(holder), SetArgs.Builder.nx().px(timeUnit.toMillis(expireAfterWrite)));
             return new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
-                    JetCacheExecutor.executor().execute(() -> logError("PUT_IF_ABSENT", key, ex));
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("PUT_IF_ABSENT", key, ex));
                     return new ResultData(ex);
                 } else {
                     if ("OK".equals(rt)) {

@@ -76,7 +76,7 @@ public class DefaultCacheMonitorManager {
             }
         };
         long delay = firstDelay(resetTime, resetTimeUnit);
-        future = JetCacheExecutor.executor().scheduleAtFixedRate(
+        future = JetCacheExecutor.defaultExecutor().scheduleAtFixedRate(
                 cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
         logger.info("cache stat period at " + resetTime + " " + resetTimeUnit);
     }

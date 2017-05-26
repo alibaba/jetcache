@@ -15,8 +15,12 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 
     private Consumer<CacheEvent> eventConsumer;
 
+    protected CacheConfig<K, V> config;
+
     public LoadingCache(Cache<K, V> cache) {
         super(cache);
+        this.config = config();
+
         while (cache instanceof ProxyCache) {
             cache = ((ProxyCache) cache).getTargetCache();
         }
@@ -28,7 +32,6 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 
     @Override
     public V get(K key) {
-        CacheConfig<K, V> config = config();
         Function<K, V> loader = config.getLoader();
         Function<Set<K>, Map<K, V>> batchLoader = config.getBatchLoader();
         if (loader == null && batchLoader != null) {
@@ -63,7 +66,6 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 
     @Override
     public Map<K, V> getAll(Set<? extends K> keys) {
-        CacheConfig<K, V> config = config();
         Function<K, V> loader = config.getLoader();
         Function<Set<K>, Map<K, V>> batchLoader = config.getBatchLoader();
         if (batchLoader == null && loader != null) {
