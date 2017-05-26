@@ -2,7 +2,6 @@ package com.alicp.jetcache.support;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * Created on 2017/5/3.
@@ -10,29 +9,48 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class JetCacheExecutor {
-    protected static ScheduledExecutorService executorService;
+    protected static ScheduledExecutorService defaultExecutor;
+    protected static ScheduledExecutorService heavyIOExecutor;
+
+    private static int threadCount;
 
     public static ScheduledExecutorService defaultExecutor() {
-        if (executorService != null) {
-            return executorService;
+        if (defaultExecutor != null) {
+            return defaultExecutor;
         }
-        initExecutor();
-        return executorService;
-    }
-
-    private static void initExecutor() {
-        synchronized (DefaultCacheMonitor.class) {
-            if (executorService == null) {
-                executorService = new ScheduledThreadPoolExecutor(10, r -> {
-                    Thread t = new Thread(r, "JetCacheExecutorThread");
+        synchronized (JetCacheExecutor.class) {
+            if (defaultExecutor == null) {
+                defaultExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+                    Thread t = new Thread(r, "JetCacheDefaultExecutor");
                     t.setDaemon(true);
                     return t;
                 });
             }
         }
+        return defaultExecutor;
+    }
+
+    public static ScheduledExecutorService heavyIOExecutor() {
+        if (heavyIOExecutor != null) {
+            return heavyIOExecutor;
+        }
+        synchronized (JetCacheExecutor.class) {
+            if (heavyIOExecutor == null) {
+                heavyIOExecutor = Executors.newScheduledThreadPool(10, r -> {
+                    Thread t = new Thread(r, "JetCacheHeavyIOExecutor" + threadCount++);
+                    t.setDaemon(true);
+                    return t;
+                });
+            }
+        }
+        return heavyIOExecutor;
     }
 
     public static void setDefaultExecutor(ScheduledExecutorService executor) {
-        JetCacheExecutor.executorService = executor;
+        JetCacheExecutor.defaultExecutor = executor;
+    }
+
+    public static void setHeavyIOExecutor(ScheduledExecutorService heavyIOExecutor) {
+        JetCacheExecutor.heavyIOExecutor = heavyIOExecutor;
     }
 }

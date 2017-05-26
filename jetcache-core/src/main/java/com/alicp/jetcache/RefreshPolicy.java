@@ -9,7 +9,7 @@ public class RefreshPolicy implements Cloneable {
 
     private long refreshMillis;
     private long stopRefreshAfterLastAccessMillis;
-    private long loadLockTimeOutMillis = 60 * 1000;
+    private long loadLockTimeoutMillis = 60 * 1000;
 
     public RefreshPolicy() {
     }
@@ -39,11 +39,11 @@ public class RefreshPolicy implements Cloneable {
         this.stopRefreshAfterLastAccessMillis = stopRefreshAfterLastAccessMillis;
     }
 
-    public long getLoadLockTimeOutMillis() {
-        return loadLockTimeOutMillis;
+    public long getLoadLockTimeoutMillis() {
+        return loadLockTimeoutMillis;
     }
 
-    public void setLoadLockTimeOutMillis(long loadLockTimeOutMillis) {
-        this.loadLockTimeOutMillis = loadLockTimeOutMillis;
+    public void setLoadLockTimeoutMillis(long loadLockTimeoutMillis) {
+        this.loadLockTimeoutMillis = loadLockTimeoutMillis;
     }
 }

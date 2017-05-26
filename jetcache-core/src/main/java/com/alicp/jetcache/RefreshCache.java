@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -23,11 +26,49 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(RefreshCache.class);
 
-    private ConcurrentHashMap<Object, Runnable> taskMap = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Object, RefreshTask> taskMap = new ConcurrentHashMap<>();
+
+    private volatile ScheduledFuture<?> cleanFuture;
 
     public RefreshCache(Cache cache) {
         super(cache);
     }
+
+    private void addCleanTask() {
+        if (cleanFuture != null) {
+            logger.error("cleanFuture is not null");
+            return;
+        }
+        Runnable command = () -> {
+            long accessTimeout = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
+            if (accessTimeout > 0) {
+                List<RefreshTask> tasks = new ArrayList<>();
+                taskMap.values().forEach(task -> tasks.add(task));
+                tasks.forEach(task -> {
+                    if (System.currentTimeMillis() - task.lastAccessTime > accessTimeout) {
+                        taskMap.remove(task.taskId);
+                        task.future.cancel(false);
+                    }
+                });
+            }
+        };
+        cleanFuture = JetCacheExecutor.defaultExecutor().scheduleWithFixedDelay(command, 10, 10, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void close() {
+        if (cleanFuture != null) {
+            cleanFuture.cancel(false);
+            List<RefreshTask> tasks = new ArrayList<>();
+            taskMap.values().forEach(task -> tasks.add(task));
+            tasks.forEach(task -> {
+                taskMap.remove(task.taskId);
+                task.future.cancel(false);
+            });
+        }
+        cleanFuture = null;
+    }
+
 
     private boolean hasLoader() {
         return config.getLoader() != null || config.getBatchLoader() != null;
@@ -57,8 +98,8 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private void addTask(Object taskId, long refreshMillis, K key) {
         Cache cache = this;
-        final byte[] suffix = "@Lock@".getBytes();
-        Runnable command = () -> {
+        final byte[] suffix = "_#RL#".getBytes();
+        Runnable refreshCommand = () -> {
             try {
                 Cache c = cache;
                 while (c instanceof ProxyCache) {
@@ -68,10 +109,11 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
                     byte[] newKey = ((AbstractExternalCache) c).buildKey(key);
                     byte[] lockKey = Arrays.copyOf(newKey, newKey.length + suffix.length);
                     System.arraycopy(suffix, 0, lockKey, newKey.length, suffix.length);
-                    long loadTimeOut = config.getRefreshPolicy().getLoadLockTimeOutMillis();
+                    long loadTimeOut = config.getRefreshPolicy().getLoadLockTimeoutMillis();
                     Method method = cache.getClass().getMethod("tryLockAndRun",
                             Object.class, long.class, TimeUnit.class, Runnable.class);
                     Runnable r = () -> get(key);
+                    // AbstractExternalCache buildKey method will not convert byte[]
                     method.invoke(cache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
                 } else {
                     get(key);
@@ -82,11 +124,19 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
                 logger.error("load key error: key=" + key, e);
             }
         };
-        taskMap.computeIfAbsent(taskId, (tid) -> {
-            JetCacheExecutor.defaultExecutor().scheduleWithFixedDelay(
-                    command, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
-            return command;
+        RefreshTask refreshTask = taskMap.computeIfAbsent(taskId, tid -> {
+            if (cleanFuture == null) {
+                addCleanTask();
+            }
+            ScheduledFuture<?> future = JetCacheExecutor.heavyIOExecutor().scheduleWithFixedDelay(
+                    refreshCommand, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
+            RefreshTask task = new RefreshTask();
+            task.taskId = tid;
+            task.lastAccessTime = System.currentTimeMillis();
+            task.future = future;
+            return task;
         });
+        refreshTask.lastAccessTime = System.currentTimeMillis();
     }
 
     @Override
@@ -109,5 +159,11 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
             }
         }
         return super.GET_ALL(keys);
+    }
+
+    static class RefreshTask {
+        Object taskId;
+        long lastAccessTime;
+        ScheduledFuture future;
     }
 }

@@ -1,5 +1,6 @@
 package com.alicp.jetcache;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -10,7 +11,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public interface Cache<K, V> {
+public interface Cache<K, V> extends Closeable {
 
     //-----------------------------JSR 107 style API------------------------------------------------
 
@@ -63,6 +64,9 @@ public interface Cache<K, V> {
      *                                  the specified class.
      */
     <T> T unwrap(Class<T> clazz);
+
+    default void close() {
+    }
 
     //--------------------------JetCache API---------------------------------------------
 
