@@ -32,7 +32,6 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
             b.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
             b.setValueDecoder(JavaValueDecoder.INSTANCE);
             b.setValueEncoder(JavaValueEncoder.INSTANCE);
-            b.setKeyPrefix("PREFIX");
             cache = b.buildCache();
             baseTest();
         }

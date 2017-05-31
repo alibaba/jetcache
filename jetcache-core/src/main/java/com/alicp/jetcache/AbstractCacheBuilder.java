@@ -80,9 +80,17 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return self();
     }
 
+    public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
+        getConfig().setExpireAfterAccessInMillis(expireAfterAccessInMillis);
+    }
+
     public T expireAfterWrite(long defaultExpire, TimeUnit timeUnit) {
         getConfig().setExpireAfterWriteInMillis(timeUnit.toMillis(defaultExpire));
         return self();
+    }
+
+    public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
+        getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
     }
 
     public T cacheNullValueByDefault(boolean cacheNullValueByDefault) {
@@ -90,26 +98,25 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return self();
     }
 
+    public void setCacheNullValueByDefault(boolean cacheNullValueByDefault) {
+        getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
+    }
+
     public <K, V> T loader(CacheLoader<K, V> loader) {
         getConfig().setLoader(loader);
         return self();
-    }
-
-
-    public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
-        getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
-    }
-
-    public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
-        getConfig().setExpireAfterAccessInMillis(expireAfterAccessInMillis);
-    }
-
-    public void setCacheNullValueByDefault(boolean cacheNullValueByDefault) {
-        getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
     }
 
     public <K, V> void setLoader(CacheLoader<K, V> loader) {
         getConfig().setLoader(loader);
     }
 
+    public T refreshPolicy(RefreshPolicy refreshPolicy) {
+        getConfig().setRefreshPolicy(refreshPolicy);
+        return self();
+    }
+
+    public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
+        getConfig().setRefreshPolicy(refreshPolicy);
+    }
 }

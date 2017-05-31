@@ -1,7 +1,10 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
+import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Map;
 import java.util.Set;
@@ -13,9 +16,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-public class LoadingCacheTest {
+public class LoadingCacheTest extends AbstractCacheTest {
 
-    public static void loadingCacheTest1(AbstractCacheBuilder builder) {
+    @Test
+    public void test() throws Exception {
+        cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
+                .buildCache();
+        cache = new LoadingCache<>(cache);
+        baseTest();
+        AtomicInteger count = new AtomicInteger(0);
+        cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
+        loadingCacheTest(cache);
+    }
+
+    public static void loadingCacheTest(AbstractCacheBuilder builder) {
         AtomicInteger count = new AtomicInteger(0);
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
         loadingCacheTest(builder.buildCache());
@@ -50,5 +64,7 @@ public class LoadingCacheTest {
         Assert.assertEquals(2, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(3, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
+
+        cache.config().getMonitors().remove(monitor);
     }
 }

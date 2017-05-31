@@ -10,6 +10,7 @@ import com.alicp.jetcache.external.ExternalCacheConfig;
  */
 public class MockRemoteCacheBuilder extends ExternalCacheBuilder {
     public MockRemoteCacheBuilder() {
+        this.setKeyPrefix("DEFAULT_PREFIX");
         buildFunc((c) -> new MockRemoteCache((ExternalCacheConfig) c));
     }
 }

@@ -1,5 +1,8 @@
 package com.alicp.jetcache.redis;
 
+import com.alicp.jetcache.LoadingCache;
+import com.alicp.jetcache.LoadingCacheTest;
+import com.alicp.jetcache.RefreshCacheTest;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -58,16 +61,24 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .expireAfterWrite(200, TimeUnit.MILLISECONDS)
                 .buildCache();
         baseTest();
+        fastjsonKeyCoverterTest();
         expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
 
-        cache = RedisCacheBuilder.createRedisCacheBuilder()
+        LoadingCacheTest.loadingCacheTest(RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .valueEncoder(KryoValueEncoder.INSTANCE)
-                .valueDecoder(KryoValueDecoder.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .buildCache();
-        fastjsonKeyCoverterTest();
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
+        RefreshCacheTest.refreshCacheTest(RedisCacheBuilder.createRedisCacheBuilder()
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
+                .jedisPool(pool)
+                .keyPrefix(new Random().nextInt() + "")
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
+
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(null)

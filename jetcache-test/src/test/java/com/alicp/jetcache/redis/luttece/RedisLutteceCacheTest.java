@@ -1,5 +1,7 @@
 package com.alicp.jetcache.redis.luttece;
 
+import com.alicp.jetcache.LoadingCacheTest;
+import com.alicp.jetcache.RefreshCacheTest;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import com.lambdaworks.redis.AbstractRedisClient;
@@ -77,6 +79,21 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
         expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
         fastjsonKeyCoverterTest();
         testUnwrap(client);
+
+        LoadingCacheTest.loadingCacheTest(RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+                .redisClient(client)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
+                .keyPrefix(new Random().nextInt() + "")
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
+        RefreshCacheTest.refreshCacheTest(RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+                .redisClient(client)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
+                .keyPrefix(new Random().nextInt() + "")
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
 
         cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
                 .redisClient(client)
