@@ -1,7 +1,5 @@
 package com.alicp.jetcache.support;
 
-import java.math.BigDecimal;
-import java.util.Map;
 import java.io.Serializable;
 
 /**

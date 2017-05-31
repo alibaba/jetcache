@@ -16,6 +16,44 @@ import java.util.function.Function;
  */
 class CacheUtil {
 
+    public static <K, V> CacheLoader<K, V> createProxyLoader(Cache<K, V> cache,
+                                                             CacheLoader<K, V> loader,
+                                                             Consumer<CacheEvent> eventConsumer) {
+        return new CacheLoader<K, V>() {
+            @Override
+            public V load(K key) throws Throwable {
+                long t = System.currentTimeMillis();
+                V v = null;
+                boolean success = false;
+                try {
+                    v = loader.load(key);
+                    success = true;
+                } finally {
+                    t = System.currentTimeMillis() - t;
+                    CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
+                    eventConsumer.accept(event);
+                }
+                return v;
+            }
+
+            @Override
+            public Map<K, V> loadAll(Set<K> keys) throws Throwable {
+                long t = System.currentTimeMillis();
+                boolean success = false;
+                Map<K, V> kvMap = null;
+                try {
+                    kvMap = loader.loadAll(keys);
+                    success = true;
+                } finally {
+                    t = System.currentTimeMillis() - t;
+                    CacheLoadAllEvent event = new CacheLoadAllEvent(cache, t, keys, kvMap, success);
+                    eventConsumer.accept(event);
+                }
+                return kvMap;
+            }
+        };
+    }
+
     public static <K, V> Function<K, V> createProxyLoader(Cache<K, V> cache,
                                                           Function<K, V> loader,
                                                           Consumer<CacheEvent> eventConsumer) {
@@ -35,22 +73,4 @@ class CacheUtil {
         };
     }
 
-    public static <K, V> Function<Set<K>, Map<K, V>> createProxyBatchLoader(Cache<K, V> cache,
-                                                                                 Function<Set<K>, Map<K, V>> batchLoader,
-                                                                                 Consumer<CacheEvent> eventConsumer) {
-        return (k) -> {
-            long t = System.currentTimeMillis();
-            boolean success = false;
-            Map<K, V> kvMap = null;
-            try {
-                kvMap = batchLoader.apply(k);
-                success = true;
-            } finally {
-                t = System.currentTimeMillis() - t;
-                CacheLoadAllEvent event = new CacheLoadAllEvent(cache, t, k, kvMap, success);
-                eventConsumer.accept(event);
-            }
-            return kvMap;
-        };
-    }
 }

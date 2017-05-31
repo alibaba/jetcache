@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno;
 
 import java.lang.annotation.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -15,6 +16,7 @@ public @interface Cached {
     String area() default CacheConsts.DEFAULT_AREA;
     String name() default CacheConsts.UNDEFINED_STRING;
     boolean enabled() default CacheConsts.DEFAULT_ENABLED;
+    TimeUnit timeUnit() default TimeUnit.SECONDS;
     int expire() default CacheConsts.UNDEFINED_INT;
     CacheType cacheType() default CacheType.REMOTE;
     int localLimit() default CacheConsts.UNDEFINED_INT;

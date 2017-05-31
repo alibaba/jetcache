@@ -1,5 +1,7 @@
 package com.alicp.jetcache;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created on 2017/5/25.
  *
@@ -9,9 +11,25 @@ public class RefreshPolicy implements Cloneable {
 
     private long refreshMillis;
     private long stopRefreshAfterLastAccessMillis;
-    private long loadLockTimeoutMillis = 60 * 1000;
+    private long refreshLockTimeoutMillis = 60 * 1000;
 
     public RefreshPolicy() {
+    }
+
+    public static RefreshPolicy newPolicy(long time, TimeUnit timeUnit) {
+        RefreshPolicy p = new RefreshPolicy();
+        p.refreshMillis = timeUnit.toMillis(time);
+        return p;
+    }
+
+    public RefreshPolicy stopRefreshAfterLastAccess(long time, TimeUnit timeUnit) {
+        this.stopRefreshAfterLastAccessMillis = timeUnit.toMillis(time);
+        return this;
+    }
+
+    public RefreshPolicy refreshLockTimeout(long time, TimeUnit timeUnit) {
+        this.refreshLockTimeoutMillis = timeUnit.toMillis(time);
+        return this;
     }
 
     @Override
@@ -19,7 +37,7 @@ public class RefreshPolicy implements Cloneable {
         try {
             return (RefreshPolicy) super.clone();
         } catch (CloneNotSupportedException e) {
-            throw new CacheException(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -39,11 +57,11 @@ public class RefreshPolicy implements Cloneable {
         this.stopRefreshAfterLastAccessMillis = stopRefreshAfterLastAccessMillis;
     }
 
-    public long getLoadLockTimeoutMillis() {
-        return loadLockTimeoutMillis;
+    public long getRefreshLockTimeoutMillis() {
+        return refreshLockTimeoutMillis;
     }
 
-    public void setLoadLockTimeoutMillis(long loadLockTimeoutMillis) {
-        this.loadLockTimeoutMillis = loadLockTimeoutMillis;
+    public void setRefreshLockTimeoutMillis(long refreshLockTimeoutMillis) {
+        this.refreshLockTimeoutMillis = refreshLockTimeoutMillis;
     }
 }

@@ -23,6 +23,7 @@ public class CacheConfigUtil {
         cc.setName(anno.name());
         cc.setCacheType(anno.cacheType());
         cc.setEnabled(anno.enabled());
+        cc.setTimeUnit(anno.timeUnit());
         cc.setExpire(anno.expire());
         cc.setLocalLimit(anno.localLimit());
         cc.setCacheNullValue(anno.cacheNullValue());

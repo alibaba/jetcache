@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class RefreshCache<K, V> extends LoadingCache<K, V> {
+public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(RefreshCache.class);
 
@@ -43,7 +43,7 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
             long accessTimeout = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
             if (accessTimeout > 0) {
                 List<RefreshTask> tasks = new ArrayList<>();
-                taskMap.values().forEach(task -> tasks.add(task));
+                tasks.addAll(taskMap.values());
                 tasks.forEach(task -> {
                     if (System.currentTimeMillis() - task.lastAccessTime > accessTimeout) {
                         taskMap.remove(task.taskId);
@@ -71,7 +71,7 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
 
 
     private boolean hasLoader() {
-        return config.getLoader() != null || config.getBatchLoader() != null;
+        return config.getLoader() != null;
     }
 
     private Object getTaskId(K key) {
@@ -109,7 +109,7 @@ class RefreshCache<K, V> extends LoadingCache<K, V> {
                     byte[] newKey = ((AbstractExternalCache) c).buildKey(key);
                     byte[] lockKey = Arrays.copyOf(newKey, newKey.length + suffix.length);
                     System.arraycopy(suffix, 0, lockKey, newKey.length, suffix.length);
-                    long loadTimeOut = config.getRefreshPolicy().getLoadLockTimeoutMillis();
+                    long loadTimeOut = config.getRefreshPolicy().getRefreshLockTimeoutMillis();
                     Method method = cache.getClass().getMethod("tryLockAndRun",
                             Object.class, long.class, TimeUnit.class, Runnable.class);
                     Runnable r = () -> get(key);

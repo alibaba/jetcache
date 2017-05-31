@@ -3,7 +3,10 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.AbstractCache;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.event.CacheLoadEvent;

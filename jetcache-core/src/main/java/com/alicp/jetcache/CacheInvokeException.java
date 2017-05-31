@@ -6,6 +6,9 @@ package com.alicp.jetcache;
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
 public class CacheInvokeException extends CacheException {
+
+    private static final long serialVersionUID = -9002505061387176702L;
+
     private Throwable target;
 
     public CacheInvokeException(String message, Throwable cause) {

@@ -3,7 +3,10 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
@@ -71,7 +74,6 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         DefaultCacheMonitorTest.testMonitor(cache);
 
         LoadingCacheTest.loadingCacheTest1(EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()));
-        LoadingCacheTest.loadingCacheTest2(EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()));
 
         int thread = 10;
         int limit = 1000;

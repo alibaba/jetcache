@@ -1,11 +1,9 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.luttece.RedisLutteceCacheConfig;
 import com.alicp.jetcache.redis.luttece.RedisLutteceCacheTest;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
@@ -29,9 +27,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.util.Pool;
 
 import javax.annotation.PostConstruct;
 

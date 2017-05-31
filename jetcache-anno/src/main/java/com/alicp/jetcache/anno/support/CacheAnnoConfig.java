@@ -5,6 +5,8 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.CacheType;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -13,7 +15,8 @@ public class CacheAnnoConfig {
     private String area;
     private String name;
     private boolean enabled;
-    private int expire;
+    private TimeUnit timeUnit;
+    private long expire;
     private CacheType cacheType;
     private int localLimit;
     private boolean cacheNullValue;
@@ -30,7 +33,7 @@ public class CacheAnnoConfig {
         return enabled;
     }
 
-    public int getExpire() {
+    public long getExpire() {
         return expire;
     }
 
@@ -50,7 +53,7 @@ public class CacheAnnoConfig {
         this.enabled = enabled;
     }
 
-    public void setExpire(int expire) {
+    public void setExpire(long expire) {
         this.expire = expire;
     }
 
@@ -108,5 +111,13 @@ public class CacheAnnoConfig {
 
     public void setKeyConvertor(String keyConvertor) {
         this.keyConvertor = keyConvertor;
+    }
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(TimeUnit timeUnit) {
+        this.timeUnit = timeUnit;
     }
 }

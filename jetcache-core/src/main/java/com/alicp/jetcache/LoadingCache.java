@@ -2,16 +2,18 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.event.CacheEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Created on 2017/5/17.
  *
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
-class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
+public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 
     private Consumer<CacheEvent> eventConsumer;
 
@@ -32,18 +34,7 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 
     @Override
     public V get(K key) {
-        Function<K, V> loader = config.getLoader();
-        Function<Set<K>, Map<K, V>> batchLoader = config.getBatchLoader();
-        if (loader == null && batchLoader != null) {
-            loader = (k) -> {
-                Map<K, V> values = batchLoader.apply(Collections.singleton(key));
-                if (values != null) {
-                    return values.values().iterator().next();
-                } else {
-                    return null;
-                }
-            };
-        }
+        CacheLoader<K, V> loader = config.getLoader();
         if (loader != null) {
             if (eventConsumer != null) {
                 loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
@@ -52,7 +43,12 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
             if (r.isSuccess()) {
                 return r.getValue();
             } else {
-                Object loadedValue = loader.apply(key);
+                Object loadedValue;
+                try {
+                    loadedValue = loader.load(key);
+                } catch (Throwable e) {
+                    throw new CacheInvokeException(e);
+                }
                 V castedValue = (V) loadedValue;
                 if (loadedValue != null || config.isCacheNullValueByDefault()) {
                     put(key, castedValue);
@@ -60,29 +56,16 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 return castedValue;
             }
         } else {
-            return super.get(key);
+            return cache.get(key);
         }
     }
 
     @Override
     public Map<K, V> getAll(Set<? extends K> keys) {
-        Function<K, V> loader = config.getLoader();
-        Function<Set<K>, Map<K, V>> batchLoader = config.getBatchLoader();
-        if (batchLoader == null && loader != null) {
-            batchLoader = (ks) -> {
-                Map<K, V> map = new HashMap<>();
-                ks.forEach((k) -> {
-                    V value = loader.apply(k);
-                    if (value != null) {
-                        map.put(k, value);
-                    }
-                });
-                return map;
-            };
-        }
-        if (batchLoader != null) {
+        CacheLoader<K, V> loader = config.getLoader();
+        if (loader != null) {
             if (eventConsumer != null) {
-                batchLoader = CacheUtil.createProxyBatchLoader(cache, batchLoader, eventConsumer);
+                loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
             }
             MultiGetResult<K, V> r = GET_ALL(keys);
             if (r.isSuccess() || r.getResultCode() == CacheResultCode.PART_SUCCESS) {
@@ -93,14 +76,20 @@ class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                         keysNeedLoad.add(k);
                     }
                 });
-                Map<K, V> loadResult = batchLoader.apply(keysNeedLoad);
+                Map<K, V> loadResult;
+                try {
+                    loadResult = loader.loadAll(keysNeedLoad);
+                } catch (Throwable e) {
+                    throw new CacheInvokeException(e);
+                }
+
                 kvMap.putAll(loadResult);
                 return kvMap;
             } else {
                 return new HashMap<>();
             }
         } else {
-            return getAll(keys);
+            return cache.getAll(keys);
         }
 
     }

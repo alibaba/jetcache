@@ -1,6 +1,8 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.MonitoredCache;
+import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;

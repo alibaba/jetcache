@@ -2,7 +2,6 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.CacheBuilder;
-import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,5 @@
 package com.alicp.jetcache;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created on 2016/12/13.
  *

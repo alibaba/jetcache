@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
@@ -45,7 +46,8 @@ public class CacheHandlerTest {
         cacheAnnoConfig.setArea(CacheConsts.DEFAULT_AREA);
         cacheAnnoConfig.setName(CacheConsts.UNDEFINED_STRING);
         cacheAnnoConfig.setEnabled(CacheConsts.DEFAULT_ENABLED);
-        cacheAnnoConfig.setExpire(CacheConsts.DEFAULT_EXPIRE);
+        cacheAnnoConfig.setTimeUnit(TimeUnit.SECONDS);
+        cacheAnnoConfig.setExpire(100);
         cacheAnnoConfig.setCacheType(CacheType.REMOTE);
         cacheAnnoConfig.setLocalLimit(CacheConsts.DEFAULT_LOCAL_LIMIT);
         cacheAnnoConfig.setCacheNullValue(CacheConsts.DEFAULT_CACHE_NULL_VALUE);

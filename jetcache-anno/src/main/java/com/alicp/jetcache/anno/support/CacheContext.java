@@ -3,7 +3,10 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.MultiLevelCacheBuilder;
+import com.alicp.jetcache.RefreshCache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
@@ -119,6 +122,7 @@ public class CacheContext {
                     .addCache(local, remote)
                     .buildCache();
         }
+        cache = new RefreshCache(cache);
 
         if (defaultCacheMonitorManager != null) {
             DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
@@ -135,8 +139,8 @@ public class CacheContext {
         }
         cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
 
-        if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
-            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getExpire() * 1000L);
+        if (cacheAnnoConfig.getExpire() > 0 ) {
+            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getTimeUnit().toMillis(cacheAnnoConfig.getExpire()));
         }
         if (cacheBuilder.getConfig().getKeyPrefix() != null) {
             cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + cacheName);
@@ -164,8 +168,8 @@ public class CacheContext {
         if (cacheAnnoConfig.getLocalLimit() != CacheConsts.UNDEFINED_INT) {
             cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
         }
-        if (cacheAnnoConfig.getExpire() != CacheConsts.UNDEFINED_INT) {
-            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getExpire() * 1000L);
+        if (cacheAnnoConfig.getExpire() > 0) {
+            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getTimeUnit().toMillis(cacheAnnoConfig.getExpire()));
         }
         if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));

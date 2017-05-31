@@ -44,8 +44,12 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         beforeBuild();
         CacheConfig c = getConfig().clone();
         Cache<K, V> cache = buildFunc.apply(c);
-        if (c.getLoader() != null || c.getBatchLoader() != null) {
-            cache = new LoadingCache<>(cache);
+        if (c.getLoader() != null) {
+            if (c.getRefreshPolicy() == null) {
+                cache = new LoadingCache<>(cache);
+            } else {
+                cache = new RefreshCache<>(cache);
+            }
         }
         return cache;
     }
@@ -86,15 +90,11 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return self();
     }
 
-    public <K, V> T loader(Function<K, V> loader) {
+    public <K, V> T loader(CacheLoader<K, V> loader) {
         getConfig().setLoader(loader);
         return self();
     }
 
-    public <K, V> T batchLoader(Function<K, V> batchLoader) {
-        getConfig().setBatchLoader(batchLoader);
-        return self();
-    }
 
     public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
         getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
@@ -108,11 +108,8 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
     }
 
-    public <K, V> void setLoader(Function<K, V> loader) {
+    public <K, V> void setLoader(CacheLoader<K, V> loader) {
         getConfig().setLoader(loader);
     }
 
-    public <K, V> void setBatchLoader(Function<K, V> batchLoader) {
-        getConfig().setBatchLoader(batchLoader);
-    }
 }

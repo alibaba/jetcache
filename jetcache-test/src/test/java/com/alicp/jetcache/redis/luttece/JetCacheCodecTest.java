@@ -3,8 +3,6 @@ package com.alicp.jetcache.redis.luttece;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.nio.ByteBuffer;
-
 /**
  * Created on 2017/5/9.
  *

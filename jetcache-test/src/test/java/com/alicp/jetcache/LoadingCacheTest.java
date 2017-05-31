@@ -1,10 +1,8 @@
 package com.alicp.jetcache;
 
-import com.alicp.jetcache.support.CacheStat;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import org.junit.Assert;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -19,22 +17,10 @@ public class LoadingCacheTest {
 
     public static void loadingCacheTest1(AbstractCacheBuilder builder) {
         AtomicInteger count = new AtomicInteger(0);
-        builder.loader((key) -> key + "_V" + count.getAndIncrement())
-                .batchLoader(null);
+        builder.loader((key) -> key + "_V" + count.getAndIncrement());
         loadingCacheTest(builder.buildCache());
     }
 
-    public static void loadingCacheTest2(AbstractCacheBuilder builder) {
-        AtomicInteger count = new AtomicInteger(0);
-        builder.loader(null);
-        builder.batchLoader((keys) -> {
-            Map map = new HashMap();
-            ((Set) keys).forEach((k) -> map.put(k, k + "_V" + count.getAndIncrement()));
-            return map;
-        });
-        loadingCacheTest(builder.buildCache());
-
-    }
 
     private static void loadingCacheTest(Cache cache) {
         DefaultCacheMonitor monitor = new DefaultCacheMonitor("test");

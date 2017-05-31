@@ -5,7 +5,6 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
 
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/10/8.

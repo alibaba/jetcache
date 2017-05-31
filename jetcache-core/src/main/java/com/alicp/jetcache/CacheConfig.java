@@ -2,10 +2,8 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.anno.CacheConsts;
 
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -20,8 +18,7 @@ public class CacheConfig<K, V> implements Cloneable {
     private long expireAfterAccessInMillis = -1;
     private Function<K, Object> keyConvertor;
 
-    private Function<K, V> loader;
-    private Function<Set<K>, Map<K, V>> batchLoader;
+    private CacheLoader<K, V> loader;
 
     private List<CacheMonitor> monitors = new ArrayList<>();
 
@@ -87,20 +84,12 @@ public class CacheConfig<K, V> implements Cloneable {
         this.expireAfterAccessInMillis = expireAfterAccessInMillis;
     }
 
-    public Function<K, V> getLoader() {
+    public CacheLoader<K, V> getLoader() {
         return loader;
     }
 
-    public void setLoader(Function<K, V> loader) {
+    public void setLoader(CacheLoader<K, V> loader) {
         this.loader = loader;
-    }
-
-    public Function<Set<K>, Map<K, V>> getBatchLoader() {
-        return batchLoader;
-    }
-
-    public void setBatchLoader(Function<Set<K>, Map<K, V>> batchLoader) {
-        this.batchLoader = batchLoader;
     }
 
     public boolean isCacheNullValueByDefault() {

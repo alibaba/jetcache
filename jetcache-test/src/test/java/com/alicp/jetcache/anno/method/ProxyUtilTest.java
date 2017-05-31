@@ -17,6 +17,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -43,6 +45,7 @@ public class ProxyUtilTest {
         cac.setCondition(CacheConsts.UNDEFINED_STRING);
         cac.setUnless(CacheConsts.UNDEFINED_STRING);
         cac.setEnabled(true);
+        cac.setTimeUnit(TimeUnit.SECONDS);
         cac.setExpire(100);
         cac.setName(CacheConsts.UNDEFINED_STRING);
         cac.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);

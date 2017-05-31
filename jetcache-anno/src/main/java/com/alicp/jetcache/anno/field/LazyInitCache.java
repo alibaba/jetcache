@@ -60,6 +60,7 @@ class LazyInitCache implements ProxyCache {
         CacheAnnoConfig cac = new CacheAnnoConfig();
         cac.setArea(ann.area());
         cac.setName(ann.name());
+        cac.setTimeUnit(ann.timeUnit());
         cac.setExpire(ann.expire());
         cac.setCacheType(ann.cacheType());
         cac.setLocalLimit(ann.localLimit());
