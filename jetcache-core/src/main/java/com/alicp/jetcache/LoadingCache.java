@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  */
 public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 
-    private Consumer<CacheEvent> eventConsumer;
+    protected Consumer<CacheEvent> eventConsumer;
 
     protected CacheConfig<K, V> config;
 

@@ -28,45 +28,18 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private ConcurrentHashMap<Object, RefreshTask> taskMap = new ConcurrentHashMap<>();
 
-    private volatile ScheduledFuture<?> cleanFuture;
-
     public RefreshCache(Cache cache) {
         super(cache);
     }
 
-    private void addCleanTask() {
-        if (cleanFuture != null) {
-            logger.error("cleanFuture is not null");
-            return;
-        }
-        Runnable command = () -> {
-            long accessTimeout = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
-            if (accessTimeout > 0) {
-                List<RefreshTask> tasks = new ArrayList<>();
-                tasks.addAll(taskMap.values());
-                tasks.forEach(task -> {
-                    if (System.currentTimeMillis() - task.lastAccessTime > accessTimeout) {
-                        taskMap.remove(task.taskId);
-                        task.future.cancel(false);
-                    }
-                });
-            }
-        };
-        cleanFuture = JetCacheExecutor.defaultExecutor().scheduleWithFixedDelay(command, 10, 10, TimeUnit.SECONDS);
-    }
-
     @Override
     public void close() {
-        if (cleanFuture != null) {
-            cleanFuture.cancel(false);
-            List<RefreshTask> tasks = new ArrayList<>();
-            taskMap.values().forEach(task -> tasks.add(task));
-            tasks.forEach(task -> {
-                taskMap.remove(task.taskId);
-                task.future.cancel(false);
-            });
-        }
-        cleanFuture = null;
+        List<RefreshTask> tasks = new ArrayList<>();
+        taskMap.values().forEach(task -> tasks.add(task));
+        tasks.forEach(task -> {
+            taskMap.remove(task.taskId);
+            task.future.cancel(false);
+        });
     }
 
 
@@ -74,7 +47,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         return config.getLoader() != null;
     }
 
-    private Object getTaskId(K key) {
+    private Cache concreteCache() {
         Cache c = getTargetCache();
         while (true) {
             if (c instanceof ProxyCache) {
@@ -83,56 +56,30 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 Cache[] caches = ((MultiLevelCache) c).caches();
                 c = caches[caches.length - 1];
             } else {
-                if (c instanceof AbstractEmbeddedCache) {
-                    return ((AbstractEmbeddedCache) c).buildKey(key);
-                } else if (c instanceof AbstractExternalCache) {
-                    byte[] bs = ((AbstractExternalCache) c).buildKey(key);
-                    return ByteBuffer.wrap(bs);
-                } else {
-                    logger.error("can't getTaskId from " + c.getClass());
-                    return null;
-                }
+                return c;
             }
         }
     }
 
-    private void addTask(Object taskId, long refreshMillis, K key) {
-        Cache cache = this;
-        final byte[] suffix = "_#RL#".getBytes();
-        Runnable refreshCommand = () -> {
-            try {
-                Cache c = cache;
-                while (c instanceof ProxyCache) {
-                    c = ((ProxyCache) c).getTargetCache();
-                }
-                if (c instanceof AbstractExternalCache) {
-                    byte[] newKey = ((AbstractExternalCache) c).buildKey(key);
-                    byte[] lockKey = Arrays.copyOf(newKey, newKey.length + suffix.length);
-                    System.arraycopy(suffix, 0, lockKey, newKey.length, suffix.length);
-                    long loadTimeOut = config.getRefreshPolicy().getRefreshLockTimeoutMillis();
-                    Method method = cache.getClass().getMethod("tryLockAndRun",
-                            Object.class, long.class, TimeUnit.class, Runnable.class);
-                    Runnable r = () -> get(key);
-                    // AbstractExternalCache buildKey method will not convert byte[]
-                    method.invoke(cache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
-                } else {
-                    get(key);
-                }
-            } catch (InvocationTargetException e) {
-                logger.error("load key error: key=" + key, e.getTargetException());
-            } catch (Throwable e) {
-                logger.error("load key error: key=" + key, e);
-            }
-        };
+    private Object getTaskId(K key) {
+        Cache c = concreteCache();
+        if (c instanceof AbstractEmbeddedCache) {
+            return ((AbstractEmbeddedCache) c).buildKey(key);
+        } else if (c instanceof AbstractExternalCache) {
+            byte[] bs = ((AbstractExternalCache) c).buildKey(key);
+            return ByteBuffer.wrap(bs);
+        } else {
+            logger.error("can't getTaskId from " + c.getClass());
+            return null;
+        }
+    }
+
+    private void addTaskOrUpdateLastAccessTime(Object taskId, long refreshMillis, K key) {
         RefreshTask refreshTask = taskMap.computeIfAbsent(taskId, tid -> {
-            if (cleanFuture == null) {
-                addCleanTask();
-            }
-            ScheduledFuture<?> future = JetCacheExecutor.heavyIOExecutor().scheduleWithFixedDelay(
-                    refreshCommand, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
-            RefreshTask task = new RefreshTask();
-            task.taskId = tid;
+            RefreshTask task = new RefreshTask(taskId, key);
             task.lastAccessTime = System.currentTimeMillis();
+            ScheduledFuture<?> future = JetCacheExecutor.heavyIOExecutor().scheduleWithFixedDelay(
+                    task, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
             task.future = future;
             return task;
         });
@@ -142,28 +89,85 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     @Override
     public CacheGetResult<V> GET(K key) {
         if (config.getRefreshPolicy() != null && hasLoader()) {
-            addTask(getTaskId(key),
+            addTaskOrUpdateLastAccessTime(getTaskId(key),
                     config.getRefreshPolicy().getRefreshMillis(),
                     key);
         }
-        return super.GET(key);
+        return cache.GET(key);
     }
 
     @Override
     public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
         if (config.getRefreshPolicy() != null && hasLoader()) {
             for (K key : keys) {
-                addTask(getTaskId(key),
+                addTaskOrUpdateLastAccessTime(getTaskId(key),
                         config.getRefreshPolicy().getRefreshMillis(),
                         key);
             }
         }
-        return super.GET_ALL(keys);
+        return cache.GET_ALL(keys);
     }
 
-    static class RefreshTask {
-        Object taskId;
-        long lastAccessTime;
-        ScheduledFuture future;
+    class RefreshTask implements Runnable {
+        private Object taskId;
+        private K key;
+        private long lastAccessTime;
+        private ScheduledFuture future;
+
+        RefreshTask(Object taskId, K key) {
+            this.taskId = taskId;
+            this.key = key;
+        }
+
+        private void cancel() {
+            future.cancel(false);
+            taskMap.remove(taskId);
+        }
+
+        private void load() {
+            try {
+                CacheLoader<K, V> loader = config.getLoader();
+                loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
+                V v = loader.load(key);
+                cache.PUT(key, v);
+            } catch (Throwable e) {
+                throw new CacheInvokeException(e);
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (config.getRefreshPolicy() == null || config.getLoader() == null) {
+                    cancel();
+                    return;
+                }
+                long now = System.currentTimeMillis();
+                long stopRefreshAfterLastAccessMillis = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
+                if (lastAccessTime + stopRefreshAfterLastAccessMillis < now) {
+                    cancel();
+                    return;
+                }
+                Cache c = concreteCache();
+                if (c instanceof AbstractExternalCache) {
+                    final byte[] suffix = "_#RL#".getBytes();
+                    byte[] newKey = ((AbstractExternalCache) c).buildKey(key);
+                    byte[] lockKey = Arrays.copyOf(newKey, newKey.length + suffix.length);
+                    System.arraycopy(suffix, 0, lockKey, newKey.length, suffix.length);
+                    long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
+                    Method method = cache.getClass().getMethod("tryLockAndRun",
+                            Object.class, long.class, TimeUnit.class, Runnable.class);
+                    Runnable r = this::load;
+                    // AbstractExternalCache buildKey method will not convert byte[]
+                    method.invoke(cache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
+                } else {
+                    load();
+                }
+            } catch (InvocationTargetException e) {
+                logger.error("load key error: key=" + key, e.getTargetException());
+            } catch (Throwable e) {
+                logger.error("load key error: key=" + key, e);
+            }
+        }
     }
 }
