@@ -75,15 +75,17 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     }
 
     private void addTaskOrUpdateLastAccessTime(Object taskId, long refreshMillis, K key) {
-        RefreshTask refreshTask = taskMap.computeIfAbsent(taskId, tid -> {
-            RefreshTask task = new RefreshTask(taskId, key);
-            task.lastAccessTime = System.currentTimeMillis();
-            ScheduledFuture<?> future = JetCacheExecutor.heavyIOExecutor().scheduleWithFixedDelay(
-                    task, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
-            task.future = future;
-            return task;
-        });
-        refreshTask.lastAccessTime = System.currentTimeMillis();
+        if (refreshMillis > 0) {
+            RefreshTask refreshTask = taskMap.computeIfAbsent(taskId, tid -> {
+                RefreshTask task = new RefreshTask(taskId, key);
+                task.lastAccessTime = System.currentTimeMillis();
+                ScheduledFuture<?> future = JetCacheExecutor.heavyIOExecutor().scheduleWithFixedDelay(
+                        task, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
+                task.future = future;
+                return task;
+            });
+            refreshTask.lastAccessTime = System.currentTimeMillis();
+        }
     }
 
     @Override
@@ -144,9 +146,11 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 }
                 long now = System.currentTimeMillis();
                 long stopRefreshAfterLastAccessMillis = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
-                if (lastAccessTime + stopRefreshAfterLastAccessMillis < now) {
-                    cancel();
-                    return;
+                if (stopRefreshAfterLastAccessMillis > 0) {
+                    if (lastAccessTime + stopRefreshAfterLastAccessMillis < now) {
+                        cancel();
+                        return;
+                    }
                 }
                 Cache c = concreteCache();
                 if (c instanceof AbstractExternalCache) {
