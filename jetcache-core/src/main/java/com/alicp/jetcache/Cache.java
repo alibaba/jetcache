@@ -105,7 +105,7 @@ public interface Cache<K, V> extends Closeable {
     MultiGetResult<K, V> GET_ALL(Set<? extends K> keys);
 
     default V computeIfAbsent(K key, Function<K, V> loader) {
-        return computeIfAbsent(key, loader, config().isCacheNullValueByDefault());
+        return computeIfAbsent(key, loader, config().isCacheNullValue());
     }
 
     default V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {

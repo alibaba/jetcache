@@ -93,13 +93,13 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
     }
 
-    public T cacheNullValueByDefault(boolean cacheNullValueByDefault) {
-        getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
+    public T cacheNullValue(boolean cacheNullValue) {
+        getConfig().setCacheNullValue(cacheNullValue);
         return self();
     }
 
-    public void setCacheNullValueByDefault(boolean cacheNullValueByDefault) {
-        getConfig().setCacheNullValueByDefault(cacheNullValueByDefault);
+    public void setCacheNullValue(boolean cacheNullValue) {
+        getConfig().setCacheNullValue(cacheNullValue);
     }
 
     public <K, V> T loader(CacheLoader<K, V> loader) {

@@ -50,7 +50,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                     throw new CacheInvokeException(e);
                 }
                 V castedValue = (V) loadedValue;
-                if (loadedValue != null || config.isCacheNullValueByDefault()) {
+                if (loadedValue != null || config.isCacheNullValue()) {
                     put(key, castedValue);
                 }
                 return castedValue;

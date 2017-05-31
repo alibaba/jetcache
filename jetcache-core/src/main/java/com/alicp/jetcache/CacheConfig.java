@@ -22,7 +22,7 @@ public class CacheConfig<K, V> implements Cloneable {
 
     private List<CacheMonitor> monitors = new ArrayList<>();
 
-    private boolean cacheNullValueByDefault = false;
+    private boolean cacheNullValue = false;
 
     private RefreshPolicy refreshPolicy;
 
@@ -92,12 +92,12 @@ public class CacheConfig<K, V> implements Cloneable {
         this.loader = loader;
     }
 
-    public boolean isCacheNullValueByDefault() {
-        return cacheNullValueByDefault;
+    public boolean isCacheNullValue() {
+        return cacheNullValue;
     }
 
-    public void setCacheNullValueByDefault(boolean cacheNullValueByDefault) {
-        this.cacheNullValueByDefault = cacheNullValueByDefault;
+    public void setCacheNullValue(boolean cacheNullValue) {
+        this.cacheNullValue = cacheNullValue;
     }
 
     public List<CacheMonitor> getMonitors() {
