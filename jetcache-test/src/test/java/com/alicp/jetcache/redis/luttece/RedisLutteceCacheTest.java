@@ -1,7 +1,11 @@
 package com.alicp.jetcache.redis.luttece;
 
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.LoadingCacheTest;
+import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.RefreshCacheTest;
+import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import com.lambdaworks.redis.AbstractRedisClient;
@@ -66,6 +70,34 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
         test(client);
     }
 
+    @Test
+    public void testWithMultiLevelCache() throws Exception {
+        Cache l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
+                .limit(10)
+                .expireAfterWrite(100, TimeUnit.MILLISECONDS)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .buildCache();
+        RedisClient client = RedisClient.create("redis://127.0.0.1");
+        Cache l2Cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+                .redisClient(client)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
+                .keyPrefix(new Random().nextInt() + "")
+                .expireAfterWrite(100, TimeUnit.MILLISECONDS)
+                .buildCache();
+        cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
+                .expireAfterWrite(100, TimeUnit.MILLISECONDS)
+                .addCache(l1Cache, l2Cache)
+                .buildCache();
+        baseTest();
+        expireAfterWriteTest(100);
+
+        LoadingCacheTest.loadingCacheTest(MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
+                .expireAfterWrite(5000, TimeUnit.MILLISECONDS)
+                .addCache(l1Cache, l2Cache), 50);
+    }
+
     private void test(AbstractRedisClient client) throws Exception {
         cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
                 .redisClient(client)
@@ -86,7 +118,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS), 50);
+                .expireAfterWrite(5000, TimeUnit.MILLISECONDS), 50);
 
         cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
                 .redisClient(client)

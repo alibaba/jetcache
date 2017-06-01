@@ -43,6 +43,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         initL1L2(200);
         cache = new MultiLevelCache(l1Cache, l2Cache);
         doTest(200);
+        expireAfterWriteTest(200);
         DefaultCacheMonitorTest.testMonitor(cache);
 
         initL1L2(2000);
