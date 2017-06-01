@@ -1,5 +1,6 @@
 package com.alicp.jetcache;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -91,6 +92,15 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
 
     public void setExpireAfterWriteInMillis(long expireAfterWriteInMillis) {
         getConfig().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
+    }
+
+    public T addMonitor(CacheMonitor monitor) {
+        getConfig().getMonitors().add(monitor);
+        return self();
+    }
+
+    public void setMonitors(List<CacheMonitor> monitors) {
+        getConfig().setMonitors(monitors);
     }
 
     public T cacheNullValue(boolean cacheNullValue) {
