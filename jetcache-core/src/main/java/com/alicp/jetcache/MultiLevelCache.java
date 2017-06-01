@@ -25,7 +25,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CacheConfig lastConfig = caches[caches.length - 1].config();
         config = new MultiLevelCacheConfig<>();
         config.setCaches(Arrays.asList(caches));
-        config.setExpireAfterAccessInMillis(lastConfig.getExpireAfterAccessInMillis());
         config.setExpireAfterWriteInMillis(lastConfig.getExpireAfterWriteInMillis());
         config.setCacheNullValue(lastConfig.isCacheNullValue());
     }
