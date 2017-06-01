@@ -21,22 +21,31 @@ public class RefreshCacheTest extends AbstractCacheTest {
                 .buildCache();
         cache = new RefreshCache<>(cache);
         baseTest();
+        refreshCacheTest(cache);
+    }
 
+    public static void refreshCacheTest(Cache cache) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
+        CacheLoader oldLoader = cache.config().getLoader();
+        RefreshPolicy oldPolicy = cache.config().getRefreshPolicy();
+
         cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
-        RefreshPolicy policy = RefreshPolicy.newPolicy(50, TimeUnit.MILLISECONDS);
+        RefreshPolicy policy = RefreshPolicy.newPolicy(60, TimeUnit.MILLISECONDS);
         cache.config().setRefreshPolicy(policy);
         refreshCacheTest1(cache);
 
         count.set(0);
         cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(30);
         refreshCacheTest2(cache);
+
+        cache.config().setLoader(oldLoader);
+        cache.config().setRefreshPolicy(oldPolicy);
     }
 
     public static void refreshCacheTest(AbstractCacheBuilder builder) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
-        RefreshPolicy policy = RefreshPolicy.newPolicy(50, TimeUnit.MILLISECONDS);
+        RefreshPolicy policy = RefreshPolicy.newPolicy(60, TimeUnit.MILLISECONDS);
         builder.refreshPolicy(policy);
         refreshCacheTest1(builder.buildCache());
 
@@ -124,6 +133,8 @@ public class RefreshCacheTest extends AbstractCacheTest {
                 break;
             }
         }
+
+        cache.config().setRefreshPolicy(null);//stop refresh
 
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
         long missCount = monitor.getCacheStat().getGetMissCount();

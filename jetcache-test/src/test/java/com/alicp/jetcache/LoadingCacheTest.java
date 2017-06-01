@@ -24,17 +24,23 @@ public class LoadingCacheTest extends AbstractCacheTest {
                 .buildCache();
         cache = new LoadingCache<>(cache);
         baseTest();
-        AtomicInteger count = new AtomicInteger(0);
-        cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
         loadingCacheTest(cache, 0);
-        nullValueTest(cache, 0);
+    }
+
+    public static void loadingCacheTest(Cache cache, long waitMillis) throws Exception {
+        AtomicInteger count = new AtomicInteger(0);
+        CacheLoader oldLoader = cache.config().getLoader();
+        cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
+        loadingCacheTestImpl(cache, waitMillis);
+        nullValueTest(cache, waitMillis);
+        cache.config().setLoader(oldLoader);
     }
 
     public static void loadingCacheTest(AbstractCacheBuilder builder, long waitMillis) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
         Cache cache = builder.buildCache();
-        loadingCacheTest(cache, waitMillis);
+        loadingCacheTestImpl(cache, waitMillis);
         nullValueTest(cache, waitMillis);
     }
 
@@ -71,7 +77,7 @@ public class LoadingCacheTest extends AbstractCacheTest {
         cache.config().getMonitors().remove(monitor);
     }
 
-    private static void loadingCacheTest(Cache cache, long waitMillis) throws Exception {
+    private static void loadingCacheTestImpl(Cache cache, long waitMillis) throws Exception {
         DefaultCacheMonitor monitor = new DefaultCacheMonitor("test");
         cache.config().getMonitors().add(monitor);
 

@@ -1,8 +1,6 @@
 package com.alicp.jetcache.anno.filed;
 
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.MultiLevelCache;
-import com.alicp.jetcache.ProxyCache;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.KeyConvertor;
@@ -104,6 +102,8 @@ public class CreateCacheTest extends SpringTest {
             public void test() throws Exception {
                 super.cache = this.cache1;
                 super.baseTest();
+                LoadingCacheTest.loadingCacheTest(cache1, 0);
+                RefreshCacheTest.refreshCacheTest(cache1);
 
                 cache1.put("KK1", "V1");
                 Assert.assertNull(cache_A1.get("KK1"));
