@@ -1,6 +1,7 @@
 package com.alicp.jetcache;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,7 +31,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    public MultiLevelCache(MultiLevelCacheConfig<K,V> cacheConfig) {
+    public MultiLevelCache(MultiLevelCacheConfig<K, V> cacheConfig) {
         this.config = cacheConfig;
         this.caches = cacheConfig.getCaches().toArray(new Cache[]{});
         if (caches == null || caches.length == 0) {
@@ -68,7 +69,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (now <= currentExpire) {
                 long restTtl = currentExpire - now;
                 if (restTtl > 0) {
-                    PUT_caches(false, i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
                 }
                 return true;
             }
@@ -82,7 +83,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
         HashMap<K, CacheGetResult<V>> resultMap = new HashMap<>();
-        Set<K> restKeys = new HashSet<K>(keys);
+        Set<K> restKeys = new HashSet<>(keys);
         for (int i = 0; i < caches.length; i++) {
             if (restKeys.size() == 0) {
                 break;
@@ -93,7 +94,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
                 K key = en.getKey();
                 CacheValueHolder<V> holder = en.getValue();
                 if (checkResultAndFillUpperCache(key, i, holder)) {
-                    resultMap.put(key, new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue()));
+                    resultMap.put(key, new CacheGetResult<>(CacheResultCode.SUCCESS, null, holder.getValue()));
                     restKeys.remove(key);
                 }
             }
@@ -109,7 +110,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        return PUT_caches(false, caches.length, key, value, expireAfterWrite, timeUnit);
+        return PUT_caches(caches.length, key, value, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        int failCount = 0;
+        CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache c : caches) {
             Map newMap = new HashMap();
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
@@ -126,35 +127,32 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             }
 
             CacheResult r = c.PUT_ALL(newMap, expireAfterWrite, timeUnit);
-            if (!r.isSuccess()) {
-                failCount++;
-            }
+            future = combine(future, r);
         }
-        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+        return new CacheResult(future);
     }
 
-    private CacheResult PUT_caches(boolean useDefaultExpire, int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
-        int failCount = 0;
+    private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
+        CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
-            if (useDefaultExpire) {
-                expire = cache.config().getExpireAfterWriteInMillis();
-                timeUnit = TimeUnit.MILLISECONDS;
-            }
             CacheValueHolder<V> h = new CacheValueHolder<>(value, timeUnit.toMillis(expire));
-            CacheResult r;
-            if (useDefaultExpire) {
-                r = cache.PUT(key, h);
-            } else {
-                r = cache.PUT(key, h, expire, timeUnit);
-            }
-            if (!r.isSuccess()) {
-                failCount++;
-            }
+            CacheResult r = cache.PUT(key, h, expire, timeUnit);
+            future = combine(future, r);
         }
-        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+        return new CacheResult(future);
+    }
+
+    private CompletableFuture<ResultData> combine(CompletableFuture<ResultData> future, CacheResult result) {
+        return future.thenCombine(result.future(), (d1, d2) -> {
+            if (d1 == null) {
+                return d2;
+            }
+            if (d1.getResultCode() != d2.getResultCode()) {
+                return new ResultData(CacheResultCode.PART_SUCCESS, null, null);
+            }
+            return d1;
+        });
     }
 
     @Override
@@ -162,15 +160,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        int failCount = 0;
+        CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache cache : caches) {
             CacheResult r = cache.REMOVE(key);
-            if (!r.isSuccess()) {
-                failCount++;
-            }
+            future = combine(future, r);
         }
-        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+        return new CacheResult(future);
     }
 
     @Override
@@ -178,15 +173,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         if (keys == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        int failCount = 0;
+        CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache cache : caches) {
             CacheResult r = cache.REMOVE_ALL(keys);
-            if (!r.isSuccess()) {
-                failCount++;
-            }
+            future = combine(future, r);
         }
-        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                failCount == caches.length ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+        return new CacheResult(future);
     }
 
     @Override
