@@ -1,6 +1,8 @@
 package com.alicp.jetcache;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Created on 2017/5/24.
@@ -36,6 +38,26 @@ public class MultiLevelCacheBuilder<T extends MultiLevelCacheBuilder<T>> extends
 
     public void setCaches(List<Cache> caches) {
         getConfig().setCaches(caches);
+    }
+
+    @Override
+    public T keyConvertor(Function<Object, Object> keyConvertor) {
+        throw new UnsupportedOperationException("MultiLevelCache do not need a key convertor");
+    }
+
+    @Override
+    public void setKeyConvertor(Function<Object, Object> keyConvertor) {
+        throw new UnsupportedOperationException("MultiLevelCache do not need a key convertor");
+    }
+
+    @Override
+    public T expireAfterAccess(long defaultExpire, TimeUnit timeUnit) {
+        throw new UnsupportedOperationException("MultiLevelCache do not support expireAfterAccess");
+    }
+
+    @Override
+    public void setExpireAfterAccessInMillis(long expireAfterAccessInMillis) {
+        throw new UnsupportedOperationException("MultiLevelCache do not support expireAfterAccess");
     }
 
 }
