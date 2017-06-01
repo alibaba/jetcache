@@ -77,7 +77,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS), 100, 50);
 
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()

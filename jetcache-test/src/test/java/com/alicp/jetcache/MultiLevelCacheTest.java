@@ -54,7 +54,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         LoadingCacheTest.loadingCacheTest(MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache), 0);
 
         initL1L2(200);
-        RefreshCacheTest.refreshCacheTest(MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache));
+        RefreshCacheTest.refreshCacheTest(MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache), 80, 40);
 
         doMonitoredTest(200, () -> {
             try {

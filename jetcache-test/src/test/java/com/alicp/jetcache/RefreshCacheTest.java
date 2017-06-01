@@ -21,36 +21,36 @@ public class RefreshCacheTest extends AbstractCacheTest {
                 .buildCache();
         cache = new RefreshCache<>(cache);
         baseTest();
-        refreshCacheTest(cache);
+        refreshCacheTest(cache, 80, 40);
     }
 
-    public static void refreshCacheTest(Cache cache) throws Exception {
+    public static void refreshCacheTest(Cache cache, long refresh, long stopRefreshAfterLastAccess) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
         CacheLoader oldLoader = cache.config().getLoader();
         RefreshPolicy oldPolicy = cache.config().getRefreshPolicy();
 
         cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
-        RefreshPolicy policy = RefreshPolicy.newPolicy(60, TimeUnit.MILLISECONDS);
+        RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
         cache.config().setRefreshPolicy(policy);
         refreshCacheTest1(cache);
 
         count.set(0);
-        cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(30);
+        cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(stopRefreshAfterLastAccess);
         refreshCacheTest2(cache);
 
         cache.config().setLoader(oldLoader);
         cache.config().setRefreshPolicy(oldPolicy);
     }
 
-    public static void refreshCacheTest(AbstractCacheBuilder builder) throws Exception {
+    public static void refreshCacheTest(AbstractCacheBuilder builder, long refresh, long stopRefreshAfterLastAccess) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
-        RefreshPolicy policy = RefreshPolicy.newPolicy(60, TimeUnit.MILLISECONDS);
+        RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
         builder.refreshPolicy(policy);
         refreshCacheTest1(builder.buildCache());
 
         count.set(0);
-        builder.getConfig().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(30);
+        builder.getConfig().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(stopRefreshAfterLastAccess);
         refreshCacheTest2(builder.buildCache());
     }
 

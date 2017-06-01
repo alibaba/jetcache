@@ -72,7 +72,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
 
         LoadingCacheTest.loadingCacheTest(EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()), 0);
 
-        RefreshCacheTest.refreshCacheTest(EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()));
+        RefreshCacheTest.refreshCacheTest(EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc()), 80, 40);
 
 
         int thread = 10;

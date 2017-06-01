@@ -103,7 +103,7 @@ public class CreateCacheTest extends SpringTest {
                 super.cache = this.cache1;
                 super.baseTest();
                 LoadingCacheTest.loadingCacheTest(cache1, 0);
-                RefreshCacheTest.refreshCacheTest(cache1);
+                RefreshCacheTest.refreshCacheTest(cache1, 200, 100);
 
                 cache1.put("KK1", "V1");
                 Assert.assertNull(cache_A1.get("KK1"));
