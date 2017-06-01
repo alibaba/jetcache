@@ -70,7 +70,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS), 0);
         RefreshCacheTest.refreshCacheTest(RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)

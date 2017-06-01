@@ -49,11 +49,10 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 } catch (Throwable e) {
                     throw new CacheInvokeException(e);
                 }
-                V castedValue = (V) loadedValue;
                 if (loadedValue != null || config.isCacheNullValue()) {
-                    put(key, castedValue);
+                    PUT(key, (V) loadedValue);
                 }
-                return castedValue;
+                return (V) loadedValue;
             }
         } else {
             return cache.get(key);
@@ -79,6 +78,13 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 Map<K, V> loadResult;
                 try {
                     loadResult = loader.loadAll(keysNeedLoad);
+                    for (Map.Entry<K, V> en : loadResult.entrySet()) {
+                        K key = en.getKey();
+                        V loadedValue = en.getValue();
+                        if (loadedValue != null || config.isCacheNullValue()) {
+                            PUT(key, loadedValue);
+                        }
+                    }
                 } catch (Throwable e) {
                     throw new CacheInvokeException(e);
                 }

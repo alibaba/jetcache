@@ -55,21 +55,25 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(1, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
         Assert.assertEquals("refreshCacheTest1_K2_V1", cache.get("refreshCacheTest1_K2"));
         Assert.assertEquals(2, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
         Assert.assertEquals("refreshCacheTest1_K1_V0", cache.get("refreshCacheTest1_K1"));
         Assert.assertEquals(3, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(1, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
         Assert.assertEquals("refreshCacheTest1_K2_V1", cache.get("refreshCacheTest1_K2"));
         Assert.assertEquals(4, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
 
         Thread.sleep((long) (1.5 * refreshMillis));
 
@@ -79,11 +83,13 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(3, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(4, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(4, monitor.getCacheStat().getPutCount());
         Assert.assertNotEquals("refreshCacheTest1_K2_V1", cache.get("refreshCacheTest1_K2"));
         Assert.assertEquals(6, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(4, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(4, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(4, monitor.getCacheStat().getPutCount());
 
         cache.config().getMonitors().remove(monitor);
         cache.close();
@@ -100,11 +106,13 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(1, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
         Assert.assertEquals("refreshCacheTest2_K2_V1", cache.get("refreshCacheTest2_K2"));
         Assert.assertEquals(2, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
 
         long totalSleepTime = 0;
         while (true) {
@@ -124,11 +132,13 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(hitCount + 1, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(missCount, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(3, monitor.getCacheStat().getPutCount());
         // refresh task stopped, but it is not expires
         Assert.assertEquals("refreshCacheTest2_K2_V1", cache.get("refreshCacheTest2_K2"));
         Assert.assertEquals(hitCount + 2, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(missCount, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
+        Assert.assertEquals(3, monitor.getCacheStat().getPutCount());
 
         cache.config().getMonitors().remove(monitor);
         cache.close();

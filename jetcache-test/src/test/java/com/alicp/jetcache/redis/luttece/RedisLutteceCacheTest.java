@@ -86,14 +86,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
-        RefreshCacheTest.refreshCacheTest(RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
-                .redisClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .valueEncoder(JavaValueEncoder.INSTANCE)
-                .valueDecoder(JavaValueDecoder.INSTANCE)
-                .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS));
+                .expireAfterWrite(200, TimeUnit.MILLISECONDS), 50);
 
         cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
                 .redisClient(client)
