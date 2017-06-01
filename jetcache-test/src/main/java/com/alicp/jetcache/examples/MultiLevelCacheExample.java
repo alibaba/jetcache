@@ -1,7 +1,7 @@
 package com.alicp.jetcache.examples;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
@@ -33,7 +33,9 @@ public class MultiLevelCacheExample {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .buildCache();
 
-        MultiLevelCache<Object, Object> multiLevelCache = new MultiLevelCache<>(l1Cache, l2Cache);
+        Cache<Object, Object> multiLevelCache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
+                .addCache(l1Cache, l2Cache)
+                .buildCache();
 
         multiLevelCache.put("K1", "V1");
         multiLevelCache.put("K2", "V2", 20, TimeUnit.SECONDS);
