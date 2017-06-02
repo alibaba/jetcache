@@ -28,7 +28,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
         }
         final Cache c = cache;
         if (cache instanceof AbstractCache) {
-            eventConsumer = (event) -> ((AbstractCache) c).notify(event);
+            eventConsumer = ((AbstractCache) c)::notify;
         }
     }
 

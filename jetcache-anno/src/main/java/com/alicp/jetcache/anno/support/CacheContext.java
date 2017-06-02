@@ -118,7 +118,7 @@ public class CacheContext {
             }
 
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
-                    .expireAfterWrite(local.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
+                    .expireAfterWrite(cacheAnnoConfig.getExpire(), cacheAnnoConfig.getTimeUnit())
                     .addCache(local, remote)
                     .buildCache();
         }
@@ -140,7 +140,7 @@ public class CacheContext {
         cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
 
         if (cacheAnnoConfig.getExpire() > 0 ) {
-            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getTimeUnit().toMillis(cacheAnnoConfig.getExpire()));
+            cacheBuilder.expireAfterWrite(cacheAnnoConfig.getExpire(), cacheAnnoConfig.getTimeUnit());
         }
         if (cacheBuilder.getConfig().getKeyPrefix() != null) {
             cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + cacheName);
@@ -169,7 +169,7 @@ public class CacheContext {
             cacheBuilder.setLimit(cacheAnnoConfig.getLocalLimit());
         }
         if (cacheAnnoConfig.getExpire() > 0) {
-            cacheBuilder.setExpireAfterWriteInMillis(cacheAnnoConfig.getTimeUnit().toMillis(cacheAnnoConfig.getExpire()));
+            cacheBuilder.expireAfterWrite(cacheAnnoConfig.getExpire(), cacheAnnoConfig.getTimeUnit());
         }
         if (!CacheConsts.UNDEFINED_STRING.equals(cacheAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cacheAnnoConfig.getKeyConvertor()));

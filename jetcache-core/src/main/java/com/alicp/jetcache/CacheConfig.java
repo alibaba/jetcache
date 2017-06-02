@@ -15,7 +15,7 @@ public class CacheConfig<K, V> implements Cloneable {
     //    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
 //    private boolean expireAfterAccess = false;
     private long expireAfterWriteInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
-    private long expireAfterAccessInMillis = -1;
+    private long expireAfterAccessInMillis = 0;
     private Function<K, Object> keyConvertor;
 
     private CacheLoader<K, V> loader;

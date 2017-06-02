@@ -37,8 +37,8 @@ public class MultiGetResult<K, V> extends CacheResult {
     }
 
     @Override
-    protected void fetchResultFail() {
-        super.fetchResultFail();
+    protected void fetchResultFail(Throwable e) {
+        super.fetchResultFail(e);
         values = null;
     }
 

@@ -47,7 +47,7 @@ public class CacheResult {
             ResultData resultData = future.toCompletableFuture().get();
             fetchResultSuccess(resultData);
         } catch (InterruptedException | ExecutionException e) {
-            fetchResultFail();
+            fetchResultFail(e);
         }
     }
 
@@ -56,9 +56,9 @@ public class CacheResult {
         message = resultData.getMessage();
     }
 
-    protected void fetchResultFail() {
+    protected void fetchResultFail(Throwable e) {
         resultCode = CacheResultCode.FAIL;
-        message = null;
+        message = e.getClass() + ":" + e.getMessage();
     }
 
     public CacheResultCode getResultCode() {

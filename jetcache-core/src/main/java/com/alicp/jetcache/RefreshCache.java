@@ -35,11 +35,8 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     @Override
     public void close() {
         List<RefreshTask> tasks = new ArrayList<>();
-        taskMap.values().forEach(task -> tasks.add(task));
-        tasks.forEach(task -> {
-            taskMap.remove(task.taskId);
-            task.future.cancel(false);
-        });
+        tasks.addAll(taskMap.values());
+        tasks.forEach(task -> task.cancel());
     }
 
 
@@ -75,7 +72,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     }
 
     private void addTaskOrUpdateLastAccessTime(Object taskId, long refreshMillis, K key) {
-        if (refreshMillis > 0) {
+        if (refreshMillis > 0 && taskId != null) {
             RefreshTask refreshTask = taskMap.computeIfAbsent(taskId, tid -> {
                 RefreshTask task = new RefreshTask(taskId, key);
                 task.lastAccessTime = System.currentTimeMillis();
