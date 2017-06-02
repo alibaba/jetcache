@@ -118,7 +118,7 @@ public class CacheContext {
             }
 
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
-                    .expireAfterWrite(cacheAnnoConfig.getExpire(), cacheAnnoConfig.getTimeUnit())
+                    .expireAfterWrite(local.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                     .addCache(local, remote)
                     .buildCache();
         }
