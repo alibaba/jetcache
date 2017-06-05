@@ -19,9 +19,9 @@ public class SpringTest implements ApplicationContextAware {
 
     protected ApplicationContext context;
 
-    protected void doTest() {
+    protected void doTest() throws Exception {
         Service service = (Service) context.getBean("service");
-        TestBean bean = (TestBean)context.getBean("testBean");
+        TestBean bean = (TestBean) context.getBean("testBean");
         testService(service, bean);
         testTestBean(bean);
 
@@ -29,7 +29,7 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertEquals(target.count(), target.count());
     }
 
-    private void testService(Service service, TestBean bean) {
+    private void testService(Service service, TestBean bean) throws Exception {
         Assert.assertNotEquals(service.notCachedCount(), service.notCachedCount());
         Assert.assertEquals(service.countWithAnnoOnClass(), service.countWithAnnoOnClass());
         Assert.assertEquals(service.countWithAnnoOnInterface(), service.countWithAnnoOnInterface());
@@ -38,7 +38,7 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertEquals(service.enableCacheWithAnnoOnInterface(bean), service.enableCacheWithAnnoOnInterface(bean));
     }
 
-    private void testTestBean(TestBean bean) {
+    private void testTestBean(TestBean bean) throws Exception {
         Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
         Assert.assertEquals(bean.staticCount(), bean.staticCount());
         Assert.assertEquals(bean.count(), bean.count());
@@ -46,6 +46,10 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertEquals(bean.countWithBoth(), bean.countWithBoth());
         Assert.assertNotEquals(bean.countWithDisabledCache(), bean.countWithDisabledCache());
 
+        int x = bean.countWithExpire50();
+        Assert.assertEquals(x, bean.countWithExpire50());
+        Thread.sleep(50);
+        Assert.assertNotEquals(x, bean.countWithExpire50());
 
         DynamicQuery q1 = new DynamicQuery();
         q1.setId(1000);
@@ -97,10 +101,10 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertNotEquals(bean.count(false), bean.count(false));
 
         Assert.assertNotEquals(bean.count(), bean.count1());
-        Assert.assertEquals(bean.namedCount1_WithNameN1(),bean.namedCount1_WithNameN1());
-        Assert.assertEquals(bean.namedCount1_WithNameN1(),bean.namedCount2_WithNameN1());
-        Assert.assertNotEquals(bean.namedCount1_WithNameN1(),bean.namedCount_WithNameN2());
-        Assert.assertEquals(bean.namedCount_WithNameN2(),bean.namedCount_WithNameN2());
+        Assert.assertEquals(bean.namedCount1_WithNameN1(), bean.namedCount1_WithNameN1());
+        Assert.assertEquals(bean.namedCount1_WithNameN1(), bean.namedCount2_WithNameN1());
+        Assert.assertNotEquals(bean.namedCount1_WithNameN1(), bean.namedCount_WithNameN2());
+        Assert.assertEquals(bean.namedCount_WithNameN2(), bean.namedCount_WithNameN2());
     }
 
     @Override

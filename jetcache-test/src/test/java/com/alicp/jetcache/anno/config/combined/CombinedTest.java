@@ -18,14 +18,14 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class CombinedTest extends SpringTest {
     @Test
-    public void test() {
+    public void test() throws Exception {
         context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop2.xml");
         testImpl();
         context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop3.xml");
         testImpl();
     }
 
-    private void testImpl() {
+    private void testImpl() throws Exception {
         doTest();
 
         Service serviceDelegate = (Service) context.getBean("combinedServiceDelegate");

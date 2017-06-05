@@ -37,7 +37,7 @@ import javax.annotation.PostConstruct;
 public class RedisStarterTest extends SpringTest {
 
     @Test
-    public void tests() {
+    public void tests() throws Exception {
         System.setProperty("spring.profiles.active", "redis");
         context = SpringApplication.run(RedisStarterTest.class);
         doTest();

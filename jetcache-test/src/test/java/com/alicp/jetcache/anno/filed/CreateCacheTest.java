@@ -30,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/12/9.
@@ -41,7 +42,7 @@ import javax.annotation.PostConstruct;
 public class CreateCacheTest extends SpringTest {
 
     @Test
-    public void test() {
+    public void test() throws Exception {
         doTest();
     }
 
@@ -88,7 +89,7 @@ public class CreateCacheTest extends SpringTest {
             @CreateCache(name = "sameCacheName")
             private Cache cacheSameName2;
 
-            @CreateCache(area = "A1", name = "name1", expire = 5, cacheType = CacheType.BOTH, localLimit = 10, serialPolicy = SerialPolicy.JAVA, keyConvertor = KeyConvertor.NONE)
+            @CreateCache(area = "A1", name = "name1", expire = 50, timeUnit = TimeUnit.MILLISECONDS, cacheType = CacheType.BOTH, localLimit = 10, serialPolicy = SerialPolicy.JAVA, keyConvertor = KeyConvertor.NONE)
             private Cache cacheWithConfig;
 
             private Cache getTarget(Cache cache) {
@@ -120,6 +121,8 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cache1.config().getKeyConvertor());
 
                 Assert.assertTrue(getTarget(cacheWithConfig) instanceof MultiLevelCache);
+                Assert.assertEquals(50, cacheWithConfig.config().getExpireAfterWriteInMillis());
+
                 MultiLevelCache mc = (MultiLevelCache) getTarget(cacheWithConfig);
                 Cache localCache = getTarget(mc.caches()[0]);
                 Cache remoteCache = getTarget(mc.caches()[1]);
@@ -127,8 +130,8 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertTrue(remoteCache instanceof MockRemoteCache);
                 EmbeddedCacheConfig localConfig = (EmbeddedCacheConfig) localCache.config();
                 ExternalCacheConfig remoteConfig = (ExternalCacheConfig) remoteCache.config();
-                Assert.assertEquals(5000, localConfig.getExpireAfterWriteInMillis());
-                Assert.assertEquals(5000, remoteConfig.getExpireAfterWriteInMillis());
+                Assert.assertEquals(50, localConfig.getExpireAfterWriteInMillis());
+                Assert.assertEquals(50, remoteConfig.getExpireAfterWriteInMillis());
                 Assert.assertEquals(10, localConfig.getLimit());
                 Assert.assertSame(JavaValueEncoder.INSTANCE, remoteConfig.getValueEncoder());
                 Assert.assertSame(JavaValueDecoder.INSTANCE, remoteConfig.getValueDecoder());

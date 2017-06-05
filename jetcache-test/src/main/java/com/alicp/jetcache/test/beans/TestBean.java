@@ -9,6 +9,8 @@ import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
  */
@@ -32,6 +34,11 @@ public class TestBean {
 
     @Cached
     public int count() {
+        return count++;
+    }
+
+    @Cached(expire = 50, cacheType = CacheType.LOCAL, timeUnit = TimeUnit.MILLISECONDS)
+    public int countWithExpire50() {
         return count++;
     }
 

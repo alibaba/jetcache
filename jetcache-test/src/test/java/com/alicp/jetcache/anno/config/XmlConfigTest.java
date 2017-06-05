@@ -13,7 +13,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class XmlConfigTest extends SpringTest {
 
     @Test
-    public void test3_X() {
+    public void test3_X() throws Exception {
         context = new ClassPathXmlApplicationContext("beans3.0.xml");
         doTest();
     }

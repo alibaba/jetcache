@@ -22,7 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = AnnoConfigTest.A.class)
 public class AnnoConfigTest extends SpringTest {
     @Test
-    public void test() {
+    public void test() throws Exception {
         doTest();
     }
 
