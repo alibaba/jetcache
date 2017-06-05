@@ -115,8 +115,8 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
         long x = h1.getExpireTime() - h2.getExpireTime();
         if (Math.abs(x) > 10) {
-            System.out.println(h1.getCreateTime() + "," + h1.getExpireTime() + "," + ((CacheValueHolder) h1.getValue()).getCreateTime() + "," + ((CacheValueHolder) h1.getValue()).getExpireTime());
-            System.out.println(h2.getCreateTime() + "," + h2.getExpireTime() + "," + ((CacheValueHolder) h2.getValue()).getCreateTime() + "," + ((CacheValueHolder) h2.getValue()).getExpireTime());
+            System.out.println(h1.getExpireTime() + ","  + ((CacheValueHolder) h1.getValue()).getExpireTime());
+            System.out.println(h2.getExpireTime() + "," + ((CacheValueHolder) h2.getValue()).getExpireTime());
             Assert.fail();
         }
     }

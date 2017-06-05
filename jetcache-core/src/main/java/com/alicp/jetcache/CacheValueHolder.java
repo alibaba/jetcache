@@ -10,7 +10,6 @@ import java.io.Serializable;
 public final class CacheValueHolder<V> implements Serializable {
     private static final long serialVersionUID = -7973743507831565203L;
     private V value;
-    private long createTime;
     private long expireTime;
     private long accessTime;
 
@@ -22,9 +21,8 @@ public final class CacheValueHolder<V> implements Serializable {
 
     public CacheValueHolder(V value, long expireAfterWrite) {
         this.value = value;
-        this.createTime = System.currentTimeMillis();
-        this.accessTime = createTime;
-        this.expireTime = createTime + expireAfterWrite;
+        this.accessTime = System.currentTimeMillis();
+        this.expireTime = accessTime + expireAfterWrite;
     }
 
     public V getValue() {
@@ -33,14 +31,6 @@ public final class CacheValueHolder<V> implements Serializable {
 
     public void setValue(V value) {
         this.value = value;
-    }
-
-    public long getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
     }
 
     public long getExpireTime() {
