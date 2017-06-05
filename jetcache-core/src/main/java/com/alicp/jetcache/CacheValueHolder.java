@@ -11,8 +11,6 @@ public final class CacheValueHolder<V> implements Serializable {
     private static final long serialVersionUID = -7973743507831565203L;
     private V value;
     private long createTime;
-    @Deprecated
-    private long initTtlInMillis;
     private long expireTime;
     private long accessTime;
 
@@ -43,16 +41,6 @@ public final class CacheValueHolder<V> implements Serializable {
 
     public void setCreateTime(long createTime) {
         this.createTime = createTime;
-    }
-
-    @Deprecated
-    public long getInitTtlInMillis() {
-        return initTtlInMillis;
-    }
-
-    @Deprecated
-    public void setInitTtlInMillis(long initTtlInMillis) {
-        this.initTtlInMillis = initTtlInMillis;
     }
 
     public long getExpireTime() {
