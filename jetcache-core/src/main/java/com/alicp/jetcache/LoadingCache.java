@@ -33,7 +33,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
     }
 
     @Override
-    public V get(K key) {
+    public V get(K key) throws CacheInvokeException {
         CacheLoader<K, V> loader = config.getLoader();
         if (loader != null) {
             if (eventConsumer != null) {
@@ -60,7 +60,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
     }
 
     @Override
-    public Map<K, V> getAll(Set<? extends K> keys) {
+    public Map<K, V> getAll(Set<? extends K> keys) throws CacheInvokeException {
         CacheLoader<K, V> loader = config.getLoader();
         if (loader != null) {
             if (eventConsumer != null) {
