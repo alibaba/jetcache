@@ -182,7 +182,18 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        throw new UnsupportedOperationException("unwrap is not supported by MultiLevelCache");
+        Objects.requireNonNull(clazz);
+        for (Cache cache : caches) {
+            try {
+                T obj = (T) cache.unwrap(clazz);
+                if (obj != null) {
+                    return obj;
+                }
+            } catch (IllegalArgumentException e) {
+                // ignore
+            }
+        }
+        throw new IllegalArgumentException(clazz.getName());
     }
 
     @Override

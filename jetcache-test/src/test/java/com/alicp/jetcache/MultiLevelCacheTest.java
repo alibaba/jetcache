@@ -39,6 +39,14 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     }
 
     @Test
+    public void testUnwrap() {
+        initL1L2(100);
+        cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
+        Assert.assertTrue(cache.unwrap(LinkedHashMap.class) instanceof LinkedHashMap);
+        Assert.assertTrue(cache.unwrap(com.github.benmanes.caffeine.cache.Cache.class) instanceof com.github.benmanes.caffeine.cache.Cache);
+    }
+
+    @Test
     public void test() throws Exception {
         initL1L2(200);
         cache = new MultiLevelCache(l1Cache, l2Cache);
