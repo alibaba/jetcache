@@ -1,3 +1,6 @@
+* 2.2.0.Beta2 (2017-06-08)
+    ** MultiLevelCache now supports unwrap method
+    ** optimise RefreshCache
 * 2.2.0.Beta1 (2017-06-05)
     ** support redis luttece client
     ** introduce asynchronous cache API (when using luttece)
