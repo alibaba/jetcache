@@ -172,7 +172,7 @@ public interface Cache<K, V> extends Closeable {
      * <p>{@link MultiLevelCache} will use the last level cache to support this operation.</p>
      * examples:
      * <pre>
-     * cache.tryLock("MyKey",100, TimeUnit.SECONDS),() -> {
+     * cache.tryLock("MyKey",100, TimeUnit.SECONDS),() -&gt; {
      *     //do something
      * });
      * </pre>

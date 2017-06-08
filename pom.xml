@@ -62,6 +62,27 @@
                     <check />
                 </configuration>
             </plugin>
+            <plugin>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.4</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <show>public</show>
+                    <charset>UTF-8</charset>
+                    <encoding>UTF-8</encoding>
+                    <docencoding>UTF-8</docencoding>
+                    <links>
+                        <link>http://docs.oracle.com/javase/8/docs/api</link>
+                    </links>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <modules>
@@ -215,27 +236,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.10.4</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadoc</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <show>public</show>
-                            <charset>UTF-8</charset>
-                            <encoding>UTF-8</encoding>
-                            <docencoding>UTF-8</docencoding>
-                            <links>
-                                <link>http://docs.oracle.com/javase/8/docs/api</link>
-                            </links>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
