@@ -28,8 +28,20 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private ConcurrentHashMap<Object, RefreshTask> taskMap = new ConcurrentHashMap<>();
 
+    private Method tryLockAndRunMethod;
+    private Method getMethod;
+    private Method putMethod;
+
     public RefreshCache(Cache cache) {
         super(cache);
+        try {
+            tryLockAndRunMethod = cache.getClass().getMethod("tryLockAndRun",
+                    Object.class, long.class, TimeUnit.class, Runnable.class);
+            getMethod = cache.getClass().getMethod("get", Object.class);
+            putMethod = cache.getClass().getMethod("put", Object.class, Object.class);
+        } catch (NoSuchMethodException e) {
+            throw new CacheException(e);
+        }
     }
 
     @Override
@@ -44,7 +56,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         return config.getLoader() != null;
     }
 
-    private Cache concreteCache() {
+    Cache concreteCache() {
         Cache c = getTargetCache();
         while (true) {
             if (c instanceof ProxyCache) {
@@ -125,6 +137,9 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
         private void load() {
             try {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("refresh {}", key);
+                }
                 CacheLoader<K, V> loader = config.getLoader();
                 loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
                 V v = loader.load(key);
@@ -145,22 +160,30 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 long stopRefreshAfterLastAccessMillis = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
                 if (stopRefreshAfterLastAccessMillis > 0) {
                     if (lastAccessTime + stopRefreshAfterLastAccessMillis < now) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("cancel refresh: {}", key);
+                        }
                         cancel();
                         return;
                     }
                 }
                 Cache c = concreteCache();
                 if (c instanceof AbstractExternalCache) {
-                    final byte[] suffix = "_#RL#".getBytes();
                     byte[] newKey = ((AbstractExternalCache) c).buildKey(key);
-                    byte[] lockKey = Arrays.copyOf(newKey, newKey.length + suffix.length);
-                    System.arraycopy(suffix, 0, lockKey, newKey.length, suffix.length);
+                    long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
+                    byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
+                    // AbstractExternalCache buildKey method will not convert byte[]
+                    String refreshTime = (String) getMethod.invoke(cache, timestampKey);
+                    if (refreshTime != null && (now < Long.parseLong(refreshTime) + refreshMillis)) {
+                        return;
+                    }
+
+                    byte[] lockKey = combine(newKey, "_#RL#".getBytes());
                     long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
-                    Method method = cache.getClass().getMethod("tryLockAndRun",
-                            Object.class, long.class, TimeUnit.class, Runnable.class);
                     Runnable r = this::load;
                     // AbstractExternalCache buildKey method will not convert byte[]
-                    method.invoke(cache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
+                    tryLockAndRunMethod.invoke(cache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
+                    putMethod.invoke(cache, timestampKey, String.valueOf(System.currentTimeMillis()));
                 } else {
                     load();
                 }
@@ -170,5 +193,11 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 logger.error("load key error: key=" + key, e);
             }
         }
+    }
+
+    private byte[] combine(byte[] bs1, byte[] bs2) {
+        byte[] newArray = Arrays.copyOf(bs1, bs1.length + bs2.length);
+        System.arraycopy(bs2, 0, newArray, bs1.length, bs2.length);
+        return newArray;
     }
 }

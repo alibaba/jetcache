@@ -58,7 +58,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS)
+                .expireAfterWrite(500, TimeUnit.MILLISECONDS)
                 .buildCache();
         baseTest();
         fastjsonKeyCoverterTest();
@@ -69,15 +69,13 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
-                .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS), 0);
+                .keyPrefix(new Random().nextInt() + ""), 0);
         RefreshCacheTest.refreshCacheTest(RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
-                .keyPrefix(new Random().nextInt() + "")
-                .expireAfterWrite(200, TimeUnit.MILLISECONDS), 100, 50);
+                .keyPrefix(new Random().nextInt() + ""), 200, 100);
 
 
         cache = RedisCacheBuilder.createRedisCacheBuilder()
