@@ -12,6 +12,8 @@ It simplifies cache operation with these key features:
 * detailed stat of each cache area
 * consistent API
 * Spring Boot support
+* auto refresh cache (2.2+)
+* asynchronous API (2.2+)
 
 NOTICE: the Alibaba Tair support is not open source.
 
@@ -64,10 +66,13 @@ App class:
 @EnableMethodCache(basePackages = "com.company.mypackage")
 @EnableCreateCacheAnnotation
 public class MySpringBootApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MySpringBootApp.class);
+    }
 }
 ```
 
-yml config:
+spring boot application.yml config:
 ```yaml
 jetcache:
   statIntervalMinutes: 15
