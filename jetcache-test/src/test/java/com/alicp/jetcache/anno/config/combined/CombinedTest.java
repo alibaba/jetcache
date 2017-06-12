@@ -19,8 +19,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class CombinedTest extends SpringTest {
     @Test
     public void test() {
-        context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop2.xml");
-        testImpl();
+//        context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop2.xml");
+//        testImpl();
         context = new ClassPathXmlApplicationContext("combined/combined.xml", "combined/combined-aop1.xml", "combined/combined-aop3.xml");
         testImpl();
     }
