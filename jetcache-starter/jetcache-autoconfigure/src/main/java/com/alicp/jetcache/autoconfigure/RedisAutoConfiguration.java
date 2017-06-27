@@ -24,7 +24,7 @@ import java.util.Objects;
 /**
  * Created on 2016/11/25.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
 @Conditional(RedisAutoConfiguration.RedisCondition.class)

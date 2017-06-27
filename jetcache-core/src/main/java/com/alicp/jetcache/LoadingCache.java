@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * Created on 2017/5/17.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 

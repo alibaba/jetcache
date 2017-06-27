@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2017/2/28.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 class Cleaner {
 

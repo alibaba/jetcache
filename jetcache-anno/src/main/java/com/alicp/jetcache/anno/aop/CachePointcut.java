@@ -17,7 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 

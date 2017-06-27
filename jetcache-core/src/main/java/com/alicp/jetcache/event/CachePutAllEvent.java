@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Created on 2017/2/22.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CachePutAllEvent extends CacheEvent {
     private final long millis;

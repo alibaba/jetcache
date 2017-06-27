@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * Created on 2016/12/30.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ExternalKeyUtil {
     public static byte[] buildKeyAfterConvert(Object newKey, String prefix) throws IOException {

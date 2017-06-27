@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Created on 2017/5/10.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
 @Conditional(RedisLutteceAutoConfiguration.RedisLutteceCondition.class)

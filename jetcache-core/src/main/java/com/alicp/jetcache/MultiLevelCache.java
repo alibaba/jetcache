@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 16/9/13.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 

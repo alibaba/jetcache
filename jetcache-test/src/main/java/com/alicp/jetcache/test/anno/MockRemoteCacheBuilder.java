@@ -6,7 +6,7 @@ import com.alicp.jetcache.external.ExternalCacheConfig;
 /**
  * Created on 2016/10/20.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class MockRemoteCacheBuilder extends ExternalCacheBuilder {
     public MockRemoteCacheBuilder() {

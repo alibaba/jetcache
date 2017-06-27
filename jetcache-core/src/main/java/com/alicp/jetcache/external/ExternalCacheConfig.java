@@ -9,7 +9,7 @@ import java.util.function.Function;
 /**
  * Created on 16/9/9.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
     private String keyPrefix;

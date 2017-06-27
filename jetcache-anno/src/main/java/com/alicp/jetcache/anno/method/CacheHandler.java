@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.function.Supplier;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheHandler implements InvocationHandler {
     private static Logger logger = LoggerFactory.getLogger(CacheHandler.class);

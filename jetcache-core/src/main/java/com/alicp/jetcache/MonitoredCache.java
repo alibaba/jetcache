@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Created on 2016/10/27.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Deprecated
 public class MonitoredCache<K, V> extends SimpleProxyCache<K, V> {

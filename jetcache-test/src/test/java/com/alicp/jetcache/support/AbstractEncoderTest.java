@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * Created on 2016/10/8.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class AbstractEncoderTest {
 

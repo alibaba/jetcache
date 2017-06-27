@@ -4,7 +4,7 @@
 package com.alicp.jetcache;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheException extends RuntimeException {
     private static final long serialVersionUID = -9066209768410752667L;

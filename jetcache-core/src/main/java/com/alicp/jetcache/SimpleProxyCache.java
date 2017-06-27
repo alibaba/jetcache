@@ -8,7 +8,7 @@ import java.util.function.Function;
 /**
  * Created on 2017/5/17.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class SimpleProxyCache<K, V> implements ProxyCache<K, V> {
 

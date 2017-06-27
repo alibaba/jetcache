@@ -6,7 +6,7 @@ package com.alicp.jetcache.test.beans;
 import org.springframework.stereotype.Component;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Component
 public class ConfigBean {

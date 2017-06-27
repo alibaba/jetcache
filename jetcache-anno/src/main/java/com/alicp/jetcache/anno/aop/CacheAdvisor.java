@@ -9,7 +9,7 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 

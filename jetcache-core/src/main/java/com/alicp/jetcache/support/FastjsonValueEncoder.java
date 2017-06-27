@@ -6,7 +6,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 /**
  * Created on 2016/10/3.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Deprecated
 public class FastjsonValueEncoder extends AbstractValueEncoder {

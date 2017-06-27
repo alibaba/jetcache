@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Created on 2016/12/6.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class StatInfoLogger implements Consumer<StatInfo> {
 

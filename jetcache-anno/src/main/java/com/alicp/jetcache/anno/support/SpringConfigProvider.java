@@ -8,7 +8,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * Created on 2016/12/1.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class SpringConfigProvider extends ConfigProvider implements ApplicationContextAware {
     private ApplicationContext applicationContext;

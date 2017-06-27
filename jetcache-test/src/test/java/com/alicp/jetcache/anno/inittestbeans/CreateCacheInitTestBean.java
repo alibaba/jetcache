@@ -7,7 +7,7 @@ import org.junit.Assert;
 /**
  * Created on 2017/5/5.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CreateCacheInitTestBean {
     @CreateCache

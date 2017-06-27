@@ -7,7 +7,7 @@ import org.aspectj.lang.annotation.Before;
 /**
  * Created on 2017/2/15.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Aspect
 public class AspectJAspect {

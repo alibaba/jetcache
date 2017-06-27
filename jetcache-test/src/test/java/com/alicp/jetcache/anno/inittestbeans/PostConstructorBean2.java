@@ -7,7 +7,7 @@ import javax.annotation.PostConstruct;
 /**
  * Created on 2017/5/4.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Component
 public class PostConstructorBean2 extends CreateCacheInitTestBean {

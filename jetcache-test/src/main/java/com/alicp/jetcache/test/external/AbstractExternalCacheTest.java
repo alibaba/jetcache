@@ -8,7 +8,7 @@ import org.junit.Assert;
 /**
  * Created on 2016/12/30.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class AbstractExternalCacheTest extends AbstractCacheTest {
     protected void nullKeyConvertorTest() {

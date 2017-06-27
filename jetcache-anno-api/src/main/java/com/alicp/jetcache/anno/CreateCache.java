@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/12/9.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

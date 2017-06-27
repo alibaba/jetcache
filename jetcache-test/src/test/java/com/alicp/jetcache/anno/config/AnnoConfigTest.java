@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * Created on 2016/11/16.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = AnnoConfigTest.A.class)

@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created on 2017/5/3.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class JetCacheExecutor {
     protected static ScheduledExecutorService defaultExecutor;

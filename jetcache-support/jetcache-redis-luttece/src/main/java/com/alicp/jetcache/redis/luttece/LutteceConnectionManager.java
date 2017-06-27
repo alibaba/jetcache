@@ -18,7 +18,7 @@ import java.util.WeakHashMap;
 /**
  * Created on 2017/4/28.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class LutteceConnectionManager {
 

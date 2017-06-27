@@ -6,7 +6,7 @@ package com.alicp.jetcache.testsupport;
 import com.alicp.jetcache.test.support.DynamicQuery;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public interface Count {
     int count();

@@ -18,7 +18,7 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CachePointCutTest {
     private CachePointcut pc;

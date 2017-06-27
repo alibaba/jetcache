@@ -8,7 +8,7 @@ import java.util.concurrent.CompletionStage;
 /**
  * Created on 2017/2/21.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class MultiGetResult<K, V> extends CacheResult {
     private Map<K, CacheGetResult<V>> values;

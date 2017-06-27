@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno.method;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheInvokeConfig {
     private CacheAnnoConfig cacheAnnoConfig;

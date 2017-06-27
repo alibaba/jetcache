@@ -20,7 +20,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ProxyUtilTest {
 

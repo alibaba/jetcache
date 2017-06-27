@@ -10,7 +10,7 @@ import javax.annotation.PreDestroy;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class GlobalCacheConfig {
 

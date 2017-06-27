@@ -3,7 +3,7 @@ package com.alicp.jetcache;
 /**
  * Created on 2017/5/2.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ResultData {
     private CacheResultCode resultCode;

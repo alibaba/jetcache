@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.support;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 class CacheThreadLocal {
 

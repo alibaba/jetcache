@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * Created on 2016/11/29.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ConfigProvider {
 

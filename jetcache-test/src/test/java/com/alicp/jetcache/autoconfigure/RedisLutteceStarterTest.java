@@ -33,7 +33,7 @@ import javax.annotation.PostConstruct;
 /**
  * Created on 2017/05/11.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
 @EnableAutoConfiguration

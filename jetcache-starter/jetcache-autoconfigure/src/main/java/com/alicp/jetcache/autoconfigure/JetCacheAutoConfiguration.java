@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 /**
  * Created on 2016/11/17.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
 @ConditionalOnClass(GlobalCacheConfig.class)

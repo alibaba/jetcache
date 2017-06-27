@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * Created on 2017/5/9.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class JetCacheCodecTest {
     @Test

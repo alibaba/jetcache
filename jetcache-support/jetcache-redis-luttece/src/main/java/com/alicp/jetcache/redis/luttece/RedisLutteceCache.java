@@ -24,7 +24,7 @@ import java.util.function.Function;
 /**
  * Created on 2017/4/28.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
 

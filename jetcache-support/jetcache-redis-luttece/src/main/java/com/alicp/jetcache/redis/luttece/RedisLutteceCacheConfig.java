@@ -6,7 +6,7 @@ import com.lambdaworks.redis.AbstractRedisClient;
 /**
  * Created on 2017/4/28.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RedisLutteceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 

@@ -13,7 +13,7 @@ import org.springframework.context.ApplicationContextAware;
 /**
  * Created on 2016/11/23.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class SpringTest implements ApplicationContextAware {
 

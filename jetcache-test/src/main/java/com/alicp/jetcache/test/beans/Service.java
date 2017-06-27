@@ -7,7 +7,7 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public interface Service {
 

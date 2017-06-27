@@ -10,7 +10,7 @@ import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import java.lang.reflect.Method;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheConfigUtil {
     private static CacheAnnoConfig parseCacheConfig(Method m) {

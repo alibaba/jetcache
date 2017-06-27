@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno.config;
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheNamespaceHandler extends NamespaceHandlerSupport {
 

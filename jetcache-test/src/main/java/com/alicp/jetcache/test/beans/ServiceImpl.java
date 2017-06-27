@@ -8,7 +8,7 @@ import com.alicp.jetcache.anno.EnableCache;
 import org.springframework.stereotype.Component;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Component("service")
 public class ServiceImpl implements Service {

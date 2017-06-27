@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheAnnotationParser implements BeanDefinitionParser {
 

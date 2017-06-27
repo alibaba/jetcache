@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Created on 2016/10/31.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class DefaultCacheMonitorManager {
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorManager.class);

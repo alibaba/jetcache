@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created on 16/9/13.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public final class CacheValueHolder<V> implements Serializable {
     private static final long serialVersionUID = -7973743507831565203L;

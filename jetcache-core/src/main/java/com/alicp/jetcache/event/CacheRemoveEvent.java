@@ -6,7 +6,7 @@ import com.alicp.jetcache.CacheResult;
 /**
  * Created on 2017/2/22.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheRemoveEvent extends CacheEvent {
 

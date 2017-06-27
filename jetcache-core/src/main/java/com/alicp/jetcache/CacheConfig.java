@@ -9,7 +9,7 @@ import java.util.function.Function;
 /**
  * Created on 16/9/7.
  *
- * @author <a href="mailto:yeli.hl@taobao.com">huangli</a>
+ * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheConfig<K, V> implements Cloneable {
     //    private long defaultExpireInMillis = CacheConsts.DEFAULT_EXPIRE * 1000L;
