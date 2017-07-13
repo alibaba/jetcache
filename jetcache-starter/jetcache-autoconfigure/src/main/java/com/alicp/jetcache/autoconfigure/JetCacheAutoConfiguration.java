@@ -44,7 +44,7 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean
-    public BeanDependencyManager beanDependencyManager(){
+    public static BeanDependencyManager beanDependencyManager(){
         return new BeanDependencyManager();
     }
 
