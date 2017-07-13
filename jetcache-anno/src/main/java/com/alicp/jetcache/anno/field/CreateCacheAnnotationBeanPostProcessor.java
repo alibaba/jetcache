@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  */
-@Component
 public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor {
 
     private static Logger logger = LoggerFactory.getLogger(CreateCacheAnnotationBeanPostProcessor.class);
