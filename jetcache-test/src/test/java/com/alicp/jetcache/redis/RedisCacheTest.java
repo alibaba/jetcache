@@ -6,6 +6,7 @@ import com.alicp.jetcache.RefreshCacheTest;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.junit.Assert;
 import org.junit.Test;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -60,6 +61,14 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .expireAfterWrite(500, TimeUnit.MILLISECONDS)
                 .buildCache();
+
+        Assert.assertSame(pool, cache.unwrap(Pool.class));
+        if(pool instanceof JedisPool){
+            Assert.assertSame(pool, cache.unwrap(JedisPool.class));
+        } else {
+            Assert.assertSame(pool, cache.unwrap(JedisSentinelPool.class));
+        }
+
         baseTest();
         fastjsonKeyCoverterTest();
         expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
