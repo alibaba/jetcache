@@ -4,10 +4,7 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
+import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
 
@@ -52,7 +49,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
+        if (clazz.equals(Pool.class)) {
+            return (T) pool;
+        }
         if (clazz.equals(JedisPool.class)) {
+            return (T) pool;
+        }
+        if (clazz.equals(JedisSentinelPool.class)) {
             return (T) pool;
         }
         throw new IllegalArgumentException(clazz.getName());
