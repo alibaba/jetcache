@@ -8,12 +8,5 @@ before_install:
   - docker pull areyouok/redis-cluster
   - docker run -d -p 6379-6381:6379-6381 -p 26379-26381:26379-26381 areyouok/redis-sentinel
   - docker run -d --net=host areyouok/redis-cluster
-#services:
-#  - redis-server
-#script: "mvn cobertura:cobertura"
-#after_success:
-#  - bash <(curl -s https://codecov.io/bash)
-#before_install:
-#  - pip install --user codecov
-#after_success:
-#  - codecov
+after_success:
+  - mvn -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report
