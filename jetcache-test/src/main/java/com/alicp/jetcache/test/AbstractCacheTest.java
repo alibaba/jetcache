@@ -66,6 +66,12 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals(CacheResultCode.FAIL, cache.PUT(null, "V1", 1, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT(null, "V1", 1, TimeUnit.SECONDS).getMessage());
 
+        Assert.assertEquals(CacheResultCode.FAIL, cache.PUT_ALL(null).getResultCode());
+        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_ALL(null).getMessage());
+
+        Assert.assertEquals(CacheResultCode.FAIL, cache.PUT_ALL(null, 1, TimeUnit.SECONDS).getResultCode());
+        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_ALL(null, 1, TimeUnit.SECONDS).getMessage());
+
         try {
             Assert.assertFalse(cache.putIfAbsent(null, "V1"));
             Assert.assertEquals(CacheResultCode.FAIL, cache.PUT_IF_ABSENT(null, "V1", 1, TimeUnit.SECONDS).getResultCode());
