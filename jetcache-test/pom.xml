@@ -16,17 +16,27 @@
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-anno-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-anno</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-redis</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-redis-luttece</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-anno</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -80,4 +90,21 @@
         </dependency>
         -->
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>report-aggregate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report-aggregate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
