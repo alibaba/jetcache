@@ -60,16 +60,22 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        return null;
+        throw new IllegalArgumentException();
     }
 
     @Override
     public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return null;
+        }
         return cache.tryLock(genKey(key), expire, timeUnit);
     }
 
     @Override
     protected CacheGetResult<V> do_GET(K key) {
+        if (key == null) {
+            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         CacheGetResult r = cache.GET(genKey(key));
         if (r.isSuccess()) {
             V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
@@ -80,6 +86,9 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
+        }
         ArrayList<K> keyList = new ArrayList<>(keys.size());
         ArrayList<ByteBuffer> newKeyList = new ArrayList<>(keys.size());
         keys.stream().forEach((k) -> {
@@ -108,11 +117,17 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return cache.PUT(genKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
     }
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+        if (map == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         Map<ByteBuffer, byte[]> newMap = new HashMap<>();
         map.entrySet().forEach((e) -> newMap.put(genKey(e.getKey()), config.getValueEncoder().apply(e.getValue())));
         return cache.PUT_ALL(newMap, expireAfterWrite, timeUnit);
@@ -120,16 +135,25 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE(K key) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return cache.REMOVE(genKey(key));
     }
 
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
+        if (keys == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return cache.REMOVE_ALL(keys.stream().map((k) -> genKey(k)).collect(Collectors.toSet()));
     }
 
     @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
         return cache.PUT_IF_ABSENT(genKey(key), config.getValueEncoder().apply(value), expireAfterWrite, timeUnit);
     }
 }
