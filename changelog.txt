@@ -1,3 +1,7 @@
+* 2.2.0 (2017-09-01)
+    ** unwrap method in class RedisCache now work with parameter Pool.class and RedisSentinelPool.class
+    ** add direct jedis dependency for jetcache-starter-redis
+    ** coverage tools integration
 * 2.1.7 (2017-06-12)
     ** declare beanDependencyManager bean in static way to eliminate warning log during startup
 * 2.2.0.Beta4 (2017-06-12)
