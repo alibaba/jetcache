@@ -17,11 +17,9 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @SuppressWarnings("unchecked")
     @Deprecated
-    public MultiLevelCache(Cache... caches) {
+    public MultiLevelCache(Cache... caches) throws CacheConfigException {
         this.caches = caches;
-        if (caches == null || caches.length == 0) {
-            throw new IllegalArgumentException();
-        }
+        checkCaches();
         CacheConfig lastConfig = caches[caches.length - 1].config();
         config = new MultiLevelCacheConfig<>();
         config.setCaches(Arrays.asList(caches));
@@ -30,11 +28,20 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    public MultiLevelCache(MultiLevelCacheConfig<K, V> cacheConfig) {
+    public MultiLevelCache(MultiLevelCacheConfig<K, V> cacheConfig) throws CacheConfigException {
         this.config = cacheConfig;
         this.caches = cacheConfig.getCaches().toArray(new Cache[]{});
+        checkCaches();
+    }
+
+    private void checkCaches() {
         if (caches == null || caches.length == 0) {
             throw new IllegalArgumentException();
+        }
+        for (Cache c : caches) {
+            if (c.config().getLoader() != null) {
+                throw new CacheConfigException("Loader on sub cache is not allowed, set the loader into MultiLevelCache.");
+            }
         }
     }
 

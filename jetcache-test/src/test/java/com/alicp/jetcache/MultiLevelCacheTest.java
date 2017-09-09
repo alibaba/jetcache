@@ -39,6 +39,34 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     }
 
     @Test
+    public void testConstructor() {
+        try{
+            cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().buildCache();
+            Assert.fail();
+        } catch (IllegalArgumentException e){
+        }
+        try{
+            new MultiLevelCache(new Cache[0]);
+            Assert.fail();
+        } catch (IllegalArgumentException e){
+        }
+
+        initL1L2(100);
+        l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
+                .limit(10)
+                .expireAfterWrite(1000, TimeUnit.MILLISECONDS)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .loader(key -> null)
+                .buildCache();
+        try {
+            cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
+            Assert.fail();
+        } catch (CacheConfigException e) {
+        }
+    }
+
+
+    @Test
     public void testUnwrap() {
         initL1L2(100);
         cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
