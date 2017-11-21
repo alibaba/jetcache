@@ -4,16 +4,19 @@ jetcache:
   local:
     default:
       type: caffeine
+      keyConvertor: fastjson
       limit: 200
       defaultExpireInMillis: 10000
     A1:
       type: linkedhashmap
+      keyConvertor: fastjson
       limit: 100
       expireAfterAccess: true
       defaultExpireInMillis: 10000
   remote:
     default:
       type: redis
+      keyConvertor: fastjson
       poolConfig:
         minIdle: 2
         maxIdle: 5
@@ -24,6 +27,7 @@ jetcache:
       keyPrefix: jedisTest
     A1:
       type: redis
+      keyConvertor: fastjson
       poolConfig:
         minIdle: 2
         maxIdle: 5

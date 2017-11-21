@@ -64,7 +64,7 @@ public class SpringTest implements ApplicationContextAware {
         int x2 = bean.countLocalWithDynamicQuery(q2);
         int x3 = bean.countLocalWithDynamicQuery(q3);
         Assert.assertNotEquals(x1, x2);
-        Assert.assertNotEquals(x1, x3);
+        Assert.assertEquals(x1, x3);
 
         x1 = bean.countRemoteWithDynamicQuery(q1);
         x2 = bean.countRemoteWithDynamicQuery(q2);

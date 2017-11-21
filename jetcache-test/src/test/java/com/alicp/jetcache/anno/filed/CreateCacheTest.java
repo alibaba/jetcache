@@ -20,6 +20,8 @@ import com.alicp.jetcache.test.anno.MockRemoteCache;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
+import com.alicp.jetcache.test.support.DynamicQuery;
+import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -92,6 +94,9 @@ public class CreateCacheTest extends SpringTest {
             @CreateCache(area = "A1", name = "name1", expire = 50, timeUnit = TimeUnit.MILLISECONDS, cacheType = CacheType.BOTH, localLimit = 10, serialPolicy = SerialPolicy.JAVA, keyConvertor = KeyConvertor.NONE)
             private Cache cacheWithConfig;
 
+            @CreateCache(cacheType =CacheType.LOCAL, keyConvertor = KeyConvertor.NONE)
+            private Cache cacheWithoutConvertor;
+
             private Cache getTarget(Cache cache) {
                 while(cache instanceof ProxyCache){
                     cache = ((ProxyCache) cache).getTargetCache();
@@ -101,10 +106,7 @@ public class CreateCacheTest extends SpringTest {
 
             @PostConstruct
             public void test() throws Exception {
-                super.cache = this.cache1;
-                super.baseTest();
-                LoadingCacheTest.loadingCacheTest(cache1, 0);
-                RefreshCacheTest.refreshCacheTest(cache1, 200, 100);
+                runGeneralTest();
 
                 cache1.put("KK1", "V1");
                 Assert.assertNull(cache_A1.get("KK1"));
@@ -137,6 +139,43 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertSame(JavaValueDecoder.INSTANCE, remoteConfig.getValueDecoder());
                 Assert.assertNull(localConfig.getKeyConvertor());
                 Assert.assertNull(remoteConfig.getKeyConvertor());
+
+                cacheWithoutConvertorTest();
+            }
+
+            private void runGeneralTest() throws Exception {
+                super.cache = this.cache1;
+                super.baseTest();
+                LoadingCacheTest.loadingCacheTest(cache1, 0);
+                RefreshCacheTest.refreshCacheTest(cache1, 200, 100);
+            }
+
+            private void cacheWithoutConvertorTest() {
+                DynamicQuery q1 = new DynamicQuery();
+                q1.setId(1000);
+                q1.setName("N1");
+                DynamicQuery q2 = new DynamicQuery();
+                q2.setId(1000);
+                q2.setName("N2");
+                DynamicQuery q3 = new DynamicQuery();
+                q3.setId(1000);
+                q3.setName("N1");
+                cacheWithoutConvertor.put(q1, "V");
+                Assert.assertEquals(CacheResultCode.NOT_EXISTS, cacheWithoutConvertor.GET(q2).getResultCode());
+                Assert.assertEquals(CacheResultCode.NOT_EXISTS, cacheWithoutConvertor.GET(q3).getResultCode());
+
+                DynamicQueryWithEquals dqwe1 = new DynamicQueryWithEquals();
+                dqwe1.setId(1000);
+                dqwe1.setName("N1");
+                DynamicQueryWithEquals dqwe2 = new DynamicQueryWithEquals();
+                dqwe2.setId(1001);
+                dqwe2.setName("N2");
+                DynamicQueryWithEquals dqwe3 = new DynamicQueryWithEquals();
+                dqwe3.setId(1000);
+                dqwe3.setName("N1");
+                cacheWithoutConvertor.put(dqwe1, "V");
+                Assert.assertEquals(CacheResultCode.NOT_EXISTS, cacheWithoutConvertor.GET(dqwe2).getResultCode());
+                Assert.assertEquals(CacheResultCode.SUCCESS, cacheWithoutConvertor.GET(dqwe3).getResultCode());
             }
         }
     }

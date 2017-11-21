@@ -22,7 +22,7 @@ public class TestUtil {
     public static GlobalCacheConfig createGloableConfig(ConfigProvider configProvider) {
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder();
-//        localBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        localBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
         localBuilders.put("A1", localBuilder);
 
@@ -35,7 +35,7 @@ public class TestUtil {
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
         remoteBuilder = new MockRemoteCacheBuilder();
-//        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
         remoteBuilders.put("A1", remoteBuilder);

@@ -6,6 +6,7 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
@@ -62,7 +63,7 @@ public class RedisStarterTest extends SpringTest {
             Assert.assertEquals(200, cc1.getLimit());
             Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
             Assert.assertFalse(cc1.isExpireAfterAccess());
-            Assert.assertNull(cc1.getKeyConvertor());
+            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
         }
     }
 

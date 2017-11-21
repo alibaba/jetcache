@@ -48,7 +48,7 @@ public class ConfigTest implements ApplicationContextAware {
 
         {
             ExternalCacheConfig c = (ExternalCacheConfig) bean.defualtRemote.config();
-            Assert.assertNull(c.getKeyConvertor());
+            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
             Assert.assertSame(JavaValueEncoder.INSTANCE, c.getValueEncoder());
             Assert.assertSame(JavaValueDecoder.INSTANCE, c.getValueDecoder());
             Assert.assertFalse(c.isExpireAfterAccess());
@@ -68,7 +68,7 @@ public class ConfigTest implements ApplicationContextAware {
 
         {
             EmbeddedCacheConfig c = (EmbeddedCacheConfig) bean.defaultLocal.config();
-            Assert.assertNull(c.getKeyConvertor());
+            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
             Assert.assertEquals(20, c.getLimit());
             Assert.assertFalse(c.isExpireAfterAccess());
             Assert.assertEquals(50, c.getExpireAfterWriteInMillis());
@@ -109,7 +109,7 @@ public class ConfigTest implements ApplicationContextAware {
         public GlobalCacheConfig config(SpringConfigProvider configProvider) {
             Map localFactories = new HashMap();
             EmbeddedCacheBuilder localFactory = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                    .limit(20).keyConvertor(null).expireAfterWrite(50, TimeUnit.MILLISECONDS);
+                    .limit(20).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterWrite(50, TimeUnit.MILLISECONDS);
             EmbeddedCacheBuilder localFactory2 = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                     .limit(10).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterAccess(60, TimeUnit.MILLISECONDS);
             localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
@@ -120,6 +120,7 @@ public class ConfigTest implements ApplicationContextAware {
 
             MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
             remoteBuilder.setKeyConvertor(null);
+            remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
             remoteBuilder.setValueEncoder(JavaValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(JavaValueDecoder.INSTANCE);
             remoteBuilder.setExpireAfterWriteInMillis(90);

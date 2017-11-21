@@ -37,6 +37,8 @@ public class CacheHandlerTest {
     @Before
     public void setup() {
         globalCacheConfig = new GlobalCacheConfig();
+        globalCacheConfig.setLocalCacheBuilders(new HashMap<>());
+        globalCacheConfig.setRemoteCacheBuilders(new HashMap<>());
         globalCacheConfig.init();
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)

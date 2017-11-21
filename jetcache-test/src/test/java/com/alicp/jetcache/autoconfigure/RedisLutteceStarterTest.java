@@ -6,6 +6,7 @@ import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.redis.luttece.RedisLutteceCacheConfig;
 import com.alicp.jetcache.redis.luttece.RedisLutteceCacheTest;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import com.lambdaworks.redis.RedisClient;
@@ -86,7 +87,7 @@ public class RedisLutteceStarterTest extends SpringTest {
             Assert.assertNotNull(c1.unwrap(RedisClient.class));
             RedisLutteceCacheConfig cc1 = (RedisLutteceCacheConfig) c1.config();
             Assert.assertEquals(20000, cc1.getExpireAfterWriteInMillis());
-            Assert.assertNull(cc1.getKeyConvertor());
+            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
         }
     }
 
