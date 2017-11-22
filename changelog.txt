@@ -1,3 +1,11 @@
+* 2.2.1 (2017-11-22)
+    ** If sub cache has a loader, MultiLevelCache will throw a CacheConfigException during construction
+    ** Fix problems when spring boot version <= 1.2.X
+    ** Compatible with Spring Boot 2.0.0.M6
+    ** Update lettuce to 4.4.2 and fix misspell "lettuce" in configuration
+* 2.1.8 (2017-11-22)
+    ** Fix problems when spring boot version <= 1.2.X
+    ** unwrap method in class RedisCache now work with parameter Pool.class and RedisSentinelPool.class
 * 2.2.0 (2017-09-01)
     ** unwrap method in class RedisCache now work with parameter Pool.class and RedisSentinelPool.class
     ** add direct jedis dependency for jetcache-starter-redis
