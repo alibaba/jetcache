@@ -27,14 +27,15 @@ import java.util.stream.Collectors;
 @Conditional(RedisLutteceAutoConfiguration.RedisLutteceCondition.class)
 public class RedisLutteceAutoConfiguration {
     public static final String AUTO_INIT_BEAN_NAME = "redisLutteceAutoInit";
+    private static final String AUTO_INIT_BEAN_NAME2 = "redisLettuceAutoInit";
 
     public static class RedisLutteceCondition extends JetCacheConditon {
         public RedisLutteceCondition() {
-            super("redis.luttece");
+            super("redis.luttece", "redis.lettuce");
         }
     }
 
-    @Bean(name = AUTO_INIT_BEAN_NAME)
+    @Bean(name = {AUTO_INIT_BEAN_NAME, AUTO_INIT_BEAN_NAME2})
     public RedisLutteceAutoInit redisLutteceAutoInit() {
         return new RedisLutteceAutoInit();
     }
@@ -42,7 +43,7 @@ public class RedisLutteceAutoConfiguration {
     public static class RedisLutteceAutoInit extends ExternalCacheAutoInit {
 
         public RedisLutteceAutoInit() {
-            super("redis.luttece");
+            super("redis.luttece", "redis.lettuce");
         }
 
         @Override

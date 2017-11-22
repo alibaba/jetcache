@@ -10,8 +10,8 @@ import com.alicp.jetcache.external.ExternalCacheBuilder;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
-    public ExternalCacheAutoInit(String cacheType) {
-        super(cacheType);
+    public ExternalCacheAutoInit(String... cacheTypes) {
+        super(cacheTypes);
     }
 
     @Override

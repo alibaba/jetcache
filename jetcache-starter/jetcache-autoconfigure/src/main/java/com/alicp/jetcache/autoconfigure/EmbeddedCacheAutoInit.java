@@ -11,8 +11,8 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
  */
 public abstract class EmbeddedCacheAutoInit extends AbstractCacheAutoInit {
 
-    public EmbeddedCacheAutoInit(String typeName) {
-        super(typeName);
+    public EmbeddedCacheAutoInit(String... cacheTypes) {
+        super(cacheTypes);
     }
 
     @Override

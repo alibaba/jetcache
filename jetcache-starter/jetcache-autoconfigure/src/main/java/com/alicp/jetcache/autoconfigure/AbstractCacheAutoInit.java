@@ -7,9 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,12 +34,14 @@ public abstract class AbstractCacheAutoInit {
     @Autowired
     protected ConfigProvider configProvider;
 
-    protected String typeName;
+    protected String[] typeNames;
 
     private boolean inited = false;
 
-    public AbstractCacheAutoInit(String cacheType) {
-        this.typeName = cacheType;
+    public AbstractCacheAutoInit(String... cacheTypes) {
+        Objects.requireNonNull(cacheTypes,"cacheTypes can't be null");
+        Assert.isTrue(cacheTypes.length > 0, "cacheTypes length is 0");
+        this.typeNames = cacheTypes;
     }
 
     @PostConstruct
@@ -57,11 +62,13 @@ public abstract class AbstractCacheAutoInit {
         Map<String, Object> m = resolver.getProperties();
         Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
         for (String cacheArea : cacheAreaNames) {
-            if (!typeName.equals(m.get(cacheArea + ".type"))) {
+            final Object configType = m.get(cacheArea + ".type");
+            boolean match = Arrays.stream(typeNames).anyMatch((tn) -> tn.equals(configType));
+            if (!match) {
                 continue;
             }
             ConfigTree ct = resolver.subTree(cacheArea + ".");
-            logger.info("init cache area {} , type= {}", cacheArea, typeName);
+            logger.info("init cache area {} , type= {}", cacheArea, typeNames[0]);
             CacheBuilder c = initCache(ct, local ? "local." + cacheArea : "remote." + cacheArea);
             cacheBuilders.put(cacheArea, c);
         }
