@@ -2,8 +2,8 @@ package com.alicp.jetcache.autoconfigure;
 
 import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
 import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import java.util.Map;
@@ -25,17 +25,16 @@ public abstract class JetCacheConditon extends SpringBootCondition {
 
     @Override
     public ConditionOutcome getMatchOutcome(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-        RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(
-                conditionContext.getEnvironment(), "jetcache.");
-        if (match(resolver, "local.") || match(resolver, "remote.")) {
+        ConfigTree ct = new ConfigTree((ConfigurableEnvironment) conditionContext.getEnvironment(), "jetcache.");
+        if (match(ct, "local.") || match(ct, "remote.")) {
             return ConditionOutcome.match();
         } else {
             return ConditionOutcome.noMatch("no match " + cacheType);
         }
     }
 
-    private boolean match(RelaxedPropertyResolver resolver, String prefix) {
-        Map<String, Object> m = resolver.getSubProperties(prefix);
+    private boolean match(ConfigTree ct, String prefix) {
+        Map<String, Object> m = ct.subTree(prefix).getProperties();
         Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
         return cacheAreaNames.stream().anyMatch((s) -> cacheType.equals(m.get(s + ".type")));
     }

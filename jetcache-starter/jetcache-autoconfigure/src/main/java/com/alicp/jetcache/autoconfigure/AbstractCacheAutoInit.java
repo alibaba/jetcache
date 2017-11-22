@@ -5,11 +5,8 @@ import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -21,11 +18,12 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
+public abstract class AbstractCacheAutoInit {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCacheAutoInit.class);
 
-    protected ApplicationContext applicationContext;
+    @Autowired
+    protected ConfigurableEnvironment environment;
 
     @Autowired
     protected AutoConfigureBeans autoConfigureBeans;
@@ -39,11 +37,6 @@ public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
 
     public AbstractCacheAutoInit(String cacheType) {
         this.typeName = cacheType;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
     }
 
     @PostConstruct
@@ -60,40 +53,39 @@ public abstract class AbstractCacheAutoInit implements ApplicationContextAware {
     }
 
     private void process(String prefix, Map cacheBuilders, boolean local) {
-        RelaxedPropertyResolver resolver = new RelaxedPropertyResolver(
-                applicationContext.getEnvironment(), prefix);
-        Map<String, Object> m = resolver.getSubProperties("");
+        ConfigTree resolver = new ConfigTree(environment, prefix);
+        Map<String, Object> m = resolver.getProperties();
         Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
         for (String cacheArea : cacheAreaNames) {
             if (!typeName.equals(m.get(cacheArea + ".type"))) {
                 continue;
             }
-            RelaxedPropertyResolver r = new RelaxedPropertyResolver(applicationContext.getEnvironment(), prefix + cacheArea + ".");
+            ConfigTree ct = resolver.subTree(cacheArea + ".");
             logger.info("init cache area {} , type= {}", cacheArea, typeName);
-            CacheBuilder c = initCache(r, local ? "local." + cacheArea : "remote." + cacheArea);
+            CacheBuilder c = initCache(ct, local ? "local." + cacheArea : "remote." + cacheArea);
             cacheBuilders.put(cacheArea, c);
         }
     }
 
-    protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
+    protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
         AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
-        acb.keyConvertor(configProvider.parseKeyConvertor(resolver.getProperty("keyConvertor")));
+        acb.keyConvertor(configProvider.parseKeyConvertor(ct.getProperty("keyConvertor")));
 
-        String expireAfterWriteInMillis = resolver.getProperty("expireAfterWriteInMillis");
+        String expireAfterWriteInMillis = ct.getProperty("expireAfterWriteInMillis");
         if (expireAfterWriteInMillis == null) {
             // compatible with 2.1
-            expireAfterWriteInMillis = resolver.getProperty("defaultExpireInMillis");
+            expireAfterWriteInMillis = ct.getProperty("defaultExpireInMillis");
         }
         if (expireAfterWriteInMillis != null) {
             acb.setExpireAfterWriteInMillis(Long.parseLong(expireAfterWriteInMillis));
         }
 
-        String expireAfterAccessInMillis = resolver.getProperty("expireAfterAccessInMillis");
+        String expireAfterAccessInMillis = ct.getProperty("expireAfterAccessInMillis");
         if (expireAfterAccessInMillis != null) {
             acb.setExpireAfterAccessInMillis(Long.parseLong(expireAfterAccessInMillis));
         }
 
     }
 
-    protected abstract CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheAreaWithPrefix);
+    protected abstract CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix);
 }

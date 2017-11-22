@@ -9,7 +9,6 @@ import com.lambdaworks.redis.AbstractRedisClient;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -47,8 +46,8 @@ public class RedisLutteceAutoConfiguration {
         }
 
         @Override
-        protected CacheBuilder initCache(RelaxedPropertyResolver resolver, String cacheAreaWithPrefix) {
-            Map<String, Object> map = resolver.getSubProperties("uri");
+        protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
+            Map<String, Object> map = ct.subTree("uri"/*there is no dot*/).getProperties();
             AbstractRedisClient client = null;
             if (map == null || map.size() == 0) {
                 throw new CacheConfigException("uri is required");
@@ -63,7 +62,7 @@ public class RedisLutteceAutoConfiguration {
 
             ExternalCacheBuilder externalCacheBuilder = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
                     .redisClient(client);
-            parseGeneralConfig(externalCacheBuilder, resolver);
+            parseGeneralConfig(externalCacheBuilder, ct);
 
             // eg: "remote.default.client"
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".client", client);

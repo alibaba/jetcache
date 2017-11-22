@@ -3,7 +3,6 @@ package com.alicp.jetcache.autoconfigure;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 
 /**
  * Created on 2016/11/29.
@@ -16,11 +15,11 @@ public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
     }
 
     @Override
-    protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
-        super.parseGeneralConfig(builder, resolver);
+    protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
+        super.parseGeneralConfig(builder, ct);
         ExternalCacheBuilder ecb = (ExternalCacheBuilder) builder;
-        ecb.setKeyPrefix(resolver.getProperty("keyPrefix"));
-        ecb.setValueEncoder(configProvider.parseValueEncoder(resolver.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
-        ecb.setValueDecoder(configProvider.parseValueDecoder(resolver.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
+        ecb.setKeyPrefix(ct.getProperty("keyPrefix"));
+        ecb.setValueEncoder(configProvider.parseValueEncoder(ct.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
+        ecb.setValueDecoder(configProvider.parseValueDecoder(ct.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
     }
 }

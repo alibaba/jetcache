@@ -3,7 +3,6 @@ package com.alicp.jetcache.autoconfigure;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 
 /**
  * Created on 2016/12/2.
@@ -17,10 +16,10 @@ public abstract class EmbeddedCacheAutoInit extends AbstractCacheAutoInit {
     }
 
     @Override
-    protected void parseGeneralConfig(CacheBuilder builder, RelaxedPropertyResolver resolver) {
-        super.parseGeneralConfig(builder, resolver);
+    protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
+        super.parseGeneralConfig(builder, ct);
         EmbeddedCacheBuilder ecb = (EmbeddedCacheBuilder) builder;
 
-        ecb.limit(Integer.parseInt(resolver.getProperty("limit", String.valueOf(CacheConsts.DEFAULT_LOCAL_LIMIT))));
+        ecb.limit(Integer.parseInt(ct.getProperty("limit", String.valueOf(CacheConsts.DEFAULT_LOCAL_LIMIT))));
     }
 }
