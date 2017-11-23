@@ -8,25 +8,32 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jetcache-redis-luttece</artifactId>
+    <artifactId>jetcache-starter-redis-lettuce4</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-core</artifactId>
+            <artifactId>jetcache-autoconfigure</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-anno</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-redis-luttece</artifactId>
             <version>${project.version}</version>
         </dependency>
 
         <dependency>
-            <groupId>biz.paluch.redis</groupId>
-            <artifactId>lettuce</artifactId>
-            <version>4.4.2.Final</version>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
-
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
         </dependency>
     </dependencies>
 </project>
