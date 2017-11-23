@@ -1,10 +1,10 @@
 package com.alicp.jetcache.autoconfigure;
 
-import com.lambdaworks.redis.AbstractRedisClient;
-import com.lambdaworks.redis.api.StatefulConnection;
-import com.lambdaworks.redis.cluster.api.async.RedisClusterAsyncCommands;
-import com.lambdaworks.redis.cluster.api.rx.RedisClusterReactiveCommands;
-import com.lambdaworks.redis.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.api.StatefulConnection;
+import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
+import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
+import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class LutteceFactory implements FactoryBean {
+public class LettuceFactory implements FactoryBean {
     @Autowired
     private AutoConfigureBeans autoConfigureBeans;
 
@@ -23,13 +23,13 @@ public class LutteceFactory implements FactoryBean {
     private String key;
 
     // for unit test
-    LutteceFactory(AutoConfigureBeans autoConfigureBeans, String key, Class<?> clazz) {
+    LettuceFactory(AutoConfigureBeans autoConfigureBeans, String key, Class<?> clazz) {
         this(key, clazz);
         this.autoConfigureBeans = autoConfigureBeans;
     }
 
 
-    public LutteceFactory(String key, Class<?> clazz) {
+    public LettuceFactory(String key, Class<?> clazz) {
         this.clazz = clazz;
         if (AbstractRedisClient.class.isAssignableFrom(clazz)) {
             key += ".client";

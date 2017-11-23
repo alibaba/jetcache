@@ -3,12 +3,12 @@ package com.alicp.jetcache.autoconfigure;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import com.alicp.jetcache.redis.luttece.LutteceConnectionManager;
-import com.alicp.jetcache.redis.luttece.RedisLutteceCacheBuilder;
-import com.lambdaworks.redis.AbstractRedisClient;
-import com.lambdaworks.redis.RedisClient;
-import com.lambdaworks.redis.RedisURI;
-import com.lambdaworks.redis.cluster.RedisClusterClient;
+import com.alicp.jetcache.redis.lettuce.LettuceConnectionManager;
+import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
+import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.cluster.RedisClusterClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -24,18 +24,17 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
-@Conditional(RedisLettuce4AutoConfiguration.RedisLutteceCondition.class)
-public class RedisLettuce4AutoConfiguration {
-    public static final String AUTO_INIT_BEAN_NAME = "redisLutteceAutoInit";
-    private static final String AUTO_INIT_BEAN_NAME2 = "redisLettuceAutoInit";
+@Conditional(RedisLettuceAutoConfiguration.RedisLettuceCondition.class)
+public class RedisLettuceAutoConfiguration {
+    public static final String AUTO_INIT_BEAN_NAME = "redisLettuceAutoInit";
 
-    public static class RedisLutteceCondition extends JetCacheConditon {
-        public RedisLutteceCondition() {
-            super("redis.lettuce4", "redis.luttece");
+    public static class RedisLettuceCondition extends JetCacheConditon {
+        public RedisLettuceCondition() {
+            super("redis.lettuce");
         }
     }
 
-    @Bean(name = {AUTO_INIT_BEAN_NAME, AUTO_INIT_BEAN_NAME2})
+    @Bean(name = {AUTO_INIT_BEAN_NAME})
     public RedisLutteceAutoInit redisLutteceAutoInit() {
         return new RedisLutteceAutoInit();
     }
@@ -43,7 +42,7 @@ public class RedisLettuce4AutoConfiguration {
     public static class RedisLutteceAutoInit extends ExternalCacheAutoInit {
 
         public RedisLutteceAutoInit() {
-            super("redis.lettuce4", "redis.luttece");
+            super("redis.lettuce");
         }
 
         @Override
@@ -61,13 +60,13 @@ public class RedisLettuce4AutoConfiguration {
                 client = RedisClusterClient.create(list);
             }
 
-            ExternalCacheBuilder externalCacheBuilder = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+            ExternalCacheBuilder externalCacheBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                     .redisClient(client);
             parseGeneralConfig(externalCacheBuilder, ct);
 
             // eg: "remote.default.client"
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".client", client);
-            LutteceConnectionManager m = LutteceConnectionManager.defaultManager();
+            LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".connection", m.connection(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".commands", m.commands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".asyncCommands", m.asyncCommands(client));

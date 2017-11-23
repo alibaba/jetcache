@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Import;
 @Import({RedisAutoConfiguration.class,
         CaffeineAutoConfiguration.class,
         LinkedHashMapAutoConfiguration.class,
+        RedisLettuceAutoConfiguration.class,
         RedisLettuce4AutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 

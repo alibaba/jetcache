@@ -27,7 +27,7 @@ public class LettuceConnectionManagerTest {
 
     @Test
     public void testCluster() {
-        if (!RedisLutteceCacheTest.checkOS()) {
+        if (!RedisLettuceCacheTest.checkOS()) {
             return;
         }
         RedisURI node1 = RedisURI.create("127.0.0.1", 7000);

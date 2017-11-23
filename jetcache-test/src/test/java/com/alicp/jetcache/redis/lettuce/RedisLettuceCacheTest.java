@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
+public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
     public static boolean checkOS() {
         String os = System.getProperty("os.name");
         if (os.contains("Mac") || os.contains("Windows")) {

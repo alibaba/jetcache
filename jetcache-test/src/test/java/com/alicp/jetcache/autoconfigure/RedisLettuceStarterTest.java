@@ -4,20 +4,20 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.redis.luttece.RedisLutteceCacheConfig;
-import com.alicp.jetcache.redis.lettuce4.RedisLutteceCacheTest;
+import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
+import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheConfig;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
-import com.lambdaworks.redis.RedisClient;
-import com.lambdaworks.redis.api.StatefulRedisConnection;
-import com.lambdaworks.redis.api.async.RedisAsyncCommands;
-import com.lambdaworks.redis.api.rx.RedisReactiveCommands;
-import com.lambdaworks.redis.api.sync.RedisCommands;
-import com.lambdaworks.redis.cluster.RedisClusterClient;
-import com.lambdaworks.redis.cluster.api.async.RedisClusterAsyncCommands;
-import com.lambdaworks.redis.cluster.api.rx.RedisClusterReactiveCommands;
-import com.lambdaworks.redis.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.async.RedisAsyncCommands;
+import io.lettuce.core.api.reactive.RedisReactiveCommands;
+import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
+import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
+import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +41,16 @@ import javax.annotation.PostConstruct;
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
-public class RedisLuttece4StarterTest extends SpringTest {
+public class RedisLettuceStarterTest extends SpringTest {
 
     @Test
     public void tests() throws Exception {
-        if (RedisLutteceCacheTest.checkOS()) {
-            System.setProperty("spring.profiles.active", "redislettuce4-cluster");
+        if (RedisLettuceCacheTest.checkOS()) {
+            System.setProperty("spring.profiles.active", "redislettuce-cluster");
         } else {
-            System.setProperty("spring.profiles.active", "redislettuce4");
+            System.setProperty("spring.profiles.active", "redislettuce");
         }
-        context = SpringApplication.run(RedisLuttece4StarterTest.class);
+        context = SpringApplication.run(RedisLettuceStarterTest.class);
         doTest();
         A bean = context.getBean(A.class);
         bean.test();
@@ -64,17 +64,17 @@ public class RedisLuttece4StarterTest extends SpringTest {
         AutoConfigureBeans acb = context.getBean(AutoConfigureBeans.class);
 
         String key = "remote.A1";
-        Assert.assertTrue(new Lettuce4Factory(acb, key, StatefulRedisConnection.class).getObject() instanceof StatefulRedisConnection);
-        Assert.assertTrue(new Lettuce4Factory(acb, key, RedisCommands.class).getObject() instanceof RedisCommands);
-        Assert.assertTrue(new Lettuce4Factory(acb, key, RedisAsyncCommands.class).getObject() instanceof RedisAsyncCommands);
-        Assert.assertTrue(new Lettuce4Factory(acb, key, RedisReactiveCommands.class).getObject() instanceof RedisReactiveCommands);
+        Assert.assertTrue(new LettuceFactory(acb, key, StatefulRedisConnection.class).getObject() instanceof StatefulRedisConnection);
+        Assert.assertTrue(new LettuceFactory(acb, key, RedisCommands.class).getObject() instanceof RedisCommands);
+        Assert.assertTrue(new LettuceFactory(acb, key, RedisAsyncCommands.class).getObject() instanceof RedisAsyncCommands);
+        Assert.assertTrue(new LettuceFactory(acb, key, RedisReactiveCommands.class).getObject() instanceof RedisReactiveCommands);
 
-        if (RedisLutteceCacheTest.checkOS()) {
+        if (RedisLettuceCacheTest.checkOS()) {
             key = "remote.A2";
-            Assert.assertTrue(new Lettuce4Factory(acb, key , RedisClusterClient.class).getObject() instanceof RedisClusterClient);
-            Assert.assertTrue(new Lettuce4Factory(acb, key , RedisClusterCommands.class).getObject() instanceof RedisClusterCommands);
-            Assert.assertTrue(new Lettuce4Factory(acb, key , RedisClusterAsyncCommands.class).getObject() instanceof RedisClusterAsyncCommands);
-            Assert.assertTrue(new Lettuce4Factory(acb, key , RedisClusterReactiveCommands.class).getObject() instanceof RedisClusterReactiveCommands);
+            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterClient.class).getObject() instanceof RedisClusterClient);
+            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterCommands.class).getObject() instanceof RedisClusterCommands);
+            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterAsyncCommands.class).getObject() instanceof RedisClusterAsyncCommands);
+            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterReactiveCommands.class).getObject() instanceof RedisClusterReactiveCommands);
         }
     }
 
@@ -85,7 +85,7 @@ public class RedisLuttece4StarterTest extends SpringTest {
 
         public void test() {
             Assert.assertNotNull(c1.unwrap(RedisClient.class));
-            RedisLutteceCacheConfig cc1 = (RedisLutteceCacheConfig) c1.config();
+            RedisLettuceCacheConfig cc1 = (RedisLettuceCacheConfig) c1.config();
             Assert.assertEquals(20000, cc1.getExpireAfterWriteInMillis());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
         }
@@ -114,15 +114,15 @@ public class RedisLuttece4StarterTest extends SpringTest {
         }
 
         @Bean(name = "defaultClient")
-        @DependsOn(RedisLettuce4AutoConfiguration.AUTO_INIT_BEAN_NAME)
-        public Lettuce4Factory defaultClient() {
-            return new Lettuce4Factory("remote.default", RedisClient.class);
+        @DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
+        public LettuceFactory defaultClient() {
+            return new LettuceFactory("remote.default", RedisClient.class);
         }
 
         @Bean(name = "a1Client")
-        @DependsOn(RedisLettuce4AutoConfiguration.AUTO_INIT_BEAN_NAME)
-        public Lettuce4Factory a1Client() {
-            return new Lettuce4Factory("remote.A1", RedisClient.class);
+        @DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
+        public LettuceFactory a1Client() {
+            return new LettuceFactory("remote.A1", RedisClient.class);
         }
     }
 
