@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-redis-luttece</artifactId>
+            <artifactId>jetcache-redis-lettuce4</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
