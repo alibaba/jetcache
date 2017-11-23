@@ -4,8 +4,6 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
-import com.alicp.jetcache.redis.luttece.LettuceConnectionManager;
-import com.alicp.jetcache.redis.luttece.RedisLettuceCacheBuilder;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import com.lambdaworks.redis.AbstractRedisClient;

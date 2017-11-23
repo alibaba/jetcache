@@ -1,6 +1,5 @@
 package com.alicp.jetcache.redis.lettuce4;
 
-import com.alicp.jetcache.redis.luttece.LettuceConnectionManager;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
 import com.lambdaworks.redis.cluster.RedisClusterClient;

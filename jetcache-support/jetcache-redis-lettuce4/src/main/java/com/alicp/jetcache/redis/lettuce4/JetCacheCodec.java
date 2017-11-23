@@ -1,4 +1,4 @@
-package com.alicp.jetcache.redis.luttece;
+package com.alicp.jetcache.redis.lettuce4;
 
 import com.lambdaworks.redis.codec.RedisCodec;
 

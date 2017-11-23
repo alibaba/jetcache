@@ -4,7 +4,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.redis.luttece.RedisLettuceCacheConfig;
+import com.alicp.jetcache.redis.lettuce4.RedisLettuceCacheConfig;
 import com.alicp.jetcache.redis.lettuce4.RedisLettuceCacheTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
