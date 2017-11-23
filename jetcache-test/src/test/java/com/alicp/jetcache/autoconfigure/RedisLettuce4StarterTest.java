@@ -4,8 +4,8 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.redis.luttece.RedisLutteceCacheConfig;
-import com.alicp.jetcache.redis.lettuce4.RedisLutteceCacheTest;
+import com.alicp.jetcache.redis.luttece.RedisLettuceCacheConfig;
+import com.alicp.jetcache.redis.lettuce4.RedisLettuceCacheTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
@@ -41,16 +41,16 @@ import javax.annotation.PostConstruct;
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
-public class RedisLuttece4StarterTest extends SpringTest {
+public class RedisLettuce4StarterTest extends SpringTest {
 
     @Test
     public void tests() throws Exception {
-        if (RedisLutteceCacheTest.checkOS()) {
+        if (RedisLettuceCacheTest.checkOS()) {
             System.setProperty("spring.profiles.active", "redislettuce4-cluster");
         } else {
             System.setProperty("spring.profiles.active", "redislettuce4");
         }
-        context = SpringApplication.run(RedisLuttece4StarterTest.class);
+        context = SpringApplication.run(RedisLettuce4StarterTest.class);
         doTest();
         A bean = context.getBean(A.class);
         bean.test();
@@ -69,7 +69,7 @@ public class RedisLuttece4StarterTest extends SpringTest {
         Assert.assertTrue(new Lettuce4Factory(acb, key, RedisAsyncCommands.class).getObject() instanceof RedisAsyncCommands);
         Assert.assertTrue(new Lettuce4Factory(acb, key, RedisReactiveCommands.class).getObject() instanceof RedisReactiveCommands);
 
-        if (RedisLutteceCacheTest.checkOS()) {
+        if (RedisLettuceCacheTest.checkOS()) {
             key = "remote.A2";
             Assert.assertTrue(new Lettuce4Factory(acb, key , RedisClusterClient.class).getObject() instanceof RedisClusterClient);
             Assert.assertTrue(new Lettuce4Factory(acb, key , RedisClusterCommands.class).getObject() instanceof RedisClusterCommands);
@@ -85,7 +85,7 @@ public class RedisLuttece4StarterTest extends SpringTest {
 
         public void test() {
             Assert.assertNotNull(c1.unwrap(RedisClient.class));
-            RedisLutteceCacheConfig cc1 = (RedisLutteceCacheConfig) c1.config();
+            RedisLettuceCacheConfig cc1 = (RedisLettuceCacheConfig) c1.config();
             Assert.assertEquals(20000, cc1.getExpireAfterWriteInMillis());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
         }

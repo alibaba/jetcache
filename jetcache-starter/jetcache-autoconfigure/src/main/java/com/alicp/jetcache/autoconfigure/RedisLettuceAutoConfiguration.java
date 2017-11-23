@@ -35,13 +35,13 @@ public class RedisLettuceAutoConfiguration {
     }
 
     @Bean(name = {AUTO_INIT_BEAN_NAME})
-    public RedisLutteceAutoInit redisLutteceAutoInit() {
-        return new RedisLutteceAutoInit();
+    public RedisLettuceAutoInit redisLutteceAutoInit() {
+        return new RedisLettuceAutoInit();
     }
 
-    public static class RedisLutteceAutoInit extends ExternalCacheAutoInit {
+    public static class RedisLettuceAutoInit extends ExternalCacheAutoInit {
 
-        public RedisLutteceAutoInit() {
+        public RedisLettuceAutoInit() {
             super("redis.lettuce");
         }
 

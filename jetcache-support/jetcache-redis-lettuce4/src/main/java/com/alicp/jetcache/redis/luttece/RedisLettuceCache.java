@@ -26,22 +26,22 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
+public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisLutteceCache.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisLettuceCache.class);
 
-    private RedisLutteceCacheConfig<K, V> config;
+    private RedisLettuceCacheConfig<K, V> config;
 
     private Function<Object, byte[]> valueEncoder;
     private Function<byte[], Object> valueDecoder;
 
     private final AbstractRedisClient client;
-    private LutteceConnectionManager lutteceConnectionManager;
+    private LettuceConnectionManager lettuceConnectionManager;
     private RedisStringCommands<byte[], byte[]> stringCommands;
     private RedisStringAsyncCommands<byte[], byte[]> stringAsyncCommands;
     private RedisKeyAsyncCommands<byte[], byte[]> keyAsyncCommands;
 
-    public RedisLutteceCache(RedisLutteceCacheConfig<K, V> config) {
+    public RedisLettuceCache(RedisLettuceCacheConfig<K, V> config) {
         super(config);
         this.config = config;
         this.valueEncoder = config.getValueEncoder();
@@ -54,10 +54,10 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
         }
 
         client = config.getRedisClient();
-        lutteceConnectionManager = LutteceConnectionManager.defaultManager();
+        lettuceConnectionManager = LettuceConnectionManager.defaultManager();
 
-        stringCommands = (RedisStringCommands<byte[], byte[]>) lutteceConnectionManager.commands(client);
-        stringAsyncCommands = (RedisStringAsyncCommands<byte[], byte[]>) lutteceConnectionManager.asyncCommands(client);
+        stringCommands = (RedisStringCommands<byte[], byte[]>) lettuceConnectionManager.commands(client);
+        stringAsyncCommands = (RedisStringAsyncCommands<byte[], byte[]>) lettuceConnectionManager.asyncCommands(client);
         keyAsyncCommands = (RedisKeyAsyncCommands<byte[], byte[]>) stringAsyncCommands;
     }
 
@@ -74,7 +74,7 @@ public class RedisLutteceCache<K, V> extends AbstractExternalCache<K, V> {
             return (T) stringAsyncCommands;
         } else if (RedisClusterReactiveCommands.class.isAssignableFrom(clazz)) {
             // RedisReactiveCommands extends RedisClusterReactiveCommands
-            return (T) lutteceConnectionManager.reactiveCommands(client);
+            return (T) lettuceConnectionManager.reactiveCommands(client);
         }
         throw new IllegalArgumentException(clazz.getName());
     }

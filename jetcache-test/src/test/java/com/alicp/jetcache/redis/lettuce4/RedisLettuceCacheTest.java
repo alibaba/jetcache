@@ -3,11 +3,9 @@ package com.alicp.jetcache.redis.lettuce4;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
-import com.alicp.jetcache.RefreshCacheTest;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
-import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
-import com.alicp.jetcache.redis.luttece.LutteceConnectionManager;
-import com.alicp.jetcache.redis.luttece.RedisLutteceCacheBuilder;
+import com.alicp.jetcache.redis.luttece.LettuceConnectionManager;
+import com.alicp.jetcache.redis.luttece.RedisLettuceCacheBuilder;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import com.lambdaworks.redis.AbstractRedisClient;
@@ -32,7 +30,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
+public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
     public static boolean checkOS() {
         String os = System.getProperty("os.name");
         if (os.contains("Mac") || os.contains("Windows")) {
@@ -80,7 +78,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
         RedisClient client = RedisClient.create("redis://127.0.0.1");
-        Cache l2Cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+        Cache l2Cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
@@ -101,7 +99,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
     }
 
     private void test(AbstractRedisClient client) throws Exception {
-        cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+        cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
@@ -114,14 +112,14 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
         fastjsonKeyCoverterTest();
         testUnwrap(client);
 
-        LoadingCacheTest.loadingCacheTest(RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+        LoadingCacheTest.loadingCacheTest(RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + ""), 50);
 
-        cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+        cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .keyConvertor(null)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
@@ -132,7 +130,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
 
         int thread = 10;
         int time = 3000;
-        cache = RedisLutteceCacheBuilder.createRedisLutteceCacheBuilder()
+        cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
@@ -140,7 +138,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         concurrentTest(thread, 500, time);
-        LutteceConnectionManager.defaultManager().removeAndClose(client);
+        LettuceConnectionManager.defaultManager().removeAndClose(client);
     }
 
     private void testUnwrap(AbstractRedisClient client) {

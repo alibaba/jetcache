@@ -20,7 +20,7 @@ import java.util.WeakHashMap;
  */
 public class LettuceConnectionManager {
 
-    private static class LutteceObjects {
+    private static class LettuceObjects {
         private StatefulConnection connection;
         private Object commands;
         private Object asyncCommands;
@@ -38,12 +38,12 @@ public class LettuceConnectionManager {
         return defaultManager;
     }
 
-    private LutteceObjects getLutteceObjectsFromMap(AbstractRedisClient redisClient) {
-        return (LutteceObjects) map.computeIfAbsent(redisClient, key -> new LutteceObjects());
+    private LettuceObjects getLutteceObjectsFromMap(AbstractRedisClient redisClient) {
+        return (LettuceObjects) map.computeIfAbsent(redisClient, key -> new LettuceObjects());
     }
 
     public StatefulConnection connection(AbstractRedisClient redisClient) {
-        LutteceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
         if (lo.connection == null) {
             if (redisClient instanceof RedisClient) {
                 lo.connection = ((RedisClient) redisClient).connect(new JetCacheCodec());
@@ -58,7 +58,7 @@ public class LettuceConnectionManager {
 
     public Object commands(AbstractRedisClient redisClient) {
         connection(redisClient);
-        LutteceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
         if (lo.commands == null) {
             if (lo.connection instanceof StatefulRedisConnection) {
                 lo.commands = ((StatefulRedisConnection) lo.connection).sync();
@@ -74,7 +74,7 @@ public class LettuceConnectionManager {
 
     public Object asyncCommands(AbstractRedisClient redisClient) {
         connection(redisClient);
-        LutteceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
         if (lo.asyncCommands == null) {
             if (lo.connection instanceof StatefulRedisConnection) {
                 lo.asyncCommands = ((StatefulRedisConnection) lo.connection).async();
@@ -89,7 +89,7 @@ public class LettuceConnectionManager {
 
     public Object reactiveCommands(AbstractRedisClient redisClient) {
         connection(redisClient);
-        LutteceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
         if (lo.reactiveCommands == null) {
             if (lo.connection instanceof StatefulRedisConnection) {
                 lo.reactiveCommands = ((StatefulRedisConnection) lo.connection).reactive();
@@ -103,7 +103,7 @@ public class LettuceConnectionManager {
     }
 
     public void removeAndClose(AbstractRedisClient redisClient) {
-        LutteceObjects lo = (LutteceObjects) map.remove(redisClient);
+        LettuceObjects lo = (LettuceObjects) map.remove(redisClient);
         if (lo == null) {
             return;
         }
