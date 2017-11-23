@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
-@Conditional(RedisLutteceAutoConfiguration.RedisLutteceCondition.class)
-public class RedisLutteceAutoConfiguration {
+@Conditional(RedisLettuce4AutoConfiguration.RedisLutteceCondition.class)
+public class RedisLettuce4AutoConfiguration {
     public static final String AUTO_INIT_BEAN_NAME = "redisLutteceAutoInit";
     private static final String AUTO_INIT_BEAN_NAME2 = "redisLettuceAutoInit";
 

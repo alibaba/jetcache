@@ -114,13 +114,13 @@ public class RedisLuttece4StarterTest extends SpringTest {
         }
 
         @Bean(name = "defaultClient")
-        @DependsOn(RedisLutteceAutoConfiguration.AUTO_INIT_BEAN_NAME)
+        @DependsOn(RedisLettuce4AutoConfiguration.AUTO_INIT_BEAN_NAME)
         public LutteceFactory defaultClient() {
             return new LutteceFactory("remote.default", RedisClient.class);
         }
 
         @Bean(name = "a1Client")
-        @DependsOn(RedisLutteceAutoConfiguration.AUTO_INIT_BEAN_NAME)
+        @DependsOn(RedisLettuce4AutoConfiguration.AUTO_INIT_BEAN_NAME)
         public LutteceFactory a1Client() {
             return new LutteceFactory("remote.A1", RedisClient.class);
         }
