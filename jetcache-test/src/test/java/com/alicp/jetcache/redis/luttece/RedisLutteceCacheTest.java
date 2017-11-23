@@ -138,6 +138,7 @@ public class RedisLutteceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         concurrentTest(thread, 500, time);
+        LutteceConnectionManager.defaultManager().removeAndClose(client);
     }
 
     private void testUnwrap(AbstractRedisClient client) {
