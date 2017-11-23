@@ -119,6 +119,7 @@
 
         <module>jetcache-support/jetcache-redis</module>
         <module>jetcache-support/jetcache-redis-lettuce4</module>
+        <module>jetcache-support/jetcache-redis-lettuce</module>
 
         <module>jetcache-starter/jetcache-autoconfigure</module>
         <module>jetcache-starter/jetcache-starter-redis</module>
