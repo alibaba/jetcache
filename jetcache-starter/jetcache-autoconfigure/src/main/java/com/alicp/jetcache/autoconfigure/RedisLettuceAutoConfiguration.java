@@ -35,7 +35,7 @@ public class RedisLettuceAutoConfiguration {
     }
 
     @Bean(name = {AUTO_INIT_BEAN_NAME})
-    public RedisLettuceAutoInit redisLutteceAutoInit() {
+    public RedisLettuceAutoInit redisLettuceAutoInit() {
         return new RedisLettuceAutoInit();
     }
 

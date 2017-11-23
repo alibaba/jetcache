@@ -26,24 +26,23 @@ import java.util.stream.Collectors;
 @Configuration
 @Conditional(RedisLettuce4AutoConfiguration.RedisLettuceCondition.class)
 public class RedisLettuce4AutoConfiguration {
-    public static final String AUTO_INIT_BEAN_NAME = "redisLutteceAutoInit";
-    private static final String AUTO_INIT_BEAN_NAME2 = "redisLettuceAutoInit";
+    public static final String AUTO_INIT_BEAN_NAME = "redisLettuce4AutoInit";
 
     public static class RedisLettuceCondition extends JetCacheConditon {
         public RedisLettuceCondition() {
-            super("redis.lettuce4", "redis.luttece");
+            super("redis.lettuce4");
         }
     }
 
-    @Bean(name = {AUTO_INIT_BEAN_NAME, AUTO_INIT_BEAN_NAME2})
-    public RedisLettuceAutoInit redisLutteceAutoInit() {
+    @Bean(name = {AUTO_INIT_BEAN_NAME})
+    public RedisLettuceAutoInit redisLettuceAutoInit() {
         return new RedisLettuceAutoInit();
     }
 
     public static class RedisLettuceAutoInit extends ExternalCacheAutoInit {
 
         public RedisLettuceAutoInit() {
-            super("redis.lettuce4", "redis.luttece");
+            super("redis.lettuce4");
         }
 
         @Override

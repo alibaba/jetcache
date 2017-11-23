@@ -38,12 +38,12 @@ public class LettuceConnectionManager {
         return defaultManager;
     }
 
-    private LettuceObjects getLutteceObjectsFromMap(AbstractRedisClient redisClient) {
+    private LettuceObjects getLettuceObjectsFromMap(AbstractRedisClient redisClient) {
         return (LettuceObjects) map.computeIfAbsent(redisClient, key -> new LettuceObjects());
     }
 
     public StatefulConnection connection(AbstractRedisClient redisClient) {
-        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.connection == null) {
             if (redisClient instanceof RedisClient) {
                 lo.connection = ((RedisClient) redisClient).connect(new JetCacheCodec());
@@ -58,7 +58,7 @@ public class LettuceConnectionManager {
 
     public Object commands(AbstractRedisClient redisClient) {
         connection(redisClient);
-        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.commands == null) {
             if (lo.connection instanceof StatefulRedisConnection) {
                 lo.commands = ((StatefulRedisConnection) lo.connection).sync();
@@ -74,7 +74,7 @@ public class LettuceConnectionManager {
 
     public Object asyncCommands(AbstractRedisClient redisClient) {
         connection(redisClient);
-        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.asyncCommands == null) {
             if (lo.connection instanceof StatefulRedisConnection) {
                 lo.asyncCommands = ((StatefulRedisConnection) lo.connection).async();
@@ -89,7 +89,7 @@ public class LettuceConnectionManager {
 
     public Object reactiveCommands(AbstractRedisClient redisClient) {
         connection(redisClient);
-        LettuceObjects lo = getLutteceObjectsFromMap(redisClient);
+        LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
         if (lo.reactiveCommands == null) {
             if (lo.connection instanceof StatefulRedisConnection) {
                 lo.reactiveCommands = ((StatefulRedisConnection) lo.connection).reactive();

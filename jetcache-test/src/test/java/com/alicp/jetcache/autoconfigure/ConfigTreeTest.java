@@ -12,10 +12,10 @@ public class ConfigTreeTest {
     @Before
     public void setup() {
         MockEnvironment environment = new MockEnvironment();
-        environment.withProperty("jetcache.remote.default.type", "redis.luttece")
+        environment.withProperty("jetcache.remote.default.type", "redis.lettuce")
                 .withProperty("jetcache.remote.default.keyConvertor", "fastjson")
                 .withProperty("jetcache.remote.default.uri", "redis://127.0.0.1:6379/")
-                .withProperty("jetcache.remote.A1.type", "redis.luttece")
+                .withProperty("jetcache.remote.A1.type", "redis.lettuce")
                 .withProperty("jetcache.remote.A1.keyConvertor", "fastjson")
                 .withProperty("jetcache.remote.A1.uri[0]", "redis://127.0.0.1:7000")
                 .withProperty("jetcache.remote.A1.uri[1]", "redis://127.0.0.1:7001")
