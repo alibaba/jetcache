@@ -1,5 +1,6 @@
-package com.alicp.jetcache.redis.luttece;
+package com.alicp.jetcache.redis.lettuce4;
 
+import com.alicp.jetcache.redis.luttece.JetCacheCodec;
 import org.junit.Assert;
 import org.junit.Test;
 

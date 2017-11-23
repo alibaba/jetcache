@@ -5,7 +5,7 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.redis.luttece.RedisLutteceCacheConfig;
-import com.alicp.jetcache.redis.luttece.RedisLutteceCacheTest;
+import com.alicp.jetcache.redis.lettuce4.RedisLutteceCacheTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
@@ -41,7 +41,7 @@ import javax.annotation.PostConstruct;
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
-public class RedisLutteceStarterTest extends SpringTest {
+public class RedisLuttece4StarterTest extends SpringTest {
 
     @Test
     public void tests() throws Exception {
@@ -50,7 +50,7 @@ public class RedisLutteceStarterTest extends SpringTest {
         } else {
             System.setProperty("spring.profiles.active", "redisluttece");
         }
-        context = SpringApplication.run(RedisLutteceStarterTest.class);
+        context = SpringApplication.run(RedisLuttece4StarterTest.class);
         doTest();
         A bean = context.getBean(A.class);
         bean.test();
