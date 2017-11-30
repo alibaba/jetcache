@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-class ConfigTree {
+public class ConfigTree {
     private ConfigurableEnvironment environment;
     private String prefix;
 
