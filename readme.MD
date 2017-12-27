@@ -8,10 +8,10 @@ JetCache is a Java cache abstraction which provides consistent use for various c
 Presently There are four implements: ```RedisCache```, ```TairCache```(not open source on github), ```CaffeineCache``` (in memory), a simple ```LinkedHashMapCache``` (in memory).
 Features of JetCache:
 * Operate cache through consistent Cache API. 
-* declarative caching using annotation with TTL(Time To Live) and two level caching support
+* Declarative method caching using annotation with TTL(Time To Live) and two level caching support
 * Create & configure ```Cache``` instance using annotation
 * Auto collect access statistics for Cache instance and method cache
-* policy of key generation and value serialization can be customized
+* The policy of key generation and value serialization can be customized
 * Auto Refresh (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
 * Spring Boot support
@@ -26,7 +26,7 @@ Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents.
 # getting started
 
 ## method cache
-Declare method cache using ```Cached``` annotation.  ```expire = 3600``` indicates that the elements will expires in 3600 seconds after put.
+Declare method cache using ```@Cached``` annotation.  ```expire = 3600``` indicates that the elements will expires in 3600 seconds after put.
 ```java
 public interface UserService {
     @Cached(expire = 3600, cacheType = CacheType.REMOTE)
@@ -35,7 +35,7 @@ public interface UserService {
 ```
 
 ## cache API
-Create a ```Cache``` instance using ```CreateCache``` annotation:
+Create a ```Cache``` instance using ```@CreateCache``` annotation:
 ```java
 @CreateCache(expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
 private Cache<Long, UserDO> userCache;
