@@ -5,24 +5,23 @@
 
 # introduction
 JetCache is a Java cache abstraction which provides consistent use for various caching solutions. 
-Presently it support Redis and Alibaba Tair and Caffeine cache as embedded cache.
-It simplifies cache operation with these key features:  
+Presently There are four implements: ```RedisCache```, ```TairCache```(not open source on github), ```CaffeineCache``` (in memory), a simple ```LinkedHashMapCache``` (in memory).
+Features of JetCache:
+* Operate cache through consistent Cache API. 
 * declarative caching using annotation with TTL(Time To Live) and two level caching support
-* policy of key generation and value serialization can be custom
-* detailed stat of each cache area
-* consistent API
+* Create & configure ```Cache``` instance using annotation
+* Auto collect access statistics for Cache instance and method cache
+* policy of key generation and value serialization can be customized
+* Auto Refresh (2.2+)
+* Asynchronous access using Cache API (2.2+, with redis lettuce client)
 * Spring Boot support
-* auto refresh cache (2.2+)
-* asynchronous API (2.2+)
-
-NOTICE: the Alibaba Tair support is not open source.
 
 requirements:
-* Java 8 is necessary.
-* Spring Framework 4.0.8 or above. If you do not use declarative caching, it's not necessary.
-* Spring Boot 1.1.9 or above, optional, only need if you are using Spring Boot.
+* JDK1.8
+* Spring Framework4.0.8+ (optional, with annotation support)
+* Spring Boot1.1.9+ (optional)
 
-Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents (currently in Chinese only).
+Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents.
 
 # getting started
 
@@ -156,4 +155,4 @@ public class JetCacheConfig {
 ```
 
 ## more docs
-Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents (currently in Chinese only).
+Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents.
