@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.embedded;
 
+import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.CacheValueHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         ((LRUMap) innerMap).cleanExpiredEntry();
     }
 
-    static final class LRUMap extends LinkedHashMap implements InnerMap {
+    final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
         private Object lock;
@@ -133,9 +134,11 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
         public boolean putIfAbsentValue(Object key, Object value) {
             synchronized (lock) {
-                if (get(key) == null) {
+                CacheValueHolder h = (CacheValueHolder) get(key);
+                if (h == null || parseHolderResult(h).getResultCode() == CacheResultCode.EXPIRED) {
                     put(key, value);
                     return true;
                 } else {

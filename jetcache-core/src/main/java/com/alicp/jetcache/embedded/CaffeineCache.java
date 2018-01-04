@@ -1,6 +1,8 @@
 package com.alicp.jetcache.embedded;
 
+import com.alicp.jetcache.CacheValueHolder;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.Expiry;
 
 import java.util.Collection;
 import java.util.Map;
@@ -28,15 +30,35 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected InnerMap createAreaCache() {
         Caffeine<Object, Object> builder = Caffeine.newBuilder();
         builder.maximumSize(config.getLimit());
-        if (config.isExpireAfterAccess()) {
-            builder.expireAfterAccess(config.getExpireAfterAccessInMillis(), TimeUnit.MILLISECONDS);
-        }
-        if (config.isExpireAfterWrite()) {
-            builder.expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
-        }
+        final boolean isExpireAfterAccess = config.isExpireAfterAccess();
+        final long expireAfterAccess = config.getExpireAfterAccessInMillis();
+        builder.expireAfter(new Expiry<Object, CacheValueHolder>() {
+            private long getRestTimeInNanos(CacheValueHolder value) {
+                long now = System.currentTimeMillis();
+                long ttl = value.getExpireTime() - now;
+                if(isExpireAfterAccess){
+                    ttl = Math.min(ttl, expireAfterAccess);
+                }
+                return TimeUnit.MILLISECONDS.toNanos(ttl);
+            }
+
+            public long expireAfterCreate(Object key, CacheValueHolder value, long currentTime) {
+                return getRestTimeInNanos(value);
+            }
+
+            public long expireAfterUpdate(Object key, CacheValueHolder value,
+                                          long currentTime, long currentDuration) {
+                return currentDuration;
+            }
+            public long expireAfterRead(Object key, CacheValueHolder value,
+                                        long currentTime, long currentDuration) {
+                return getRestTimeInNanos(value);
+            }
+        });
 
         cache = builder.build();
         return new InnerMap() {

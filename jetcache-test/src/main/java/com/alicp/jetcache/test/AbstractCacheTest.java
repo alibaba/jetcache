@@ -196,7 +196,7 @@ public abstract class AbstractCacheTest {
         return c instanceof MultiLevelCache;
     }
 
-    private void putIfAbsentTest() {
+    private void putIfAbsentTest() throws Exception {
         if (isMultiLevelCache()) {
             return;
         }
@@ -209,6 +209,11 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals(CacheResultCode.EXISTS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals("V2", cache.get("PIA_K2"));
         Assert.assertTrue(cache.remove("PIA_K2"));
+
+        Assert.assertTrue(cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).isSuccess());
+        Thread.sleep(10);
+        Assert.assertTrue(cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).isSuccess());
+        cache.remove("PIA_K3");
     }
 
     private void computeIfAbsentTest() {
