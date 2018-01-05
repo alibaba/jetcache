@@ -147,13 +147,13 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
         Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
 
-        long totalSleepTime = 0;
+        long beginTime = System.currentTimeMillis();
         while (true) {
-            long sleepTime = stopRefresh / 2;
+            long sleepTime = stopRefresh / 5;
             Thread.sleep(sleepTime);
-            totalSleepTime += sleepTime;
             cache.get("refreshCacheTest2_K1");
-            if (totalSleepTime > 1.3 * refreshMillis) {
+            long totalSpendTime = System.currentTimeMillis() - beginTime;
+            if (totalSpendTime > 1.4 * refreshMillis) {
                 break;
             }
         }
