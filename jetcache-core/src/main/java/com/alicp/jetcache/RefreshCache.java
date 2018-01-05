@@ -47,11 +47,16 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         super(cache);
     }
 
-    @Override
-    public void close() {
+    protected void stopRefresh() {
         List<RefreshTask> tasks = new ArrayList<>();
         tasks.addAll(taskMap.values());
         tasks.forEach(task -> task.cancel());
+    }
+
+    @Override
+    public void close() {
+        stopRefresh();
+        super.close();
     }
 
 

@@ -34,10 +34,12 @@ public class RefreshCacheTest extends AbstractCacheTest {
         RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
         cache.config().setRefreshPolicy(policy);
         refreshCacheTest1(cache);
+        getRefreshCache(cache).stopRefresh();
 
         count.set(0);
         cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(stopRefreshAfterLastAccess);
         refreshCacheTest2(cache);
+        getRefreshCache(cache).stopRefresh();
 
         cache.config().setLoader(oldLoader);
         cache.config().setRefreshPolicy(oldPolicy);
@@ -48,11 +50,25 @@ public class RefreshCacheTest extends AbstractCacheTest {
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
         RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
         builder.refreshPolicy(policy);
-        refreshCacheTest1(builder.buildCache());
+        Cache cache = builder.buildCache();
+        refreshCacheTest1(cache);
+        cache.close();
 
         count.set(0);
         builder.getConfig().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(stopRefreshAfterLastAccess);
-        refreshCacheTest2(builder.buildCache());
+        cache = builder.buildCache();
+        refreshCacheTest2(cache);
+        cache.close();
+    }
+
+    private static RefreshCache getRefreshCache(Cache cache){
+        Cache c = cache;
+        while (!(c instanceof RefreshCache)) {
+            if (c instanceof ProxyCache) {
+                c = ((ProxyCache) c).getTargetCache();
+            }
+        }
+        return (RefreshCache) c;
     }
 
     private static void refreshCacheTest1(Cache cache) throws Exception {
@@ -86,13 +102,8 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
 
         Thread.sleep((long) (1.5 * refreshMillis));
-        Cache c = cache;
-        while (!(c instanceof RefreshCache)) {
-            if (c instanceof ProxyCache) {
-                c = ((ProxyCache) c).getTargetCache();
-            }
-        }
-        boolean external = ((RefreshCache) c).concreteCache() instanceof AbstractExternalCache;
+
+        boolean external = getRefreshCache(cache).concreteCache() instanceof AbstractExternalCache;
 
         Assert.assertEquals(4, monitor.getCacheStat().getLoadCount());
         Assert.assertNotEquals("refreshCacheTest1_K1_V0", cache.get("refreshCacheTest1_K1"));
@@ -125,7 +136,6 @@ public class RefreshCacheTest extends AbstractCacheTest {
         }
 
         cache.config().getMonitors().remove(monitor);
-        cache.close();
     }
 
     private static void refreshCacheTest2(Cache cache) throws Exception {
@@ -135,6 +145,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
         long stopRefresh = cache.config().getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
 
         Assert.assertEquals("refreshCacheTest2_K1_V0", cache.get("refreshCacheTest2_K1"));
+        long key1StartRefreshTime = System.currentTimeMillis();
         Assert.assertEquals(1, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
@@ -147,12 +158,11 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
         Assert.assertEquals(2, monitor.getCacheStat().getPutCount());
 
-        long beginTime = System.currentTimeMillis();
         while (true) {
             long sleepTime = stopRefresh / 5;
             Thread.sleep(sleepTime);
             cache.get("refreshCacheTest2_K1");
-            long totalSpendTime = System.currentTimeMillis() - beginTime;
+            long totalSpendTime = System.currentTimeMillis() - key1StartRefreshTime;
             if (totalSpendTime > 1.4 * refreshMillis) {
                 break;
             }
@@ -174,6 +184,5 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
 
         cache.config().getMonitors().remove(monitor);
-        cache.close();
     }
 }

@@ -147,4 +147,9 @@ public class SimpleProxyCache<K, V> implements ProxyCache<K, V> {
     public CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         return cache.PUT_IF_ABSENT(key, value, expireAfterWrite, timeUnit);
     }
+
+    @Override
+    public void close() {
+        cache.close();
+    }
 }
