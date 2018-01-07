@@ -26,6 +26,12 @@ public class CacheConfig<K, V> implements Cloneable {
 
     private RefreshPolicy refreshPolicy;
 
+    private int tryLockUnlockCount = 2;
+
+    private int tryLockInquiryCount = 1;
+
+    private int tryLockLockCount = 2;
+
     @Override
     public CacheConfig clone() {
         try {
@@ -114,5 +120,29 @@ public class CacheConfig<K, V> implements Cloneable {
 
     public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
         this.refreshPolicy = refreshPolicy;
+    }
+
+    public int getTryLockUnlockCount() {
+        return tryLockUnlockCount;
+    }
+
+    public void setTryLockUnlockCount(int tryLockUnlockCount) {
+        this.tryLockUnlockCount = tryLockUnlockCount;
+    }
+
+    public int getTryLockInquiryCount() {
+        return tryLockInquiryCount;
+    }
+
+    public void setTryLockInquiryCount(int tryLockInquiryCount) {
+        this.tryLockInquiryCount = tryLockInquiryCount;
+    }
+
+    public int getTryLockLockCount() {
+        return tryLockLockCount;
+    }
+
+    public void setTryLockLockCount(int tryLockLockCount) {
+        this.tryLockLockCount = tryLockLockCount;
     }
 }

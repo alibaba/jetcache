@@ -71,6 +71,14 @@ public class RefreshCacheTest extends AbstractCacheTest {
         return (RefreshCache) c;
     }
 
+    private static boolean isMultiLevelCache(Cache cache) {
+        Cache c = cache;
+        while (c instanceof ProxyCache) {
+            c = ((ProxyCache) c).getTargetCache();
+        }
+        return c instanceof MultiLevelCache;
+    }
+
     private static void refreshCacheTest1(Cache cache) throws Exception {
         DefaultCacheMonitor monitor = new DefaultCacheMonitor("test");
         cache.config().getMonitors().add(monitor);
@@ -104,15 +112,16 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Thread.sleep((long) (1.5 * refreshMillis));
 
         boolean external = getRefreshCache(cache).concreteCache() instanceof AbstractExternalCache;
+        boolean multiLevel = isMultiLevelCache(cache);
 
         Assert.assertEquals(4, monitor.getCacheStat().getLoadCount());
         Assert.assertNotEquals("refreshCacheTest1_K1_V0", cache.get("refreshCacheTest1_K1"));
-        if (external) {
-            Assert.assertEquals(5 + 2, monitor.getCacheStat().getGetCount());
+        if (external && !multiLevel) {
+            Assert.assertEquals(5 + 2/*timestamp*/, monitor.getCacheStat().getGetCount());
             Assert.assertEquals(3, monitor.getCacheStat().getGetHitCount());
-            Assert.assertEquals(2 + 2, monitor.getCacheStat().getGetMissCount());
+            Assert.assertEquals(2 + 2/*timestamp*/, monitor.getCacheStat().getGetMissCount());
             Assert.assertEquals(4, monitor.getCacheStat().getLoadCount());
-            Assert.assertEquals(4 + 2, monitor.getCacheStat().getPutCount());
+            Assert.assertEquals(4 + 2/*timestamp*/ + 2/*tryLock -> putIfAbsent*/, monitor.getCacheStat().getPutCount());
         } else {
             Assert.assertEquals(5, monitor.getCacheStat().getGetCount());
             Assert.assertEquals(3, monitor.getCacheStat().getGetHitCount());
@@ -121,12 +130,12 @@ public class RefreshCacheTest extends AbstractCacheTest {
             Assert.assertEquals(4, monitor.getCacheStat().getPutCount());
         }
         Assert.assertNotEquals("refreshCacheTest1_K2_V1", cache.get("refreshCacheTest1_K2"));
-        if (external) {
+        if (external && !multiLevel) {
             Assert.assertEquals(6 + 2, monitor.getCacheStat().getGetCount());
             Assert.assertEquals(4, monitor.getCacheStat().getGetHitCount());
             Assert.assertEquals(2 + 2, monitor.getCacheStat().getGetMissCount());
             Assert.assertEquals(4, monitor.getCacheStat().getLoadCount());
-            Assert.assertEquals(4 + 2, monitor.getCacheStat().getPutCount());
+            Assert.assertEquals(4 + 2 + 2, monitor.getCacheStat().getPutCount());
         } else {
             Assert.assertEquals(6, monitor.getCacheStat().getGetCount());
             Assert.assertEquals(4, monitor.getCacheStat().getGetHitCount());
@@ -171,16 +180,10 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache.config().setRefreshPolicy(null);//stop refresh
 
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
-        long missCount = monitor.getCacheStat().getGetMissCount();
-        long hitCount = monitor.getCacheStat().getGetHitCount();
         Assert.assertNotEquals("refreshCacheTest2_K1_V0", cache.get("refreshCacheTest2_K1"));
-        Assert.assertEquals(hitCount + 1, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(missCount, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
-        // refresh task stopped, but it is not expires
+        // refresh task stopped, but K/V is not expires
         Assert.assertEquals("refreshCacheTest2_K2_V1", cache.get("refreshCacheTest2_K2"));
-        Assert.assertEquals(hitCount + 2, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(missCount, monitor.getCacheStat().getGetMissCount());
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
 
         cache.config().getMonitors().remove(monitor);

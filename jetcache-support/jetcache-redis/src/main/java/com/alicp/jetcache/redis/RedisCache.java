@@ -210,65 +210,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        if (key == null) {
-            return null;
-        }
-        try (Jedis jedis = pool.getResource()) {
-            final String uuid = UUID.randomUUID().toString();
-            final byte[] newKey = buildKey(key);
-            final long expireTimestamp = System.currentTimeMillis() + timeUnit.toMillis(expire);
-
-            AutoReleaseLock lock = () -> {
-                if (System.currentTimeMillis() < expireTimestamp) {
-                    CacheResult cacheResult = REMOVE_impl(key, newKey);
-                    if (cacheResult.getResultCode() == CacheResultCode.FAIL && System.currentTimeMillis() < expireTimestamp) {
-                        logger.warn("unlock key {} + failed, retry. msg = {}", key, cacheResult.getMessage());
-                        cacheResult = REMOVE_impl(key, newKey);
-                        if (cacheResult.getResultCode() == CacheResultCode.FAIL) {
-                            logger.error("retry unlock key {} + failed. msg = {}", key, cacheResult.getMessage());
-                        } else {
-                            logger.debug("release lock: {}, {}", key, uuid);
-                        }
-                    } else {
-                        logger.debug("release lock: {}, {}", key, uuid);
-                    }
-                } else {
-                    logger.debug("lock expired: {}, {}", key, uuid);
-                }
-            };
-
-            try {
-                String rt = jedis.set(newKey, uuid.getBytes(), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expire));
-                if ("OK".equals(rt)) {
-                    logger.debug("get lock {},{}", key, uuid);
-                    return lock;
-                } else {
-                    return null;
-                }
-            } catch (Exception e) {
-                logger.warn("tryLock {} + failed, try get again. uuid={}, exClass={}, exMessage={}", key, uuid, e.getClass(), e.getMessage());
-
-                try {
-                    byte[] bs = jedis.get(newKey);
-                    if (bs != null && uuid.equals(new String(bs))) {
-                        logger.info("successful get lock {} after put failure, uuid={}", key, uuid);
-                        return lock;
-                    } else {
-                        return null;
-                    }
-                } catch (Exception e2) {
-                    logger.warn("tryLock(retry) {} + failed. uuid={}, exClass={}, exMessage={}", key, uuid, e2.getClass(), e2.getMessage());
-                    return null;
-                }
-            }
-        } catch (Exception ex) {
-            logError("tryLock", key, ex);
-            return null;
-        }
-    }
-
-    @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;

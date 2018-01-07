@@ -60,15 +60,11 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        throw new IllegalArgumentException();
+        return cache.unwrap(clazz);
     }
 
-    @Override
-    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        if (key == null) {
-            return null;
-        }
-        return cache.tryLock(genKey(key), expire, timeUnit);
+    public CacheValueHolder<V> getHolder(K key) {
+        return (CacheValueHolder<V>) cache.unwrap(LinkedHashMap.class).get(genKey(key));
     }
 
     @Override

@@ -1,8 +1,12 @@
 package com.alicp.jetcache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Closeable;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -12,6 +16,8 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public interface Cache<K, V> extends Closeable {
+
+    Logger logger = LoggerFactory.getLogger(Cache.class);
 
     //-----------------------------JSR 107 style API------------------------------------------------
 
@@ -165,7 +171,88 @@ public interface Cache<K, V> extends Closeable {
      *         or error occurs during cache access.
      * @see #tryLockAndRun(Object, long, TimeUnit, Runnable)
      */
-    AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit);
+    @SuppressWarnings("unchecked")
+    default AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
+        if (key == null) {
+            return null;
+        }
+        final String uuid = UUID.randomUUID().toString();
+        final long expireTimestamp = System.currentTimeMillis() + timeUnit.toMillis(expire);
+        final CacheConfig config = config();
+
+
+        AutoReleaseLock lock = () -> {
+            int unlockCount = 0;
+            while (unlockCount++ < config.getTryLockUnlockCount()) {
+                if(System.currentTimeMillis() < expireTimestamp) {
+                    CacheResult unlockResult = REMOVE(key);
+                    if (unlockResult.getResultCode() == CacheResultCode.FAIL
+                            || unlockResult.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                        logger.info("[tryLock] [{} of {}] [{}] unlock failed. Key={}, msg = {}",
+                                unlockCount, config.getTryLockUnlockCount(), uuid, key, unlockResult.getMessage());
+                        // retry
+                    } else if (unlockResult.isSuccess()) {
+                        logger.debug("[tryLock] [{} of {}] [{}] successfully release the lock. Key={}",
+                                unlockCount, config.getTryLockUnlockCount(), uuid, key);
+                        return;
+                    } else {
+                        logger.warn("[tryLock] [{} of {}] [{}] unexpected unlock result: Key={}, result={}",
+                                unlockCount, config.getTryLockUnlockCount(), uuid, key, unlockResult.getResultCode());
+                        return;
+                    }
+                } else {
+                    logger.info("[tryLock] [{} of {}] [{}] lock already expired: Key={}",
+                            unlockCount, config.getTryLockUnlockCount(), uuid, key);
+                    return;
+                }
+            }
+        };
+
+        int lockCount = 0;
+        Cache cache = this;
+        while (lockCount++ < config.getTryLockLockCount()) {
+            CacheResult lockResult = cache.PUT_IF_ABSENT(key, uuid, expire, timeUnit);
+            if (lockResult.isSuccess()) {
+                logger.debug("[tryLock] [{} of {}] [{}] successfully get a lock. Key={}",
+                        lockCount, config.getTryLockLockCount(), uuid, key);
+                return lock;
+            } else if (lockResult.getResultCode() == CacheResultCode.FAIL || lockResult.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                logger.info("[tryLock] [{} of {}] [{}] cache access failed during get lock, will inquiry {} times. Key={}, msg={}",
+                        lockCount, config.getTryLockLockCount(), uuid,
+                        config.getTryLockInquiryCount(), key, lockResult.getMessage());
+                int inquiryCount = 0;
+                while (inquiryCount++ < config.getTryLockInquiryCount()) {
+                    CacheGetResult inquiryResult = cache.GET(key);
+                    if (inquiryResult.isSuccess()) {
+                        if (uuid.equals(inquiryResult.getValue())) {
+                            logger.debug("[tryLock] [{} of {}] [{}] successfully get a lock after inquiry. Key={}",
+                                    inquiryCount, config.getTryLockInquiryCount(), uuid, key);
+                            return lock;
+                        } else if (inquiryResult.getValue() != null) {
+                            logger.debug("[tryLock] [{} of {}] [{}] not the owner of the lock, return null. Key={}",
+                                    inquiryCount, config.getTryLockInquiryCount(), uuid, key);
+                            return null;
+                        } else {
+                            // retry lock
+                            break;
+                        }
+                    } else {
+                        logger.info("[tryLock] [{} of {}] [{}] inquiry failed. Key={}, msg={}",
+                                inquiryCount, config.getTryLockInquiryCount(), uuid, key, inquiryResult.getMessage());
+                        // retry inquiry
+                    }
+                }
+            } else {
+                // others holds the lock
+                logger.debug("[tryLock] [{} of {}] [{}] others holds the lock, return null. Key={}",
+                        lockCount, config.getTryLockLockCount(), uuid, key);
+                return null;
+            }
+        }
+
+        logger.debug("[tryLock] [{}] return null after {} attempts. Key={}", uuid, config.getTryLockLockCount(), key);
+        return null;
+    }
 
     /**
      * Use this cache to try run an action exclusively.

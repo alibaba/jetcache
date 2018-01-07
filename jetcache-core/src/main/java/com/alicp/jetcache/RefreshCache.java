@@ -64,7 +64,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         return config.getLoader() != null;
     }
 
-    Cache concreteCache() {
+    protected Cache concreteCache() {
         Cache c = getTargetCache();
         while (true) {
             if (c instanceof ProxyCache) {

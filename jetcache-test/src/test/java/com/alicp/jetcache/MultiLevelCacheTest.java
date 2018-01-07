@@ -1,12 +1,13 @@
 package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
-import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
+import com.alicp.jetcache.test.anno.MockRemoteCache;
+import com.alicp.jetcache.test.anno.MockRemoteCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,8 +32,14 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
+        /*
         l2Cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(LIMIT)
+                .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .buildCache();
+        */
+        l2Cache = new MockRemoteCacheBuilder()
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -140,14 +147,14 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l1Cache.remove("KK1");
         Assert.assertEquals("V1", cache.get("KK1"));
 
-        AbstractCache c1 = getAbstractCache(l1Cache);
-        AbstractCache c2 = getAbstractCache(l2Cache);
+        AbstractCache c1 = getConcreteCache(l1Cache);
+        AbstractCache c2 = getConcreteCache(l2Cache);
 
         CacheValueHolder<Object> h1 = (CacheValueHolder<Object>)
                 ((com.github.benmanes.caffeine.cache.Cache) c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class))
                         .getIfPresent("KK1");
         CacheValueHolder<Object> h2 = (CacheValueHolder<Object>)
-                ((LinkedHashMap) c2.unwrap(LinkedHashMap.class)).get("KK1");
+                ((MockRemoteCache)c2).getHolder("KK1");
 
         long x = h1.getExpireTime() - h2.getExpireTime();
         if (Math.abs(x) > 10) {
@@ -157,9 +164,9 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         }
     }
 
-    private AbstractCache getAbstractCache(Cache c) {
-        while (c instanceof MonitoredCache) {
-            c = ((MonitoredCache) c).getTargetCache();
+    private AbstractCache getConcreteCache(Cache c) {
+        while (c instanceof ProxyCache) {
+            c = ((ProxyCache) c).getTargetCache();
         }
         return (AbstractCache) c;
     }

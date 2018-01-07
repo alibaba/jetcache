@@ -147,14 +147,6 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
-    public AutoReleaseLock tryLock(K key, long expire, TimeUnit timeUnit) {
-        if (key == null) {
-            return null;
-        }
-        return SimpleLock.tryLock(this, buildKey(key), expire, timeUnit);
-    }
-
-    @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
