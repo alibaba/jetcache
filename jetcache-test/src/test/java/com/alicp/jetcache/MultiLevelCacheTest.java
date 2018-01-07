@@ -6,8 +6,8 @@ import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import com.alicp.jetcache.test.anno.MockRemoteCache;
-import com.alicp.jetcache.test.anno.MockRemoteCacheBuilder;
+import com.alicp.jetcache.test.MockRemoteCache;
+import com.alicp.jetcache.test.MockRemoteCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,6 +40,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 .buildCache();
         */
         l2Cache = new MockRemoteCacheBuilder()
+                .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();

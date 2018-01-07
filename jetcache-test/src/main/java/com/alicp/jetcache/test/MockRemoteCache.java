@@ -1,7 +1,7 @@
 /**
  * Created on  13-09-22 16:54
  */
-package com.alicp.jetcache.test.anno;
+package com.alicp.jetcache.test;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
@@ -10,7 +10,6 @@ import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
-import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -38,10 +37,11 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
 
-    public MockRemoteCache(ExternalCacheConfig<K, V> config) {
+    public MockRemoteCache(MockRemoteCacheConfig<K, V> config) {
         super(config);
         this.config = config;
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
+                .limit(config.getLimit())
                 .expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                 .buildCache();
     }

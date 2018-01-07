@@ -438,7 +438,12 @@ public abstract class AbstractCacheTest {
     private volatile AtomicLong lockAtommicCount2;
 
     protected void concurrentTest(int threadCount, int limit, int timeInMillis) throws Exception {
-        int count = 2 * limit / threadCount;
+        concurrentTest(threadCount, limit * 5, timeInMillis, true);
+        concurrentTest(threadCount, limit, timeInMillis, false);
+    }
+
+    private void concurrentTest(int threadCount, int limit, int timeInMillis, boolean overflow) throws Exception {
+        int count = limit / threadCount;
         lockAtommicCount1 = new AtomicLong();
         lockAtommicCount2 = new AtomicLong();
         lockCount1 = new AtomicLong();
@@ -453,61 +458,73 @@ public abstract class AbstractCacheTest {
                 this.keyPrefix = keyPrefix;
             }
 
+            private void task1() {
+                int i = 0;
+                while (!stop) {
+                    if (++i >= count) {
+                        i = 0;
+                    }
+                    String key = keyPrefix + i;
+                    Integer value = random.nextInt(10);
+
+                    cache.PUT(key, value, 10000, TimeUnit.SECONDS);
+                    CacheGetResult result = cache.GET(key);
+                    checkResult(key, value, result);
+                    CacheResult removeResult = cache.REMOVE(key);
+                    Assert.assertTrue(removeResult.isSuccess() || removeResult.getResultCode() == CacheResultCode.NOT_EXISTS);
+
+                    if (!isMultiLevelCache()) {
+                        cache.putIfAbsent(String.valueOf(i), i);
+                    }
+
+                    String k1 = String.valueOf(i);
+                    String k2 = key;
+                    HashMap m = new HashMap();
+                    m.put(k1, value);
+                    value = value + 1;
+                    m.put(k2, value);
+                    Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
+                    MultiGetResult<Object, Object> multiGetResult = cache.GET_ALL(m.keySet());
+                    Assert.assertTrue(multiGetResult.isSuccess());
+                    checkResult(k2, value, multiGetResult.getValues().get(k2));
+                    Assert.assertTrue(cache.REMOVE_ALL(m.keySet()).isSuccess());
+                }
+            }
+
+            private void task2() throws Exception {
+                while (!stop) {
+                    boolean b = random.nextBoolean();
+                    String lockKey = b ? "lock1" : "lock2";
+                    try (AutoReleaseLock lock = cache.tryLock(lockKey, 10, TimeUnit.SECONDS)) {
+                        if (lock != null) {
+                            int x = random.nextInt(10);
+                            AtomicLong lockAtomicCount = b ? lockAtommicCount1 : lockAtommicCount2;
+                            AtomicLong lockCount = b ? lockCount1 : lockCount2;
+                            String shareKey = lockKey + "_share";
+
+                            lockAtomicCount.addAndGet(x);
+                            long lockCountNum = lockCount.get();
+
+                            cache.put(shareKey, x);
+                            Assert.assertEquals(x, cache.get(shareKey));
+                            Assert.assertTrue(cache.remove(shareKey));
+                            if (b) {
+                                putIfAbsentTest();
+                            }
+
+                            lockCount.set(lockCountNum + x);
+                        }
+                    }
+                }
+            }
+
             @Override
             public void run() {
                 try {
-                    int i = 0;
-                    while (!stop) {
-                        if (++i >= count) {
-                            i = 0;
-                        }
-                        String key = keyPrefix + i;
-                        Integer value = random.nextInt(10);
-
-                        cache.PUT(key, value, 10000, TimeUnit.SECONDS);
-                        CacheGetResult result = cache.GET(key);
-                        checkResult(key, value, result);
-                        CacheResult removeResult = cache.REMOVE(key);
-                        Assert.assertTrue(removeResult.isSuccess() || removeResult.getResultCode() == CacheResultCode.NOT_EXISTS);
-
-                        if (!isMultiLevelCache()) {
-                            cache.putIfAbsent(String.valueOf(i), i);
-                        }
-
-                        String k1 = String.valueOf(i);
-                        String k2 = key;
-                        HashMap m = new HashMap();
-                        m.put(k1, value);
-                        value = value + 1;
-                        m.put(k2, value);
-                        Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
-                        MultiGetResult<Object, Object> multiGetResult = cache.GET_ALL(m.keySet());
-                        Assert.assertTrue(multiGetResult.isSuccess());
-                        checkResult(k2, value, multiGetResult.getValues().get(k2));
-                        Assert.assertTrue(cache.REMOVE_ALL(m.keySet()).isSuccess());
-
-                        boolean b = random.nextBoolean();
-                        String lockKey = b ? "locka" : "lockb";
-                        try (AutoReleaseLock lock = cache.tryLock(lockKey, 10, TimeUnit.SECONDS)) {
-                            if (lock != null) {
-                                int x = random.nextInt(10);
-                                AtomicLong lockAtomicCount = b ? lockAtommicCount1 : lockAtommicCount2;
-                                AtomicLong lockCount = b ? lockCount1 : lockCount2;
-                                String shareKey = lockKey + "_share";
-
-                                lockAtomicCount.addAndGet(x);
-                                long lockCountNum = lockCount.get();
-
-                                cache.put(shareKey, x);
-                                Assert.assertEquals(x, cache.get(shareKey));
-                                Assert.assertTrue(cache.remove(shareKey));
-                                if (b) {
-                                    putIfAbsentTest();
-                                }
-
-                                lockCount.set(lockCountNum + x);
-                            }
-                        }
+                    if (overflow) {
+                        task1();
+                    } else {
+                        task2();
                     }
                 } catch (Throwable e) {
                     e.printStackTrace();
