@@ -228,13 +228,10 @@ public interface Cache<K, V> extends Closeable {
                             logger.debug("[tryLock] [{} of {}] [{}] successfully get a lock after inquiry. Key={}",
                                     inquiryCount, config.getTryLockInquiryCount(), uuid, key);
                             return lock;
-                        } else if (inquiryResult.getValue() != null) {
+                        } else {
                             logger.debug("[tryLock] [{} of {}] [{}] not the owner of the lock, return null. Key={}",
                                     inquiryCount, config.getTryLockInquiryCount(), uuid, key);
                             return null;
-                        } else {
-                            // retry lock
-                            break;
                         }
                     } else {
                         logger.info("[tryLock] [{} of {}] [{}] inquiry failed. Key={}, msg={}",

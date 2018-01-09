@@ -163,6 +163,15 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V7", cache.get(k7));
         Assert.assertEquals("V8", cache.get(k8));
         Assert.assertEquals("V9", cache.get(k9));
+
+        m.clear();
+        m.put(k7, "V77");
+        m.put(k8, "V88");
+        m.put(k9, "V99");
+        cache.putAll(m, 5000, TimeUnit.MILLISECONDS);
+        Assert.assertEquals("V77", cache.get(k7));
+        Assert.assertEquals("V88", cache.get(k8));
+        Assert.assertEquals("V99", cache.get(k9));
     }
 
     private void removeAllTest() {
@@ -330,12 +339,14 @@ public abstract class AbstractCacheTest {
         CountDownLatch countDownLatch = new CountDownLatch(count);
         int[] runCount = new int[2];
         Runnable runnable = () -> {
-            boolean b = cache.tryLockAndRun("LockKeyAndRunKey", 1, TimeUnit.SECONDS,
+            boolean b = cache.tryLockAndRun("LockKeyAndRunKey", 10, TimeUnit.SECONDS,
                     () -> {
                         runCount[1]++;
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
+                        while (countDownLatch.getCount() > 1) {
+                            try {
+                                Thread.sleep(1);
+                            } catch (InterruptedException e) {
+                            }
                         }
                     });
             if (b)
@@ -348,6 +359,17 @@ public abstract class AbstractCacheTest {
         countDownLatch.await();
         Assert.assertEquals(1, runCount[0]);
         Assert.assertEquals(1, runCount[1]);
+
+        try {
+            cache.tryLockAndRun("LockKeyAndRunKey", 10, TimeUnit.SECONDS, () -> {
+                throw new RuntimeException();
+            });
+            Assert.fail();
+        } catch (Exception e) {
+            try(AutoReleaseLock lock = cache.tryLock("LockKeyAndRunKey", 1, TimeUnit.SECONDS)){
+                Assert.assertNotNull(lock);
+            };
+        }
     }
 
     protected void expireAfterWriteTest(long ttl) throws InterruptedException {
