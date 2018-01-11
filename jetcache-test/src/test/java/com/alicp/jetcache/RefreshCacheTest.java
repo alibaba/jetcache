@@ -7,6 +7,9 @@ import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -153,14 +156,12 @@ public class RefreshCacheTest extends AbstractCacheTest {
         long refreshMillis = cache.config().getRefreshPolicy().getRefreshMillis();
         long stopRefresh = cache.config().getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
 
-        Assert.assertEquals("refreshCacheTest2_K1_V0", cache.get("refreshCacheTest2_K1"));
+        Set s = new HashSet();
+        s.add("refreshCacheTest2_K1");
+        s.add("refreshCacheTest2_K2");
+        Map values = cache.getAll(s);
         long key1StartRefreshTime = System.currentTimeMillis();
-        Assert.assertEquals(1, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
-        Assert.assertEquals("refreshCacheTest2_K2_V1", cache.get("refreshCacheTest2_K2"));
+
         Assert.assertEquals(2, monitor.getCacheStat().getGetCount());
         Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
         Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
@@ -180,10 +181,10 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache.config().setRefreshPolicy(null);//stop refresh
 
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
-        Assert.assertNotEquals("refreshCacheTest2_K1_V0", cache.get("refreshCacheTest2_K1"));
+        Assert.assertNotEquals(values.get("refreshCacheTest2_K1"), cache.get("refreshCacheTest2_K1"));
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
         // refresh task stopped, but K/V is not expires
-        Assert.assertEquals("refreshCacheTest2_K2_V1", cache.get("refreshCacheTest2_K2"));
+        Assert.assertEquals(values.get("refreshCacheTest2_K2"), cache.get("refreshCacheTest2_K2"));
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
 
         cache.config().getMonitors().remove(monitor);

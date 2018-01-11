@@ -36,7 +36,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         try {
             tryLockAndRunMethod = Cache.class.getMethod("tryLockAndRun",
                     Object.class, long.class, TimeUnit.class, Runnable.class);
-            getMethod = Cache.class.getMethod("get", Object.class);
+            getMethod = Cache.class.getMethod("GET", Object.class);
             putMethod = Cache.class.getMethod("put", Object.class, Object.class);
         } catch (NoSuchMethodException e) {
             throw new CacheException(e);
@@ -143,18 +143,37 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
             taskMap.remove(taskId);
         }
 
-        private void load() {
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("refresh {}", key);
+        private void load() throws Throwable {
+            logger.debug("refresh {}", key);
+            CacheLoader<K, V> loader = config.getLoader();
+            loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
+            V v = loader.load(key);
+            cache.PUT(key, v);
+        }
+
+        private void externalLoad(final Cache concreteCache, final long currentTime)
+                throws Throwable {
+            byte[] newKey = ((AbstractExternalCache) concreteCache).buildKey(key);
+            byte[] lockKey = combine(newKey, "_#RL#".getBytes());
+            long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
+            Runnable r = () -> {
+                try {
+                    long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
+                    byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
+                    // AbstractExternalCache buildKey method will not convert byte[]
+                    CacheGetResult refreshTimeResult = (CacheGetResult) getMethod.invoke(concreteCache, timestampKey);
+                    if (refreshTimeResult.isSuccess() && (currentTime < Long.parseLong(refreshTimeResult.getValue().toString()) + refreshMillis)) {
+                        return;
+                    }
+                    load();
+                    // AbstractExternalCache buildKey method will not convert byte[]
+                    putMethod.invoke(concreteCache, timestampKey, String.valueOf(System.currentTimeMillis()));
+                } catch (Throwable e){
+                    throw new CacheException("refresh error", e);
                 }
-                CacheLoader<K, V> loader = config.getLoader();
-                loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
-                V v = loader.load(key);
-                cache.PUT(key, v);
-            } catch (Throwable e) {
-                throw new CacheInvokeException(e);
-            }
+            };
+            // AbstractExternalCache buildKey method will not convert byte[]
+            tryLockAndRunMethod.invoke(concreteCache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
         }
 
         @Override
@@ -168,39 +187,19 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 long stopRefreshAfterLastAccessMillis = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
                 if (stopRefreshAfterLastAccessMillis > 0) {
                     if (lastAccessTime + stopRefreshAfterLastAccessMillis < now) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("cancel refresh: {}", key);
-                        }
+                        logger.debug("cancel refresh: {}", key);
                         cancel();
                         return;
                     }
                 }
                 Cache concreteCache = concreteCache();
                 if (concreteCache instanceof AbstractExternalCache) {
-                    byte[] newKey = ((AbstractExternalCache) concreteCache).buildKey(key);
-                    long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
-                    byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
-                    // AbstractExternalCache buildKey method will not convert byte[]
-                    String refreshTime = (String) getMethod.invoke(concreteCache, timestampKey);
-                    if (refreshTime != null && (now < Long.parseLong(refreshTime) + refreshMillis)) {
-                        return;
-                    }
-
-                    byte[] lockKey = combine(newKey, "_#RL#".getBytes());
-                    long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
-                    Runnable r = this::load;
-                    // AbstractExternalCache buildKey method will not convert byte[]
-                    tryLockAndRunMethod.invoke(concreteCache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
-
-                    // AbstractExternalCache buildKey method will not convert byte[]
-                    putMethod.invoke(concreteCache, timestampKey, String.valueOf(System.currentTimeMillis()));
+                    externalLoad(concreteCache, now);
                 } else {
                     load();
                 }
-            } catch (InvocationTargetException e) {
-                logger.error("load key error: key=" + key, e.getTargetException());
             } catch (Throwable e) {
-                logger.error("load key error: key=" + key, e);
+                logger.error("refresh error: key=" + key, e);
             }
         }
     }
