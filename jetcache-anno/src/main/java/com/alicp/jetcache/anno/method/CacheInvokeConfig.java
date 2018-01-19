@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 
 /**
@@ -17,6 +18,7 @@ public class CacheInvokeConfig {
     EL unlessEL;
     String unlessScript;
 
+    private Cache cache;
 
 
     private static final CacheInvokeConfig noCacheInvokeConfigInstance = new CacheInvokeConfig();
@@ -74,5 +76,13 @@ public class CacheInvokeConfig {
 
     public void setUnlessEL(EL unlessEL) {
         this.unlessEL = unlessEL;
+    }
+
+    public Cache getCache() {
+        return cache;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 }

@@ -10,6 +10,7 @@ import com.alicp.jetcache.RefreshCache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.method.ClassUtil;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
@@ -72,15 +73,21 @@ public class CacheContext {
     public CacheInvokeContext createCacheInvokeContext() {
         CacheInvokeContext c = newCacheInvokeContext();
         c.setCacheFunction((invokeContext) -> {
-            CacheAnnoConfig cacheAnnoConfig = invokeContext.getCacheInvokeConfig().getCacheAnnoConfig();
-            String area = cacheAnnoConfig.getArea();
-            String cacheName = cacheAnnoConfig.getName();
-            if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
-                cacheName = ClassUtil.generateCacheName(
-                        invokeContext.getMethod(), invokeContext.getHiddenPackages());
+            CacheInvokeConfig cic = invokeContext.getCacheInvokeConfig();
+            Cache cache = cic.getCache();
+            if (cache == null) {
+                CacheAnnoConfig cacheAnnoConfig = cic.getCacheAnnoConfig();
+                String area = cacheAnnoConfig.getArea();
+                String cacheName = cacheAnnoConfig.getName();
+                if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
+                    cacheName = ClassUtil.generateCacheName(
+                            invokeContext.getMethod(), invokeContext.getHiddenPackages());
+                }
+                String fullCacheName = area + "_" + cacheName;
+                cache = __createOrGetCache(cacheAnnoConfig, area, fullCacheName);
+                cic.setCache(cache);
             }
-            String fullCacheName = area + "_" + cacheName;
-            return __createOrGetCache(cacheAnnoConfig, area, fullCacheName);
+            return cache;
         });
         return c;
     }

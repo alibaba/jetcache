@@ -2,7 +2,8 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Created on 16/9/7.
@@ -11,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheManager {
 
-    private ConcurrentHashMap<String, Cache> caches = new ConcurrentHashMap();
+    private Map<String, Cache> caches = new Hashtable<>();
 
     private static CacheManager instance = new CacheManager();
 
