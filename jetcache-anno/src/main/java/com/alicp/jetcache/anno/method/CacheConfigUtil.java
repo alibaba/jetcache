@@ -31,6 +31,7 @@ public class CacheConfigUtil {
         cc.setUnless(anno.unless());
         cc.setSerialPolicy(anno.serialPolicy());
         cc.setKeyConvertor(anno.keyConvertor());
+        cc.setKey(anno.key());
         return cc;
     }
 

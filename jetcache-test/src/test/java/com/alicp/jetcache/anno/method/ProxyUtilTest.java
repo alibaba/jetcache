@@ -50,6 +50,7 @@ public class ProxyUtilTest {
         cac.setName(CacheConsts.UNDEFINED_STRING);
         cac.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
         cac.setKeyConvertor(KeyConvertor.FASTJSON);
+        cac.setKey(CacheConsts.UNDEFINED_STRING);
 
         Count c1 = new CountClass();
         Count c2 = ProxyUtil.getProxy(c1, cac, globalCacheConfig);

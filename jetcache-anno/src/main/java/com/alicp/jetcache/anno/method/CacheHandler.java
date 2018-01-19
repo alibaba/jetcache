@@ -118,9 +118,9 @@ public class CacheHandler implements InvocationHandler {
             return invokeOrigin(context);
         }
 
-        Object key = context.getArgs();
+        Object key = ExpressionUtil.evalKey(context);
         if (key == null) {
-            key = "_$JETCACHE_NULL_KEY$_";
+            return loadAndCount(context, cache, key);
         }
 
         if (!ExpressionUtil.evalCondition(context)) {

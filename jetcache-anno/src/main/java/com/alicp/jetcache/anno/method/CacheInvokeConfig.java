@@ -17,6 +17,7 @@ public class CacheInvokeConfig {
 
     private Function<Object, Boolean> conditionEvaluator;
     private Function<Object, Boolean> unlessEvaluator;
+    private Function<Object, Object> keyEvaluator;
 
     private Cache cache;
 
@@ -64,5 +65,13 @@ public class CacheInvokeConfig {
 
     public void setUnlessEvaluator(Function<Object, Boolean> unlessEvaluator) {
         this.unlessEvaluator = unlessEvaluator;
+    }
+
+    public Function<Object, Object> getKeyEvaluator() {
+        return keyEvaluator;
+    }
+
+    public void setKeyEvaluator(Function<Object, Object> keyEvaluator) {
+        this.keyEvaluator = keyEvaluator;
     }
 }

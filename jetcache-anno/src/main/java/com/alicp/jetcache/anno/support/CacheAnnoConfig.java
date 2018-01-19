@@ -24,6 +24,7 @@ public class CacheAnnoConfig {
     private String unless;
     private String serialPolicy;
     private String keyConvertor;
+    private String key;
 
     public String getArea() {
         return area;
@@ -119,5 +120,13 @@ public class CacheAnnoConfig {
 
     public void setTimeUnit(TimeUnit timeUnit) {
         this.timeUnit = timeUnit;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

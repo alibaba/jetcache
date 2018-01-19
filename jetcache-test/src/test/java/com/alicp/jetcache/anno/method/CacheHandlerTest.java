@@ -57,6 +57,7 @@ public class CacheHandlerTest {
         cacheAnnoConfig.setUnless(CacheConsts.UNDEFINED_STRING);
         cacheAnnoConfig.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
         cacheAnnoConfig.setKeyConvertor(KeyConvertor.FASTJSON);
+        cacheAnnoConfig.setKey(CacheConsts.UNDEFINED_STRING);
 
 
         cacheInvokeConfig = new CacheInvokeConfig();

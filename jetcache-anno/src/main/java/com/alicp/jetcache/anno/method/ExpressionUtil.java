@@ -52,4 +52,26 @@ class ExpressionUtil {
         }
     }
 
+    public static Object evalKey(CacheInvokeContext context) {
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        String keyScript = cic.getCacheAnnoConfig().getKey();
+        try {
+            if (cic.getKeyEvaluator() == null) {
+                if (CacheConsts.UNDEFINED_STRING.equals(keyScript)) {
+                    cic.setKeyEvaluator(o -> {
+                        CacheInvokeContext c = (CacheInvokeContext) o;
+                        return c.getArgs() == null ? "_$JETCACHE_NULL_KEY$_" : c.getArgs();
+                    });
+                } else {
+                    ExpressionEvaluator e = new ExpressionEvaluator(keyScript);
+                    cic.setKeyEvaluator((o) -> e.apply(o));
+                }
+            }
+            return cic.getKeyEvaluator().apply(context);
+        } catch (Exception e) {
+            logger.error("error occurs when eval key \"" + keyScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
+            return null;
+        }
+    }
+
 }

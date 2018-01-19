@@ -85,6 +85,13 @@ public @interface Cached {
     String keyConvertor() default CacheConsts.UNDEFINED_STRING;
 
     /**
+     * Specify the key by expression script, optional. If not specified,
+     * use all parameters of the target method and keyConvertor to generate one.
+     * @return an expression script which specifies key
+     */
+    String key() default CacheConsts.UNDEFINED_STRING;
+
+    /**
      * Specify whether a null value should be cached.
      * @return whether a null value should be cached
      */
