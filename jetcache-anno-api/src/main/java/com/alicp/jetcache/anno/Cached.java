@@ -33,7 +33,7 @@ public @interface Cached {
     /**
      * Specify whether the method caching is enabled.
      * If set to false, you can enable it in thread context using
-     * CacheContext.enableCache(Supplier<T> callback)
+     * {@code CacheContext.enableCache(Supplier<T> callback)}
      * @return if the method cache is enabled
      */
     boolean enabled() default CacheConsts.DEFAULT_ENABLED;
