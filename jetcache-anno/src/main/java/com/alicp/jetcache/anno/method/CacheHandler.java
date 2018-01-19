@@ -67,28 +67,28 @@ public class CacheHandler implements InvocationHandler {
         CacheInvokeContext context = null;
         if (cacheInvokeConfig != null) {
             context = contextSupplier.get();
-            context.cacheInvokeConfig = cacheInvokeConfig;
+            context.setCacheInvokeConfig(cacheInvokeConfig);
         } else {
             String sig = ClassUtil.getMethodSig(method);
             CacheInvokeConfig cac = configMap.get(sig);
             if (cac != null) {
                 context = contextSupplier.get();
-                context.cacheInvokeConfig = cac;
+                context.setCacheInvokeConfig(cac);
             }
         }
         if (context == null) {
             return method.invoke(src, args);
         } else {
-            context.invoker = () -> method.invoke(src, args);
-            context.hiddenPackages = hiddenPackages;
-            context.args = args;
-            context.method = method;
+            context.setInvoker(() -> method.invoke(src, args));
+            context.setHiddenPackages(hiddenPackages);
+            context.setArgs(args);
+            context.setMethod(method);
             return invoke(context);
         }
     }
 
     public static Object invoke(CacheInvokeContext context) throws Throwable {
-        if (context.cacheInvokeConfig.isEnableCacheContext()) {
+        if (context.getCacheInvokeConfig().isEnableCacheContext()) {
             try {
                 CacheContextSupport._enable();
                 return doInvoke(context);
@@ -101,7 +101,7 @@ public class CacheHandler implements InvocationHandler {
     }
 
     private static Object doInvoke(CacheInvokeContext context) throws Throwable {
-        CacheAnnoConfig cacheAnnoConfig = context.cacheInvokeConfig.getCacheAnnoConfig();
+        CacheAnnoConfig cacheAnnoConfig = context.getCacheInvokeConfig().getCacheAnnoConfig();
         if (cacheAnnoConfig != null && (cacheAnnoConfig.isEnabled() || CacheContextSupport._isEnabled())) {
             return invokeWithCache(context);
         } else {
@@ -112,13 +112,13 @@ public class CacheHandler implements InvocationHandler {
     private static Object invokeWithCache(CacheInvokeContext context)
             throws Throwable {
 
-        Cache cache = context.cacheFunction.apply(context);
+        Cache cache = context.getCacheFunction().apply(context);
         if (cache == null) {
-            logger.error("no cache with name: " + context.method);
+            logger.error("no cache with name: " + context.getMethod());
             return invokeOrigin(context);
         }
 
-        Object key = context.args;
+        Object key = context.getArgs();
         if (key == null) {
             key = "_$JETCACHE_NULL_KEY$_";
         }
@@ -130,23 +130,23 @@ public class CacheHandler implements InvocationHandler {
         // the semantics of "unless" and "cacheNullValue" is not very accurate, we do our best to process it.
         CacheGetResult cacheGetResult = cache.GET(key);
         if (cacheGetResult.isSuccess()) {
-            context.result = cacheGetResult.getValue();
+            context.setResult(cacheGetResult.getValue());
         }
         if (!cacheGetResult.isSuccess()) {//not hit
-            context.result = loadAndCount(context, cache, key);
+            context.setResult(loadAndCount(context, cache, key));
             if (!canNotCache(context)) {
-                cache.put(key, context.result);
+                cache.put(key, context.getResult());
             }
         } else { //cache hit
             if (canNotCache(context)) {
-                context.result = loadAndCount(context, cache, key);//reload
+                context.setResult(loadAndCount(context, cache, key));//reload
                 if (!canNotCache(context)) {//eval again
-                    cache.put(key, context.result);
+                    cache.put(key, context.getResult());
                 }
             }
         }
 
-        return context.result;
+        return context.getResult();
     }
 
     private static Object loadAndCount(CacheInvokeContext context, Cache cache, Object key) throws Throwable {
@@ -171,11 +171,11 @@ public class CacheHandler implements InvocationHandler {
 
     private static boolean canNotCache(CacheInvokeContext context) {
         return ExpressionUtil.evalUnless(context) ||
-                (context.result == null && !context.cacheInvokeConfig.getCacheAnnoConfig().isCacheNullValue());
+                (context.getResult() == null && !context.getCacheInvokeConfig().getCacheAnnoConfig().isCacheNullValue());
     }
 
     private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {
-        return context.invoker.invoke();
+        return context.getInvoker().invoke();
     }
 
 

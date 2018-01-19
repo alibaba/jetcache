@@ -29,12 +29,15 @@ class ExpressionUtil {
     }
 
     public static boolean evalCondition(CacheInvokeContext context) {
-        String condition = context.cacheInvokeConfig.getCacheAnnoConfig().getCondition();
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        String condition = cic.getCacheAnnoConfig().getCondition();
         if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
             return true;
         }
         try {
-            return eval(context.cacheInvokeConfig.conditionScript, context, context.cacheInvokeConfig.conditionEL);
+            String script = cic.getConditionScript();
+            EL el = cic.getConditionEL();
+            return eval(script, context, el);
         } catch (Exception e) {
             logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return false;
@@ -42,12 +45,15 @@ class ExpressionUtil {
     }
 
     public static boolean evalUnless(CacheInvokeContext context) {
-        String unless = context.cacheInvokeConfig.getCacheAnnoConfig().getUnless();
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        String unless = cic.getCacheAnnoConfig().getUnless();
         if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
             return false;
         }
         try {
-            return eval(context.cacheInvokeConfig.unlessScript, context, context.cacheInvokeConfig.unlessEL);
+            String script = cic.getUnlessScript();
+            EL el = cic.getUnlessEL();
+            return eval(script, context, el);
         } catch (Exception e) {
             logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return true;

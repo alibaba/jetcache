@@ -71,11 +71,11 @@ public class CacheHandlerTest {
 
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
         CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext();
-        c.cacheInvokeConfig = cacheInvokeConfig;
+        c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
-        c.invoker = invoker;
-        c.method = method;
-        c.args = args;
+        c.setInvoker(invoker);
+        c.setMethod(method);
+        c.setArgs(args);
         c.setCacheFunction((n) -> cache);
         return c;
     }
@@ -291,10 +291,10 @@ public class CacheHandlerTest {
         cacheAnnoConfig.setEnabled(false);
         x1 = (Integer) CacheHandler.invoke(context);
         context = createContext(invoker, method, null);
-        context.cacheInvokeConfig.setCacheAnnoConfig(null);
+        context.getCacheInvokeConfig().setCacheAnnoConfig(null);
         x2 = (Integer) CacheHandler.invoke(context);
         context = createContext(invoker, method, null);
-        context.cacheInvokeConfig.setCacheAnnoConfig(null);
+        context.getCacheInvokeConfig().setCacheAnnoConfig(null);
         x3 = (Integer) CacheHandler.invoke(context);
         Assert.assertTrue(x1 != x2 && x1 != x3 && x2 != x3);
 

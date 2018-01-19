@@ -12,15 +12,15 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheInvokeContext {
-    Invoker invoker;
-    Method method;
-    Object[] args;
-    CacheInvokeConfig cacheInvokeConfig;
+    private Invoker invoker;
+    private Method method;
+    private Object[] args;
+    private CacheInvokeConfig cacheInvokeConfig;
 
-    Function<CacheInvokeContext, Cache> cacheFunction;
-    String[] hiddenPackages;
+    private Function<CacheInvokeContext, Cache> cacheFunction;
+    private String[] hiddenPackages;
 
-    Object result = null;
+    private Object result = null;
 
     public CacheInvokeContext(){
     }
@@ -28,6 +28,10 @@ public class CacheInvokeContext {
 
     public void setInvoker(Invoker invoker) {
         this.invoker = invoker;
+    }
+
+    public Invoker getInvoker() {
+        return invoker;
     }
 
     public Method getMethod() {
@@ -62,10 +66,16 @@ public class CacheInvokeContext {
         this.cacheFunction = cacheFunction;
     }
 
-    //------------for eval script
+    public Function<CacheInvokeContext, Cache> getCacheFunction() {
+        return cacheFunction;
+    }
 
     public Object[] getArgs() {
         return args;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
     }
 
     public Object getResult() {

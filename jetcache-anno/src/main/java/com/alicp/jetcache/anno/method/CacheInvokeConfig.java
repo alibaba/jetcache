@@ -13,10 +13,10 @@ public class CacheInvokeConfig {
     private CacheAnnoConfig cacheAnnoConfig;
     private boolean enableCacheContext;
 
-    EL conditionEL;
-    String conditionScript;
-    EL unlessEL;
-    String unlessScript;
+    private EL conditionEL;
+    private String conditionScript;
+    private EL unlessEL;
+    private String unlessScript;
 
     private Cache cache;
 
@@ -66,16 +66,16 @@ public class CacheInvokeConfig {
         return conditionEL;
     }
 
-    public void setConditionEL(EL conditionEL) {
-        this.conditionEL = conditionEL;
-    }
-
     public EL getUnlessEL() {
         return unlessEL;
     }
 
-    public void setUnlessEL(EL unlessEL) {
-        this.unlessEL = unlessEL;
+    public String getConditionScript() {
+        return conditionScript;
+    }
+
+    public String getUnlessScript() {
+        return unlessScript;
     }
 
     public Cache getCache() {
