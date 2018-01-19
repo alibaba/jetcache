@@ -19,7 +19,6 @@ public class ProxyUtil {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
         cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
-        cacheInvokeConfig.init();
         CacheHandler h = new CacheHandler(target, cacheInvokeConfig,
                 () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(),
                 globalCacheConfig.getHiddenPackages());

@@ -43,7 +43,6 @@ public class CacheConfigUtil {
         CacheAnnoConfig cc = parseCacheConfig(method);
         if (cc != null) {
             cac.setCacheAnnoConfig(cc);
-            cac.init();
         }
         boolean enable = parseEnableCacheConfig(method);
         if (enable) {

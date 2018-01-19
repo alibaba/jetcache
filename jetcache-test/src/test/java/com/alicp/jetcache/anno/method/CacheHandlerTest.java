@@ -205,7 +205,6 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count", int.class);
         int x1, x2;
         cacheAnnoConfig.setCondition("mvel{args[0]>10}");
-        cacheInvokeConfig.init();
         x1 = invoke(method, new Object[]{10});
         x2 = invoke(method, new Object[]{10});
         Assert.assertNotEquals(x1, x2);
@@ -219,12 +218,12 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3, x4;
         cacheAnnoConfig.setUnless("mvel{result%2==1}");
-        cacheInvokeConfig.init();
+        cacheInvokeConfig.setUnlessEvaluator(null);
         x1 = invoke(method, null);//return 0, unless=false, so cached
         x2 = invoke(method, null);//cache hit
         Assert.assertEquals(x1, x2);
         cacheAnnoConfig.setUnless("mvel{result%2==0}");
-        cacheInvokeConfig.init();
+        cacheInvokeConfig.setUnlessEvaluator(null);
         x3 = invoke(method, null);//cache hit(0),unless=true,invoke and return 1, and then cached
         x4 = invoke(method, null);//cache hit(1)
         Assert.assertEquals(x3, x4);
@@ -238,20 +237,20 @@ public class CacheHandlerTest {
 
         cacheAnnoConfig.setCacheNullValue(false);
         cacheAnnoConfig.setUnless("mvel{result==0}");
-        cacheInvokeConfig.init();
+        cacheInvokeConfig.setUnlessEvaluator(null);
         Assert.assertNull(invoke(method, null));//null, not cached
         Assert.assertEquals(0, invoke(method, null).longValue());//0, not cached
         Assert.assertEquals(1, invoke(method, null).longValue());//1, cache
         Assert.assertEquals(1, invoke(method, null).longValue());//cache hit
 
         cacheAnnoConfig.setUnless("mvel{result==1}");
-        cacheInvokeConfig.init();
+        cacheInvokeConfig.setUnlessEvaluator(null);
         Assert.assertEquals(2, invoke(method, null).longValue());
         Assert.assertEquals(2, invoke(method, null).longValue());
 
         count = new CountClass();
         cacheAnnoConfig.setUnless("mvel{result==2}");
-        cacheInvokeConfig.init();
+        cacheInvokeConfig.setUnlessEvaluator(null);
         Assert.assertNull(invoke(method, null));
         Assert.assertEquals(0, invoke(method, null).longValue());//0, cached
         Assert.assertEquals(0, invoke(method, null).longValue());//cache hit
@@ -259,7 +258,7 @@ public class CacheHandlerTest {
         cacheAnnoConfig.setCacheNullValue(true);
         count = new CountClass();
         cacheAnnoConfig.setUnless("mvel{result==0}");
-        cacheInvokeConfig.init();
+        cacheInvokeConfig.setUnlessEvaluator(null);
         Assert.assertNull(invoke(method, null));
         Assert.assertNull(invoke(method, null));
     }

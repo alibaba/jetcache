@@ -6,6 +6,8 @@ package com.alicp.jetcache.anno.method;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 
+import java.util.function.Function;
+
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -13,37 +15,15 @@ public class CacheInvokeConfig {
     private CacheAnnoConfig cacheAnnoConfig;
     private boolean enableCacheContext;
 
-    private EL conditionEL;
-    private String conditionScript;
-    private EL unlessEL;
-    private String unlessScript;
+    private Function<Object, Boolean> conditionEvaluator;
+    private Function<Object, Boolean> unlessEvaluator;
 
     private Cache cache;
-
 
     private static final CacheInvokeConfig noCacheInvokeConfigInstance = new CacheInvokeConfig();
 
     public static CacheInvokeConfig getNoCacheInvokeConfigInstance() {
         return noCacheInvokeConfigInstance;
-    }
-
-    public void init() {
-        Object[] tmp = ExpressionUtil.parseEL(cacheAnnoConfig.getCondition());
-        if (tmp != null) {
-            conditionEL = (EL) tmp[0];
-            conditionScript = (String) tmp[1];
-        } else {
-            conditionEL = null;
-            conditionScript = null;
-        }
-        tmp = ExpressionUtil.parseEL(cacheAnnoConfig.getUnless());
-        if (tmp != null) {
-            unlessEL = (EL) tmp[0];
-            unlessScript = (String) tmp[1];
-        } else {
-            unlessEL = null;
-            unlessScript = null;
-        }
     }
 
     public CacheAnnoConfig getCacheAnnoConfig() {
@@ -62,27 +42,27 @@ public class CacheInvokeConfig {
         this.enableCacheContext = enableCacheContext;
     }
 
-    public EL getConditionEL() {
-        return conditionEL;
-    }
-
-    public EL getUnlessEL() {
-        return unlessEL;
-    }
-
-    public String getConditionScript() {
-        return conditionScript;
-    }
-
-    public String getUnlessScript() {
-        return unlessScript;
-    }
-
     public Cache getCache() {
         return cache;
     }
 
     public void setCache(Cache cache) {
         this.cache = cache;
+    }
+
+    public Function<Object, Boolean> getConditionEvaluator() {
+        return conditionEvaluator;
+    }
+
+    public void setConditionEvaluator(Function<Object, Boolean> conditionEvaluator) {
+        this.conditionEvaluator = conditionEvaluator;
+    }
+
+    public Function<Object, Boolean> getUnlessEvaluator() {
+        return unlessEvaluator;
+    }
+
+    public void setUnlessEvaluator(Function<Object, Boolean> unlessEvaluator) {
+        this.unlessEvaluator = unlessEvaluator;
     }
 }
