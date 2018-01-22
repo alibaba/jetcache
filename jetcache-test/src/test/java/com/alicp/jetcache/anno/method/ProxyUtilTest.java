@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.*;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -39,7 +39,7 @@ public class ProxyUtilTest {
 
     @Test
     public void testGetProxy() {
-        CacheAnnoConfig cac = new CacheAnnoConfig();
+        CachedAnnoConfig cac = new CachedAnnoConfig();
         cac.setArea(CacheConsts.DEFAULT_AREA);
         cac.setCacheType(CacheType.REMOTE);
         cac.setCondition(CacheConsts.UNDEFINED_STRING);

@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class CacheAnnoConfig {
+public class CachedAnnoConfig {
 
     private String area;
     private String name;

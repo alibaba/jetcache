@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 
 import java.util.function.Function;
 
@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheInvokeConfig {
-    private CacheAnnoConfig cacheAnnoConfig;
+    private CachedAnnoConfig cachedAnnoConfig;
     private boolean enableCacheContext;
 
     private Function<Object, Boolean> conditionEvaluator;
@@ -27,12 +27,12 @@ public class CacheInvokeConfig {
         return noCacheInvokeConfigInstance;
     }
 
-    public CacheAnnoConfig getCacheAnnoConfig() {
-        return cacheAnnoConfig;
+    public CachedAnnoConfig getCachedAnnoConfig() {
+        return cachedAnnoConfig;
     }
 
-    public void setCacheAnnoConfig(CacheAnnoConfig cacheAnnoConfig) {
-        this.cacheAnnoConfig = cacheAnnoConfig;
+    public void setCachedAnnoConfig(CachedAnnoConfig cachedAnnoConfig) {
+        this.cachedAnnoConfig = cachedAnnoConfig;
     }
 
     public boolean isEnableCacheContext() {

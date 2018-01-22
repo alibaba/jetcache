@@ -16,7 +16,7 @@ class ExpressionUtil {
 
     public static boolean evalCondition(CacheInvokeContext context) {
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        String condition = cic.getCacheAnnoConfig().getCondition();
+        String condition = cic.getCachedAnnoConfig().getCondition();
         try {
             if (cic.getConditionEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
@@ -35,7 +35,7 @@ class ExpressionUtil {
 
     public static boolean evalUnless(CacheInvokeContext context) {
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        String unless = cic.getCacheAnnoConfig().getUnless();
+        String unless = cic.getCachedAnnoConfig().getUnless();
         try {
             if (cic.getUnlessEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
@@ -54,7 +54,7 @@ class ExpressionUtil {
 
     public static Object evalKey(CacheInvokeContext context) {
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        String keyScript = cic.getCacheAnnoConfig().getKey();
+        String keyScript = cic.getCachedAnnoConfig().getKey();
         try {
             if (cic.getKeyEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(keyScript)) {

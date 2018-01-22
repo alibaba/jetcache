@@ -7,7 +7,7 @@ import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.ProxyCache;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.event.CacheLoadEvent;
 import org.slf4j.Logger;
@@ -101,8 +101,8 @@ public class CacheHandler implements InvocationHandler {
     }
 
     private static Object doInvoke(CacheInvokeContext context) throws Throwable {
-        CacheAnnoConfig cacheAnnoConfig = context.getCacheInvokeConfig().getCacheAnnoConfig();
-        if (cacheAnnoConfig != null && (cacheAnnoConfig.isEnabled() || CacheContextSupport._isEnabled())) {
+        CachedAnnoConfig cachedAnnoConfig = context.getCacheInvokeConfig().getCachedAnnoConfig();
+        if (cachedAnnoConfig != null && (cachedAnnoConfig.isEnabled() || CacheContextSupport._isEnabled())) {
             return invokeWithCache(context);
         } else {
             return invokeOrigin(context);
@@ -171,7 +171,7 @@ public class CacheHandler implements InvocationHandler {
 
     private static boolean canNotCache(CacheInvokeContext context) {
         return ExpressionUtil.evalUnless(context) ||
-                (context.getResult() == null && !context.getCacheInvokeConfig().getCacheAnnoConfig().isCacheNullValue());
+                (context.getResult() == null && !context.getCacheInvokeConfig().getCachedAnnoConfig().isCacheNullValue());
     }
 
     private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {

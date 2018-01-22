@@ -4,7 +4,7 @@ import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.method.ClassUtil;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
@@ -57,7 +57,7 @@ class LazyInitCache implements ProxyCache {
         }
         GlobalCacheConfig globalCacheConfig = beanFactory.getBean(GlobalCacheConfig.class);
 
-        CacheAnnoConfig cac = new CacheAnnoConfig();
+        CachedAnnoConfig cac = new CachedAnnoConfig();
         cac.setArea(ann.area());
         cac.setName(ann.name());
         cac.setTimeUnit(ann.timeUnit());

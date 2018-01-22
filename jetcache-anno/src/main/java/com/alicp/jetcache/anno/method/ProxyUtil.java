@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
@@ -15,10 +15,10 @@ import java.util.HashMap;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ProxyUtil {
-    public static <T> T getProxy(T target, CacheAnnoConfig cacheAnnoConfig, GlobalCacheConfig globalCacheConfig) {
+    public static <T> T getProxy(T target, CachedAnnoConfig cachedAnnoConfig, GlobalCacheConfig globalCacheConfig) {
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
-        cacheInvokeConfig.setCacheAnnoConfig(cacheAnnoConfig);
+        cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
         CacheHandler h = new CacheHandler(target, cacheInvokeConfig,
                 () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(),
                 globalCacheConfig.getHiddenPackages());

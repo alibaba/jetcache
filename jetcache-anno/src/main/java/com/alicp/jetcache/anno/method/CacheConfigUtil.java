@@ -5,7 +5,7 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
-import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 
 import java.lang.reflect.Method;
 
@@ -13,12 +13,12 @@ import java.lang.reflect.Method;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheConfigUtil {
-    private static CacheAnnoConfig parseCacheConfig(Method m) {
+    private static CachedAnnoConfig parseCacheConfig(Method m) {
         Cached anno = m.getAnnotation(Cached.class);
         if (anno == null) {
             return null;
         }
-        CacheAnnoConfig cc = new CacheAnnoConfig();
+        CachedAnnoConfig cc = new CachedAnnoConfig();
         cc.setArea(anno.area());
         cc.setName(anno.name());
         cc.setCacheType(anno.cacheType());
@@ -41,9 +41,9 @@ public class CacheConfigUtil {
     }
 
     public static boolean parse(CacheInvokeConfig cac, Method method) {
-        CacheAnnoConfig cc = parseCacheConfig(method);
+        CachedAnnoConfig cc = parseCacheConfig(method);
         if (cc != null) {
-            cac.setCacheAnnoConfig(cc);
+            cac.setCachedAnnoConfig(cc);
         }
         boolean enable = parseEnableCacheConfig(method);
         if (enable) {
