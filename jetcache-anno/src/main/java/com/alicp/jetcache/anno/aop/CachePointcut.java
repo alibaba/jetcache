@@ -6,6 +6,7 @@ package com.alicp.jetcache.anno.aop;
 import com.alicp.jetcache.anno.method.CacheConfigUtil;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.method.ClassUtil;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.ClassFilter;
@@ -14,7 +15,6 @@ import org.springframework.asm.Type;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -23,7 +23,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
 
     private static final Logger logger = LoggerFactory.getLogger(CachePointcut.class);
 
-    private ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap;
+    private ConfigMap cacheConfigMap;
     private String[] basePackages;
 
     public CachePointcut(String[] basePackages) {
@@ -115,7 +115,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             return false;
         }
         String key = getKey(method, targetClass);
-        CacheInvokeConfig cac = cacheConfigMap.get(key);
+        CacheInvokeConfig cac = cacheConfigMap.getByMethodInfo(key);
         if (cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
             return false;
         } else if (cac != null) {
@@ -129,10 +129,10 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
             parseByTargetClass(cac, targetClass, name, paramTypes);
 
             if (!cac.isEnableCacheContext() && cac.getCachedAnnoConfig() == null) {
-                cacheConfigMap.put(key, CacheInvokeConfig.getNoCacheInvokeConfigInstance());
+                cacheConfigMap.putByMethodInfo(key, CacheInvokeConfig.getNoCacheInvokeConfigInstance());
                 return false;
             } else {
-                cacheConfigMap.put(key, cac);
+                cacheConfigMap.putByMethodInfo(key, cac);
                 return true;
             }
         }
@@ -192,7 +192,7 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
 
-    public void setCacheConfigMap(ConcurrentHashMap cacheConfigMap) {
+    public void setCacheConfigMap(ConfigMap cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 }

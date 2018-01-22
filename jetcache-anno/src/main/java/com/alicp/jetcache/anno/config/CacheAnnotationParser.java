@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.anno.aop.CacheAdvisor;
 import com.alicp.jetcache.anno.aop.JetCacheInterceptor;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -35,7 +36,7 @@ public class CacheAnnotationParser implements BeanDefinitionParser {
         if (!parserContext.getRegistry().containsBeanDefinition(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)) {
             Object eleSource = parserContext.extractSource(element);
 
-            RootBeanDefinition configMapDef = new RootBeanDefinition(ConcurrentHashMap.class);
+            RootBeanDefinition configMapDef = new RootBeanDefinition(ConfigMap.class);
             configMapDef.setSource(eleSource);
             configMapDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
             String configMapName = parserContext.getReaderContext().registerWithGeneratedName(configMapDef);

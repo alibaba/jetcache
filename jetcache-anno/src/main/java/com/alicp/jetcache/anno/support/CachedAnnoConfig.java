@@ -10,25 +10,17 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class CachedAnnoConfig {
+public class CachedAnnoConfig extends CacheAnnoConfig {
 
-    private String area;
-    private String name;
     private boolean enabled;
     private TimeUnit timeUnit;
     private long expire;
     private CacheType cacheType;
     private int localLimit;
     private boolean cacheNullValue;
-    private String condition;
     private String unless;
     private String serialPolicy;
     private String keyConvertor;
-    private String key;
-
-    public String getArea() {
-        return area;
-    }
 
     public boolean isEnabled() {
         return enabled;
@@ -44,10 +36,6 @@ public class CachedAnnoConfig {
 
     public int getLocalLimit() {
         return localLimit;
-    }
-
-    public void setArea(String area) {
-        this.area = area;
     }
 
     public void setEnabled(boolean enabled) {
@@ -74,14 +62,6 @@ public class CachedAnnoConfig {
         this.cacheNullValue = cacheNullValue;
     }
 
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
-
     public String getUnless() {
         return unless;
     }
@@ -96,14 +76,6 @@ public class CachedAnnoConfig {
 
     public void setSerialPolicy(String serialPolicy) {
         this.serialPolicy = serialPolicy;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getKeyConvertor() {
@@ -122,11 +94,4 @@ public class CachedAnnoConfig {
         this.timeUnit = timeUnit;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
 }

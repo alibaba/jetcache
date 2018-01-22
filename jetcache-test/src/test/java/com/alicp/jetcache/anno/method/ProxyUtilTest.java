@@ -37,33 +37,6 @@ public class ProxyUtilTest {
         globalCacheConfig.shutdown();
     }
 
-    @Test
-    public void testGetProxy() {
-        CachedAnnoConfig cac = new CachedAnnoConfig();
-        cac.setArea(CacheConsts.DEFAULT_AREA);
-        cac.setCacheType(CacheType.REMOTE);
-        cac.setCondition(CacheConsts.UNDEFINED_STRING);
-        cac.setUnless(CacheConsts.UNDEFINED_STRING);
-        cac.setEnabled(true);
-        cac.setTimeUnit(TimeUnit.SECONDS);
-        cac.setExpire(100);
-        cac.setName(CacheConsts.UNDEFINED_STRING);
-        cac.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
-        cac.setKeyConvertor(KeyConvertor.FASTJSON);
-        cac.setKey(CacheConsts.UNDEFINED_STRING);
-
-        Count c1 = new CountClass();
-        Count c2 = ProxyUtil.getProxy(c1, cac, globalCacheConfig);
-
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertEquals(c2.count(), c2.count());
-        Assert.assertEquals(c2.count(100), c2.count(100));
-        Assert.assertEquals(c2.count("S", 100), c2.count("S", 100));
-        Assert.assertEquals(c2.count(new DynamicQuery(), 100), c2.count(new DynamicQuery(), 100));
-
-        Assert.assertNotEquals(c2.count(200), c2.count(100));
-    }
-
     public interface I1 {
         int count();
 

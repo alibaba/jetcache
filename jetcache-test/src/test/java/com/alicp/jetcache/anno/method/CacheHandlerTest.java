@@ -9,6 +9,7 @@ import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.KeyConvertor;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
@@ -71,7 +72,7 @@ public class CacheHandlerTest {
     }
 
     private CacheInvokeContext createContext(Invoker invoker, Method method, Object[] args) {
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext();
+        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(new ConfigMap());
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
         c.setInvoker(invoker);
@@ -219,12 +220,12 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count");
         int x1, x2, x3, x4;
         cachedAnnoConfig.setUnless("mvel{result%2==1}");
-        cacheInvokeConfig.setUnlessEvaluator(null);
+        cacheInvokeConfig.setCachedUnlessEvaluator(null);
         x1 = invoke(method, null);//return 0, unless=false, so cached
         x2 = invoke(method, null);//cache hit
         Assert.assertEquals(x1, x2);
         cachedAnnoConfig.setUnless("mvel{result%2==0}");
-        cacheInvokeConfig.setUnlessEvaluator(null);
+        cacheInvokeConfig.setCachedUnlessEvaluator(null);
         x3 = invoke(method, null);//cache hit(0),unless=true,invoke and return 1, and then cached
         x4 = invoke(method, null);//cache hit(1)
         Assert.assertEquals(x3, x4);
@@ -238,20 +239,20 @@ public class CacheHandlerTest {
 
         cachedAnnoConfig.setCacheNullValue(false);
         cachedAnnoConfig.setUnless("mvel{result==0}");
-        cacheInvokeConfig.setUnlessEvaluator(null);
+        cacheInvokeConfig.setCachedUnlessEvaluator(null);
         Assert.assertNull(invoke(method, null));//null, not cached
         Assert.assertEquals(0, invoke(method, null).longValue());//0, not cached
         Assert.assertEquals(1, invoke(method, null).longValue());//1, cache
         Assert.assertEquals(1, invoke(method, null).longValue());//cache hit
 
         cachedAnnoConfig.setUnless("mvel{result==1}");
-        cacheInvokeConfig.setUnlessEvaluator(null);
+        cacheInvokeConfig.setCachedUnlessEvaluator(null);
         Assert.assertEquals(2, invoke(method, null).longValue());
         Assert.assertEquals(2, invoke(method, null).longValue());
 
         count = new CountClass();
         cachedAnnoConfig.setUnless("mvel{result==2}");
-        cacheInvokeConfig.setUnlessEvaluator(null);
+        cacheInvokeConfig.setCachedUnlessEvaluator(null);
         Assert.assertNull(invoke(method, null));
         Assert.assertEquals(0, invoke(method, null).longValue());//0, cached
         Assert.assertEquals(0, invoke(method, null).longValue());//cache hit
@@ -259,7 +260,7 @@ public class CacheHandlerTest {
         cachedAnnoConfig.setCacheNullValue(true);
         count = new CountClass();
         cachedAnnoConfig.setUnless("mvel{result==0}");
-        cacheInvokeConfig.setUnlessEvaluator(null);
+        cacheInvokeConfig.setCachedUnlessEvaluator(null);
         Assert.assertNull(invoke(method, null));
         Assert.assertNull(invoke(method, null));
     }
@@ -328,23 +329,13 @@ public class CacheHandlerTest {
     }
 
     @Test
-    public void testInvoke1() throws Throwable {
-        Method method = CountClass.class.getMethod("count");
-        Invoker invoker = () -> method.invoke(count);
-        CacheHandler ch = new CacheHandler(count, cacheInvokeConfig, () -> createContext(invoker, method, null), null);
-        int x1 = (Integer) ch.invoke(null, method, null);
-        int x2 = (Integer) ch.invoke(null, method, null);
-        Assert.assertEquals(x1, x2);
-    }
-
-    @Test
     public void testInvoke2() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         final CacheInvokeConfig cac = new CacheInvokeConfig();
         cac.setCachedAnnoConfig(cachedAnnoConfig);
-        HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>() {
+        ConfigMap configMap = new ConfigMap() {
             @Override
-            public CacheInvokeConfig get(Object key) {
+            public CacheInvokeConfig getByMethodInfo(String key) {
                 return cac;
             }
         };

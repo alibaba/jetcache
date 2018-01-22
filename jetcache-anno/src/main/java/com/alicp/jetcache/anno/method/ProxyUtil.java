@@ -4,40 +4,30 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ProxyUtil {
-    public static <T> T getProxy(T target, CachedAnnoConfig cachedAnnoConfig, GlobalCacheConfig globalCacheConfig) {
-        Class<?>[] its = ClassUtil.getAllInterfaces(target);
-        CacheInvokeConfig cacheInvokeConfig = new CacheInvokeConfig();
-        cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
-        CacheHandler h = new CacheHandler(target, cacheInvokeConfig,
-                () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(),
-                globalCacheConfig.getHiddenPackages());
-        Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
-        return (T) o;
-    }
 
     public static <T> T getProxyByAnnotation(T target, GlobalCacheConfig globalCacheConfig) {
-        final HashMap<String, CacheInvokeConfig> configMap = new HashMap<String, CacheInvokeConfig>();
+        final ConfigMap configMap = new ConfigMap();
         processType(configMap, target.getClass());
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap,
-                () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(),
+                () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap),
                 globalCacheConfig.getHiddenPackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;
     }
 
-    private static void processType(HashMap<String, CacheInvokeConfig> configMap, Class<?> clazz) {
+    private static void processType(ConfigMap configMap, Class<?> clazz) {
         if (clazz.isAnnotation() || clazz.isArray() || clazz.isEnum() || clazz.isPrimitive()) {
             throw new IllegalArgumentException(clazz.getName());
         }
@@ -63,13 +53,13 @@ public class ProxyUtil {
         }
     }
 
-    private static void processMethod(HashMap<String, CacheInvokeConfig> configMap, Method m) {
+    private static void processMethod(ConfigMap configMap, Method m) {
         String sig = ClassUtil.getMethodSig(m);
-        CacheInvokeConfig cac = configMap.get(sig);
+        CacheInvokeConfig cac = configMap.getByMethodInfo(sig);
         if (cac == null) {
             cac = new CacheInvokeConfig();
             if (CacheConfigUtil.parse(cac, m)) {
-                configMap.put(sig, cac);
+                configMap.putByMethodInfo(sig, cac);
             }
         } else {
             CacheConfigUtil.parse(cac, m);

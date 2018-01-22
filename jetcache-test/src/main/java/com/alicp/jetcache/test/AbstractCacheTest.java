@@ -21,7 +21,7 @@ public abstract class AbstractCacheTest {
     protected void baseTest() throws Exception {
         illegalArgTest();
 
-        // get/put/get
+        // get/put/getByMethodInfo
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V1", 10, TimeUnit.SECONDS).getResultCode());
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("BASE_K1").getResultCode());

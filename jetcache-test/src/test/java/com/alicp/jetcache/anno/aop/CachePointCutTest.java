@@ -8,6 +8,7 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,19 +16,18 @@ import otherpackage.OtherService;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CachePointCutTest {
     private CachePointcut pc;
-    private ConcurrentHashMap<String, CacheInvokeConfig> map;
+    private ConfigMap map;
 
     @Before
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        map = new ConcurrentHashMap<>();
+        map = new ConfigMap();
         pc.setCacheConfigMap(map);
     }
 
@@ -55,14 +55,14 @@ public class CachePointCutTest {
         Assert.assertTrue(pc.matches(m1, I1.class));
         Assert.assertTrue(pc.matches(m2, I1.class));
 
-        Assert.assertFalse(map.get(CachePointcut.getKey(m1, C1.class)).isEnableCacheContext());
-        Assert.assertFalse(map.get(CachePointcut.getKey(m1, I1.class)).isEnableCacheContext());
-        Assert.assertFalse(map.get(CachePointcut.getKey(m2, C1.class)).isEnableCacheContext());
-        Assert.assertFalse(map.get(CachePointcut.getKey(m2, I1.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, C1.class)).getCachedAnnoConfig());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, I1.class)).getCachedAnnoConfig());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, C1.class)).getCachedAnnoConfig());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, I1.class)).getCachedAnnoConfig());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, C1.class)).isEnableCacheContext());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, I1.class)).isEnableCacheContext());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C1.class)).isEnableCacheContext());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, I1.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C1.class)).getCachedAnnoConfig());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, I1.class)).getCachedAnnoConfig());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C1.class)).getCachedAnnoConfig());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I1.class)).getCachedAnnoConfig());
 
         Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, (proxy, method, args) -> null);
         Assert.assertTrue(pc.matches(m1, o1.getClass()));
@@ -91,16 +91,16 @@ public class CachePointCutTest {
         Assert.assertFalse(pc.matches(m1, I2.class));
         Assert.assertTrue(pc.matches(m2, I2.class));
 
-        Assert.assertSame(CacheInvokeConfig.getNoCacheInvokeConfigInstance(), map.get(CachePointcut.getKey(m1, I2.class)));
+        Assert.assertSame(CacheInvokeConfig.getNoCacheInvokeConfigInstance(), map.getByMethodInfo(CachePointcut.getKey(m1, I2.class)));
 
-        Assert.assertFalse(map.get(CachePointcut.getKey(m1, C2.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, C2.class)).getCachedAnnoConfig());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, C2.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C2.class)).getCachedAnnoConfig());
 
-        Assert.assertFalse(map.get(CachePointcut.getKey(m2, I2.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, I2.class)).getCachedAnnoConfig());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, I2.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I2.class)).getCachedAnnoConfig());
 
-        Assert.assertFalse(map.get(CachePointcut.getKey(m2, C2.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, C2.class)).getCachedAnnoConfig());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).getCachedAnnoConfig());
     }
 
     interface I3_Parent {
@@ -132,15 +132,15 @@ public class CachePointCutTest {
         Assert.assertTrue(pc.matches(m3, I3.class));
 
 
-        Assert.assertTrue(map.get(CachePointcut.getKey(m1, I3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.get(CachePointcut.getKey(m1, C3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.get(CachePointcut.getKey(m2, I3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.get(CachePointcut.getKey(m2, C3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.get(CachePointcut.getKey(m3, I3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.get(CachePointcut.getKey(m3, C3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, I3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, C3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, I3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, C3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m3, I3.class)).isEnableCacheContext());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m3, C3.class)).isEnableCacheContext());
 
 
-        CachedAnnoConfig cac = map.get(CachePointcut.getKey(m1, I3.class)).getCachedAnnoConfig();
+        CachedAnnoConfig cac = map.getByMethodInfo(CachePointcut.getKey(m1, I3.class)).getCachedAnnoConfig();
         Assert.assertEquals("A1", cac.getArea());
         Assert.assertEquals(false, cac.isEnabled());
         Assert.assertEquals(1, cac.getExpire());
@@ -173,17 +173,17 @@ public class CachePointCutTest {
         Assert.assertTrue(pc.matches(m1, I4.class));
         Assert.assertTrue(pc.matches(m2, I4.class));
 
-        Assert.assertFalse(map.get(CachePointcut.getKey(m1, I4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, I4.class)).getCachedAnnoConfig());
+        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, I4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, I4.class)).getCachedAnnoConfig());
 
-        Assert.assertTrue(map.get(CachePointcut.getKey(m1, C4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m1, C4.class)).getCachedAnnoConfig());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, C4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C4.class)).getCachedAnnoConfig());
 
-        Assert.assertTrue(map.get(CachePointcut.getKey(m2, I4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, I4.class)).getCachedAnnoConfig());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, I4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I4.class)).getCachedAnnoConfig());
 
-        Assert.assertTrue(map.get(CachePointcut.getKey(m2, C4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.get(CachePointcut.getKey(m2, C4.class)).getCachedAnnoConfig());
+        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, C4.class)).isEnableCacheContext());
+        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C4.class)).getCachedAnnoConfig());
 
     }
 

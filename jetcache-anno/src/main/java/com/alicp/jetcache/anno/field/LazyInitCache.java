@@ -77,8 +77,7 @@ class LazyInitCache implements ProxyCache {
             sb.append(".").append(field.getName());
             cacheName = sb.toString();
         }
-        String fullCacheName = cac.getArea() + "_" + cacheName;
-        cache = globalCacheConfig.getCacheContext().__createOrGetCache(cac, ann.area(), fullCacheName);
+        cache = globalCacheConfig.getCacheContext().__createOrGetCache(cac, ann.area(), cacheName);
     }
 
     @Override

@@ -3,10 +3,9 @@
  */
 package com.alicp.jetcache.anno.aop;
 
+import com.alicp.jetcache.anno.support.ConfigMap;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -15,7 +14,7 @@ public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 
     public static final String CACHE_ADVISOR_BEAN_NAME = "jetcache2.internalCacheAdvisor";
 
-    private ConcurrentHashMap cacheConfigMap;
+    private ConfigMap cacheConfigMap;
 
     private String[] basePackages;
 
@@ -25,7 +24,7 @@ public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
         return pointcut;
     }
 
-    public void setCacheConfigMap(ConcurrentHashMap cacheConfigMap) {
+    public void setCacheConfigMap(ConfigMap cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 

@@ -9,13 +9,13 @@ import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.event.CacheLoadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.function.Supplier;
 
 /**
@@ -27,8 +27,7 @@ public class CacheHandler implements InvocationHandler {
     private Object src;
     private Supplier<CacheInvokeContext> contextSupplier;
     private String[] hiddenPackages;
-    private CacheInvokeConfig cacheInvokeConfig;
-    private HashMap<String, CacheInvokeConfig> configMap;
+    private ConfigMap configMap;
 
     private static class CacheContextSupport extends CacheContext {
 
@@ -49,14 +48,7 @@ public class CacheHandler implements InvocationHandler {
         }
     }
 
-    public CacheHandler(Object src, CacheInvokeConfig cacheInvokeConfig, Supplier<CacheInvokeContext> contextSupplier, String[] hiddenPackages) {
-        this.src = src;
-        this.cacheInvokeConfig = cacheInvokeConfig;
-        this.contextSupplier = contextSupplier;
-        this.hiddenPackages = hiddenPackages;
-    }
-
-    public CacheHandler(Object src, HashMap<String, CacheInvokeConfig> configMap, Supplier<CacheInvokeContext> contextSupplier, String[] hiddenPackages) {
+    public CacheHandler(Object src, ConfigMap configMap, Supplier<CacheInvokeContext> contextSupplier, String[] hiddenPackages) {
         this.src = src;
         this.configMap = configMap;
         this.contextSupplier = contextSupplier;
@@ -65,16 +57,12 @@ public class CacheHandler implements InvocationHandler {
 
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheInvokeContext context = null;
-        if (cacheInvokeConfig != null) {
+
+        String sig = ClassUtil.getMethodSig(method);
+        CacheInvokeConfig cac = configMap.getByMethodInfo(sig);
+        if (cac != null) {
             context = contextSupplier.get();
-            context.setCacheInvokeConfig(cacheInvokeConfig);
-        } else {
-            String sig = ClassUtil.getMethodSig(method);
-            CacheInvokeConfig cac = configMap.get(sig);
-            if (cac != null) {
-                context = contextSupplier.get();
-                context.setCacheInvokeConfig(cac);
-            }
+            context.setCacheInvokeConfig(cac);
         }
         if (context == null) {
             return method.invoke(src, args);
@@ -101,15 +89,43 @@ public class CacheHandler implements InvocationHandler {
     }
 
     private static Object doInvoke(CacheInvokeContext context) throws Throwable {
-        CachedAnnoConfig cachedAnnoConfig = context.getCacheInvokeConfig().getCachedAnnoConfig();
-        if (cachedAnnoConfig != null && (cachedAnnoConfig.isEnabled() || CacheContextSupport._isEnabled())) {
-            return invokeWithCache(context);
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        CachedAnnoConfig cachedConfig = cic.getCachedAnnoConfig();
+        if (cachedConfig != null && (cachedConfig.isEnabled() || CacheContextSupport._isEnabled())) {
+            return invokeWithCached(context);
+        } else if (cic.getInvalidateAnnoConfig() != null) {
+            return invokeWithInvalidate(context);
         } else {
             return invokeOrigin(context);
         }
     }
 
-    private static Object invokeWithCache(CacheInvokeContext context)
+    private static Object invokeWithInvalidate(CacheInvokeContext context) throws Throwable {
+        Object originResult = invokeOrigin(context);
+
+        Cache cache = context.getCacheFunction().apply(context);
+        if (cache == null) {
+            logger.error("no cache with name: " + context.getMethod());
+            return originResult;
+        }
+
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        if (!ExpressionUtil.evalCondition(context, cic.getInvalidateAnnoConfig().getCondition(),
+                cic::getInvalidateConditionEvaluator, cic::setInvalidateConditionEvaluator)) {
+            return originResult;
+        }
+
+        Object key = ExpressionUtil.evalKey(context, cic.getInvalidateAnnoConfig().getKey(),
+                cic::getInvalidateKeyEvaluator, cic::setInvalidateKeyEvaluator);
+        if (key == null) {
+            return originResult;
+        }
+
+        cache.remove(key);
+        return originResult;
+    }
+
+    private static Object invokeWithCached(CacheInvokeContext context)
             throws Throwable {
 
         Cache cache = context.getCacheFunction().apply(context);
@@ -118,12 +134,16 @@ public class CacheHandler implements InvocationHandler {
             return invokeOrigin(context);
         }
 
-        Object key = ExpressionUtil.evalKey(context);
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        CachedAnnoConfig cac = cic.getCachedAnnoConfig();
+        Object key = ExpressionUtil.evalKey(context, cac.getKey(),
+                cic::getCachedKeyEvaluator, cic::setCachedKeyEvaluator);
         if (key == null) {
             return loadAndCount(context, cache, key);
         }
 
-        if (!ExpressionUtil.evalCondition(context)) {
+        if (!ExpressionUtil.evalCondition(context, cac.getCondition(),
+                cic::getCachedConditionEvaluator, cic::setCachedConditionEvaluator)) {
             return loadAndCount(context, cache, key);
         }
 

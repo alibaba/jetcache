@@ -4,8 +4,8 @@
 package com.alicp.jetcache.anno.aop;
 
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
@@ -16,7 +16,6 @@ import org.junit.*;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -34,7 +33,7 @@ public class JetCacheInterceptorTest {
         globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
-        ConcurrentHashMap<String, CacheInvokeConfig> map = new ConcurrentHashMap();
+        ConfigMap map = new ConfigMap();
         pc.setCacheConfigMap(map);
         interceptor = new JetCacheInterceptor();
         interceptor.setCacheConfigMap(map);

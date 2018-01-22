@@ -7,6 +7,10 @@ import com.alicp.jetcache.anno.CacheConsts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -14,19 +18,19 @@ class ExpressionUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionUtil.class);
 
-    public static boolean evalCondition(CacheInvokeContext context) {
-        CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        String condition = cic.getCachedAnnoConfig().getCondition();
+    public static boolean evalCondition(CacheInvokeContext context, String condition,
+                                        Supplier<Function<Object, Boolean>> evaluatorGetter,
+                                        Consumer<Function<Object, Boolean>> evaluatorSetter) {
         try {
-            if (cic.getConditionEvaluator() == null) {
+            if (evaluatorGetter.get() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
-                    cic.setConditionEvaluator(o -> true);
+                    evaluatorSetter.accept(o -> true);
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(condition);
-                    cic.setConditionEvaluator((o) -> (Boolean) e.apply(o));
+                    evaluatorSetter.accept((o) -> (Boolean) e.apply(o));
                 }
             }
-            return cic.getConditionEvaluator().apply(context);
+            return evaluatorGetter.get().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return false;
@@ -37,37 +41,37 @@ class ExpressionUtil {
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
         String unless = cic.getCachedAnnoConfig().getUnless();
         try {
-            if (cic.getUnlessEvaluator() == null) {
+            if (cic.getCachedUnlessEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
-                    cic.setUnlessEvaluator(o -> false);
+                    cic.setCachedUnlessEvaluator(o -> false);
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(unless);
-                    cic.setUnlessEvaluator((o) -> (Boolean) e.apply(o));
+                    cic.setCachedUnlessEvaluator((o) -> (Boolean) e.apply(o));
                 }
             }
-            return cic.getUnlessEvaluator().apply(context);
+            return cic.getCachedUnlessEvaluator().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return true;
         }
     }
 
-    public static Object evalKey(CacheInvokeContext context) {
-        CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        String keyScript = cic.getCachedAnnoConfig().getKey();
+    public static Object evalKey(CacheInvokeContext context, String keyScript,
+                                 Supplier<Function<Object, Object>> evaluatorGetter,
+                                 Consumer<Function<Object, Object>> evaluatorSetter) {
         try {
-            if (cic.getKeyEvaluator() == null) {
+            if (evaluatorGetter.get() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(keyScript)) {
-                    cic.setKeyEvaluator(o -> {
+                    evaluatorSetter.accept(o -> {
                         CacheInvokeContext c = (CacheInvokeContext) o;
                         return c.getArgs() == null ? "_$JETCACHE_NULL_KEY$_" : c.getArgs();
                     });
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(keyScript);
-                    cic.setKeyEvaluator((o) -> e.apply(o));
+                    evaluatorSetter.accept((o) -> e.apply(o));
                 }
             }
-            return cic.getKeyEvaluator().apply(context);
+            return evaluatorGetter.get().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval key \"" + keyScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return null;

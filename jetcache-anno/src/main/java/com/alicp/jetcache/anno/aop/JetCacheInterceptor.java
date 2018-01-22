@@ -6,26 +6,24 @@ package com.alicp.jetcache.anno.aop;
 import com.alicp.jetcache.anno.method.CacheHandler;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
+import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class JetCacheInterceptor implements MethodInterceptor, ApplicationContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(JetCacheInterceptor.class);
+    //private static final Logger logger = LoggerFactory.getLogger(JetCacheInterceptor.class);
 
-    private ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap;
+    private ConfigMap cacheConfigMap;
     private ApplicationContext applicationContext;
     GlobalCacheConfig globalCacheConfig;
 
@@ -40,7 +38,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         CacheInvokeConfig cac = null;
         if (obj != null) {
             String key = CachePointcut.getKey(method, obj.getClass());
-            cac  = cacheConfigMap.get(key);
+            cac  = cacheConfigMap.getByMethodInfo(key);
         }
 
         /*
@@ -60,7 +58,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         if (globalCacheConfig == null) {
             globalCacheConfig = applicationContext.getBean(GlobalCacheConfig.class);
         }
-        CacheInvokeContext context = globalCacheConfig.getCacheContext().createCacheInvokeContext();
+        CacheInvokeContext context = globalCacheConfig.getCacheContext().createCacheInvokeContext(cacheConfigMap);
         context.setInvoker(invocation::proceed);
         context.setMethod(method);
         context.setArgs(invocation.getArguments());
@@ -69,7 +67,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         return CacheHandler.invoke(context);
     }
 
-    public void setCacheConfigMap(ConcurrentHashMap<String, CacheInvokeConfig> cacheConfigMap) {
+    public void setCacheConfigMap(ConfigMap cacheConfigMap) {
         this.cacheConfigMap = cacheConfigMap;
     }
 
