@@ -3,9 +3,7 @@
  */
 package com.alicp.jetcache.anno.aop;
 
-import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigMap;
@@ -101,6 +99,11 @@ public class CachePointCutTest {
 
         Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).isEnableCacheContext());
         Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).getCachedAnnoConfig());
+
+        Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, (proxy, method, args) -> null);
+        Assert.assertTrue(pc.matches(m1, o1.getClass()));
+        Assert.assertTrue(pc.matches(m2, o1.getClass()));
+        Assert.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));
     }
 
     interface I3_Parent {
@@ -192,7 +195,7 @@ public class CachePointCutTest {
             return 0;
         }
 
-        @Cached
+        @CacheInvalidate(name = "c1", key = "k1")
         public int bar2(){
             return 0;
         }
@@ -223,7 +226,7 @@ public class CachePointCutTest {
         }
     }
     class C6_2 implements I6 {
-        @Cached
+        @CacheUpdate(name = "c1", key = "k1", value = "v1")
         public int foo() {
             return 0;
         }

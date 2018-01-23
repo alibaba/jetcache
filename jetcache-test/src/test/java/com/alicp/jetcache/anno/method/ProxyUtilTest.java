@@ -3,21 +3,22 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.*;
-import com.alicp.jetcache.anno.support.CachedAnnoConfig;
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheUpdate;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
-import com.alicp.jetcache.test.support.DynamicQuery;
-import com.alicp.jetcache.testsupport.Count;
-import com.alicp.jetcache.testsupport.CountClass;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.util.concurrent.TimeUnit;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -26,13 +27,13 @@ public class ProxyUtilTest {
 
     private GlobalCacheConfig globalCacheConfig;
 
-    @Before
+    @BeforeEach
     public void setup() {
         globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
     }
 
-    @After
+    @AfterEach
     public void stop(){
         globalCacheConfig.shutdown();
     }
@@ -61,10 +62,10 @@ public class ProxyUtilTest {
     public void testGetProxyByAnnotation1() {
         I1 c1 = new C1();
         I1 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-        Assert.assertEquals(c2.count(), c2.count());
-        Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+        assertNotEquals(c1.count(), c1.count());
+        assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+        assertEquals(c2.count(), c2.count());
+        assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
     public interface I2 {
@@ -100,14 +101,14 @@ public class ProxyUtilTest {
         I2 c1 = new C2();
         I2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
 
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-        Assert.assertEquals(c2.count(), c2.count());
-        Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+        assertNotEquals(c1.count(), c1.count());
+        assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+        assertEquals(c2.count(), c2.count());
+        assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
 
         I2 c3 = new C22();
         I2 c4 = ProxyUtil.getProxyByAnnotation(c3, globalCacheConfig);
-        Assert.assertEquals(c2.count(), c4.count());
+        assertEquals(c2.count(), c4.count());
     }
 
     public interface I3_1 {
@@ -137,10 +138,10 @@ public class ProxyUtilTest {
     public void testGetProxyByAnnotation3() {
         I3_2 c1 = new C3();
         I3_2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-        Assert.assertEquals(c2.count(), c2.count());
-        Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+        assertNotEquals(c1.count(), c1.count());
+        assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+        assertEquals(c2.count(), c2.count());
+        assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
     public interface I4_1 {
@@ -169,10 +170,10 @@ public class ProxyUtilTest {
     public void testGetProxyByAnnotation4() {
         I4_1 c1 = new C4();
         I4_1 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-        Assert.assertEquals(c2.count(), c2.count());
-        Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+        assertNotEquals(c1.count(), c1.count());
+        assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+        assertEquals(c2.count(), c2.count());
+        assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
     public interface I5 {
@@ -197,15 +198,15 @@ public class ProxyUtilTest {
     public void testGetProxyByAnnotation5() {
         I5 c1 = new C5();
         I5 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-        Assert.assertNotEquals(c2.count(), c2.count());
-        Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+        assertNotEquals(c1.count(), c1.count());
+        assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+        assertNotEquals(c2.count(), c2.count());
+        assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
         CacheContext.enableCache(() -> {
-            Assert.assertNotEquals(c1.count(), c1.count());
-            Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-            Assert.assertEquals(c2.count(), c2.count());
-            Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+            assertNotEquals(c1.count(), c1.count());
+            assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+            assertEquals(c2.count(), c2.count());
+            assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
             return null;
         });
     }
@@ -233,10 +234,10 @@ public class ProxyUtilTest {
     public void testGetProxyByAnnotation6() {
         I6 c1 = new C6();
         I6 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
-        Assert.assertNotEquals(c1.count(), c1.count());
-        Assert.assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
-        Assert.assertEquals(c2.count(), c2.count());
-        Assert.assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
+        assertNotEquals(c1.count(), c1.count());
+        assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
+        assertEquals(c2.count(), c2.count());
+        assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
     }
 
     public interface I7_1 {
@@ -284,8 +285,87 @@ public class ProxyUtilTest {
         C7_2 c2_1 = new C7_2();
         c2_1.service = c1_2;
         I7_2 c2_2 = ProxyUtil.getProxyByAnnotation(c2_1, globalCacheConfig);
-        Assert.assertNotEquals(c2_1.count(), c2_1.count());
-        Assert.assertNotEquals(c2_2.countWithoutCache(), c2_2.countWithoutCache());
-        Assert.assertEquals(c2_2.count(), c2_2.count());
+        assertNotEquals(c2_1.count(), c2_1.count());
+        assertNotEquals(c2_2.countWithoutCache(), c2_2.countWithoutCache());
+        assertEquals(c2_2.count(), c2_2.count());
+    }
+
+    public interface I8 {
+        @Cached(name = "c1", key = "args[0]")
+        int count(String id);
+
+        @CacheUpdate(name = "c1", key = "args[0]", value = "args[1]")
+        void update(String id, int value);
+
+        @CacheUpdate(name = "c2", key = "args[0]", value = "args[1]")
+        void update2(String id, int value);
+
+        @CacheInvalidate(name = "c1", key = "args[0]")
+        void delete(String id);
+
+        @CacheInvalidate(name = "c2", key = "args[0]")
+        void delete2(String id);
+    }
+
+    public class C8 implements I8 {
+        int count;
+        Map<String, Integer> m = new HashMap<>();
+
+        @Override
+        public int count(String id) {
+            Integer v = m.get(id);
+            if (v == null) {
+                v = count++;
+            }
+            v++;
+            m.put(id, v);
+            return v;
+        }
+
+        @Override
+        public void update(String id, int value) {
+            m.put(id, value);
+        }
+
+        @Override
+        public void delete(String id) {
+            m.remove(id);
+        }
+
+        @Override
+        public void update2(String id, int value) {
+            m.put(id, value);
+        }
+
+        @Override
+        public void delete2(String id) {
+            m.remove(id);
+        }
+    }
+
+
+    @Test
+    // @CacheUpdate and @CacheInvalidate test
+    public void testGetProxyByAnnotation8() {
+        I8 i8 = new C8();
+        I8 i8_proxy = ProxyUtil.getProxyByAnnotation(i8, globalCacheConfig);
+
+        int v1 = i8_proxy.count("K1");
+        assertEquals(v1, i8_proxy.count("K1"));
+
+        i8_proxy.delete("K1");
+        int v2 = i8_proxy.count("K1");
+        assertNotEquals(v1, v2);
+        i8_proxy.delete2("K1");
+        assertEquals(v2, i8_proxy.count("K1"));
+
+        i8_proxy.update("K1", 200);
+        assertEquals(200, i8_proxy.count("K1"));
+        i8_proxy.update2("K1", 300);
+        assertEquals(200, i8_proxy.count("K1"));
+
+        assertEquals(i8_proxy.count("K1"), i8_proxy.count("K1"));
+        assertNotEquals(i8_proxy.count("K1"), i8_proxy.count("K2"));
+
     }
 }

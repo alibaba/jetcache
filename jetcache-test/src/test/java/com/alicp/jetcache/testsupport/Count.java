@@ -16,4 +16,6 @@ public interface Count {
     int count(String s, int p);
 
     int count(DynamicQuery q, int p);
+
+    void update(String key, int newCount);
 }

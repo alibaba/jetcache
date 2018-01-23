@@ -36,6 +36,24 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertNotEquals(service.enableCacheWithNoCacheCount(bean), service.enableCacheWithNoCacheCount(bean));
         Assert.assertEquals(service.enableCacheWithAnnoOnClass(bean), service.enableCacheWithAnnoOnClass(bean));
         Assert.assertEquals(service.enableCacheWithAnnoOnInterface(bean), service.enableCacheWithAnnoOnInterface(bean));
+
+        int v1 = service.count("K1");
+        Assert.assertEquals(v1, service.count("K1"));
+
+        service.delete("K1");
+        int v2 = service.count("K1");
+        Assert.assertNotEquals(v1, v2);
+        service.delete2("K1");
+        Assert.assertEquals(v2, service.count("K1"));
+
+        service.update("K1", 200);
+        Assert.assertEquals(200, service.count("K1"));
+        service.update2("K1", 300);
+        Assert.assertEquals(200, service.count("K1"));
+
+        Assert.assertEquals(service.count("K1"), service.count("K1"));
+        Assert.assertNotEquals(service.count("K1"), service.count("K2"));
+
     }
 
     private void testTestBean(TestBean bean) throws Exception {
@@ -105,6 +123,24 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertEquals(bean.namedCount1_WithNameN1(), bean.namedCount2_WithNameN1());
         Assert.assertNotEquals(bean.namedCount1_WithNameN1(), bean.namedCount_WithNameN2());
         Assert.assertEquals(bean.namedCount_WithNameN2(), bean.namedCount_WithNameN2());
+
+
+        int v1 = bean.count("K1");
+        Assert.assertEquals(v1, bean.count("K1"));
+
+        bean.delete("K1");
+        int v2 = bean.count("K1");
+        Assert.assertNotEquals(v1, v2);
+        bean.delete2("K1");
+        Assert.assertEquals(v2, bean.count("K1"));
+
+        bean.update("K1", 200);
+        Assert.assertEquals(200, bean.count("K1"));
+        bean.update2("K1", 300);
+        Assert.assertEquals(200, bean.count("K1"));
+
+        Assert.assertEquals(bean.count("K1"), bean.count("K1"));
+        Assert.assertNotEquals(bean.count("K1"), bean.count("K2"));
     }
 
     @Override

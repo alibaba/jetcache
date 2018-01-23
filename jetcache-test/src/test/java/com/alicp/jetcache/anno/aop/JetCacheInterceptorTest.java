@@ -10,9 +10,11 @@ import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
 import org.aopalliance.intercept.MethodInvocation;
-import org.jmock.Expectations;
-import org.jmock.integration.junit4.JUnitRuleMockery;
-import org.junit.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
@@ -25,10 +27,7 @@ public class JetCacheInterceptorTest {
     private JetCacheInterceptor interceptor;
     private GlobalCacheConfig globalCacheConfig;
 
-    @Rule
-    public JUnitRuleMockery context = new JUnitRuleMockery();
-
-    @Before
+    @BeforeEach
     public void setup() {
         globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
         globalCacheConfig.init();
@@ -40,7 +39,7 @@ public class JetCacheInterceptorTest {
         interceptor.globalCacheConfig = globalCacheConfig;
     }
 
-    @After
+    @AfterEach
     public void stop(){
         globalCacheConfig.shutdown();
     }
@@ -61,27 +60,17 @@ public class JetCacheInterceptorTest {
         final Method m = I1.class.getMethod("foo");
         final C1 c = new C1();
         pc.matches(m, C1.class);
-        final MethodInvocation mi = context.mock(MethodInvocation.class);
+        final MethodInvocation mi = mock(MethodInvocation.class);
 
-        context.checking(new Expectations() {
-            {
-                try {
-                    allowing(mi).getMethod();
-                    will(Expectations.returnValue(m));
-                    allowing(mi).getThis();
-                    will(Expectations.returnValue(c));
-                    allowing(mi).getArguments();
-                    will(Expectations.returnValue(null));
-                    oneOf(mi).proceed();
-                    will(Expectations.returnValue(new Integer(100)));
-                } catch (Throwable e) {
-                    Assert.fail();
-                }
-            }
-        });
+        when(mi.getMethod()).thenReturn(m);
+        when(mi.getThis()).thenReturn(c);
+        when(mi.getArguments()).thenReturn(null);
+        when(mi.proceed()).thenReturn(100);
 
         interceptor.invoke(mi);
         interceptor.invoke(mi);
+
+        verify(mi, times(1)).proceed();
     }
 
     interface I2 {
@@ -101,28 +90,12 @@ public class JetCacheInterceptorTest {
         final Method m = I2.class.getMethod("foo");
         final C2 c = new C2();
         pc.matches(m, C2.class);
-        final MethodInvocation mi = context.mock(MethodInvocation.class);
+        final MethodInvocation mi = mock(MethodInvocation.class);
 
-        context.checking(new Expectations() {
-            {
-                try {
-                    allowing(mi).getMethod();
-                    will(Expectations.returnValue(m));
-                    allowing(mi).getThis();
-                    will(Expectations.returnValue(c));
-                    allowing(mi).getArguments();
-                    will(Expectations.returnValue(null));
-                    oneOf(mi).proceed();
-                    will(Expectations.returnValue(new Integer(100)));
-                    oneOf(mi).proceed();
-                    will(Expectations.returnValue(new Integer(100)));
-                    oneOf(mi).proceed();
-                    will(Expectations.returnValue(new Integer(100)));
-                } catch (Throwable e) {
-                    Assert.fail();
-                }
-            }
-        });
+        when(mi.getMethod()).thenReturn(m);
+        when(mi.getThis()).thenReturn(c);
+        when(mi.getArguments()).thenReturn(null);
+        when(mi.proceed()).thenReturn(100);
 
         interceptor.invoke(mi);
         interceptor.invoke(mi);
@@ -132,10 +105,12 @@ public class JetCacheInterceptorTest {
                 interceptor.invoke(mi);
                 return null;
             } catch (Throwable e) {
-                Assert.fail();
+                fail(e);
                 return null;
             }
         });
+
+        verify(mi, times(3)).proceed();
     }
 
     interface I3 {
@@ -155,28 +130,16 @@ public class JetCacheInterceptorTest {
         final Method m = I3.class.getMethod("foo");
         final C3 c = new C3();
         pc.matches(m, C3.class);
-        final MethodInvocation mi = context.mock(MethodInvocation.class);
+        final MethodInvocation mi = mock(MethodInvocation.class);
 
-        context.checking(new Expectations() {
-            {
-                try {
-                    allowing(mi).getMethod();
-                    will(Expectations.returnValue(m));
-                    allowing(mi).getThis();
-                    will(Expectations.returnValue(c));
-                    allowing(mi).getArguments();
-                    will(Expectations.returnValue(null));
-                    oneOf(mi).proceed();
-                    will(Expectations.throwException(new SQLException()));
-                } catch (Throwable e) {
-                    Assert.fail();
-                }
-            }
-        });
+        when(mi.getMethod()).thenReturn(m);
+        when(mi.getThis()).thenReturn(c);
+        when(mi.getArguments()).thenReturn(null);
+        when(mi.proceed()).thenThrow(new SQLException(""));
 
         try {
             interceptor.invoke(mi);
-            Assert.fail();
+            fail("");
         } catch (SQLException e) {
         }
     }

@@ -3,12 +3,16 @@
  */
 package com.alicp.jetcache.test.beans;
 
+import com.alicp.jetcache.anno.CacheInvalidate;
 import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -18,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class TestBean {
 
     private static int count = 0;
+    Map<String, Integer> m = new HashMap<>();
 
 
     public TestBean() {
@@ -116,5 +121,36 @@ public class TestBean {
     @Cached(name="n2")
     public int namedCount_WithNameN2(){
         return count++;
+    }
+
+
+    @Cached(name = "c1", key = "args[0]")
+    public int count(String id) {
+        Integer v = m.get(id);
+        if (v == null) {
+            v = count++;
+        }
+        v++;
+        m.put(id, v);
+        return v;
+    }
+
+    @CacheUpdate(name = "c1", key = "args[0]", value = "args[1]")
+    public void update(String id, int value) {
+        m.put(id, value);
+    }
+    @CacheInvalidate(name = "c1", key = "args[0]")
+    public void delete(String id) {
+        m.remove(id);
+    }
+
+    @CacheUpdate(name = "c2", key = "args[0]", value = "args[1]")
+    public void update2(String id, int value) {
+        m.put(id, value);
+    }
+
+    @CacheInvalidate(name = "c2", key = "args[0]")
+    public void delete2(String id) {
+        m.remove(id);
     }
 }

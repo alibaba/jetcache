@@ -83,11 +83,11 @@ public class CacheContext {
                 if (cacheAnnoConfig instanceof CachedAnnoConfig) {
                     cache = createCacheByCachedConfig((CachedAnnoConfig) cacheAnnoConfig,
                             invokeContext.getMethod(), invokeContext.getHiddenPackages());
-                } else if (cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) {
-                    CacheInvalidateAnnoConfig invalidateConfig = (CacheInvalidateAnnoConfig) cacheAnnoConfig;
-                    CacheInvokeConfig cacheDefineConfig = configMap.getByCacheName(invalidateConfig.getArea(), invalidateConfig.getName());
+                } else if ((cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) || (cacheAnnoConfig instanceof CacheUpdateAnnoConfig)) {
+                    CacheInvokeConfig cacheDefineConfig = configMap.getByCacheName(cacheAnnoConfig.getArea(), cacheAnnoConfig.getName());
                     if (cacheDefineConfig == null) {
-                        logger.error("no @Cached define with name {} ({})", invalidateConfig.getName(), invalidateConfig.getArea());
+                        logger.error("no @Cached define with name {} ({})", cacheAnnoConfig.getName(), cacheAnnoConfig.getArea());
+                        return null;
                     }
                     cache = createCacheByCachedConfig(cacheDefineConfig.getCachedAnnoConfig(),
                             invokeContext.getMethod(), invokeContext.getHiddenPackages());

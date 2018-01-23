@@ -83,11 +83,11 @@ class ExpressionUtil {
     public static Object evalValue(CacheInvokeContext context, CacheUpdateAnnoConfig cac) {
         String valueScript = cac.getValue();
         try {
-            if (cac.getKeyEvaluator() == null) {
+            if (cac.getValueEvaluator() == null) {
                 ExpressionEvaluator e = new ExpressionEvaluator(valueScript);
-                cac.setKeyEvaluator((o) -> e.apply(o));
+                cac.setValueEvaluator((o) -> e.apply(o));
             }
-            return cac.getKeyEvaluator().apply(context);
+            return cac.getValueEvaluator().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval value \"" + valueScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return null;
