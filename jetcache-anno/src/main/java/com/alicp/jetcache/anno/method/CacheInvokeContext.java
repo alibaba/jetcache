@@ -4,8 +4,10 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 
 import java.lang.reflect.Method;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -17,7 +19,7 @@ public class CacheInvokeContext {
     private Object[] args;
     private CacheInvokeConfig cacheInvokeConfig;
 
-    private Function<CacheInvokeContext, Cache> cacheFunction;
+    private BiFunction<CacheInvokeContext, CacheAnnoConfig, Cache> cacheFunction;
     private String[] hiddenPackages;
 
     private Object result = null;
@@ -62,11 +64,11 @@ public class CacheInvokeContext {
         return hiddenPackages;
     }
 
-    public void setCacheFunction(Function<CacheInvokeContext, Cache> cacheFunction) {
+    public void setCacheFunction(BiFunction<CacheInvokeContext, CacheAnnoConfig, Cache> cacheFunction) {
         this.cacheFunction = cacheFunction;
     }
 
-    public Function<CacheInvokeContext, Cache> getCacheFunction() {
+    public BiFunction<CacheInvokeContext, CacheAnnoConfig, Cache> getCacheFunction() {
         return cacheFunction;
     }
 

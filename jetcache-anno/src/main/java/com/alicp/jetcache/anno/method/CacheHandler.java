@@ -93,57 +93,59 @@ public class CacheHandler implements InvocationHandler {
         CachedAnnoConfig cachedConfig = cic.getCachedAnnoConfig();
         if (cachedConfig != null && (cachedConfig.isEnabled() || CacheContextSupport._isEnabled())) {
             return invokeWithCached(context);
-        } else if (cic.getInvalidateAnnoConfig() != null) {
-            return invokeWithInvalidate(context);
+        } else if (cic.getInvalidateAnnoConfig() != null || cic.getUpdateAnnoConfig() != null) {
+            return invokeWithInvalidateOrUpdate(context);
         } else {
             return invokeOrigin(context);
         }
     }
 
-    private static Object invokeWithInvalidate(CacheInvokeContext context) throws Throwable {
+    private static Object invokeWithInvalidateOrUpdate(CacheInvokeContext context) throws Throwable {
         Object originResult = invokeOrigin(context);
-
-        Cache cache = context.getCacheFunction().apply(context);
-        if (cache == null) {
-            logger.error("no cache with name: " + context.getMethod());
-            return originResult;
-        }
-
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        if (!ExpressionUtil.evalCondition(context, cic.getInvalidateAnnoConfig().getCondition(),
-                cic::getInvalidateConditionEvaluator, cic::setInvalidateConditionEvaluator)) {
-            return originResult;
+
+        if (cic.getInvalidateAnnoConfig() != null) {
+            Cache cache = context.getCacheFunction().apply(context, cic.getInvalidateAnnoConfig());
+            boolean condition = ExpressionUtil.evalCondition(context, cic.getInvalidateAnnoConfig());
+            if (cache != null && condition) {
+                Object key = ExpressionUtil.evalKey(context, cic.getInvalidateAnnoConfig());
+                if (key != null) {
+                    cache.remove(key);
+                }
+            }
         }
 
-        Object key = ExpressionUtil.evalKey(context, cic.getInvalidateAnnoConfig().getKey(),
-                cic::getInvalidateKeyEvaluator, cic::setInvalidateKeyEvaluator);
-        if (key == null) {
-            return originResult;
+        if (cic.getUpdateAnnoConfig() != null) {
+            Cache cache = context.getCacheFunction().apply(context, cic.getUpdateAnnoConfig());
+            boolean condition = ExpressionUtil.evalCondition(context, cic.getUpdateAnnoConfig());
+            if (cache != null && condition) {
+                Object key = ExpressionUtil.evalKey(context, cic.getUpdateAnnoConfig());
+                Object value = ExpressionUtil.evalValue(context, cic.getUpdateAnnoConfig());
+                if (key != null) {
+                    cache.put(key, value);
+                }
+            }
         }
 
-        cache.remove(key);
         return originResult;
     }
 
     private static Object invokeWithCached(CacheInvokeContext context)
             throws Throwable {
-
-        Cache cache = context.getCacheFunction().apply(context);
+        CacheInvokeConfig cic = context.getCacheInvokeConfig();
+        CachedAnnoConfig cac = cic.getCachedAnnoConfig();
+        Cache cache = context.getCacheFunction().apply(context, cac);
         if (cache == null) {
             logger.error("no cache with name: " + context.getMethod());
             return invokeOrigin(context);
         }
 
-        CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        CachedAnnoConfig cac = cic.getCachedAnnoConfig();
-        Object key = ExpressionUtil.evalKey(context, cac.getKey(),
-                cic::getCachedKeyEvaluator, cic::setCachedKeyEvaluator);
+        Object key = ExpressionUtil.evalKey(context, cic.getCachedAnnoConfig());
         if (key == null) {
             return loadAndCount(context, cache, key);
         }
 
-        if (!ExpressionUtil.evalCondition(context, cac.getCondition(),
-                cic::getCachedConditionEvaluator, cic::setCachedConditionEvaluator)) {
+        if (!ExpressionUtil.evalCondition(context, cic.getCachedAnnoConfig())) {
             return loadAndCount(context, cache, key);
         }
 

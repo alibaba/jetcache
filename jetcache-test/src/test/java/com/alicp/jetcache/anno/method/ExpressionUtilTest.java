@@ -29,25 +29,21 @@ public class ExpressionUtilTest {
     @Test
     public void testCondition1() {
         cachedAnnoConfig.setCondition("mvel{args[0]==null}");
-        Assert.assertFalse(ExpressionUtil.evalCondition(context, cachedAnnoConfig.getCondition(),
-                cic::getCachedConditionEvaluator, cic::setCachedConditionEvaluator));
+        Assert.assertFalse(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
         context.setArgs(new Object[1]);
-        Assert.assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig.getCondition(),
-                cic::getCachedConditionEvaluator, cic::setCachedConditionEvaluator));
+        Assert.assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
     }
     @Test
     public void testCondition2() {
         cachedAnnoConfig.setCondition("mvel{args[0].length()==4}");
         context.setArgs(new Object[]{"1234"});
-        Assert.assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig.getCondition(),
-                cic::getCachedConditionEvaluator, cic::setCachedConditionEvaluator));
+        Assert.assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
     }
 
     @Test
     public void testCondition3() {
         cachedAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        Assert.assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig.getCondition(),
-                cic::getCachedConditionEvaluator, cic::setCachedConditionEvaluator));
+        Assert.assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
     }
 
     @Test

@@ -6,6 +6,7 @@ package com.alicp.jetcache.anno.support;
 import com.alicp.jetcache.anno.CacheType;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -21,6 +22,8 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     private String unless;
     private String serialPolicy;
     private String keyConvertor;
+
+    private Function<Object, Boolean> unlessEvaluator;
 
     public boolean isEnabled() {
         return enabled;
@@ -94,4 +97,11 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
         this.timeUnit = timeUnit;
     }
 
+    public Function<Object, Boolean> getUnlessEvaluator() {
+        return unlessEvaluator;
+    }
+
+    public void setUnlessEvaluator(Function<Object, Boolean> unlessEvaluator) {
+        this.unlessEvaluator = unlessEvaluator;
+    }
 }

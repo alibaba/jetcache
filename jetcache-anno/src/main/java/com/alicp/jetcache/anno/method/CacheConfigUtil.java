@@ -5,9 +5,11 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheUpdate;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
+import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 
 import java.lang.reflect.Method;
@@ -46,10 +48,30 @@ public class CacheConfigUtil {
         CacheInvalidateAnnoConfig cc = new CacheInvalidateAnnoConfig();
         cc.setArea(anno.area());
         cc.setName(anno.name());
-        if(cc.getName()==null || cc.getName().trim().equals("")){
+        if (cc.getName() == null || cc.getName().trim().equals("")) {
             throw new CacheConfigException("name is required for @CacheInvalidate: " + m.getClass().getName() + "." + m.getName());
         }
         cc.setKey(anno.key());
+        cc.setCondition(anno.condition());
+        return cc;
+    }
+
+    private static CacheUpdateAnnoConfig parseCacheUpdate(Method m) {
+        CacheUpdate anno = m.getAnnotation(CacheUpdate.class);
+        if (anno == null) {
+            return null;
+        }
+        CacheUpdateAnnoConfig cc = new CacheUpdateAnnoConfig();
+        cc.setArea(anno.area());
+        cc.setName(anno.name());
+        if (cc.getName() == null || cc.getName().trim().equals("")) {
+            throw new CacheConfigException("name is required for @CacheUpdate: " + m.getClass().getName() + "." + m.getName());
+        }
+        cc.setKey(anno.key());
+        cc.setValue(anno.value());
+        if (cc.getValue() == null || cc.getValue().trim().equals("")) {
+            throw new CacheConfigException("value is required for @CacheUpdate: " + m.getClass().getName() + "." + m.getName());
+        }
         cc.setCondition(anno.condition());
         return cc;
     }
@@ -77,9 +99,14 @@ public class CacheConfigUtil {
             cac.setInvalidateAnnoConfig(invalidateAnnoConfig);
             hasAnnotation = true;
         }
+        CacheUpdateAnnoConfig updateAnnoConfig = parseCacheUpdate(method);
+        if (updateAnnoConfig != null) {
+            cac.setUpdateAnnoConfig(updateAnnoConfig);
+            hasAnnotation = true;
+        }
 
-        if (cachedConfig != null && invalidateAnnoConfig != null) {
-            throw new CacheConfigException("@Cached can't coexists with @CacheInvalidate: " + method);
+        if (cachedConfig != null && (invalidateAnnoConfig != null || updateAnnoConfig != null)) {
+            throw new CacheConfigException("@Cached can't coexists with @CacheInvalidate or @CacheUpdate: " + method);
         }
 
         return hasAnnotation;

@@ -4,6 +4,9 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
+import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,19 +21,18 @@ class ExpressionUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionUtil.class);
 
-    public static boolean evalCondition(CacheInvokeContext context, String condition,
-                                        Supplier<Function<Object, Boolean>> evaluatorGetter,
-                                        Consumer<Function<Object, Boolean>> evaluatorSetter) {
+    public static boolean evalCondition(CacheInvokeContext context, CacheAnnoConfig cac) {
+        String condition = cac.getCondition();
         try {
-            if (evaluatorGetter.get() == null) {
+            if (cac.getConditionEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
-                    evaluatorSetter.accept(o -> true);
+                    cac.setConditionEvaluator(o -> true);
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(condition);
-                    evaluatorSetter.accept((o) -> (Boolean) e.apply(o));
+                    cac.setConditionEvaluator((o) -> (Boolean) e.apply(o));
                 }
             }
-            return evaluatorGetter.get().apply(context);
+            return cac.getConditionEvaluator().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return false;
@@ -39,43 +41,56 @@ class ExpressionUtil {
 
     public static boolean evalUnless(CacheInvokeContext context) {
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        String unless = cic.getCachedAnnoConfig().getUnless();
+        CachedAnnoConfig cac = cic.getCachedAnnoConfig();
+        String unless = cac.getUnless();
         try {
-            if (cic.getCachedUnlessEvaluator() == null) {
+            if (cac.getUnlessEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
-                    cic.setCachedUnlessEvaluator(o -> false);
+                    cac.setUnlessEvaluator(o -> false);
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(unless);
-                    cic.setCachedUnlessEvaluator((o) -> (Boolean) e.apply(o));
+                    cac.setUnlessEvaluator((o) -> (Boolean) e.apply(o));
                 }
             }
-            return cic.getCachedUnlessEvaluator().apply(context);
+            return cac.getUnlessEvaluator().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return true;
         }
     }
 
-    public static Object evalKey(CacheInvokeContext context, String keyScript,
-                                 Supplier<Function<Object, Object>> evaluatorGetter,
-                                 Consumer<Function<Object, Object>> evaluatorSetter) {
+    public static Object evalKey(CacheInvokeContext context, CacheAnnoConfig cac) {
+        String keyScript = cac.getKey();
         try {
-            if (evaluatorGetter.get() == null) {
+            if (cac.getKeyEvaluator() == null) {
                 if (CacheConsts.UNDEFINED_STRING.equals(keyScript)) {
-                    evaluatorSetter.accept(o -> {
+                    cac.setKeyEvaluator(o -> {
                         CacheInvokeContext c = (CacheInvokeContext) o;
                         return c.getArgs() == null ? "_$JETCACHE_NULL_KEY$_" : c.getArgs();
                     });
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(keyScript);
-                    evaluatorSetter.accept((o) -> e.apply(o));
+                    cac.setKeyEvaluator((o) -> e.apply(o));
                 }
             }
-            return evaluatorGetter.get().apply(context);
+            return cac.getKeyEvaluator().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval key \"" + keyScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return null;
         }
     }
 
+    public static Object evalValue(CacheInvokeContext context, CacheUpdateAnnoConfig cac) {
+        String valueScript = cac.getValue();
+        try {
+            if (cac.getKeyEvaluator() == null) {
+                ExpressionEvaluator e = new ExpressionEvaluator(valueScript);
+                cac.setKeyEvaluator((o) -> e.apply(o));
+            }
+            return cac.getKeyEvaluator().apply(context);
+        } catch (Exception e) {
+            logger.error("error occurs when eval value \"" + valueScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
+            return null;
+        }
+    }
 }

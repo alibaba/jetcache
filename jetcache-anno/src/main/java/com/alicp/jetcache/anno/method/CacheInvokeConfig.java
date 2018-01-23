@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
+import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 
 import java.util.function.Function;
@@ -15,16 +16,8 @@ import java.util.function.Function;
 public class CacheInvokeConfig {
     private CachedAnnoConfig cachedAnnoConfig;
     private CacheInvalidateAnnoConfig invalidateAnnoConfig;
+    private CacheUpdateAnnoConfig updateAnnoConfig;
     private boolean enableCacheContext;
-
-    private Function<Object, Boolean> cachedConditionEvaluator;
-    private Function<Object, Boolean> cachedUnlessEvaluator;
-    private Function<Object, Object> cachedKeyEvaluator;
-
-    private Function<Object, Boolean> invalidateConditionEvaluator;
-    private Function<Object, Object> invalidateKeyEvaluator;
-
-    private Cache cache;
 
     private static final CacheInvokeConfig noCacheInvokeConfigInstance = new CacheInvokeConfig();
 
@@ -48,38 +41,6 @@ public class CacheInvokeConfig {
         this.enableCacheContext = enableCacheContext;
     }
 
-    public Cache getCache() {
-        return cache;
-    }
-
-    public void setCache(Cache cache) {
-        this.cache = cache;
-    }
-
-    public Function<Object, Boolean> getCachedConditionEvaluator() {
-        return cachedConditionEvaluator;
-    }
-
-    public void setCachedConditionEvaluator(Function<Object, Boolean> cachedConditionEvaluator) {
-        this.cachedConditionEvaluator = cachedConditionEvaluator;
-    }
-
-    public Function<Object, Boolean> getCachedUnlessEvaluator() {
-        return cachedUnlessEvaluator;
-    }
-
-    public void setCachedUnlessEvaluator(Function<Object, Boolean> cachedUnlessEvaluator) {
-        this.cachedUnlessEvaluator = cachedUnlessEvaluator;
-    }
-
-    public Function<Object, Object> getCachedKeyEvaluator() {
-        return cachedKeyEvaluator;
-    }
-
-    public void setCachedKeyEvaluator(Function<Object, Object> cachedKeyEvaluator) {
-        this.cachedKeyEvaluator = cachedKeyEvaluator;
-    }
-
     public CacheInvalidateAnnoConfig getInvalidateAnnoConfig() {
         return invalidateAnnoConfig;
     }
@@ -88,19 +49,11 @@ public class CacheInvokeConfig {
         this.invalidateAnnoConfig = invalidateAnnoConfig;
     }
 
-    public Function<Object, Boolean> getInvalidateConditionEvaluator() {
-        return invalidateConditionEvaluator;
+    public CacheUpdateAnnoConfig getUpdateAnnoConfig() {
+        return updateAnnoConfig;
     }
 
-    public void setInvalidateConditionEvaluator(Function<Object, Boolean> invalidateConditionEvaluator) {
-        this.invalidateConditionEvaluator = invalidateConditionEvaluator;
-    }
-
-    public Function<Object, Object> getInvalidateKeyEvaluator() {
-        return invalidateKeyEvaluator;
-    }
-
-    public void setInvalidateKeyEvaluator(Function<Object, Object> invalidateKeyEvaluator) {
-        this.invalidateKeyEvaluator = invalidateKeyEvaluator;
+    public void setUpdateAnnoConfig(CacheUpdateAnnoConfig updateAnnoConfig) {
+        this.updateAnnoConfig = updateAnnoConfig;
     }
 }

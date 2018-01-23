@@ -17,6 +17,8 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -28,6 +30,8 @@ import java.util.function.Supplier;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheContext {
+
+    private static Logger logger = LoggerFactory.getLogger(CacheContext.class);
 
     private static ThreadLocal<CacheThreadLocal> cacheThreadLocal = new ThreadLocal<CacheThreadLocal>() {
         @Override
@@ -73,32 +77,35 @@ public class CacheContext {
 
     public CacheInvokeContext createCacheInvokeContext(ConfigMap configMap) {
         CacheInvokeContext c = newCacheInvokeContext();
-        c.setCacheFunction((invokeContext) -> {
-            CacheInvokeConfig cic = invokeContext.getCacheInvokeConfig();
-            Cache cache = cic.getCache();
+        c.setCacheFunction((invokeContext, cacheAnnoConfig) -> {
+            Cache cache = cacheAnnoConfig.getCache();
             if (cache == null) {
-                if (cic.getCachedAnnoConfig() != null) {
-                    cache = createCacheByCachedConfig(cic, invokeContext.getMethod(), invokeContext.getHiddenPackages());
-                } else if (cic.getInvalidateAnnoConfig() != null) {
-                    CacheInvalidateAnnoConfig invalidateConfig = cic.getInvalidateAnnoConfig();
+                if (cacheAnnoConfig instanceof CachedAnnoConfig) {
+                    cache = createCacheByCachedConfig((CachedAnnoConfig) cacheAnnoConfig,
+                            invokeContext.getMethod(), invokeContext.getHiddenPackages());
+                } else if (cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) {
+                    CacheInvalidateAnnoConfig invalidateConfig = (CacheInvalidateAnnoConfig) cacheAnnoConfig;
                     CacheInvokeConfig cacheDefineConfig = configMap.getByCacheName(invalidateConfig.getArea(), invalidateConfig.getName());
-                    cache = createCacheByCachedConfig(cacheDefineConfig, invokeContext.getMethod(), invokeContext.getHiddenPackages());
+                    if (cacheDefineConfig == null) {
+                        logger.error("no @Cached define with name {} ({})", invalidateConfig.getName(), invalidateConfig.getArea());
+                    }
+                    cache = createCacheByCachedConfig(cacheDefineConfig.getCachedAnnoConfig(),
+                            invokeContext.getMethod(), invokeContext.getHiddenPackages());
                 }
+                cacheAnnoConfig.setCache(cache);
             }
             return cache;
         });
         return c;
     }
 
-    private Cache createCacheByCachedConfig(CacheInvokeConfig cic, Method method, String[] hiddenPackages) {
-        CachedAnnoConfig ac = cic.getCachedAnnoConfig();
+    private Cache createCacheByCachedConfig(CachedAnnoConfig ac, Method method, String[] hiddenPackages) {
         String area = ac.getArea();
         String cacheName = ac.getName();
         if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
             cacheName = ClassUtil.generateCacheName(method, hiddenPackages);
         }
         Cache cache = __createOrGetCache(ac, area, cacheName);
-        cic.setCache(cache);
         return cache;
     }
 
