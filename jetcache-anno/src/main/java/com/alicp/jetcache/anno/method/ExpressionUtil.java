@@ -34,7 +34,7 @@ class ExpressionUtil {
             }
             return cac.getConditionEvaluator().apply(context);
         } catch (Exception e) {
-            logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
+            logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
             return false;
         }
     }
@@ -55,7 +55,7 @@ class ExpressionUtil {
             return cac.getUnlessEvaluator().apply(context);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
+            logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
             return true;
         }
     }
@@ -76,7 +76,7 @@ class ExpressionUtil {
             }
             return cac.getKeyEvaluator().apply(context);
         } catch (Exception e) {
-            logger.error("error occurs when eval key \"" + keyScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
+            logger.error("error occurs when eval key \"" + keyScript + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
             return null;
         }
     }
@@ -90,7 +90,7 @@ class ExpressionUtil {
             }
             return cac.getValueEvaluator().apply(context);
         } catch (Exception e) {
-            logger.error("error occurs when eval value \"" + valueScript + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
+            logger.error("error occurs when eval value \"" + valueScript + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
             return null;
         }
     }
