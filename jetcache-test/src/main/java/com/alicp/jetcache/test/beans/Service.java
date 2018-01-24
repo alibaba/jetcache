@@ -30,7 +30,7 @@ public interface Service {
     @Cached(name = "c1", key = "args[0]")
     int count(String id);
 
-    @CacheUpdate(name = "c1", key = "args[0]", value = "args[1]")
+    @CacheUpdate(name = "c1", key = "#id", value = "args[1]")
     void update(String id, int value);
 
     @CacheUpdate(name = "c2", key = "args[0]", value = "args[1]")

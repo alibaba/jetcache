@@ -294,13 +294,13 @@ public class ProxyUtilTest {
         @Cached(name = "c1", key = "args[0]")
         int count(String id);
 
-        @CacheUpdate(name = "c1", key = "args[0]", value = "args[1]")
+        @CacheUpdate(name = "c1", key = "#id", value = "args[1]")
         void update(String id, int value);
 
         @CacheUpdate(name = "c2", key = "args[0]", value = "args[1]")
         void update2(String id, int value);
 
-        @CacheInvalidate(name = "c1", key = "args[0]")
+        @CacheInvalidate(name = "c1", key = "#id")
         void delete(String id);
 
         @CacheInvalidate(name = "c2", key = "args[0]")
@@ -323,23 +323,23 @@ public class ProxyUtilTest {
         }
 
         @Override
-        public void update(String id, int value) {
-            m.put(id, value);
+        public void update(String theId, int value) {
+            m.put(theId, value);
         }
 
         @Override
-        public void delete(String id) {
-            m.remove(id);
+        public void delete(String theId) {
+            m.remove(theId);
         }
 
         @Override
-        public void update2(String id, int value) {
-            m.put(id, value);
+        public void update2(String theId, int value) {
+            m.put(theId, value);
         }
 
         @Override
-        public void delete2(String id) {
-            m.remove(id);
+        public void delete2(String theId) {
+            m.remove(theId);
         }
     }
 

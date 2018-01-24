@@ -93,6 +93,7 @@ public class CacheHandlerTest {
     @Test
     public void testStaticInvoke1() throws Throwable {
         Method method = CountClass.class.getMethod("count");
+        cachedAnnoConfig.setDefineMethod(method);
         int x1, x2, x3;
         method.invoke(count);
 
@@ -118,6 +119,7 @@ public class CacheHandlerTest {
     @Test
     public void testStaticInvoke2() throws Throwable {
         Method method = CountClass.class.getMethod("count", String.class, int.class);
+        cachedAnnoConfig.setDefineMethod(method);
         int x1, x2, x3, x4, x5, x6;
 
         x1 = invokeQuery(method, new Object[]{"aaa", 10});
@@ -174,6 +176,7 @@ public class CacheHandlerTest {
     @Test
     public void testStaticInvokeNull() throws Throwable {
         Method method = CountClass.class.getMethod("countNull");
+        cachedAnnoConfig.setDefineMethod(method);
         Integer x1, x2, x3;
 
         cachedAnnoConfig.setCacheNullValue(false);
@@ -208,6 +211,7 @@ public class CacheHandlerTest {
     @Test
     public void testStaticInvokeCondition() throws Throwable {
         Method method = CountClass.class.getMethod("count", int.class);
+        cachedAnnoConfig.setDefineMethod(method);
         int x1, x2;
         cachedAnnoConfig.setCondition("mvel{args[0]>10}");
         x1 = invokeQuery(method, new Object[]{10});
@@ -221,6 +225,7 @@ public class CacheHandlerTest {
     @Test
     public void testStaticInvokeUnless() throws Throwable {
         Method method = CountClass.class.getMethod("count");
+        cachedAnnoConfig.setDefineMethod(method);
         int x1, x2, x3, x4;
         cachedAnnoConfig.setUnless("mvel{result%2==1}");
         cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
@@ -239,6 +244,7 @@ public class CacheHandlerTest {
     @Test
     public void testStaticInvokeUnlessAndNull() throws Throwable {
         Method method = CountClass.class.getMethod("countNull");
+        cachedAnnoConfig.setDefineMethod(method);
 
         cachedAnnoConfig.setCacheNullValue(false);
         cachedAnnoConfig.setUnless("mvel{result==0}");
@@ -271,6 +277,7 @@ public class CacheHandlerTest {
     private void assertResultEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);
+        cachedAnnoConfig.setDefineMethod(method);
         x1 = invokeQuery(method, new Object[]{q1, p1});
         x2 = invokeQuery(method, new Object[]{q2, p2});
         assertEquals(x1, x2);
@@ -279,6 +286,7 @@ public class CacheHandlerTest {
     private void assertResultNotEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);
+        cachedAnnoConfig.setDefineMethod(method);
         x1 = invokeQuery(method, new Object[]{q1, p1});
         x2 = invokeQuery(method, new Object[]{q2, p2});
         assertNotEquals(x1, x2);
@@ -333,16 +341,18 @@ public class CacheHandlerTest {
 
     @Test
     public void invokeInvalidateMethod() throws Throwable {
+        Method method = CountClass.class.getMethod("update", String.class, int.class);
         CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(null);
         CacheInvalidateAnnoConfig invalidateAnnoConfig = new CacheInvalidateAnnoConfig();
+        invalidateAnnoConfig.setDefineMethod(method);
         invalidateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
         cacheInvokeConfig.setInvalidateAnnoConfig(invalidateAnnoConfig);
 
         invalidateAnnoConfig.setKey("args[0]");
         cacheInvokeConfig.setCachedAnnoConfig(null);
-        c.setMethod(CountClass.class.getMethod("update", String.class, int.class));
+        c.setMethod(method);
         c.setArgs(new Object[]{"KEY", 1000});
         c.setInvoker(() -> c.getMethod().invoke(count, c.getArgs()));
         c.setCacheFunction((a, b) -> cache);
@@ -380,17 +390,19 @@ public class CacheHandlerTest {
 
     @Test
     public void invokeUpdateMethod() throws Throwable {
+        Method method = CountClass.class.getMethod("update", String.class, int.class);
         CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(null);
         CacheUpdateAnnoConfig updateAnnoConfig = new CacheUpdateAnnoConfig();
         updateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
+        updateAnnoConfig.setDefineMethod(method);
         cacheInvokeConfig.setUpdateAnnoConfig(updateAnnoConfig);
 
         updateAnnoConfig.setKey("args[0]");
         updateAnnoConfig.setValue("args[1]");
         cacheInvokeConfig.setCachedAnnoConfig(null);
-        c.setMethod(CountClass.class.getMethod("update", String.class, int.class));
+        c.setMethod(method);
         c.setArgs(new Object[]{"K1", 1000});
         c.setInvoker(() -> c.getMethod().invoke(count, c.getArgs()));
         c.setCacheFunction((a, b) -> cache);
@@ -429,6 +441,7 @@ public class CacheHandlerTest {
     @Test
     public void testInstanceInvoke() throws Throwable {
         Method method = CountClass.class.getMethod("count");
+        cachedAnnoConfig.setDefineMethod(method);
         final CacheInvokeConfig cac = new CacheInvokeConfig();
         cac.setCachedAnnoConfig(cachedAnnoConfig);
         ConfigMap configMap = new ConfigMap() {

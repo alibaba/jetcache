@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
 
+import java.lang.reflect.Method;
 import java.util.function.Function;
 
 /**
@@ -19,6 +20,7 @@ public class CacheAnnoConfig {
     private Function<Object, Boolean> conditionEvaluator;
     private Function<Object, Object> keyEvaluator;
     private Cache<?, ?> cache;
+    private Method defineMethod;
 
     public String getArea() {
         return area;
@@ -74,5 +76,13 @@ public class CacheAnnoConfig {
 
     public void setCache(Cache<?, ?> cache) {
         this.cache = cache;
+    }
+
+    public Method getDefineMethod() {
+        return defineMethod;
+    }
+
+    public void setDefineMethod(Method defineMethod) {
+        this.defineMethod = defineMethod;
     }
 }

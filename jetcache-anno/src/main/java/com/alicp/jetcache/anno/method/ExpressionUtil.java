@@ -28,7 +28,7 @@ class ExpressionUtil {
                 if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
                     cac.setConditionEvaluator(o -> true);
                 } else {
-                    ExpressionEvaluator e = new ExpressionEvaluator(condition);
+                    ExpressionEvaluator e = new ExpressionEvaluator(condition, cac.getDefineMethod());
                     cac.setConditionEvaluator((o) -> (Boolean) e.apply(o));
                 }
             }
@@ -48,12 +48,13 @@ class ExpressionUtil {
                 if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
                     cac.setUnlessEvaluator(o -> false);
                 } else {
-                    ExpressionEvaluator e = new ExpressionEvaluator(unless);
+                    ExpressionEvaluator e = new ExpressionEvaluator(unless, cac.getDefineMethod());
                     cac.setUnlessEvaluator((o) -> (Boolean) e.apply(o));
                 }
             }
             return cac.getUnlessEvaluator().apply(context);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + "." + e.getClass() + ":" + e.getMessage());
             return true;
         }
@@ -69,7 +70,7 @@ class ExpressionUtil {
                         return c.getArgs() == null ? "_$JETCACHE_NULL_KEY$_" : c.getArgs();
                     });
                 } else {
-                    ExpressionEvaluator e = new ExpressionEvaluator(keyScript);
+                    ExpressionEvaluator e = new ExpressionEvaluator(keyScript, cac.getDefineMethod());
                     cac.setKeyEvaluator((o) -> e.apply(o));
                 }
             }
@@ -84,7 +85,7 @@ class ExpressionUtil {
         String valueScript = cac.getValue();
         try {
             if (cac.getValueEvaluator() == null) {
-                ExpressionEvaluator e = new ExpressionEvaluator(valueScript);
+                ExpressionEvaluator e = new ExpressionEvaluator(valueScript, cac.getDefineMethod());
                 cac.setValueEvaluator((o) -> e.apply(o));
             }
             return cac.getValueEvaluator().apply(context);

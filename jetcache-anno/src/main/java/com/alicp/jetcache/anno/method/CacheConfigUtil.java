@@ -37,6 +37,7 @@ public class CacheConfigUtil {
         cc.setSerialPolicy(anno.serialPolicy());
         cc.setKeyConvertor(anno.keyConvertor());
         cc.setKey(anno.key());
+        cc.setDefineMethod(m);
         return cc;
     }
 
@@ -53,6 +54,7 @@ public class CacheConfigUtil {
         }
         cc.setKey(anno.key());
         cc.setCondition(anno.condition());
+        cc.setDefineMethod(m);
         return cc;
     }
 
@@ -73,6 +75,7 @@ public class CacheConfigUtil {
             throw new CacheConfigException("value is required for @CacheUpdate: " + m.getClass().getName() + "." + m.getName());
         }
         cc.setCondition(anno.condition());
+        cc.setDefineMethod(m);
         return cc;
     }
 

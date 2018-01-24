@@ -6,13 +6,18 @@ package com.alicp.jetcache.anno.method;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.support.CacheAnnoConfig;
 import org.mvel2.MVEL;
+import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.SpelCompilerMode;
+import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import java.lang.reflect.Method;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,14 +29,14 @@ public class ExpressionEvaluator implements Function<Object, Object> {
     private static final Pattern pattern = Pattern.compile("\\s*(\\w+)\\s*\\{(.+)\\}\\s*");
     private Function<Object, Object> target;
 
-    public ExpressionEvaluator(String script) {
+    public ExpressionEvaluator(String script, Method defineMethod) {
         Object rt[] = parseEL(script);
         EL el = (EL) rt[0];
         String realScript = (String) rt[1];
         if (el == EL.MVEL) {
             target = new MvelEvaluator(realScript);
         } else if (el == EL.SPRING_EL) {
-            target = new SpelEvaluator(realScript);
+            target = new SpelEvaluator(realScript, defineMethod);
         }
     }
 
@@ -86,16 +91,33 @@ class MvelEvaluator implements Function<Object, Object> {
 
 class SpelEvaluator implements Function<Object, Object> {
 
-    private static ExpressionParser parser = new SpelExpressionParser();
-    private final Expression expression;
+    private static ExpressionParser parser;
 
-    public SpelEvaluator(String script) {
+    static{
+        SpelParserConfiguration config = new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE,
+                SpelEvaluator.class.getClassLoader());
+        parser  = new SpelExpressionParser(config);
+    }
+
+    private final Expression expression;
+    private String[] parameterNames;
+
+    public SpelEvaluator(String script, Method defineMethod) {
         expression = parser.parseExpression(script);
+        if (defineMethod.getParameterCount() > 0) {
+            parameterNames = new DefaultParameterNameDiscoverer().getParameterNames(defineMethod);
+        }
     }
 
     @Override
     public Object apply(Object rootObject) {
         EvaluationContext context = new StandardEvaluationContext(rootObject);
+        CacheInvokeContext cic = (CacheInvokeContext) rootObject;
+        if (parameterNames != null) {
+            for (int i = 0; i < parameterNames.length; i++) {
+                context.setVariable(parameterNames[i], cic.getArgs()[i]);
+            }
+        }
         return expression.getValue(context);
     }
 }

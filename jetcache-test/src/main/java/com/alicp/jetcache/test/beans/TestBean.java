@@ -135,7 +135,7 @@ public class TestBean {
         return v;
     }
 
-    @CacheUpdate(name = "c1", key = "args[0]", value = "args[1]")
+    @CacheUpdate(name = "c1", key = "#id", value = "args[1]")
     public void update(String id, int value) {
         m.put(id, value);
     }
