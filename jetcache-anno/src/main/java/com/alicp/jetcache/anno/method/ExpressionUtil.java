@@ -54,7 +54,6 @@ class ExpressionUtil {
             }
             return cac.getUnlessEvaluator().apply(context);
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
             return true;
         }
