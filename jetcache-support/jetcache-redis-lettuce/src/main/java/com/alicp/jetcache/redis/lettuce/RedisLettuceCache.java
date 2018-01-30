@@ -162,7 +162,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                         if (System.currentTimeMillis() >= holder.getExpireTime()) {
                             return new ResultData(CacheResultCode.EXPIRED, null, null);
                         } else {
-                            return new ResultData(CacheResultCode.SUCCESS, null, holder.getValue());
+                            return new ResultData(CacheResultCode.SUCCESS, null, holder);
                         }
                     } else {
                         return new ResultData(CacheResultCode.NOT_EXISTS, null, null);
@@ -202,7 +202,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                             if (System.currentTimeMillis() >= holder.getExpireTime()) {
                                 resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
                             } else {
-                                CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue());
+                                CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
                                 resultMap.put(key, r);
                             }
                         } else {

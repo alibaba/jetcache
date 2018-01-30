@@ -12,6 +12,7 @@ import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import org.junit.Test;
 
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -63,8 +64,52 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
         return cache.unwrap(clazz);
     }
 
-    public CacheValueHolder<V> getHolder(K key) {
-        return (CacheValueHolder<V>) cache.unwrap(LinkedHashMap.class).get(genKey(key));
+
+    private static Method getHolder;
+
+    static {
+        try {
+            getHolder = CacheGetResult.class.getDeclaredMethod("getHolder");
+            getHolder.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new CacheException(e);
+        }
+    }
+
+    private CacheGetResult convertCacheGetResult(CacheGetResult originResult) {
+        try {
+            CacheValueHolder originHolder = (CacheValueHolder) getHolder.invoke(originResult);
+            LinkedList<CacheValueHolder> list = new LinkedList<>();
+            while (originHolder != null) {
+                CacheValueHolder h = new CacheValueHolder();
+                if (list.size() > 0) {
+                    list.getLast().setValue(h);
+                }
+                list.add(h);
+                h.setAccessTime(originHolder.getAccessTime());
+                h.setExpireTime(originHolder.getExpireTime());
+
+                Object v = originHolder.getValue();
+                if (v != null && !(v instanceof CacheValueHolder)) {
+                    h.setValue(config.getValueDecoder().apply((byte[]) v));
+                    break;
+                } else if (originHolder.getValue() == null) {
+                    originHolder = (CacheValueHolder) originHolder.getValue();
+                }
+            }
+            return new CacheGetResult(originResult.getResultCode(), originResult.getMessage(), list.peekFirst());
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
+    }
+
+    public CacheValueHolder getHolder(K key) {
+        try {
+            CacheGetResult<V> r = GET(key);
+            return (CacheValueHolder) getHolder.invoke(r);
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
     }
 
     @Override
@@ -74,8 +119,7 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
         }
         CacheGetResult r = cache.GET(genKey(key));
         if (r.isSuccess()) {
-            V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
-            r = new CacheGetResult(CacheResultCode.SUCCESS, null, v);
+            r = convertCacheGetResult(r);
         }
         return r;
     }
@@ -101,8 +145,7 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
                 ByteBuffer newKey = newKeyList.get(i);
                 CacheGetResult r = resultMap.get(newKey);
                 if (r.getValue() != null) {
-                    V v = (V) config.getValueDecoder().apply((byte[]) r.getValue());
-                    r = new CacheGetResult(r.getResultCode(), null, v);
+                    r = convertCacheGetResult(r);
                 }
                 returnMap.put(key, r);
             }

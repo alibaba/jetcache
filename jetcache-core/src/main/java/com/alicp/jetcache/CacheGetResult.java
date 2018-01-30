@@ -11,12 +11,13 @@ import java.util.concurrent.CompletionStage;
  */
 public class CacheGetResult<V> extends CacheResult {
     private V value;
+    private CacheValueHolder<V> holder;
 
     public static final CacheGetResult NOT_EXISTS_WITHOUT_MSG = new CacheGetResult(CacheResultCode.NOT_EXISTS, null, null);
     public static final CacheGetResult EXPIRED_WITHOUT_MSG = new CacheGetResult(CacheResultCode.EXPIRED, null ,null);
 
-    public CacheGetResult(CacheResultCode resultCode, String message, V value) {
-        super(CompletableFuture.completedFuture(new ResultData(resultCode, message, value)));
+    public CacheGetResult(CacheResultCode resultCode, String message, CacheValueHolder<V> holder) {
+        super(CompletableFuture.completedFuture(new ResultData(resultCode, message, holder)));
     }
 
     public CacheGetResult(CompletionStage<ResultData> future) {
@@ -35,12 +36,26 @@ public class CacheGetResult<V> extends CacheResult {
     @Override
     protected void fetchResultSuccess(ResultData resultData) {
         super.fetchResultSuccess(resultData);
-        value = (V) resultData.getData();
+        // if @Cached or @CacheCache change type from REMOTE to BOTH (or from BOTH to REMOTE),
+        // during the dev/publish process, the value type which different application server put into cache server will be different
+        // (CacheValueHolder<V> and CacheValueHolder<CacheValueHolder<V>>, respectively).
+        // So we need correct the problem at here and in MultiLevelCache.unwrapHolder
+        holder = (CacheValueHolder<V>) resultData.getData();
+        Object v = holder;
+        while (v != null && v instanceof CacheValueHolder) {
+            v = ((CacheValueHolder) v).getValue();
+        }
+        value = (V) v;
     }
 
     @Override
     protected void fetchResultFail(Throwable e) {
         super.fetchResultFail(e);
         value = null;
+    }
+
+    protected CacheValueHolder<V> getHolder() {
+        waitForResult();
+        return holder;
     }
 }
