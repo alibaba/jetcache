@@ -61,26 +61,39 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         }
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
-            CacheValueHolder<V> h = (CacheValueHolder<V>) cache.get(key);
-            if (checkResultAndFillUpperCache(key, i, h))
-                return new CacheGetResult(CacheResultCode.SUCCESS, null, h.getValue());
+            CacheGetResult result = cache.GET(key);
+            if (result.isSuccess()) {
+                CacheValueHolder<V> holder = unwrapHolder(result.getHolder());
+                checkResultAndFillUpperCache(key, i, holder);
+                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
+            }
         }
         return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
     }
 
-    private boolean checkResultAndFillUpperCache(K key, int i, CacheValueHolder<V> h) {
-        if (h != null) {
-            long currentExpire = h.getExpireTime();
-            long now = System.currentTimeMillis();
-            if (now <= currentExpire) {
-                long restTtl = currentExpire - now;
-                if (restTtl > 0) {
-                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
-                }
-                return true;
+    private CacheValueHolder<V> unwrapHolder(CacheValueHolder<V> h) {
+        // if @Cached or @CacheCache change type from REMOTE to BOTH (or from BOTH to REMOTE),
+        // during the dev/publish process, the value type which different application server put into cache server will be different
+        // (CacheValueHolder<V> and CacheValueHolder<CacheValueHolder<V>>, respectively).
+        // So we need correct the problem at here and in CacheGetResult.
+        Objects.requireNonNull(h);
+        if (h.getValue() instanceof CacheValueHolder) {
+            return (CacheValueHolder<V>) h.getValue();
+        } else {
+            return h;
+        }
+    }
+
+    private void checkResultAndFillUpperCache(K key, int i, CacheValueHolder<V> h) {
+        Objects.requireNonNull(h);
+        long currentExpire = h.getExpireTime();
+        long now = System.currentTimeMillis();
+        if (now <= currentExpire) {
+            long restTtl = currentExpire - now;
+            if (restTtl > 0) {
+                PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
             }
         }
-        return false;
     }
 
     @Override
@@ -95,13 +108,17 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
                 break;
             }
             Cache<K, CacheValueHolder<V>> c = caches[i];
-            Map<K, CacheValueHolder<V>> someResult = c.getAll(restKeys);
-            for (Map.Entry<K, CacheValueHolder<V>> en : someResult.entrySet()) {
-                K key = en.getKey();
-                CacheValueHolder<V> holder = en.getValue();
-                if (checkResultAndFillUpperCache(key, i, holder)) {
-                    resultMap.put(key, new CacheGetResult<>(CacheResultCode.SUCCESS, null, holder.getValue()));
-                    restKeys.remove(key);
+            MultiGetResult<K, CacheValueHolder<V>> allResult = c.GET_ALL(restKeys);
+            if (allResult.isSuccess() && allResult.getValues() != null) {
+                for (Map.Entry<K, CacheGetResult<CacheValueHolder<V>>> en : allResult.getValues().entrySet()) {
+                    K key = en.getKey();
+                    CacheGetResult result = en.getValue();
+                    if (result.isSuccess()) {
+                        CacheValueHolder<V> holder = unwrapHolder(result.getHolder());
+                        checkResultAndFillUpperCache(key, i, holder);
+                        resultMap.put(key, new CacheGetResult(CacheResultCode.SUCCESS, null, holder));
+                        restKeys.remove(key);
+                    }
                 }
             }
         }

@@ -69,7 +69,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
                     return CacheGetResult.EXPIRED_WITHOUT_MSG;
                 }
             }
-            return new CacheGetResult(CacheResultCode.SUCCESS, null, holder.getValue());
+            return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
         }
     }
 

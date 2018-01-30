@@ -74,7 +74,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 if (System.currentTimeMillis() >= holder.getExpireTime()) {
                     return CacheGetResult.EXPIRED_WITHOUT_MSG;
                 }
-                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder.getValue());
+                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
             } else {
                 return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
             }
@@ -104,7 +104,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                         if (System.currentTimeMillis() >= holder.getExpireTime()) {
                             resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
                         } else {
-                            CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder.getValue());
+                            CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
                             resultMap.put(key, r);
                         }
                     } else {
