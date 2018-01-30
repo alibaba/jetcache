@@ -3,8 +3,8 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -36,6 +36,9 @@ public class ClassUtilTest {
         public String foo2(I1 p) {
             return null;
         }
+
+        public void foo3(byte p2, short p3, char p4, int p5, long p6, float p7, double p8, boolean p9) {
+        }
     }
 
     @Test
@@ -47,7 +50,7 @@ public class ClassUtilTest {
         }
         Object obj = new CI2();
         Class<?>[] is = ClassUtil.getAllInterfaces(obj);
-        Assert.assertEquals(3, is.length);
+        assertEquals(3, is.length);
     }
 
     @Test
@@ -55,34 +58,40 @@ public class ClassUtilTest {
         Method m1 = C1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo", I1.class);
         Method m3 = C1.class.getMethod("foo2", I1.class);
+        Method m4 = C1.class.getMethod("foo3", byte.class, short.class, char.class, int.class, long.class, float.class, double.class, boolean.class);
 
         String s1 = "m.ClassUtilTest$C1." + m1.getName() + "()";
         String s2 = ClassUtil.generateCacheName(m1, hidePack);
-        Assert.assertEquals(s1, s2);
+        assertEquals(s1, s2);
 
         s1 = "m.ClassUtilTest$C1." + m2.getName() + "(Lm.ClassUtilTest$I1;)";
         s2 = ClassUtil.generateCacheName(m2, hidePack);
-        Assert.assertEquals(s1, s2);
+        assertEquals(s1, s2);
 
         s1 = "c.a.j.a.m.ClassUtilTest$C1." + m3.getName() + "(Lc.a.j.a.m.ClassUtilTest$I1;)";
         s2 = ClassUtil.generateCacheName(m3, null);
-        Assert.assertEquals(s1, s2);
+        assertEquals(s1, s2);
+
+        s1 = "m.ClassUtilTest$C1." + m4.getName() + "(BSCIJFDZ)";
+        s2 = ClassUtil.generateCacheName(m4, hidePack);
+        assertEquals(s1, s2);
     }
 
     @Test
     public void removeHiddenPackageTest() {
         String[] hs = {"com.foo", "com.bar."};
-        Assert.assertEquals("Foo", ClassUtil.removeHiddenPackage(hs, "com.foo.Foo"));
-        Assert.assertEquals("foo.Bar", ClassUtil.removeHiddenPackage(hs, "com.bar.foo.Bar"));
-        Assert.assertEquals("", ClassUtil.removeHiddenPackage(hs, "com.foo"));
-        Assert.assertEquals("com.bar.foo.Bar", ClassUtil.removeHiddenPackage(null, "com.bar.foo.Bar"));
-        Assert.assertEquals(null, ClassUtil.removeHiddenPackage(hs, null));
+        assertEquals("Foo", ClassUtil.removeHiddenPackage(hs, "com.foo.Foo"));
+        assertEquals("foo.Bar", ClassUtil.removeHiddenPackage(hs, "com.bar.foo.Bar"));
+        assertEquals("", ClassUtil.removeHiddenPackage(hs, "com.foo"));
+        assertEquals("com.bar.foo.Bar", ClassUtil.removeHiddenPackage(null, "com.bar.foo.Bar"));
+        assertEquals(null, ClassUtil.removeHiddenPackage(hs, null));
     }
 
     @Test
     public void getShortClassNameTest() {
-        Assert.assertEquals("j.l.String",ClassUtil.getShortClassName("java.lang.String"));
-        Assert.assertEquals("String",ClassUtil.getShortClassName("String"));
+        assertNull(ClassUtil.getShortClassName(null));
+        assertEquals("j.l.String", ClassUtil.getShortClassName("java.lang.String"));
+        assertEquals("String", ClassUtil.getShortClassName("String"));
     }
 
     @Test
@@ -93,15 +102,15 @@ public class ClassUtilTest {
 
         String s1 = m1.getName() + "()V";
         String s2 = ClassUtil.getMethodSig(m1);
-        Assert.assertEquals(s1, s2);
+        assertEquals(s1, s2);
 
         s1 = m2.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
         s2 = ClassUtil.getMethodSig(m2);
-        Assert.assertEquals(s1, s2);
+        assertEquals(s1, s2);
 
         s1 = m3.getName() + "(L" + I1.class.getName().replace('.', '/') + ";)Ljava/lang/String;";
         s2 = ClassUtil.getMethodSig(m3);
-        Assert.assertEquals(s1, s2);
+        assertEquals(s1, s2);
     }
 
 }

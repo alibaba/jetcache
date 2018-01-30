@@ -6,6 +6,8 @@ import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,6 +27,7 @@ public class LoadingCacheTest extends AbstractCacheTest {
         cache = new LoadingCache<>(cache);
         baseTest();
         loadingCacheTest(cache, 0);
+        errorTest();
     }
 
     public static void loadingCacheTest(Cache cache, long waitMillis) throws Exception {
@@ -113,5 +116,23 @@ public class LoadingCacheTest extends AbstractCacheTest {
         Assert.assertEquals(3, monitor.getCacheStat().getPutCount());
 
         cache.config().getMonitors().remove(monitor);
+    }
+
+    private void errorTest() {
+        cache.config().setLoader((key) -> {
+            throw new SQLException();
+        });
+        try {
+            cache.get("K1");
+            Assert.fail();
+        } catch (CacheInvokeException e) {
+        }
+        try {
+            Set s = new HashSet();
+            s.add("K1");
+            cache.getAll(s);
+            Assert.fail();
+        } catch (CacheInvokeException e) {
+        }
     }
 }

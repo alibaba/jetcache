@@ -34,7 +34,8 @@ public class RefreshCacheTest extends AbstractCacheTest {
         RefreshPolicy oldPolicy = cache.config().getRefreshPolicy();
 
         cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
-        RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
+        RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS)
+                .refreshLockTimeout(10, TimeUnit.SECONDS);
         cache.config().setRefreshPolicy(policy);
         refreshCacheTest1(cache);
         getRefreshCache(cache).stopRefresh();
@@ -52,13 +53,14 @@ public class RefreshCacheTest extends AbstractCacheTest {
         AtomicInteger count = new AtomicInteger(0);
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
         RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
+        policy.setRefreshLockTimeoutMillis(10000);
         builder.refreshPolicy(policy);
         Cache cache = builder.buildCache();
         refreshCacheTest1(cache);
         cache.close();
 
         count.set(0);
-        builder.getConfig().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(stopRefreshAfterLastAccess);
+        builder.getConfig().getRefreshPolicy().stopRefreshAfterLastAccess(stopRefreshAfterLastAccess, TimeUnit.MILLISECONDS);
         cache = builder.buildCache();
         refreshCacheTest2(cache);
         cache.close();
