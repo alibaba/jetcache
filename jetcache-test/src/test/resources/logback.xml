@@ -10,7 +10,6 @@
     <appender name="NULL" class="ch.qos.logback.core.helpers.NOPAppender"/>
 
     <logger name="com.alicp" level="TRACE">
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="NULL" />
     </logger>
 
