@@ -24,7 +24,6 @@ public class CacheContextTest {
         });
         Assert.assertFalse(CacheContext.isEnabled());
 
-        // 嵌套
         Assert.assertFalse(CacheContext.isEnabled());
         CacheContext.enableCache(() -> {
             Assert.assertTrue(CacheContext.isEnabled());
