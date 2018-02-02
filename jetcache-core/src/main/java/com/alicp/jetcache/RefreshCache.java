@@ -148,7 +148,9 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
             CacheLoader<K, V> loader = config.getLoader();
             loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
             V v = loader.load(key);
-            cache.PUT(key, v);
+            if (v != null || config.isCacheNullValue()) {
+                cache.PUT(key, v);
+            }
         }
 
         private void externalLoad(final Cache concreteCache, final long currentTime)
