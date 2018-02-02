@@ -2,8 +2,6 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
@@ -18,8 +16,6 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
-
-    private static final Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
     private RedisCacheConfig<K, V> config;
 
