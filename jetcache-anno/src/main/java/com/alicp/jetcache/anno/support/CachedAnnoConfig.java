@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.RefreshPolicy;
 import com.alicp.jetcache.anno.CacheType;
 
 import java.util.concurrent.TimeUnit;
@@ -19,11 +20,11 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     private CacheType cacheType;
     private int localLimit;
     private boolean cacheNullValue;
-    private String unless;
     private String serialPolicy;
     private String keyConvertor;
 
     private Function<Object, Boolean> unlessEvaluator;
+    private RefreshPolicy refreshPolicy;
 
     public boolean isEnabled() {
         return enabled;
@@ -65,14 +66,6 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
         this.cacheNullValue = cacheNullValue;
     }
 
-    public String getUnless() {
-        return unless;
-    }
-
-    public void setUnless(String unless) {
-        this.unless = unless;
-    }
-
     public String getSerialPolicy() {
         return serialPolicy;
     }
@@ -103,5 +96,13 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
 
     public void setUnlessEvaluator(Function<Object, Boolean> unlessEvaluator) {
         this.unlessEvaluator = unlessEvaluator;
+    }
+
+    public RefreshPolicy getRefreshPolicy() {
+        return refreshPolicy;
+    }
+
+    public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
+        this.refreshPolicy = refreshPolicy;
     }
 }

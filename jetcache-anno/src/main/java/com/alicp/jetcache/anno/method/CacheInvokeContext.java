@@ -22,8 +22,6 @@ public class CacheInvokeContext {
     private BiFunction<CacheInvokeContext, CacheAnnoConfig, Cache> cacheFunction;
     private String[] hiddenPackages;
 
-    private Object result = null;
-
     public CacheInvokeContext(){
     }
 
@@ -76,11 +74,4 @@ public class CacheInvokeContext {
         return args;
     }
 
-    public void setResult(Object result) {
-        this.result = result;
-    }
-
-    public Object getResult() {
-        return result;
-    }
 }

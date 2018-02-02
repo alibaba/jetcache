@@ -10,6 +10,7 @@ import com.alicp.jetcache.RefreshCache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.method.CacheHandler;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.anno.method.ClassUtil;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -44,7 +46,7 @@ public class CacheContext {
     private GlobalCacheConfig globalCacheConfig;
 
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
-    private CacheManager cacheManager;
+    private ConcurrentHashMap<String, Cache> cacheManager;
 
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
@@ -57,7 +59,7 @@ public class CacheContext {
     @PostConstruct
     public synchronized void init() {
         if (cacheManager == null) {
-            this.cacheManager = new CacheManager();
+            this.cacheManager = new ConcurrentHashMap<>();
             if (globalCacheConfig.getStatIntervalMinutes() > 0) {
                 defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
                         TimeUnit.MINUTES, globalCacheConfig.getConfigProvider().statCallback());
@@ -71,7 +73,9 @@ public class CacheContext {
         if (defaultCacheMonitorManager != null) {
             defaultCacheMonitorManager.stop();
         }
+        ConcurrentHashMap<String, Cache> m = cacheManager;
         cacheManager = null;
+        m.forEach((k, c) -> c.close());
         defaultCacheMonitorManager = null;
     }
 
@@ -115,13 +119,13 @@ public class CacheContext {
 
     public Cache __createOrGetCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         String fullCacheName = area + "_" + cacheName;
-        Cache cache = cacheManager.getCache(fullCacheName);
+        Cache cache = cacheManager.get(fullCacheName);
         if (cache == null) {
             synchronized (this) {
-                cache = cacheManager.getCache(fullCacheName);
+                cache = cacheManager.get(fullCacheName);
                 if (cache == null) {
                     cache = buildCache(cachedAnnoConfig, area, fullCacheName);
-                    cacheManager.addCache(fullCacheName, cache);
+                    cacheManager.put(fullCacheName, cache);
                 }
             }
         }
@@ -151,7 +155,7 @@ public class CacheContext {
                     .addCache(local, remote)
                     .buildCache();
         }
-        cache = new RefreshCache(cache);
+        cache = new CacheHandler.CacheHandlerRefreshCache(cache);
 
         if (defaultCacheMonitorManager != null) {
             DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
@@ -183,11 +187,12 @@ public class CacheContext {
             cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cachedAnnoConfig.getSerialPolicy()));
             cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cachedAnnoConfig.getSerialPolicy()));
         }
+        cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());
+        cacheBuilder.setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
         return cacheBuilder.buildCache();
     }
 
     protected Cache buildLocal(CachedAnnoConfig cachedAnnoConfig, String area) {
-        Cache cache;
         EmbeddedCacheBuilder cacheBuilder = (EmbeddedCacheBuilder) globalCacheConfig.getLocalCacheBuilders().get(area);
         if (cacheBuilder == null) {
             throw new CacheConfigException("no local cache builder: " + area);
@@ -203,16 +208,13 @@ public class CacheContext {
         if (!CacheConsts.UNDEFINED_STRING.equals(cachedAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
         }
-        cache = cacheBuilder.buildCache();
-        return cache;
+        cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());
+        cacheBuilder.setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
+        return cacheBuilder.buildCache();
     }
 
     protected CacheInvokeContext newCacheInvokeContext() {
         return new CacheInvokeContext();
-    }
-
-    public CacheManager getCacheManager() {
-        return cacheManager;
     }
 
     /**

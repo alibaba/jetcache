@@ -54,7 +54,6 @@ public class CacheHandlerTest {
         cachedAnnoConfig.setLocalLimit(CacheConsts.DEFAULT_LOCAL_LIMIT);
         cachedAnnoConfig.setCacheNullValue(CacheConsts.DEFAULT_CACHE_NULL_VALUE);
         cachedAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        cachedAnnoConfig.setUnless(CacheConsts.UNDEFINED_STRING);
         cachedAnnoConfig.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
         cachedAnnoConfig.setKeyConvertor(KeyConvertor.FASTJSON);
         cachedAnnoConfig.setKey(CacheConsts.UNDEFINED_STRING);
@@ -179,7 +178,7 @@ public class CacheHandlerTest {
         cachedAnnoConfig.setDefineMethod(method);
         Integer x1, x2, x3;
 
-        cachedAnnoConfig.setCacheNullValue(false);
+        cache.config().setCacheNullValue(false);
         x1 = invokeQuery(method, null);//null, not cached
         x2 = invokeQuery(method, null);//not null, so cached
         x3 = invokeQuery(method, null);//hit cache
@@ -189,23 +188,13 @@ public class CacheHandlerTest {
         assertEquals(x2, x3);
 
         setup();
-        cachedAnnoConfig.setCacheNullValue(true);
+        cache.config().setCacheNullValue(true);
         x1 = invokeQuery(method, null); //null,cached
         x2 = invokeQuery(method, null);
         x3 = invokeQuery(method, null);
         assertNull(x1);
         assertNull(x2);
         assertNull(x3);
-
-        cachedAnnoConfig.setCacheNullValue(false);
-        x1 = invokeQuery(method, null);//cached value is null, invoke, cached
-        x2 = invokeQuery(method, null);
-        x3 = invokeQuery(method, null);
-        assertNotNull(x1);
-        assertNotNull(x2);
-        assertNotNull(x3);
-        assertEquals(x1, x2);
-        assertEquals(x2, x3);
     }
 
     @Test
@@ -220,58 +209,6 @@ public class CacheHandlerTest {
         x1 = invokeQuery(method, new Object[]{11});
         x2 = invokeQuery(method, new Object[]{11});
         assertEquals(x1, x2);
-    }
-
-    @Test
-    public void testStaticInvokeUnless() throws Throwable {
-        Method method = CountClass.class.getMethod("count");
-        cachedAnnoConfig.setDefineMethod(method);
-        int x1, x2, x3, x4;
-        cachedAnnoConfig.setUnless("mvel{result%2==1}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        x1 = invokeQuery(method, null);//return 0, unless=false, so cached
-        x2 = invokeQuery(method, null);//cache hit
-        assertEquals(x1, x2);
-        cachedAnnoConfig.setUnless("mvel{result%2==0}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        x3 = invokeQuery(method, null);//cache hit(0),unless=true,invoke and return 1, and then cached
-        x4 = invokeQuery(method, null);//cache hit(1)
-        assertEquals(x3, x4);
-
-        assertNotEquals(x3, x1);
-    }
-
-    @Test
-    public void testStaticInvokeUnlessAndNull() throws Throwable {
-        Method method = CountClass.class.getMethod("countNull");
-        cachedAnnoConfig.setDefineMethod(method);
-
-        cachedAnnoConfig.setCacheNullValue(false);
-        cachedAnnoConfig.setUnless("mvel{result==0}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        assertNull(invokeQuery(method, null));//null, not cached
-        assertEquals(0, invokeQuery(method, null).longValue());//0, not cached
-        assertEquals(1, invokeQuery(method, null).longValue());//1, cache
-        assertEquals(1, invokeQuery(method, null).longValue());//cache hit
-
-        cachedAnnoConfig.setUnless("mvel{result==1}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        assertEquals(2, invokeQuery(method, null).longValue());
-        assertEquals(2, invokeQuery(method, null).longValue());
-
-        count = new CountClass();
-        cachedAnnoConfig.setUnless("mvel{result==2}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        assertNull(invokeQuery(method, null));
-        assertEquals(0, invokeQuery(method, null).longValue());//0, cached
-        assertEquals(0, invokeQuery(method, null).longValue());//cache hit
-
-        cachedAnnoConfig.setCacheNullValue(true);
-        count = new CountClass();
-        cachedAnnoConfig.setUnless("mvel{result==0}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        assertNull(invokeQuery(method, null));
-        assertNull(invokeQuery(method, null));
     }
 
     private void assertResultEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {

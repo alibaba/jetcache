@@ -3,10 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.AbstractCache;
-import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheGetResult;
-import com.alicp.jetcache.ProxyCache;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigMap;
@@ -149,26 +146,22 @@ public class CacheHandler implements InvocationHandler {
             return loadAndCount(context, cache, key);
         }
 
-        // the semantics of "unless" and "cacheNullValue" is not very accurate, we do our best to process it.
-        CacheGetResult cacheGetResult = cache.GET(key);
-        if (cacheGetResult.isSuccess()) {
-            context.setResult(cacheGetResult.getValue());
-        }
-        if (!cacheGetResult.isSuccess()) {//not hit
-            context.setResult(loadAndCount(context, cache, key));
-            if (!canNotCache(context)) {
-                cache.put(key, context.getResult());
-            }
-        } else { //cache hit
-            if (canNotCache(context)) {
-                context.setResult(loadAndCount(context, cache, key));//reload
-                if (!canNotCache(context)) {//eval again
-                    cache.put(key, context.getResult());
+        CacheLoader loader = (k) -> loadAndCount(context, cache, key);
+        try {
+            Object result = cache.computeIfAbsent(key, (k) -> {
+                try {
+                    return loader.load(k);
+                } catch (Throwable e) {
+                    throw new CacheInvokeException(e.getMessage(), e);
                 }
+            });
+            if (cache instanceof CacheHandlerRefreshCache) {
+                ((CacheHandlerRefreshCache) cache).addOrUpdateRefreshTask(key, loader);
             }
+            return result;
+        } catch (CacheInvokeException e) {
+            throw e.getCause();
         }
-
-        return context.getResult();
     }
 
     private static Object loadAndCount(CacheInvokeContext context, Cache cache, Object key) throws Throwable {
@@ -191,13 +184,20 @@ public class CacheHandler implements InvocationHandler {
         return v;
     }
 
-    private static boolean canNotCache(CacheInvokeContext context) {
-        return ExpressionUtil.evalUnless(context) ||
-                (context.getResult() == null && !context.getCacheInvokeConfig().getCachedAnnoConfig().isCacheNullValue());
-    }
-
     private static Object invokeOrigin(CacheInvokeContext context) throws Throwable {
         return context.getInvoker().invoke();
+    }
+
+    public static class CacheHandlerRefreshCache<K, V> extends RefreshCache<K, V> {
+
+        public CacheHandlerRefreshCache(Cache cache) {
+            super(cache);
+        }
+
+        @Override
+        public void addOrUpdateRefreshTask(K key, CacheLoader<K, V> loader) {
+            super.addOrUpdateRefreshTask(key, loader);
+        }
     }
 
 

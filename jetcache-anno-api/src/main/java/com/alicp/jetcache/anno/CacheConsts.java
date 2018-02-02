@@ -19,4 +19,11 @@ public interface CacheConsts {
     int UNDEFINED_INT = Integer.MIN_VALUE;
     long UNDEFINED_LONG = Long.MIN_VALUE;
 
+    static boolean isUndefined(String value) {
+        return UNDEFINED_STRING.equals(value);
+    }
+
+    static boolean isUndefined(int value) {
+        return UNDEFINED_INT == value;
+    }
 }

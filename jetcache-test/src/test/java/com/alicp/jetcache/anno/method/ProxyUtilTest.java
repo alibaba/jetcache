@@ -3,10 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.CacheInvalidate;
-import com.alicp.jetcache.anno.CacheUpdate;
-import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -19,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -367,5 +365,50 @@ public class ProxyUtilTest {
         assertEquals(i8_proxy.count("K1"), i8_proxy.count("K1"));
         assertNotEquals(i8_proxy.count("K1"), i8_proxy.count("K2"));
 
+    }
+
+    public interface I9 {
+        @Cached
+        @CacheRefresh(refresh = 100, timeUnit = TimeUnit.MILLISECONDS)
+        int count();
+
+        @Cached(key="#a")
+        @CacheRefresh(refresh = 100, timeUnit = TimeUnit.MILLISECONDS)
+        int count(int a, int b);
+    }
+
+    public class C9 implements I9 {
+        int count1;
+        int count2;
+
+        public int count() {
+            return count1++;
+        }
+
+        @Override
+        public int count(int a, int b) {
+            return a + b + count2++;
+        }
+    }
+
+    @Test
+    // refresh test
+    public void testGetProxyByAnnotation9() throws Exception {
+        I9 beanProxy = ProxyUtil.getProxyByAnnotation(new C9(), globalCacheConfig);
+        {
+            int x1 = beanProxy.count();
+            int x2 = beanProxy.count();
+            assertEquals(x1, x2);
+            Thread.sleep(150);
+            assertNotEquals(x2, beanProxy.count());
+        }
+        {
+            int x1 = beanProxy.count(1, 2);
+            int x2 = beanProxy.count(1, 200);
+            assertEquals(x1, x2);
+            Thread.sleep(150);
+            assertEquals(x1 + 1, beanProxy.count(1, 400));
+        }
+        globalCacheConfig.shutdown();
     }
 }

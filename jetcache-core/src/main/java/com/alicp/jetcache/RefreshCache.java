@@ -6,7 +6,6 @@ import com.alicp.jetcache.support.JetCacheExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -91,10 +90,17 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         }
     }
 
-    private void addTaskOrUpdateLastAccessTime(Object taskId, long refreshMillis, K key) {
-        if (refreshMillis > 0 && taskId != null) {
+    protected void addOrUpdateRefreshTask(K key, CacheLoader<K,V> loader) {
+        RefreshPolicy refreshPolicy = config.getRefreshPolicy();
+        if (refreshPolicy == null) {
+            return;
+        }
+        long refreshMillis = refreshPolicy.getRefreshMillis();
+        if (refreshMillis > 0) {
+            Object taskId = getTaskId(key);
             RefreshTask refreshTask = taskMap.computeIfAbsent(taskId, tid -> {
-                RefreshTask task = new RefreshTask(taskId, key);
+                logger.debug("add refresh task. interval={},  key={}", refreshMillis , key);
+                RefreshTask task = new RefreshTask(taskId, key, loader);
                 task.lastAccessTime = System.currentTimeMillis();
                 ScheduledFuture<?> future = JetCacheExecutor.heavyIOExecutor().scheduleWithFixedDelay(
                         task, refreshMillis, refreshMillis, TimeUnit.MILLISECONDS);
@@ -108,9 +114,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     @Override
     public CacheGetResult<V> GET(K key) {
         if (config.getRefreshPolicy() != null && hasLoader()) {
-            addTaskOrUpdateLastAccessTime(getTaskId(key),
-                    config.getRefreshPolicy().getRefreshMillis(),
-                    key);
+            addOrUpdateRefreshTask(key, null);
         }
         return cache.GET(key);
     }
@@ -119,9 +123,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     public MultiGetResult<K, V> GET_ALL(Set<? extends K> keys) {
         if (config.getRefreshPolicy() != null && hasLoader()) {
             for (K key : keys) {
-                addTaskOrUpdateLastAccessTime(getTaskId(key),
-                        config.getRefreshPolicy().getRefreshMillis(),
-                        key);
+                addOrUpdateRefreshTask(key, null);
             }
         }
         return cache.GET_ALL(keys);
@@ -130,26 +132,31 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     class RefreshTask implements Runnable {
         private Object taskId;
         private K key;
+        private CacheLoader<K, V> loader;
+
         private long lastAccessTime;
         private ScheduledFuture future;
 
-        RefreshTask(Object taskId, K key) {
+        RefreshTask(Object taskId, K key, CacheLoader<K, V> loader) {
             this.taskId = taskId;
             this.key = key;
+            this.loader = loader;
         }
 
         private void cancel() {
+            logger.debug("cancel refresh: {}", key);
             future.cancel(false);
             taskMap.remove(taskId);
         }
 
         private void load() throws Throwable {
-            logger.debug("refresh {}", key);
-            CacheLoader<K, V> loader = config.getLoader();
-            loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
-            V v = loader.load(key);
-            if (v != null || config.isCacheNullValue()) {
-                cache.PUT(key, v);
+            CacheLoader<K,V> l = loader == null? config.getLoader(): loader;
+            if (l != null) {
+                l = CacheUtil.createProxyLoader(cache, l, eventConsumer);
+                V v = l.load(key);
+                if (v != null || config.isCacheNullValue()) {
+                    cache.PUT(key, v);
+                }
             }
         }
 
@@ -181,7 +188,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         @Override
         public void run() {
             try {
-                if (config.getRefreshPolicy() == null || config.getLoader() == null) {
+                if (config.getRefreshPolicy() == null || (loader == null && !hasLoader())) {
                     cancel();
                     return;
                 }
@@ -194,6 +201,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                         return;
                     }
                 }
+                logger.debug("refresh key: {}", key);
                 Cache concreteCache = concreteCache();
                 if (concreteCache instanceof AbstractExternalCache) {
                     externalLoad(concreteCache, now);

@@ -1,10 +1,7 @@
 package com.alicp.jetcache.anno.filed;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.CacheType;
-import com.alicp.jetcache.anno.CreateCache;
-import com.alicp.jetcache.anno.KeyConvertor;
-import com.alicp.jetcache.anno.SerialPolicy;
+import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -97,6 +94,10 @@ public class CreateCacheTest extends SpringTest {
             @CreateCache(cacheType =CacheType.LOCAL, keyConvertor = KeyConvertor.NONE)
             private Cache cacheWithoutConvertor;
 
+            @CreateCache
+            @CacheRefresh(timeUnit = TimeUnit.MILLISECONDS, refresh = 100)
+            private Cache cacheWithRefresh;
+
             private Cache getTarget(Cache cache) {
                 while(cache instanceof ProxyCache){
                     cache = ((ProxyCache) cache).getTargetCache();
@@ -107,6 +108,7 @@ public class CreateCacheTest extends SpringTest {
             @PostConstruct
             public void test() throws Exception {
                 runGeneralTest();
+                refreshTest();
 
                 cache1.put("KK1", "V1");
                 Assert.assertNull(cache_A1.get("KK1"));
@@ -176,6 +178,16 @@ public class CreateCacheTest extends SpringTest {
                 cacheWithoutConvertor.put(dqwe1, "V");
                 Assert.assertEquals(CacheResultCode.NOT_EXISTS, cacheWithoutConvertor.GET(dqwe2).getResultCode());
                 Assert.assertEquals(CacheResultCode.SUCCESS, cacheWithoutConvertor.GET(dqwe3).getResultCode());
+            }
+
+            private int refreshCount;
+            private void refreshTest() throws Exception {
+                cacheWithRefresh.config().setLoader((k) -> refreshCount++);
+                cacheWithRefresh.put("K1", "V1");
+                Assert.assertEquals("V1", cacheWithRefresh.get("K1"));
+                Thread.sleep((long) (cacheWithRefresh.config().getRefreshPolicy().getRefreshMillis() * 1.5));
+                Assert.assertEquals(0, cacheWithRefresh.get("K1"));
+                cacheWithRefresh.close();
             }
         }
     }

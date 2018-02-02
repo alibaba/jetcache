@@ -2,7 +2,9 @@ package com.alicp.jetcache.anno.field;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.CacheRefresh;
 import com.alicp.jetcache.anno.CreateCache;
+import com.alicp.jetcache.anno.method.CacheConfigUtil;
 import com.alicp.jetcache.anno.method.ClassUtil;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
@@ -27,11 +29,16 @@ class LazyInitCache implements ProxyCache {
     private ConfigurableListableBeanFactory beanFactory;
     private CreateCache ann;
     private Field field;
+    private RefreshPolicy refreshPolicy;
 
     public LazyInitCache(ConfigurableListableBeanFactory beanFactory, CreateCache ann, Field field) {
         this.beanFactory = beanFactory;
         this.ann = ann;
         this.field = field;
+        CacheRefresh cr = field.getAnnotation(CacheRefresh.class);
+        if (cr != null) {
+            refreshPolicy = CacheConfigUtil.parseRefreshPolicy(cr);
+        }
     }
 
     private void checkInit() {
@@ -66,6 +73,8 @@ class LazyInitCache implements ProxyCache {
         cac.setLocalLimit(ann.localLimit());
         cac.setSerialPolicy(ann.serialPolicy());
         cac.setKeyConvertor(ann.keyConvertor());
+
+        cac.setRefreshPolicy(refreshPolicy);
 
         String cacheName = cac.getName();
         if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {

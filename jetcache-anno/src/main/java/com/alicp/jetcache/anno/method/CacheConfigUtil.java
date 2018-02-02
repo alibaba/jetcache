@@ -4,15 +4,14 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.anno.CacheInvalidate;
-import com.alicp.jetcache.anno.CacheUpdate;
-import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.RefreshPolicy;
+import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -33,12 +32,31 @@ public class CacheConfigUtil {
         cc.setLocalLimit(anno.localLimit());
         cc.setCacheNullValue(anno.cacheNullValue());
         cc.setCondition(anno.condition());
-        cc.setUnless(anno.unless());
         cc.setSerialPolicy(anno.serialPolicy());
         cc.setKeyConvertor(anno.keyConvertor());
         cc.setKey(anno.key());
         cc.setDefineMethod(m);
+
+        CacheRefresh cacheRefresh = m.getAnnotation(CacheRefresh.class);
+        if (cacheRefresh != null) {
+            RefreshPolicy policy = parseRefreshPolicy(cacheRefresh);
+            cc.setRefreshPolicy(policy);
+        }
+
         return cc;
+    }
+
+    public static RefreshPolicy parseRefreshPolicy(CacheRefresh cacheRefresh) {
+        RefreshPolicy policy = new RefreshPolicy();
+        TimeUnit t = cacheRefresh.timeUnit();
+        policy.setRefreshMillis(t.toMillis(cacheRefresh.refresh()));
+        if (!CacheConsts.isUndefined(cacheRefresh.stopRefreshAfterLastAccess())) {
+            policy.setStopRefreshAfterLastAccessMillis(t.toMillis(cacheRefresh.stopRefreshAfterLastAccess()));
+        }
+        if(!CacheConsts.isUndefined(cacheRefresh.refreshLockTimeout())){
+            policy.setRefreshLockTimeoutMillis(t.toMillis(cacheRefresh.refreshLockTimeout()));
+        }
+        return policy;
     }
 
     private static CacheInvalidateAnnoConfig parseCacheInvalidate(Method m) {

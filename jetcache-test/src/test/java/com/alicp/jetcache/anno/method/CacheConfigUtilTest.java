@@ -4,10 +4,7 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.anno.CacheInvalidate;
-import com.alicp.jetcache.anno.CacheUpdate;
-import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.anno.EnableCache;
+import com.alicp.jetcache.anno.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,6 +17,10 @@ public class CacheConfigUtilTest {
     interface I {
         @Cached
         void m1();
+
+        @Cached
+        @CacheRefresh(refresh = 100)
+        void m1_2();
 
         @EnableCache
         void m2();
@@ -48,6 +49,13 @@ public class CacheConfigUtilTest {
         CacheInvokeConfig cic = new CacheInvokeConfig();
         CacheConfigUtil.parse(cic, I.class.getMethod("m1"));
         assertNotNull(cic.getCachedAnnoConfig());
+        assertNull(cic.getCachedAnnoConfig().getRefreshPolicy());
+
+        cic = new CacheInvokeConfig();
+        CacheConfigUtil.parse(cic, I.class.getMethod("m1_2"));
+        assertNotNull(cic.getCachedAnnoConfig());
+        assertNotNull(cic.getCachedAnnoConfig().getRefreshPolicy());
+
 
         cic = new CacheInvokeConfig();
         CacheConfigUtil.parse(cic, I.class.getMethod("m2"));

@@ -39,26 +39,6 @@ class ExpressionUtil {
         }
     }
 
-    public static boolean evalUnless(CacheInvokeContext context) {
-        CacheInvokeConfig cic = context.getCacheInvokeConfig();
-        CachedAnnoConfig cac = cic.getCachedAnnoConfig();
-        String unless = cac.getUnless();
-        try {
-            if (cac.getUnlessEvaluator() == null) {
-                if (CacheConsts.UNDEFINED_STRING.equals(unless)) {
-                    cac.setUnlessEvaluator(o -> false);
-                } else {
-                    ExpressionEvaluator e = new ExpressionEvaluator(unless, cac.getDefineMethod());
-                    cac.setUnlessEvaluator((o) -> (Boolean) e.apply(o));
-                }
-            }
-            return cac.getUnlessEvaluator().apply(context);
-        } catch (Exception e) {
-            logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
-            return true;
-        }
-    }
-
     public static Object evalKey(CacheInvokeContext context, CacheAnnoConfig cac) {
         String keyScript = cac.getKey();
         try {
