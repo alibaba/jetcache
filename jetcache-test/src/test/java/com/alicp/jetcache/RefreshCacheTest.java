@@ -7,6 +7,7 @@ import com.alicp.jetcache.test.AbstractCacheTest;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -23,8 +24,20 @@ public class RefreshCacheTest extends AbstractCacheTest {
     public void test() throws Exception {
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .buildCache();
+        cache = new MonitoredCache<>(cache);
         cache = new RefreshCache<>(cache);
         baseTest();
+
+        cache.put("K1", "V1");
+        cache.config().setLoader(k -> {
+            throw new SQLException();
+        });
+        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(30, TimeUnit.MILLISECONDS));
+        Assert.assertEquals("V1", cache.get("K1"));
+        Thread.sleep(45);
+        Assert.assertEquals("V1", cache.get("K1"));
+        ((RefreshCache<Object, Object>)cache).stopRefresh();
+
         refreshCacheTest(cache, 80, 40);
     }
 
@@ -66,7 +79,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache.close();
     }
 
-    private static RefreshCache getRefreshCache(Cache cache){
+    private static RefreshCache getRefreshCache(Cache cache) {
         Cache c = cache;
         while (!(c instanceof RefreshCache)) {
             if (c instanceof ProxyCache) {
@@ -180,14 +193,18 @@ public class RefreshCacheTest extends AbstractCacheTest {
             }
         }
 
-        cache.config().setRefreshPolicy(null);//stop refresh
+        cache.config().setLoader(null);//stop refresh
 
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
-        Assert.assertNotEquals(values.get("refreshCacheTest2_K1"), cache.get("refreshCacheTest2_K1"));
+        Object newK1Value = cache.get("refreshCacheTest2_K1");
+        Assert.assertNotEquals(values.get("refreshCacheTest2_K1"), newK1Value);
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
         // refresh task stopped, but K/V is not expires
         Assert.assertEquals(values.get("refreshCacheTest2_K2"), cache.get("refreshCacheTest2_K2"));
         Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
+
+        Thread.sleep(refreshMillis);
+        Assert.assertEquals(newK1Value, cache.get("refreshCacheTest2_K1"));
 
         cache.config().getMonitors().remove(monitor);
     }
