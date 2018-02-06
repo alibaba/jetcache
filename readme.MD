@@ -80,9 +80,12 @@ userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
 ## advanced API
 Asynchronous API:
 ```java
-CompletionStage<ResultData> future = cache.GET(userId).future();
-future.thenAccept(resultData -> {
-    System.out.println(resultData.getData());
+CacheGetResult r = cache.GET(userId);
+CompletionStage<ResultData> future = r.future();
+future.thenRun(() -> {
+    if(r.isSuccess()){
+        System.out.println(r.getValue());
+    }
 });
 ```
 
