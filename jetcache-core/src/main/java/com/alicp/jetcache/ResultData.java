@@ -21,6 +21,15 @@ public class ResultData {
         this.data = data;
     }
 
+    public Object getData() {
+        return CacheGetResult.unwrapValue(data);
+    }
+
+    public Object getOriginData() {
+        return data;
+    }
+
+
     public CacheResultCode getResultCode() {
         return resultCode;
     }
@@ -35,10 +44,6 @@ public class ResultData {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public Object getData() {
-        return data;
     }
 
     public void setData(Object data) {

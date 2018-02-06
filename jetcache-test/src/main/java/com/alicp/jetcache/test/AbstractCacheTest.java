@@ -1,6 +1,7 @@
 package com.alicp.jetcache.test;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.support.JetCacheExecutor;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 
@@ -49,6 +50,8 @@ public abstract class AbstractCacheTest {
         lockTest();
         putIfAbsentTest();
         complextValueTest();
+
+        asyncTest();
     }
 
     private void illegalArgTest() {
@@ -264,6 +267,92 @@ public abstract class AbstractCacheTest {
                 throw new RuntimeException();
             }, true, 1, TimeUnit.MINUTES));
         }
+    }
+
+    boolean asyncTestFail = false;
+
+    private void asyncTest() throws Exception {
+        CacheResult putResult = cache.PUT("async_K1", "V1");
+        putResult.future().thenAccept(resultData -> {
+            if (resultData.getResultCode() != CacheResultCode.SUCCESS) {
+                asyncTestFail = true;
+            }
+        });
+        putResult.future().toCompletableFuture().get();
+        Assert.assertFalse(asyncTestFail);
+
+        CacheGetResult getResult = cache.GET("async_K1");
+        getResult.future().thenAccept(resultData -> {
+            if (resultData.getResultCode() != CacheResultCode.SUCCESS) {
+                asyncTestFail = true;
+            }
+            if (!"V1".equals(resultData.getData())) {
+                asyncTestFail = true;
+            }
+        });
+        getResult.future().toCompletableFuture().get();
+        Assert.assertFalse(asyncTestFail);
+
+        CacheGetResult getResult2 = cache.GET("async_K1");
+        getResult2.future().thenRun(() -> {
+            if (!"V1".equals(getResult2.getValue())) {
+                asyncTestFail = true;
+            }
+        });
+        getResult2.future().toCompletableFuture().get();
+        Assert.assertFalse(asyncTestFail);
+
+        HashSet<String> s = new HashSet<>();
+        s.add("async_K1");
+        s.add("async_K2");
+        MultiGetResult multiGetResult = cache.GET_ALL(s);
+        multiGetResult.future().thenAccept(resultData -> {
+            if (resultData.getResultCode() != CacheResultCode.SUCCESS) {
+                asyncTestFail = true;
+            }
+            Map m = (Map) resultData.getData();
+            CacheGetResult r1 = (CacheGetResult) m.get("async_K1");
+            CacheGetResult r2 = (CacheGetResult) m.get("async_K2");
+            if (r1.getResultCode() != CacheResultCode.SUCCESS) {
+                asyncTestFail = true;
+            }
+            if (r2.getResultCode() != CacheResultCode.NOT_EXISTS) {
+                asyncTestFail = true;
+            }
+            if (!"V1".equals(r1.getValue())) {
+                asyncTestFail = true;
+            }
+            if (r2.getValue() != null) {
+                asyncTestFail = true;
+            }
+        });
+        multiGetResult.future().toCompletableFuture().get();
+        Assert.assertFalse(asyncTestFail);
+
+        MultiGetResult multiGetResult2 = cache.GET_ALL(s);
+        multiGetResult2.future().thenRun(() -> {
+            if (multiGetResult2.getResultCode() != CacheResultCode.SUCCESS) {
+                asyncTestFail = true;
+            }
+            Map m = multiGetResult2.unwrapValues();
+            if (!"V1".equals(m.get("async_K1"))) {
+                asyncTestFail = true;
+            }
+            if (m.get("async_K2") != null) {
+                asyncTestFail = true;
+            }
+        });
+        multiGetResult2.future().toCompletableFuture().get();
+        Assert.assertFalse(asyncTestFail);
+
+        CacheResult removeResult = cache.REMOVE("async_K1");
+        removeResult.future().thenAccept(resultData -> {
+            if (resultData.getResultCode() != CacheResultCode.SUCCESS) {
+                asyncTestFail = true;
+            }
+        });
+        removeResult.future().toCompletableFuture().get();
+        Assert.assertFalse(asyncTestFail);
     }
 
 

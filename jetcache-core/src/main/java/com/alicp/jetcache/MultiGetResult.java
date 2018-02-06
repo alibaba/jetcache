@@ -33,7 +33,7 @@ public class MultiGetResult<K, V> extends CacheResult {
     @Override
     protected void fetchResultSuccess(ResultData resultData) {
         super.fetchResultSuccess(resultData);
-        values = (Map<K, CacheGetResult<V>>) resultData.getData();
+        values = (Map<K, CacheGetResult<V>>) resultData.getOriginData();
     }
 
     @Override
