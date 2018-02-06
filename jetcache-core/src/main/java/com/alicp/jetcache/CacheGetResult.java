@@ -36,17 +36,22 @@ public class CacheGetResult<V> extends CacheResult {
     @Override
     protected void fetchResultSuccess(ResultData resultData) {
         super.fetchResultSuccess(resultData);
+        holder = (CacheValueHolder<V>) resultData.getOriginData();
+        value = (V) unwrapValue(holder);
+    }
+
+    static Object unwrapValue(Object holder) {
         // if @Cached or @CacheCache change type from REMOTE to BOTH (or from BOTH to REMOTE),
         // during the dev/publish process, the value type which different application server put into cache server will be different
         // (CacheValueHolder<V> and CacheValueHolder<CacheValueHolder<V>>, respectively).
         // So we need correct the problem at here and in MultiLevelCache.unwrapHolder
-        holder = (CacheValueHolder<V>) resultData.getData();
         Object v = holder;
         while (v != null && v instanceof CacheValueHolder) {
             v = ((CacheValueHolder) v).getValue();
         }
-        value = (V) v;
+        return v;
     }
+
 
     @Override
     protected void fetchResultFail(Throwable e) {
