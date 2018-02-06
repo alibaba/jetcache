@@ -12,7 +12,7 @@ Features of JetCache:
 * Create & configure ```Cache``` instance using annotation
 * Auto collect access statistics for Cache instance and method cache
 * The policy of key generation and value serialization can be customized
-* Auto Refresh (2.2+)
+* Distributed cache auto refresh and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
 * Spring Boot support
 
@@ -26,11 +26,39 @@ Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents.
 # getting started
 
 ## method cache
-Declare method cache using ```@Cached``` annotation.  ```expire = 3600``` indicates that the elements will expires in 3600 seconds after put.
+Declare method cache using ```@Cached``` annotation.  
+```expire = 3600``` indicates that the elements will expires in 3600 seconds after put.
+JetCache auto generates cache key using all parameters.
 ```java
 public interface UserService {
     @Cached(expire = 3600, cacheType = CacheType.REMOTE)
     User getUserById(long userId);
+}
+```
+
+Using ```key``` attribute to specify cache key using [SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html) script.
+```java
+public interface UserService {
+    @Cached(name="userCache-", key="#userId", expire = 3600)
+    User getUserById(long userId);
+
+    @CacheUpdate(name="userCache-", key="#user.userId", value="#user")
+    void updateUser(User user);
+
+    @CacheInvalidate(name="userCache-", key="#userId")
+    void deleteUser(long userId);
+    
+    //compiler 
+}
+```
+To enable use parameter name such as ```key="#userId"```, you javac compiler target must be 1.8 and the ```-parameters``` should be set, otherwise use index to access parameters like ```key="args[0]"```
+
+Automatically refresh:
+```java
+public interface SummaryService{
+    @Cached(expire = 3600, cacheType = CacheType.REMOTE)
+    @CacheRefresh(refresh = 1800, stopRefreshAfterLastAccess = 3600, timeUnit = TimeUnit.SECONDS)
+    BigDecimal summaryOfToday(long catagoryId);
 }
 ```
 
@@ -48,6 +76,33 @@ userCache.remove(12345L);
 
 userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
 ```
+
+## advanced API
+Asynchronous API:
+```java
+CompletionStage<ResultData> future = cache.GET(userId).future();
+future.thenAccept(resultData -> {
+    System.out.println(resultData.getData());
+});
+```
+
+Distributed lock:
+```java
+cache.tryLockAndRun("key", 60, TimeUnit.SECONDS, () -> heavyDatabaseOperation());
+```
+
+Read through and auto refresh:
+```java
+@CreateCache
+@CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60)
+private Cache<String, Long> orderSumCache;
+
+@PostConstruct
+public void init(){
+    orderSumCache.config().setLoader(this::loadOrderSumFromDatabase);
+}
+```
+
 ## configuration with Spring Boot
 
 pom:
@@ -92,66 +147,6 @@ jetcache:
         maxTotal: 50
       host: ${redis.host}
       port: ${redis.port}
-```
-## configuration without Spring Boot
-pom:
-```xml
-<dependency>
-    <groupId>com.alicp.jetcache</groupId>
-    <artifactId>jetcache-anno</artifactId>
-    <version>${jetcache.latest.version}</version>
-</dependency>
-```
-
-config
-```java
-@Configuration
-@EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
-public class JetCacheConfig {
-
-    @Bean
-    public Pool<Jedis> pool(){
-        GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
-        pc.setMinIdle(2);
-        pc.setMaxIdle(10);
-        pc.setMaxTotal(10);
-        return new JedisPool(pc, "localhost", 6379);
-    }
-
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
-
-    @Bean
-    public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){
-        GlobalCacheConfig pc = new GlobalCacheConfig();
-
-        Map localBuilders = new HashMap();
-        EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
-                .createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE);
-        localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
-
-        Map remoteBuilders = new HashMap();
-        RedisCacheBuilder remoteCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                   .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                   .valueEncoder(JavaValueEncoder.INSTANCE)
-                   .valueDecoder(JavaValueDecoder.INSTANCE)
-                   .jedisPool(pool);
-        remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
-
-        GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setConfigProvider(configProvider);
-        globalCacheConfig.setLocalCacheBuilders(localBuilders);
-        globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
-        globalCacheConfig.setStatIntervalMinutes(15);
-
-        return globalCacheConfig;
-    }
-
-}
 ```
 
 ## more docs
