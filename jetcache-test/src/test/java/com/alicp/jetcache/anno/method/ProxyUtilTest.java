@@ -372,7 +372,7 @@ public class ProxyUtilTest {
         @CacheRefresh(refresh = 100, timeUnit = TimeUnit.MILLISECONDS)
         int count();
 
-        @Cached(key="#a")
+        @Cached(key="#a", cacheType = CacheType.BOTH)
         @CacheRefresh(refresh = 100, timeUnit = TimeUnit.MILLISECONDS)
         int count(int a, int b);
     }

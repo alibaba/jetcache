@@ -155,6 +155,7 @@ public class CacheContext {
                     .addCache(local, remote)
                     .buildCache();
         }
+        cache.config().setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
         cache = new CacheHandler.CacheHandlerRefreshCache(cache);
 
         if (defaultCacheMonitorManager != null) {
@@ -188,7 +189,6 @@ public class CacheContext {
             cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cachedAnnoConfig.getSerialPolicy()));
         }
         cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());
-        cacheBuilder.setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
         return cacheBuilder.buildCache();
     }
 
@@ -209,7 +209,6 @@ public class CacheContext {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
         }
         cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());
-        cacheBuilder.setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
         return cacheBuilder.buildCache();
     }
 
