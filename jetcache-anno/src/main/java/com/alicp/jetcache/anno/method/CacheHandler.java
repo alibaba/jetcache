@@ -146,17 +146,16 @@ public class CacheHandler implements InvocationHandler {
             return loadAndCount(context, cache, key);
         }
 
-        CacheLoader loader = (k) -> loadAndCount(context, cache, key);
         try {
             Object result = cache.computeIfAbsent(key, (k) -> {
                 try {
-                    return loader.load(k);
+                    return invokeOrigin(context);
                 } catch (Throwable e) {
                     throw new CacheInvokeException(e.getMessage(), e);
                 }
             });
             if (cache instanceof CacheHandlerRefreshCache) {
-                ((CacheHandlerRefreshCache) cache).addOrUpdateRefreshTask(key, loader);
+                ((CacheHandlerRefreshCache) cache).addOrUpdateRefreshTask(key, (unusedKey) -> invokeOrigin(context));
             }
             return result;
         } catch (CacheInvokeException e) {
