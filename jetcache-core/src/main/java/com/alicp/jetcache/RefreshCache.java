@@ -6,6 +6,7 @@ import com.alicp.jetcache.support.JetCacheExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.lang.model.SourceVersion;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -75,6 +76,14 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 return c;
             }
         }
+    }
+
+    private boolean isMultiLevelCache() {
+        Cache c = getTargetCache();
+        while (c instanceof ProxyCache) {
+            c = ((ProxyCache) c).getTargetCache();
+        }
+        return c instanceof MultiLevelCache;
     }
 
     private Object getTaskId(K key) {
@@ -164,25 +173,50 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 throws Throwable {
             byte[] newKey = ((AbstractExternalCache) concreteCache).buildKey(key);
             byte[] lockKey = combine(newKey, "_#RL#".getBytes());
+            boolean isMultiLevelCache = isMultiLevelCache();
             long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
+            long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
+            byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
+
+            // AbstractExternalCache buildKey method will not convert byte[]
+            CacheGetResult refreshTimeResult = (CacheGetResult) getMethod.invoke(concreteCache, timestampKey);
+            boolean shouldLoad = false;
+            if (refreshTimeResult.isSuccess()) {
+                shouldLoad = currentTime >= Long.parseLong(refreshTimeResult.getValue().toString()) + refreshMillis;
+            } else if (refreshTimeResult.getResultCode() == CacheResultCode.NOT_EXISTS) {
+                shouldLoad = true;
+            }
+
+            if (!shouldLoad) {
+                if (isMultiLevelCache) refreshUpperCaches(key);
+                return;
+            }
+
             Runnable r = () -> {
                 try {
-                    long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
-                    byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
-                    // AbstractExternalCache buildKey method will not convert byte[]
-                    CacheGetResult refreshTimeResult = (CacheGetResult) getMethod.invoke(concreteCache, timestampKey);
-                    if (refreshTimeResult.isSuccess() && (currentTime < Long.parseLong(refreshTimeResult.getValue().toString()) + refreshMillis)) {
-                        return;
-                    }
                     load();
-                    // AbstractExternalCache buildKey method will not convert byte[]
                     putMethod.invoke(concreteCache, timestampKey, String.valueOf(System.currentTimeMillis()));
-                } catch (Throwable e){
+                } catch (Throwable e) {
                     throw new CacheException("refresh error", e);
                 }
             };
-            // AbstractExternalCache buildKey method will not convert byte[]
             tryLockAndRunMethod.invoke(concreteCache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
+            // no need to refreshUpperCaches when tryLock failed because of the remote cache value mostly has not been refreshed.
+        }
+
+        private void refreshUpperCaches(K key) {
+            MultiLevelCache<K, V> targetCache = (MultiLevelCache<K, V>) getTargetCache();
+            Cache[] caches = targetCache.caches();
+            int len = caches.length;
+
+            CacheGetResult cacheGetResult = caches[len - 1].GET(key);
+            cacheGetResult.future().thenRun(() -> {
+                if (!cacheGetResult.isSuccess()) return;
+
+                for (int i = 0; i < len - 1; i++) {
+                    caches[i].PUT(key, cacheGetResult.getValue());
+                }
+            });
         }
 
         @Override
