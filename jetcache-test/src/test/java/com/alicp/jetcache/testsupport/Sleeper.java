@@ -6,11 +6,11 @@ package com.alicp.jetcache.testsupport;
  * <p>
  * The sleepTo method sleeps to particular time point of any multiple of interval from the start time.
  */
-public class MultiIntervalSleeper {
+public class Sleeper {
     private long refresh;
     private long start;
 
-    public MultiIntervalSleeper(long refresh) {
+    public Sleeper(long refresh) {
         this.refresh = refresh;
         start = System.currentTimeMillis();
     }

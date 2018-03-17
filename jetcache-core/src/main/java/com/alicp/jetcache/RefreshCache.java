@@ -6,8 +6,6 @@ import com.alicp.jetcache.support.JetCacheExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.lang.model.SourceVersion;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,21 +25,6 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
     private static final Logger logger = LoggerFactory.getLogger(RefreshCache.class);
 
     private ConcurrentHashMap<Object, RefreshTask> taskMap = new ConcurrentHashMap<>();
-
-    private static Method tryLockAndRunMethod;
-    private static Method getMethod;
-    private static Method putMethod;
-
-    static {
-        try {
-            tryLockAndRunMethod = Cache.class.getMethod("tryLockAndRun",
-                    Object.class, long.class, TimeUnit.class, Runnable.class);
-            getMethod = Cache.class.getMethod("GET", Object.class);
-            putMethod = Cache.class.getMethod("put", Object.class, Object.class);
-        } catch (NoSuchMethodException e) {
-            throw new CacheException(e);
-        }
-    }
 
     public RefreshCache(Cache cache) {
         super(cache);
@@ -173,13 +156,12 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                 throws Throwable {
             byte[] newKey = ((AbstractExternalCache) concreteCache).buildKey(key);
             byte[] lockKey = combine(newKey, "_#RL#".getBytes());
-            boolean isMultiLevelCache = isMultiLevelCache();
             long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
             long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
             byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
 
             // AbstractExternalCache buildKey method will not convert byte[]
-            CacheGetResult refreshTimeResult = (CacheGetResult) getMethod.invoke(concreteCache, timestampKey);
+            CacheGetResult refreshTimeResult = concreteCache.GET(timestampKey);
             boolean shouldLoad = false;
             if (refreshTimeResult.isSuccess()) {
                 shouldLoad = currentTime >= Long.parseLong(refreshTimeResult.getValue().toString()) + refreshMillis;
@@ -188,20 +170,28 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
             }
 
             if (!shouldLoad) {
-                if (isMultiLevelCache) refreshUpperCaches(key);
+                if (isMultiLevelCache()) {
+                    refreshUpperCaches(key);
+                }
                 return;
             }
 
             Runnable r = () -> {
                 try {
                     load();
-                    putMethod.invoke(concreteCache, timestampKey, String.valueOf(System.currentTimeMillis()));
+                    // AbstractExternalCache buildKey method will not convert byte[]
+                    concreteCache.put(timestampKey, String.valueOf(System.currentTimeMillis()));
                 } catch (Throwable e) {
                     throw new CacheException("refresh error", e);
                 }
             };
-            tryLockAndRunMethod.invoke(concreteCache, lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
-            // no need to refreshUpperCaches when tryLock failed because of the remote cache value mostly has not been refreshed.
+
+            // AbstractExternalCache buildKey method will not convert byte[]
+            boolean lockSuccess = concreteCache.tryLockAndRun(lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
+            if(!lockSuccess) {
+                JetCacheExecutor.heavyIOExecutor().schedule(
+                        () -> refreshUpperCaches(key), (long)(0.2 * refreshMillis), TimeUnit.MILLISECONDS);
+            }
         }
 
         private void refreshUpperCaches(K key) {
@@ -210,13 +200,12 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
             int len = caches.length;
 
             CacheGetResult cacheGetResult = caches[len - 1].GET(key);
-            cacheGetResult.future().thenRun(() -> {
-                if (!cacheGetResult.isSuccess()) return;
-
-                for (int i = 0; i < len - 1; i++) {
-                    caches[i].PUT(key, cacheGetResult.getValue());
-                }
-            });
+            if (!cacheGetResult.isSuccess()) {
+                return;
+            }
+            for (int i = 0; i < len - 1; i++) {
+                caches[i].PUT(key, cacheGetResult.getValue());
+            }
         }
 
         @Override

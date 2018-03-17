@@ -7,7 +7,7 @@ import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.test.MockRemoteCacheBuilder;
-import com.alicp.jetcache.testsupport.MultiIntervalSleeper;
+import com.alicp.jetcache.testsupport.Sleeper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,8 +32,6 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache = new MonitoredCache<>(cache);
         cache = new RefreshCache<>(cache);
         baseTest();
-
-        refreshUpperCacheTest(500);
 
         cache.put("K1", "V1");
         cache.config().setLoader(k -> {
@@ -224,7 +222,9 @@ public class RefreshCacheTest extends AbstractCacheTest {
                 .buildCache();
     }
 
-    public static void refreshUpperCacheTest(long refresh) throws Exception {
+    @Test
+    public void refreshUpperCacheTest() throws Exception {
+        long refresh = 500;
         long expire = 500;
         //  use the same remote cache for multilevel caches to be tested,
         //  so we can change the data in remote cache of multilevel cache directly in test purpose.
@@ -267,7 +267,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
 
     private static void testLockFailAndRefreshUpperCache(Cache cache1, Cache cache2, Cache remote, long refresh, AtomicLong blockMills) throws InterruptedException {
         //  start test now, set sleep interval by the refresh mills
-        MultiIntervalSleeper sleeper = new MultiIntervalSleeper(refresh);
+        Sleeper sleeper = new Sleeper(refresh);
 
         //  cache1 starts at 0x, cache2 starts at 0.5x (x = refresh mills)
         Assert.assertEquals("K1_V0", cache1.get("K1"));
