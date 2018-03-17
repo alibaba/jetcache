@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created on 2017/5/31.
@@ -20,27 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RefreshCacheTest extends AbstractCacheTest {
-    @Test
-    public void test() throws Exception {
-        cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                .buildCache();
-        cache = new MonitoredCache<>(cache);
-        cache = new RefreshCache<>(cache);
-        baseTest();
-
-        cache.put("K1", "V1");
-        cache.config().setLoader(k -> {
-            throw new SQLException();
-        });
-        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(30, TimeUnit.MILLISECONDS));
-        Assert.assertEquals("V1", cache.get("K1"));
-        Thread.sleep(45);
-        Assert.assertEquals("V1", cache.get("K1"));
-        ((RefreshCache<Object, Object>)cache).stopRefresh();
-
-        refreshCacheTest(cache, 80, 40);
-    }
-
     public static void refreshCacheTest(Cache cache, long refresh, long stopRefreshAfterLastAccess) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
         CacheLoader oldLoader = cache.config().getLoader();
@@ -77,6 +57,79 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache = builder.buildCache();
         refreshCacheTest2(cache);
         cache.close();
+    }
+
+    public static void refreshUpperCacheTest(MultiLevelCacheBuilder builder,
+                                             MultiLevelCacheBuilder builder2,
+                                             Cache<Object, Object> remote, long refresh) throws Exception {
+        RefreshPolicy policy = RefreshPolicy.newPolicy(refresh, TimeUnit.MILLISECONDS);
+        policy.setRefreshLockTimeoutMillis(10000);
+        builder.refreshPolicy(policy);
+        builder2.refreshPolicy(policy);
+
+        AtomicInteger count = new AtomicInteger(0);
+        AtomicLong blockMills = new AtomicLong(0);
+        CacheLoader loader = (key) -> {
+            if (blockMills.get() != 0) Thread.sleep(blockMills.get());
+            return key + "_V" + count.getAndIncrement();
+        };
+        builder.loader(loader);
+        builder2.loader(loader);
+
+        Cache cache = builder.buildCache();
+        Cache cache2 = builder2.buildCache();
+
+        testLockFailAndRefreshUpperCache(cache, cache2, remote, refresh, blockMills);
+        cache.close();
+        cache2.close();
+        remote.close();
+    }
+
+    private static void testLockFailAndRefreshUpperCache(Cache cache, Cache cache2, Cache remote, long refresh, AtomicLong blockMills) throws InterruptedException {
+        RefreshSleeper sleeper = new RefreshSleeper(refresh);                     //  以refresh间隔为基准x
+
+        Assert.assertEquals("K1_V0", cache.get("K1"));
+        sleeper.sleepTo(0.5);
+        Assert.assertEquals("K1_V0", cache2.get("K1"));     //  在0.5x时间点启动cache2
+
+        blockMills.set((long) (0.8*refresh));                        //  loader函数内将阻塞0.8x
+        remote.put("K1", "0");                                       //  手工将remote缓存置为0
+
+        sleeper.sleepTo(1.2);
+        Assert.assertEquals("K1_V0", cache.get("K1"));
+        Assert.assertEquals("K1_V0", cache2.get("K1"));
+
+        sleeper.sleepTo(1.7);
+        Assert.assertEquals("K1_V0", cache.get("K1"));  //  当前时间为1.7x，cache的第一次load将于1.8x执行完毕，此时loader仍然被阻塞
+        Assert.assertEquals("K1_V0", cache2.get("K1"));     //  cache2在1.5x执行load，此时lock被cache占用，将放弃执行load
+
+        sleeper.sleepTo(1.9);
+        Assert.assertEquals("K1_V1", cache.get("K1"));  //  cache的第1次load完成
+        Assert.assertEquals("K1_V0", cache2.get("K1"));
+
+        //  cache2的第2次load在2.5x开始，由于上次load完成时间是1.8x，因此也不执行load，从remote获取值，更新local
+        sleeper.sleepTo(2.7);
+        Assert.assertEquals("K1_V1", cache.get("K1"));
+        Assert.assertEquals("K1_V1", cache2.get("K1"));
+    }
+
+    /**
+     * sleep帮助类，以refresh为间隔基准，start为开始时间，可以通过sleepTo方法sleep至基准的任意倍数。
+     */
+    private static class RefreshSleeper {
+        private long refresh;
+        private long start;
+
+        public RefreshSleeper(long refresh) {
+            this.refresh = refresh;
+            start = System.currentTimeMillis();
+        }
+
+        public void sleepTo(double ratio) throws InterruptedException {
+            long wakeup = (long) (start + ratio * refresh);
+            while (System.currentTimeMillis() < wakeup)
+                Thread.sleep((long) (refresh * 0.02));
+        }
     }
 
     private static RefreshCache getRefreshCache(Cache cache) {
@@ -207,5 +260,26 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Assert.assertEquals(newK1Value, cache.get("refreshCacheTest2_K1"));
 
         cache.config().getMonitors().remove(monitor);
+    }
+
+    @Test
+    public void test() throws Exception {
+        cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
+                .buildCache();
+        cache = new MonitoredCache<>(cache);
+        cache = new RefreshCache<>(cache);
+        baseTest();
+
+        cache.put("K1", "V1");
+        cache.config().setLoader(k -> {
+            throw new SQLException();
+        });
+        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(30, TimeUnit.MILLISECONDS));
+        Assert.assertEquals("V1", cache.get("K1"));
+        Thread.sleep(45);
+        Assert.assertEquals("V1", cache.get("K1"));
+        ((RefreshCache<Object, Object>) cache).stopRefresh();
+
+        refreshCacheTest(cache, 80, 40);
     }
 }
