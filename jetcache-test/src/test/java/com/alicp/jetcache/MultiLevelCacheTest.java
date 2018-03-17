@@ -27,18 +27,20 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     private static final int LIMIT = 1000;
 
     private void initL1L2(int expireMillis) {
-        l1Cache = buildL1Cache(expireMillis);
-
-        l2Cache = new MockRemoteCacheBuilder()
+        l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
+                .limit(10)
+                .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .buildCache();
+        /*
+        l2Cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
-    }
-
-    private Cache<Object, Object> buildL1Cache(int expireMillis) {
-        return CaffeineCacheBuilder.createCaffeineCacheBuilder()
-                .limit(10)
+        */
+        l2Cache = new MockRemoteCacheBuilder()
+                .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -87,12 +89,6 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         doTest(200);
         expireAfterWriteTest(200);
         DefaultCacheMonitorTest.testMonitor(cache);
-
-        initL1L2(200);
-        RefreshCacheTest.refreshUpperCacheTest(
-                MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache),
-                MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(buildL1Cache(200), l2Cache),
-                l2Cache, 100);
 
         initL1L2(2000);
         cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
