@@ -262,7 +262,6 @@ public class RefreshCacheTest extends AbstractCacheTest {
         testLockFailAndRefreshUpperCache(cache1, cache2, remote, refresh, blockMills);
         cache1.close();
         cache2.close();
-        remote.close();
     }
 
     private static void testLockFailAndRefreshUpperCache(Cache cache1, Cache cache2, Cache remote, long refresh, AtomicLong blockMills) throws InterruptedException {

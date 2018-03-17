@@ -237,4 +237,11 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         throw new UnsupportedOperationException("PUT_IF_ABSENT is not supported by MultiLevelCache");
     }
+
+    @Override
+    public void close() {
+        for (Cache c : caches) {
+            c.close();
+        }
+    }
 }
