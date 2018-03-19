@@ -214,7 +214,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache.config().getMonitors().remove(monitor);
     }
 
-    private static Cache buildLocalCache(long expire) {
+    private Cache buildLocalCache(long expire) {
         return CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(expire, TimeUnit.MILLISECONDS)
@@ -223,9 +223,9 @@ public class RefreshCacheTest extends AbstractCacheTest {
     }
 
     @Test
-    public void refreshUpperCacheTest() throws Exception {
+    public void multiLevelCacheRefreshTest() throws Exception {
         long refresh = 500;
-        long expire = 500;
+        long expire = 1000000;
         //  use the same remote cache for multilevel caches to be tested,
         //  so we can change the data in remote cache of multilevel cache directly in test purpose.
         Cache remote = new MockRemoteCacheBuilder()
@@ -250,7 +250,9 @@ public class RefreshCacheTest extends AbstractCacheTest {
         AtomicInteger count = new AtomicInteger(0);
         AtomicLong blockMills = new AtomicLong(0);      //  block mills for loader
         CacheLoader loader = (key) -> {
-            if (blockMills.get() != 0) Thread.sleep(blockMills.get());
+            if (blockMills.get() != 0) {
+                Thread.sleep(blockMills.get());
+            }
             return key + "_V" + count.getAndIncrement();
         };
         builder1.loader(loader);
@@ -259,46 +261,56 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Cache cache1 = builder1.buildCache();
         Cache cache2 = builder2.buildCache();
 
-        testLockFailAndRefreshUpperCache(cache1, cache2, remote, refresh, blockMills);
+        multiLevelCacheRefreshTest(cache1, cache2, remote, refresh, blockMills);
         cache1.close();
         cache2.close();
     }
 
-    private static void testLockFailAndRefreshUpperCache(Cache cache1, Cache cache2, Cache remote, long refresh, AtomicLong blockMills) throws InterruptedException {
+    private void multiLevelCacheRefreshTest(Cache cache1, Cache cache2, Cache remote, long refresh, AtomicLong blockMills) throws InterruptedException {
         //  start test now, set sleep interval by the refresh mills
         Sleeper sleeper = new Sleeper(refresh);
 
-        //  cache1 starts at 0x, cache2 starts at 0.5x (x = refresh mills)
+        //  cache1 starts at 0x, cache2 starts at 0.2x (x = refresh mills)
         Assert.assertEquals("K1_V0", cache1.get("K1"));
-        sleeper.sleepTo(0.5);
+        sleeper.sleepTo(0.2);
         Assert.assertEquals("K1_V0", cache2.get("K1"));
 
-        //  change blockMills to 0.8x, execution of loader will cause to block 0.8x
-        blockMills.set((long) (0.8*refresh));
+        //  change blockMills to 0.6x, execution of loader will cause to block 0.6x
+        blockMills.set((long) (0.6 * refresh));
         remote.put("K1", "0");
 
         //  refresh for cache1 starts at 1.0x
 
-        //  now is 1.2x, refresh thread for cache1 is blocked until 1.8x, refresh for cache2 has not been scheduled until 1.5x
-        sleeper.sleepTo(1.2);
+        //  now is 1.1x, refresh thread for cache1 is blocked until 1.6x, refresh for cache2 has not been scheduled until 1.2x
+        sleeper.sleepTo(1.1);
         Assert.assertEquals("K1_V0", cache1.get("K1"));
         Assert.assertEquals("K1_V0", cache2.get("K1"));
+        Assert.assertEquals("0", remote.get("K1"));
 
-        //  now is 1.7x, refresh for cache2 starts at 1.5x but failed to get refresh lock
-        sleeper.sleepTo(1.7);
+        // now is 1.3x, refresh for cache2 starts at 1.5x but failed to get refresh lock, it will refresh from remote on 1.2+0.2=1.4x
+        sleeper.sleepTo(1.3);
         Assert.assertEquals("K1_V0", cache1.get("K1"));
         Assert.assertEquals("K1_V0", cache2.get("K1"));
+        Assert.assertEquals("0", remote.get("K1"));
 
-        //  refresh for cache1 finished at 1.8x, cache value has been changed by loader, next refresh will start at 2.8x
-        sleeper.sleepTo(1.9);
+        // now is 1.5x
+        sleeper.sleepTo(1.5);
+        Assert.assertEquals("K1_V0", cache1.get("K1"));
+        Assert.assertEquals("0", cache2.get("K1"));
+        Assert.assertEquals("0", remote.get("K1"));
+
+        // now is 1.8x, refresh for cache1 finished at 1.6x, cache value has been changed by loader, next refresh will start at 2.6x
+        sleeper.sleepTo(1.8);
         Assert.assertEquals("K1_V1", cache1.get("K1"));
-        Assert.assertEquals("K1_V0", cache2.get("K1"));
+        Assert.assertEquals("0", cache2.get("K1"));
+        Assert.assertEquals("K1_V1", remote.get("K1"));
 
-        //  the second refresh for cache2 start at 2.5x, but the last refresh timestamp set by cache1 is
+        //  the second refresh for cache2 start at 2.2x, but the last refresh timestamp set by cache1 is
         //  less than (now - refreshMills), it's no necessary to execute loader 2 times in one refresh interval,
         //  cache2 refresh upper cache value with remote cache value.
-        sleeper.sleepTo(2.7);
+        sleeper.sleepTo(2.4);
         Assert.assertEquals("K1_V1", cache1.get("K1"));
         Assert.assertEquals("K1_V1", cache2.get("K1"));
+        Assert.assertEquals("K1_V1", remote.get("K1"));
     }
 }

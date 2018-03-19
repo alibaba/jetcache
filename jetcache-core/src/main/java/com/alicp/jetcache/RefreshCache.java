@@ -26,8 +26,11 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private ConcurrentHashMap<Object, RefreshTask> taskMap = new ConcurrentHashMap<>();
 
+    private boolean multiLevelCache;
+
     public RefreshCache(Cache cache) {
         super(cache);
+        multiLevelCache = isMultiLevelCache();
     }
 
     protected void stopRefresh() {
@@ -170,7 +173,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
             }
 
             if (!shouldLoad) {
-                if (isMultiLevelCache()) {
+                if (multiLevelCache) {
                     refreshUpperCaches(key);
                 }
                 return;
@@ -188,7 +191,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
             // AbstractExternalCache buildKey method will not convert byte[]
             boolean lockSuccess = concreteCache.tryLockAndRun(lockKey, loadTimeOut, TimeUnit.MILLISECONDS, r);
-            if(!lockSuccess) {
+            if(!lockSuccess && multiLevelCache) {
                 JetCacheExecutor.heavyIOExecutor().schedule(
                         () -> refreshUpperCaches(key), (long)(0.2 * refreshMillis), TimeUnit.MILLISECONDS);
             }
