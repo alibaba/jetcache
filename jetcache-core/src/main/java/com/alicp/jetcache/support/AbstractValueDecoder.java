@@ -1,7 +1,6 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.CacheException;
-
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -11,7 +10,7 @@ import java.util.function.Function;
  */
 public abstract class AbstractValueDecoder implements Function<byte[], Object> {
 
-    protected int parseHeader(byte[] buf){
+    protected int parseHeader(byte[] buf) {
         int x = 0;
         x = x | (buf[0] & 0xFF);
         x <<= 8;
@@ -23,10 +22,18 @@ public abstract class AbstractValueDecoder implements Function<byte[], Object> {
         return x;
     }
 
-    protected void checkHeader(byte[] buf, int expectedHeader) {
-        int x = parseHeader(buf);
-        if(x != expectedHeader){
-            throw new CacheException("unexpected header:" + Integer.toHexString(x) + ",expect " + Integer.toHexString(expectedHeader));
+    protected abstract Object doApply(byte[] buffer) throws Exception;
+
+    @Override
+    public final Object apply(byte[] buffer) {
+        try {
+            DecoderMap.registerBuildInDecoder();
+            int identityNumber = parseHeader(buffer);
+            AbstractValueDecoder decoder = DecoderMap.getDecoder(identityNumber);
+            Objects.requireNonNull(decoder, "no decoder for identity number:" + identityNumber);
+            return decoder.doApply(buffer);
+        } catch (Exception e) {
+            throw new CacheEncodeException("decode error", e);
         }
     }
 }

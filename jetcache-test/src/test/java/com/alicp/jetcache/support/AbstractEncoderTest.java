@@ -1,7 +1,7 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheValueHolder;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -23,12 +23,12 @@ public class AbstractEncoderTest {
 
 
     protected void baseTest() {
-        Assert.assertEquals("123", decoder.apply(encoder.apply("123")));
-        Assert.assertEquals(123, decoder.apply(encoder.apply(123)));
+        assertEquals("123", decoder.apply(encoder.apply("123")));
+        assertEquals(123, decoder.apply(encoder.apply(123)));
         Date date = new Date();
-        Assert.assertEquals(date, decoder.apply(encoder.apply(date)));
-        Assert.assertArrayEquals(new byte[]{1, 2, 3, -1}, (byte[]) decoder.apply(encoder.apply(new byte[]{1, 2, 3, -1})));
-        Assert.assertNull(decoder.apply(encoder.apply(null)));
+        assertEquals(date, decoder.apply(encoder.apply(date)));
+        assertArrayEquals(new byte[]{1, 2, 3, -1}, (byte[]) decoder.apply(encoder.apply(new byte[]{1, 2, 3, -1})));
+        assertNull(decoder.apply(encoder.apply(null)));
         testMap(new HashMap());
         testMap(new Hashtable());
         testMap(new ConcurrentHashMap());
@@ -58,7 +58,7 @@ public class AbstractEncoderTest {
         bs = encoder.apply(new Object[]{q, 123});
         Object[] o = (Object[]) decoder.apply(bs);
         q2 = (TestObject) o[0];
-        Assert.assertEquals(123, o[1]);
+        assertEquals(123, o[1]);
 
         compareTestObject(q, q2);
 
@@ -82,11 +82,11 @@ public class AbstractEncoderTest {
         m.put(4, "4");
         m.put(5, "5");
         Map m2 = (Map) decoder.apply(encoder.apply(m));
-        Assert.assertEquals("1", m2.get(1));
-        Assert.assertEquals("2", m2.get(2));
-        Assert.assertEquals("3", m2.get(3));
-        Assert.assertEquals("4", m2.get(4));
-        Assert.assertEquals("5", m2.get(5));
+        assertEquals("1", m2.get(1));
+        assertEquals("2", m2.get(2));
+        assertEquals("3", m2.get(3));
+        assertEquals("4", m2.get(4));
+        assertEquals("5", m2.get(5));
     }
 
     private void testList(List list) {
@@ -96,11 +96,11 @@ public class AbstractEncoderTest {
         list.add(4);
         list.add(5);
         List list2 = (List) decoder.apply(encoder.apply(list));
-        Assert.assertEquals(1, list2.get(0));
-        Assert.assertEquals(2, list2.get(1));
-        Assert.assertEquals(3, list2.get(2));
-        Assert.assertEquals(4, list2.get(3));
-        Assert.assertEquals(5, list2.get(4));
+        assertEquals(1, list2.get(0));
+        assertEquals(2, list2.get(1));
+        assertEquals(3, list2.get(2));
+        assertEquals(4, list2.get(3));
+        assertEquals(5, list2.get(4));
     }
 
     private void testSet(Set s) {
@@ -110,11 +110,11 @@ public class AbstractEncoderTest {
         s.add(4);
         s.add(5);
         Set s2 = (Set) decoder.apply(encoder.apply(s));
-        Assert.assertTrue(s2.contains(1));
-        Assert.assertTrue(s2.contains(2));
-        Assert.assertTrue(s2.contains(3));
-        Assert.assertTrue(s2.contains(4));
-        Assert.assertTrue(s2.contains(5));
+        assertTrue(s2.contains(1));
+        assertTrue(s2.contains(2));
+        assertTrue(s2.contains(3));
+        assertTrue(s2.contains(4));
+        assertTrue(s2.contains(5));
     }
 
     private void testQueue(Queue q) {
@@ -122,9 +122,9 @@ public class AbstractEncoderTest {
         q.add(2);
         q.add(3);
         Queue q2 = (Queue) decoder.apply(encoder.apply(q));
-        Assert.assertEquals(1, q2.poll());
-        Assert.assertEquals(2, q2.poll());
-        Assert.assertEquals(3, q2.poll());
+        assertEquals(1, q2.poll());
+        assertEquals(2, q2.poll());
+        assertEquals(3, q2.poll());
     }
 
     private void testDeque(Deque q) {
@@ -132,16 +132,16 @@ public class AbstractEncoderTest {
         q.add(2);
         q.add(3);
         Deque q2 = (Deque) decoder.apply(encoder.apply(q));
-        Assert.assertEquals(1, q2.pollFirst());
-        Assert.assertEquals(3, q2.pollLast());
-        Assert.assertEquals(2, q2.poll());
+        assertEquals(1, q2.pollFirst());
+        assertEquals(3, q2.pollLast());
+        assertEquals(2, q2.poll());
     }
 
     private void compareTestObject(TestObject q, TestObject q2) {
-        Assert.assertEquals(q.getId(), q2.getId());
-        Assert.assertEquals(q.getName(), q2.getName());
-        Assert.assertEquals(q.getEmail(), q2.getEmail());
-        Assert.assertArrayEquals((byte[]) q.getData(), (byte[]) q2.getData());
+        assertEquals(q.getId(), q2.getId());
+        assertEquals(q.getName(), q2.getName());
+        assertEquals(q.getEmail(), q2.getEmail());
+        assertArrayEquals((byte[]) q.getData(), (byte[]) q2.getData());
     }
 
     public static class A implements Serializable {

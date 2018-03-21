@@ -1,14 +1,14 @@
 package com.alicp.jetcache.support;
 
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  * Created on 2016/10/8.
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-@Ignore
+@Disabled
 public class FastjsonEncoderTest extends AbstractEncoderTest {
     @Test
     public void test() {
