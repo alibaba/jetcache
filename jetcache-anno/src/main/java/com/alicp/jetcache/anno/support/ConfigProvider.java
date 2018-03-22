@@ -55,6 +55,10 @@ public class ConfigProvider {
         throw new CacheConfigException("not supported:" + convertor);
     }
 
+    public CacheNameGenerator createCacheNameGenerator(String[] hiddenPackages) {
+        return new DefaultCacheNameGenerator(hiddenPackages);
+    }
+
     public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
         return new CacheContext(globalCacheConfig);
     }

@@ -111,7 +111,7 @@ public class CacheContext {
         String area = ac.getArea();
         String cacheName = ac.getName();
         if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
-            cacheName = ClassUtil.generateCacheName(method, hiddenPackages);
+            cacheName = configProvider.createCacheNameGenerator(hiddenPackages).generateCacheName(method);
         }
         Cache cache = __createOrGetCache(ac, area, cacheName);
         return cache;

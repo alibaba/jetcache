@@ -6,6 +6,7 @@ import com.alicp.jetcache.anno.CacheRefresh;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.method.CacheConfigUtil;
 import com.alicp.jetcache.anno.method.ClassUtil;
+import com.alicp.jetcache.anno.support.CacheNameGenerator;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -78,13 +79,9 @@ class LazyInitCache implements ProxyCache {
 
         String cacheName = cac.getName();
         if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
-            StringBuilder sb = new StringBuilder();
-            String className = field.getDeclaringClass().getName();
-            className = ClassUtil.removeHiddenPackage(globalCacheConfig.getHiddenPackages(),className);
-            className = ClassUtil.getShortClassName(className);
-            sb.append(className);
-            sb.append(".").append(field.getName());
-            cacheName = sb.toString();
+            String[] hiddenPackages = globalCacheConfig.getHiddenPackages();
+            CacheNameGenerator g = globalCacheConfig.getConfigProvider().createCacheNameGenerator(hiddenPackages);
+            cacheName = g.generateCacheName(field);
         }
         cache = globalCacheConfig.getCacheContext().__createOrGetCache(cac, ann.area(), cacheName);
     }
