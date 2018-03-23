@@ -2,6 +2,8 @@ package com.alicp.jetcache.support;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * Created on 2016/10/8.
  *
@@ -12,8 +14,11 @@ public class KryoEncoderTest extends AbstractEncoderTest {
     public void test() {
         encoder = KryoValueEncoder.INSTANCE;
         decoder = KryoValueDecoder.INSTANCE;
-        super.baseTest();
+        baseTest();
 
+        encoder = new KryoValueEncoder(false);
+        decoder = new KryoValueDecoder(false);
+        baseTest();
     }
 
     @Test
@@ -32,6 +37,25 @@ public class KryoEncoderTest extends AbstractEncoderTest {
         encoder = KryoValueEncoder.INSTANCE;
         decoder = JavaValueDecoder.INSTANCE;
         baseTest();
+    }
+
+    @Test
+    public void errorTest() {
+        encoder = KryoValueEncoder.INSTANCE;
+        decoder = KryoValueDecoder.INSTANCE;
+        byte[] bytes = encoder.apply("12345");
+        bytes[0] = 0;
+        assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
+        ((AbstractValueEncoder)encoder).writeHeader(bytes, JavaValueEncoder.IDENTITY_NUMBER);
+        assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
+
+        encoder = KryoValueEncoder.INSTANCE;
+        decoder = new KryoValueDecoder(false);
+        assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
+
+        encoder = new KryoValueEncoder(false);
+        decoder = KryoValueDecoder.INSTANCE;
+        assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
     }
 
 }

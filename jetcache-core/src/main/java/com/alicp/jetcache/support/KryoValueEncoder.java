@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
  */
 public class KryoValueEncoder extends AbstractValueEncoder {
 
-    public static final KryoValueEncoder INSTANCE = new KryoValueEncoder();
+    public static final KryoValueEncoder INSTANCE = new KryoValueEncoder(true);
 
     protected static int IDENTITY_NUMBER = 0x4A953A82;
 
@@ -25,13 +25,19 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         return kryo;
     });
 
+    public KryoValueEncoder(boolean useIdentityNumber) {
+        super(useIdentityNumber);
+    }
+
     @Override
     public byte[] apply(Object value) {
         try {
             Kryo kryo = kryoThreadLocal.get();
             ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
             Output output = new Output(bos);
-            output.writeInt(IDENTITY_NUMBER);
+            if (useIdentityNumber) {
+                output.writeInt(IDENTITY_NUMBER);
+            }
             kryo.writeClassAndObject(output, value);
             output.close();
             return bos.toByteArray();

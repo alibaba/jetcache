@@ -11,13 +11,20 @@ import com.alibaba.fastjson.JSON;
 public class FastjsonValueDecoder extends AbstractValueDecoder {
 
     @SuppressWarnings("deprecation")
-    public static final FastjsonValueDecoder INSTANCE = new FastjsonValueDecoder();
+    public static final FastjsonValueDecoder INSTANCE = new FastjsonValueDecoder(true);
+
+    public FastjsonValueDecoder(boolean useIdentityNumber) {
+        super(useIdentityNumber);
+    }
 
     @Override
     public Object doApply(byte[] buffer) {
-        //noinspection deprecation
-        byte[] bs = new byte[buffer.length - 4];
-        System.arraycopy(buffer, 4, bs, 0, bs.length);
-        return JSON.parse(bs);
+        if (useIdentityNumber) {
+            byte[] bs = new byte[buffer.length - 4];
+            System.arraycopy(buffer, 4, bs, 0, bs.length);
+            return JSON.parse(bs);
+        } else {
+            return JSON.parse(buffer);
+        }
     }
 }

@@ -15,6 +15,10 @@ public class JavaEncoderTest extends AbstractEncoderTest {
         encoder = JavaValueEncoder.INSTANCE;
         decoder = JavaValueDecoder.INSTANCE;
         baseTest();
+
+        encoder = new JavaValueEncoder(false);
+        decoder = new JavaValueDecoder(false);
+        baseTest();
     }
 
     @Test
@@ -43,6 +47,14 @@ public class JavaEncoderTest extends AbstractEncoderTest {
         bytes[0] = 0;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
         ((AbstractValueEncoder)encoder).writeHeader(bytes, KryoValueEncoder.IDENTITY_NUMBER);
+        assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
+
+        encoder = JavaValueEncoder.INSTANCE;
+        decoder = new JavaValueDecoder(false);
+        assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
+
+        encoder = new JavaValueEncoder(false);
+        decoder = JavaValueDecoder.INSTANCE;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
     }
 

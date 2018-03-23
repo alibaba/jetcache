@@ -10,11 +10,20 @@ import java.io.ObjectInputStream;
  */
 public class JavaValueDecoder extends AbstractValueDecoder {
 
-    public static final JavaValueDecoder INSTANCE = new JavaValueDecoder();
+    public static final JavaValueDecoder INSTANCE = new JavaValueDecoder(true);
+
+    public JavaValueDecoder(boolean useIdentityNumber) {
+        super(useIdentityNumber);
+    }
 
     @Override
     public Object doApply(byte[] buffer) throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(buffer, 4, buffer.length - 4);
+        ByteArrayInputStream in;
+        if (useIdentityNumber) {
+            in = new ByteArrayInputStream(buffer, 4, buffer.length - 4);
+        } else {
+            in = new ByteArrayInputStream(buffer);
+        }
         ObjectInputStream ois = new ObjectInputStream(in);
         return ois.readObject();
     }

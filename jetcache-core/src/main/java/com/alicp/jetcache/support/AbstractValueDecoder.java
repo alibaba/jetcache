@@ -10,6 +10,12 @@ import java.util.function.Function;
  */
 public abstract class AbstractValueDecoder implements Function<byte[], Object> {
 
+    protected boolean useIdentityNumber;
+
+    public AbstractValueDecoder(boolean useIdentityNumber) {
+        this.useIdentityNumber = useIdentityNumber;
+    }
+
     protected int parseHeader(byte[] buf) {
         int x = 0;
         x = x | (buf[0] & 0xFF);
@@ -27,11 +33,15 @@ public abstract class AbstractValueDecoder implements Function<byte[], Object> {
     @Override
     public final Object apply(byte[] buffer) {
         try {
-            DecoderMap.registerBuildInDecoder();
-            int identityNumber = parseHeader(buffer);
-            AbstractValueDecoder decoder = DecoderMap.getDecoder(identityNumber);
-            Objects.requireNonNull(decoder, "no decoder for identity number:" + identityNumber);
-            return decoder.doApply(buffer);
+            if (useIdentityNumber) {
+                DecoderMap.registerBuildInDecoder();
+                int identityNumber = parseHeader(buffer);
+                AbstractValueDecoder decoder = DecoderMap.getDecoder(identityNumber);
+                Objects.requireNonNull(decoder, "no decoder for identity number:" + identityNumber);
+                return decoder.doApply(buffer);
+            } else {
+                return doApply(buffer);
+            }
         } catch (Exception e) {
             throw new CacheEncodeException("decode error", e);
         }
