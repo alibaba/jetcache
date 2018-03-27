@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.support.*;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +39,9 @@ public class ConfigProviderTest {
         encoder = (AbstractValueEncoder) cp.parseValueEncoder("java?useIdentityNumber=false");
         assertEquals(JavaValueEncoder.class, encoder.getClass());
         assertFalse(encoder.isUseIdentityNumber());
+
+        assertThrows(CacheConfigException.class, () -> cp.parseValueEncoder(null));
+        assertThrows(CacheConfigException.class, () -> cp.parseValueEncoder("xxx"));
     }
 
     @Test
@@ -50,5 +54,8 @@ public class ConfigProviderTest {
         decoder = (AbstractValueDecoder) cp.parseValueDecoder("java?useIdentityNumber=false");
         assertEquals(JavaValueDecoder.class, decoder.getClass());
         assertFalse(decoder.isUseIdentityNumber());
+
+        assertThrows(CacheConfigException.class, () -> cp.parseValueDecoder(null));
+        assertThrows(CacheConfigException.class, () -> cp.parseValueDecoder("xxx"));
     }
 }
