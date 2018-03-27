@@ -47,36 +47,37 @@ public class DefaultCacheMonitorManager {
         this.statCallback = new StatInfoLogger(verboseLog);
     }
 
+    Runnable cmd = new Runnable() {
+        private long time = System.currentTimeMillis();
+
+        @Override
+        public void run() {
+            try {
+                List<CacheStat> stats = monitorList.stream().map((m) -> {
+                    CacheStat stat = m.getCacheStat();
+                    m.resetStat();
+                    return stat;
+                }).collect(Collectors.toList());
+
+                long endTime = System.currentTimeMillis();
+                StatInfo statInfo = new StatInfo();
+                statInfo.setStartTime(time);
+                statInfo.setEndTime(endTime);
+                statInfo.setStats(stats);
+                time = endTime;
+
+                statCallback.accept(statInfo);
+            } catch (Exception e) {
+                logger.error("jetcache DefaultCacheMonitorManager error", e);
+            }
+        }
+    };
+
     @PostConstruct
     public synchronized void start() {
         if (future != null) {
             return;
         }
-        Runnable cmd = new Runnable() {
-            private long time = System.currentTimeMillis();
-
-            @Override
-            public void run() {
-                try {
-                    List<CacheStat> stats = monitorList.stream().map((m) -> {
-                        CacheStat stat = m.getCacheStat();
-                        m.resetStat();
-                        return stat;
-                    }).collect(Collectors.toList());
-
-                    long endTime = System.currentTimeMillis();
-                    StatInfo statInfo = new StatInfo();
-                    statInfo.setStartTime(time);
-                    statInfo.setEndTime(endTime);
-                    statInfo.setStats(stats);
-                    time = endTime;
-
-                    statCallback.accept(statInfo);
-                } catch (Exception e) {
-                    logger.error("jetcache DefaultCacheMonitorManager error", e);
-                }
-            }
-        };
         long delay = firstDelay(resetTime, resetTimeUnit);
         future = JetCacheExecutor.defaultExecutor().scheduleAtFixedRate(
                 cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
