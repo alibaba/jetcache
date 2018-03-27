@@ -12,6 +12,7 @@ public class JetCacheProperties {
 
     private String[] hidePackages;
     private int statIntervalMinutes;
+    private boolean areaInCacheName = true;
 
     public JetCacheProperties(){
     }
@@ -32,4 +33,11 @@ public class JetCacheProperties {
         this.statIntervalMinutes = statIntervalMinutes;
     }
 
+    public boolean isAreaInCacheName() {
+        return areaInCacheName;
+    }
+
+    public void setAreaInCacheName(boolean areaInCacheName) {
+        this.areaInCacheName = areaInCacheName;
+    }
 }

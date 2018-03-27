@@ -44,8 +44,6 @@ public class CacheContext {
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
     private ConcurrentHashMap<String, Cache> cacheManager;
 
-    private boolean defaultCacheNameGenerator;
-
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
         this.configProvider = globalCacheConfig.getConfigProvider();
@@ -54,9 +52,6 @@ public class CacheContext {
     public synchronized void init() {
         if (cacheManager == null) {
             CacheNameGenerator g = configProvider.createCacheNameGenerator(globalCacheConfig.getHiddenPackages());
-            if (g.getClass().equals(DefaultCacheNameGenerator.class)) {
-                defaultCacheNameGenerator = true;
-            }
 
             this.cacheManager = new ConcurrentHashMap<>();
             if (globalCacheConfig.getStatIntervalMinutes() > 0) {
@@ -122,7 +117,12 @@ public class CacheContext {
             synchronized (this) {
                 cache = cacheManager.get(fullCacheName);
                 if (cache == null) {
-                    cache = buildCache(cachedAnnoConfig, area, cacheName, fullCacheName);
+                    if (globalCacheConfig.isAreaInCacheName()) {
+                        // for compatible reason, if we use default configuration, the prefix should same to that version <=2.4.3
+                        cache = buildCache(cachedAnnoConfig, area, fullCacheName);
+                    } else {
+                        cache = buildCache(cachedAnnoConfig, area, cacheName);
+                    }
                     cacheManager.put(fullCacheName, cache);
                 }
             }
@@ -130,20 +130,20 @@ public class CacheContext {
         return cache;
     }
 
-    protected Cache buildCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName, String fullCacheName) {
+    protected Cache buildCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         Cache cache;
         if (cachedAnnoConfig.getCacheType() == CacheType.LOCAL) {
             cache = buildLocal(cachedAnnoConfig, area);
         } else if (cachedAnnoConfig.getCacheType() == CacheType.REMOTE) {
-            cache = buildRemote(cachedAnnoConfig, area, cacheName, fullCacheName);
+            cache = buildRemote(cachedAnnoConfig, area, cacheName);
         } else {
             Cache local = buildLocal(cachedAnnoConfig, area);
-            Cache remote = buildRemote(cachedAnnoConfig, area, cacheName, fullCacheName);
+            Cache remote = buildRemote(cachedAnnoConfig, area, cacheName);
 
             if (defaultCacheMonitorManager != null) {
-                DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(fullCacheName + "_local");
+                DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(cacheName + "_local");
                 local.config().getMonitors().add(localMonitor);
-                DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(fullCacheName + "_remote");
+                DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(cacheName + "_remote");
                 remote.config().getMonitors().add(remoteMonitor);
                 defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
             }
@@ -157,14 +157,14 @@ public class CacheContext {
         cache = new CacheHandler.CacheHandlerRefreshCache(cache);
 
         if (defaultCacheMonitorManager != null) {
-            DefaultCacheMonitor monitor = new DefaultCacheMonitor(fullCacheName);
+            DefaultCacheMonitor monitor = new DefaultCacheMonitor(cacheName);
             cache.config().getMonitors().add(monitor);
             defaultCacheMonitorManager.add(monitor);
         }
         return cache;
     }
 
-    protected Cache buildRemote(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName, String fullCacheName) {
+    protected Cache buildRemote(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
         if (cacheBuilder == null) {
             throw new CacheConfigException("no remote cache builder: " + area);
@@ -175,17 +175,10 @@ public class CacheContext {
             cacheBuilder.expireAfterWrite(cachedAnnoConfig.getExpire(), cachedAnnoConfig.getTimeUnit());
         }
 
-        String prefix;
-        if (defaultCacheNameGenerator) {
-            // for compatible reason, if we use default configuration, the prefix should same to that version <=2.4.3
-            prefix = fullCacheName;
-        } else {
-            prefix = cacheName;
-        }
         if (cacheBuilder.getConfig().getKeyPrefix() != null) {
-            cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + prefix);
+            cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + cacheName);
         } else {
-            cacheBuilder.setKeyPrefix(prefix);
+            cacheBuilder.setKeyPrefix(cacheName);
         }
 
         if (!CacheConsts.UNDEFINED_STRING.equals(cachedAnnoConfig.getKeyConvertor())) {

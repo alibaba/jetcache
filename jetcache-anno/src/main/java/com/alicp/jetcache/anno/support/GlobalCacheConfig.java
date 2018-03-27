@@ -15,11 +15,13 @@ import java.util.Map;
 public class GlobalCacheConfig {
 
     private String[] hiddenPackages;
+    protected int statIntervalMinutes;
+    private boolean areaInCacheName = true;
+
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
 
     private ConfigProvider configProvider = new SpringConfigProvider();
-    protected int statIntervalMinutes;
 
     private CacheContext cacheContext;
 
@@ -84,5 +86,13 @@ public class GlobalCacheConfig {
 
     public void setConfigProvider(ConfigProvider configProvider) {
         this.configProvider = configProvider;
+    }
+
+    public boolean isAreaInCacheName() {
+        return areaInCacheName;
+    }
+
+    public void setAreaInCacheName(boolean areaInCacheName) {
+        this.areaInCacheName = areaInCacheName;
     }
 }

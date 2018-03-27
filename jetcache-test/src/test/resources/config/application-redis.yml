@@ -1,5 +1,6 @@
 jetcache:
   statIntervalMinutes: 15
+  areaInCacheName: false
 
   local:
     default:
