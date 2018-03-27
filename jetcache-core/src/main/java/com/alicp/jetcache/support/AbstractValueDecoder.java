@@ -46,4 +46,8 @@ public abstract class AbstractValueDecoder implements Function<byte[], Object> {
             throw new CacheEncodeException("decode error", e);
         }
     }
+
+    public boolean isUseIdentityNumber() {
+        return useIdentityNumber;
+    }
 }

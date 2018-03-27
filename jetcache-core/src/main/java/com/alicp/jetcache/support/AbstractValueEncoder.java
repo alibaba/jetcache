@@ -21,4 +21,8 @@ public abstract class AbstractValueEncoder implements Function<Object, byte[]> {
     public AbstractValueEncoder(boolean useIdentityNumber) {
         this.useIdentityNumber = useIdentityNumber;
     }
+
+    public boolean isUseIdentityNumber() {
+        return useIdentityNumber;
+    }
 }

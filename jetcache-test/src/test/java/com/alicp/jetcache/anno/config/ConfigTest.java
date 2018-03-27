@@ -61,8 +61,8 @@ public class ConfigTest implements ApplicationContextAware {
             c = (ExternalCacheConfig) bean.customRemote.config();
             Assert.assertFalse(c.isExpireAfterAccess());
             Assert.assertEquals(1000, c.getExpireAfterWriteInMillis());
-            Assert.assertSame(KryoValueEncoder.INSTANCE, c.getValueEncoder());
-            Assert.assertSame(KryoValueDecoder.INSTANCE, c.getValueDecoder());
+            Assert.assertEquals(KryoValueEncoder.class, c.getValueEncoder().getClass());
+            Assert.assertEquals(KryoValueDecoder.class, c.getValueDecoder().getClass());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
         }
 

@@ -137,8 +137,8 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertEquals(50, localConfig.getExpireAfterWriteInMillis());
                 Assert.assertEquals(50, remoteConfig.getExpireAfterWriteInMillis());
                 Assert.assertEquals(10, localConfig.getLimit());
-                Assert.assertSame(JavaValueEncoder.INSTANCE, remoteConfig.getValueEncoder());
-                Assert.assertSame(JavaValueDecoder.INSTANCE, remoteConfig.getValueDecoder());
+                Assert.assertEquals(JavaValueEncoder.class, remoteConfig.getValueEncoder().getClass());
+                Assert.assertEquals(JavaValueDecoder.class, remoteConfig.getValueDecoder().getClass());
                 Assert.assertNull(localConfig.getKeyConvertor());
                 Assert.assertNull(remoteConfig.getKeyConvertor());
 
