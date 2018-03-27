@@ -14,8 +14,6 @@ import java.lang.reflect.Method;
  */
 public class ClassUtilTest {
 
-    private static final String[] hidePack = new String[]{"com.alicp.jetcache.anno"};
-
     interface I1 extends Serializable {
     }
 
@@ -51,40 +49,6 @@ public class ClassUtilTest {
         Object obj = new CI2();
         Class<?>[] is = ClassUtil.getAllInterfaces(obj);
         assertEquals(3, is.length);
-    }
-
-    @Test
-    public void testGenerateCacheName() throws Exception {
-        Method m1 = C1.class.getMethod("foo");
-        Method m2 = C1.class.getMethod("foo", I1.class);
-        Method m3 = C1.class.getMethod("foo2", I1.class);
-        Method m4 = C1.class.getMethod("foo3", byte.class, short.class, char.class, int.class, long.class, float.class, double.class, boolean.class);
-
-        String s1 = "m.ClassUtilTest$C1." + m1.getName() + "()";
-        String s2 = ClassUtil.generateCacheName(m1, hidePack);
-        assertEquals(s1, s2);
-
-        s1 = "m.ClassUtilTest$C1." + m2.getName() + "(Lm.ClassUtilTest$I1;)";
-        s2 = ClassUtil.generateCacheName(m2, hidePack);
-        assertEquals(s1, s2);
-
-        s1 = "c.a.j.a.m.ClassUtilTest$C1." + m3.getName() + "(Lc.a.j.a.m.ClassUtilTest$I1;)";
-        s2 = ClassUtil.generateCacheName(m3, null);
-        assertEquals(s1, s2);
-
-        s1 = "m.ClassUtilTest$C1." + m4.getName() + "(BSCIJFDZ)";
-        s2 = ClassUtil.generateCacheName(m4, hidePack);
-        assertEquals(s1, s2);
-    }
-
-    @Test
-    public void removeHiddenPackageTest() {
-        String[] hs = {"com.foo", "com.bar."};
-        assertEquals("Foo", ClassUtil.removeHiddenPackage(hs, "com.foo.Foo"));
-        assertEquals("foo.Bar", ClassUtil.removeHiddenPackage(hs, "com.bar.foo.Bar"));
-        assertEquals("", ClassUtil.removeHiddenPackage(hs, "com.foo"));
-        assertEquals("com.bar.foo.Bar", ClassUtil.removeHiddenPackage(null, "com.bar.foo.Bar"));
-        assertEquals(null, ClassUtil.removeHiddenPackage(hs, null));
     }
 
     @Test
