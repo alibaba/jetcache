@@ -94,6 +94,8 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         LoadingCacheTest.loadingCacheTest(MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
                 .expireAfterWrite(5000, TimeUnit.MILLISECONDS)
                 .addCache(l1Cache, l2Cache), 50);
+
+        LettuceConnectionManager.defaultManager().removeAndClose(client);
     }
 
     private void test(AbstractRedisClient client) throws Exception {

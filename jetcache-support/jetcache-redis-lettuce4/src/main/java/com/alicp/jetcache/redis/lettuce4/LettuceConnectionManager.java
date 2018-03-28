@@ -121,5 +121,6 @@ public class LettuceConnectionManager {
         if (lo.connection != null) {
             lo.connection.close();
         }
+        redisClient.shutdown();
     }
 }
