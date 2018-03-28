@@ -149,7 +149,7 @@ public class DefaultCacheMonitorTest {
 
         c1 = new MonitoredCache(c1, m1);
         c2 = new MonitoredCache(c2, m2);
-        DefaultCacheMonitorManager manager = new DefaultCacheMonitorManager(10, TimeUnit.SECONDS);
+        DefaultCacheMonitorManager manager = new DefaultCacheMonitorManager(10, TimeUnit.SECONDS, true);
         manager.start();
         manager.add(m1, m2);
 
