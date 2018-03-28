@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/alibaba/jetcache.svg?branch=master)](https://travis-ci.org/alibaba/jetcache)
 [![Coverage Status](https://coveralls.io/repos/alibaba/jetcache/badge.png?branch=master)](https://coveralls.io/r/alibaba/jetcache?branch=master) 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.alicp.jetcache/jetcache-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.alicp.jetcache/jetcache-parent/)
+[![GitHub release](https://img.shields.io/github/release/alibaba/jetcache.svg)](https://github.com/alibaba/jetcache/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
 # introduction
@@ -10,9 +11,9 @@ Features of JetCache:
 * Operate cache through consistent Cache API. 
 * Declarative method caching using annotation with TTL(Time To Live) and two level caching support
 * Create & configure ```Cache``` instance using annotation
-* Auto collect access statistics for Cache instance and method cache
+* Auto collect access statistics for ```Cache``` instance and method cache
 * The policy of key generation and value serialization can be customized
-* Distributed cache auto refresh and distributed lock. (2.2+)
+* Distributed cache automatically refreshment and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
 * Spring Boot support
 
