@@ -1,9 +1,13 @@
-package com.alicp.jetcache.support;
+package com.alicp.jetcache.examples;
 
 import com.alibaba.fastjson.JSON;
+import com.alicp.jetcache.support.AbstractValueDecoder;
 
 /**
  * Created on 2016/10/4.
+ *
+ * ParserConfig.getGlobalInstance().addAccept("com.company.yourpackage.");
+ * DecoderMap.register(FastjsonValueEncoder.IDENTITY_NUMBER, FastjsonValueDecoder.INSTANCE);
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */

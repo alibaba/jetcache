@@ -31,7 +31,7 @@ public abstract class AbstractValueDecoder implements Function<byte[], Object> {
     protected abstract Object doApply(byte[] buffer) throws Exception;
 
     @Override
-    public final Object apply(byte[] buffer) {
+    public Object apply(byte[] buffer) {
         try {
             if (useIdentityNumber) {
                 DecoderMap.registerBuildInDecoder();

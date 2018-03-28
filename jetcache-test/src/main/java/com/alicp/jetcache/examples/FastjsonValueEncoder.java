@@ -1,7 +1,9 @@
-package com.alicp.jetcache.support;
+package com.alicp.jetcache.examples;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alicp.jetcache.support.AbstractValueEncoder;
+import com.alicp.jetcache.support.CacheEncodeException;
 
 /**
  * Created on 2016/10/3.
