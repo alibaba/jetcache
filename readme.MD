@@ -153,6 +153,7 @@ spring boot application.yml config:
 ```yaml
 jetcache:
   statIntervalMinutes: 15
+  areaInCacheName: false
   local:
     default:
       type: linkedhashmap
