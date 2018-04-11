@@ -51,8 +51,6 @@ public class CacheContext {
 
     public synchronized void init() {
         if (cacheManager == null) {
-            CacheNameGenerator g = configProvider.createCacheNameGenerator(globalCacheConfig.getHiddenPackages());
-
             this.cacheManager = new ConcurrentHashMap<>();
             if (globalCacheConfig.getStatIntervalMinutes() > 0) {
                 defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
