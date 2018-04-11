@@ -6,12 +6,14 @@
 
 # introduction
 JetCache is a Java cache abstraction which provides consistent use for various caching solutions. 
+It provides more powerful annotation than that in Spring Cache. The annotation in JetCache supports native TTL, 
+two level caching, and distributed automatically refreshment, also you can operate ```Cache``` instance by hand code. 
 Presently There are four implements: ```RedisCache```, ```TairCache```(not open source on github), ```CaffeineCache``` (in memory), a simple ```LinkedHashMapCache``` (in memory).
-Features of JetCache:
+Full features of JetCache:
 * Operate cache through consistent Cache API. 
 * Declarative method caching using annotation with TTL(Time To Live) and two level caching support
 * Create & configure ```Cache``` instance using annotation
-* Auto collect access statistics for ```Cache``` instance and method cache
+* Automatically collect access statistics for ```Cache``` instance and method cache
 * The policy of key generation and value serialization can be customized
 * Distributed cache automatically refreshment and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
@@ -54,7 +56,7 @@ public interface UserService {
 ```
 To enable use parameter name such as ```key="#userId"```, you javac compiler target must be 1.8 and the ```-parameters``` should be set, otherwise use index to access parameters like ```key="args[0]"```
 
-Automatically refresh:
+Automatically refreshment:
 ```java
 public interface SummaryService{
     @Cached(expire = 3600, cacheType = CacheType.REMOTE)
@@ -78,6 +80,23 @@ userCache.remove(12345L);
 userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
 ```
 
+Or you can create ```Cache``` instance manually (RedisCache in this example) :
+```java
+GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
+        pc.setMinIdle(2);
+        pc.setMaxIdle(10);
+        pc.setMaxTotal(10);
+        JedisPool pool = new JedisPool(pc, "localhost", 6379);
+Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
+                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .valueEncoder(JavaValueEncoder.INSTANCE)
+                .valueDecoder(JavaValueDecoder.INSTANCE)
+                .jedisPool(pool)
+                .keyPrefix("userCache-")
+                .expireAfterWrite(200, TimeUnit.SECONDS)
+                .buildCache();
+```
+
 ## advanced API
 Asynchronous API:
 ```java
@@ -95,7 +114,7 @@ Distributed lock:
 cache.tryLockAndRun("key", 60, TimeUnit.SECONDS, () -> heavyDatabaseOperation());
 ```
 
-Read through and auto refresh:
+Read through and automatically refreshment:
 ```java
 @CreateCache
 @CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60)
