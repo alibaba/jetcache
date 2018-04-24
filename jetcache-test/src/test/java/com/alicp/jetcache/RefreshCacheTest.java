@@ -37,13 +37,13 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache.config().setLoader(k -> {
             throw new SQLException();
         });
-        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(30, TimeUnit.MILLISECONDS));
+        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(50, TimeUnit.MILLISECONDS));
         Assert.assertEquals("V1", cache.get("K1"));
-        Thread.sleep(45);
+        Thread.sleep(75);
         Assert.assertEquals("V1", cache.get("K1"));
         ((RefreshCache<Object, Object>)cache).stopRefresh();
 
-        refreshCacheTest(cache, 80, 40);
+        refreshCacheTest(cache, 200, 100);
     }
 
     public static void refreshCacheTest(Cache cache, long refresh, long stopRefreshAfterLastAccess) throws Exception {
