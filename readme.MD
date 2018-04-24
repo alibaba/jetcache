@@ -83,10 +83,10 @@ userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
 Or you can create ```Cache``` instance manually (RedisCache in this example) :
 ```java
 GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
-        pc.setMinIdle(2);
-        pc.setMaxIdle(10);
-        pc.setMaxTotal(10);
-        JedisPool pool = new JedisPool(pc, "localhost", 6379);
+pc.setMinIdle(2);
+pc.setMaxIdle(10);
+pc.setMaxTotal(10);
+JedisPool pool = new JedisPool(pc, "localhost", 6379);
 Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)

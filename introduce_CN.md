@@ -66,10 +66,10 @@ private Cache<Long, UserDO> userCache;
 也可以通过和guava cache/caffeine类似的builder来创建：
 ```java
 GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
-        pc.setMinIdle(2);
-        pc.setMaxIdle(10);
-        pc.setMaxTotal(10);
-        JedisPool pool = new JedisPool(pc, "localhost", 6379);
+pc.setMinIdle(2);
+pc.setMaxIdle(10);
+pc.setMaxTotal(10);
+JedisPool pool = new JedisPool(pc, "localhost", 6379);
 Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
@@ -106,6 +106,15 @@ private Cache<String, Long> orderSumCache;
 public void init(){
     orderSumCache.config().setLoader(this::loadOrderSumFromDatabase);
 }
+```
+
+如果没有使用注解，用builder一样也可以做出自动刷新：
+```java
+Cache<String, Long> orderSumCache = RedisCacheBuilder.createRedisCacheBuilder()
+    ......省略
+    .refreshPolicy(RefreshPolicy.newPolicy(60, TimeUnit.SECONDS))
+    .loader(this::loadOrderSumFromDatabase)
+    .buildCache();
 ```
 
 当前支持的缓存系统包括以下4个，而且要支持一种新的缓存也是非常容易的：
