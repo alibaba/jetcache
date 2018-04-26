@@ -155,6 +155,8 @@ public class CacheHandler implements InvocationHandler {
                 }
             });
             if (cache instanceof CacheHandlerRefreshCache) {
+                // We invoke addOrUpdateRefreshTask manually
+                // because the cache has no loader(GET method will not invoke it)
                 ((CacheHandlerRefreshCache) cache).addOrUpdateRefreshTask(key, (unusedKey) -> invokeOrigin(context));
             }
             return result;
