@@ -50,8 +50,6 @@ public interface UserService {
 
     @CacheInvalidate(name="userCache-", key="#userId")
     void deleteUser(long userId);
-    
-    //compiler 
 }
 ```
 To enable use parameter name such as ```key="#userId"```, you javac compiler target must be 1.8 and the ```-parameters``` should be set, otherwise use index to access parameters like ```key="args[0]"```
