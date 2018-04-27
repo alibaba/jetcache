@@ -154,6 +154,12 @@ public class CacheContext {
         cache.config().setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
         cache = new CacheHandler.CacheHandlerRefreshCache(cache);
 
+        cache.config().setCachePenetrationProtect(globalCacheConfig.isPenetrationProtect());
+        if (cachedAnnoConfig.getPenetrationProtectConfig() != null) {
+            cache.config().setCachePenetrationProtect(cachedAnnoConfig.getPenetrationProtectConfig().isPenetrationProtect());
+        }
+
+
         if (defaultCacheMonitorManager != null) {
             DefaultCacheMonitor monitor = new DefaultCacheMonitor(cacheName);
             cache.config().getMonitors().add(monitor);

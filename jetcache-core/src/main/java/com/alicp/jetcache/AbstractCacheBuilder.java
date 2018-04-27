@@ -129,4 +129,13 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
         getConfig().setRefreshPolicy(refreshPolicy);
     }
+
+    public T cachePenetrateProtect(boolean cachePenetrateProtect) {
+        getConfig().setCachePenetrationProtect(cachePenetrateProtect);
+        return self();
+    }
+
+    public void setCachePenetrateProtect(boolean cachePenetrateProtect) {
+        getConfig().setCachePenetrationProtect(cachePenetrateProtect);
+    }
 }

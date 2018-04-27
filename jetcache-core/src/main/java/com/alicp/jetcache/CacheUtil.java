@@ -73,4 +73,12 @@ class CacheUtil {
         };
     }
 
+
+    public static <K, V> AbstractCache<K, V> getAbstractCache(Cache<K, V> c) {
+        while (c instanceof ProxyCache) {
+            c = ((ProxyCache) c).getTargetCache();
+        }
+        return (AbstractCache) c;
+    }
+
 }

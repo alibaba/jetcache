@@ -13,6 +13,7 @@ public class JetCacheProperties {
     private String[] hidePackages;
     private int statIntervalMinutes;
     private boolean areaInCacheName = true;
+    private boolean penetrationProtect = false;
 
     public JetCacheProperties(){
     }
@@ -39,5 +40,13 @@ public class JetCacheProperties {
 
     public void setAreaInCacheName(boolean areaInCacheName) {
         this.areaInCacheName = areaInCacheName;
+    }
+
+    public boolean isPenetrationProtect() {
+        return penetrationProtect;
+    }
+
+    public void setPenetrationProtect(boolean penetrationProtect) {
+        this.penetrationProtect = penetrationProtect;
     }
 }

@@ -1,14 +1,20 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
 import com.alicp.jetcache.event.*;
+import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -19,6 +25,19 @@ import java.util.function.Function;
 public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
+
+    private ConcurrentHashMap<Object, LoaderLock> loaderMap;
+
+    ConcurrentHashMap<Object, LoaderLock> initOrGetLoaderMap() {
+        if (loaderMap == null) {
+            synchronized (this) {
+                if (loaderMap == null) {
+                    loaderMap = new ConcurrentHashMap<>();
+                }
+            }
+        }
+        return loaderMap;
+    }
 
     protected void logError(String oper, Object key, Throwable e) {
         StringBuilder sb = new StringBuilder(64);
@@ -80,14 +99,100 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     @Override
     public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
-        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, loader, this::notify);
-        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull);
+        return computeIfAbsentImpl(key, loader, cacheNullWhenLoaderReturnNull,
+                0, null, this);
     }
 
     @Override
-    public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull, long expireAfterWrite, TimeUnit timeUnit) {
-        Function<K, V> newLoader = CacheUtil.createProxyLoader(this, loader, this::notify);
-        return Cache.super.computeIfAbsent(key, newLoader, cacheNullWhenLoaderReturnNull, expireAfterWrite, timeUnit);
+    public final V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull,
+                                   long expireAfterWrite, TimeUnit timeUnit) {
+        return computeIfAbsentImpl(key, loader, cacheNullWhenLoaderReturnNull,
+                expireAfterWrite, timeUnit, this);
+    }
+
+    static <K, V> V computeIfAbsentImpl(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull,
+                                               long expireAfterWrite, TimeUnit timeUnit, Cache<K, V> cache) {
+        AbstractCache<K, V> abstractCache = CacheUtil.getAbstractCache(cache);
+        Function<K, V> newLoader = CacheUtil.createProxyLoader(cache, loader, abstractCache::notify);
+        CacheGetResult<V> r = cache.GET(key);
+        if (r.isSuccess()) {
+            return r.getValue();
+        } else {
+            Consumer<V> cacheUpdater = (loadedValue) -> {
+                if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
+                    if (timeUnit != null) {
+                        cache.PUT(key, loadedValue, expireAfterWrite, timeUnit);
+                    } else {
+                        cache.put(key, loadedValue);
+                    }
+                }
+            };
+
+            V loadedValue;
+            if (cache.config().isCachePenetrationProtect()) {
+                ConcurrentHashMap<Object, LoaderLock> loaderMap = abstractCache.initOrGetLoaderMap();
+                loadedValue = synchronizedLoad(abstractCache, key, newLoader, cacheUpdater, loaderMap);
+            } else {
+                loadedValue = newLoader.apply(key);
+                cacheUpdater.accept(loadedValue);
+            }
+
+            return loadedValue;
+        }
+    }
+
+    static <K, V> V synchronizedLoad(Cache<K,V> abstractCache, K key, Function<K, V> newLoader,
+                                     Consumer<V> cacheUpdater,
+                                     ConcurrentHashMap<Object, LoaderLock> loaderMap) {
+        V loadedValue;
+        Object lockKey = buildLoaderLockKey(abstractCache, key);
+        while (true) {
+            boolean create[] = new boolean[1];
+            LoaderLock ll = loaderMap.computeIfAbsent(lockKey, (unusedKey) -> {
+                create[0] = true;
+                LoaderLock loaderLock = new LoaderLock();
+                return loaderLock;
+            });
+            if (create[0]) {
+                try {
+                    loadedValue = newLoader.apply(key);
+                    ll.success = true;
+                    ll.value = loadedValue;
+                    cacheUpdater.accept(loadedValue);
+                    break;
+                } finally {
+                    loaderMap.remove(lockKey);
+                    ll.signal.countDown();
+                }
+            } else {
+                try {
+                    ll.signal.await();
+                    if (ll.success) {
+                        loadedValue = (V) ll.value;
+                        break;
+                    } else {
+                        continue;
+                    }
+                } catch (InterruptedException e) {
+                    throw new CacheException("loader wait interrupted", e);
+                }
+            }
+        }
+        return loadedValue;
+    }
+
+    private static Object buildLoaderLockKey(Cache c, Object key) {
+        if (c instanceof AbstractEmbeddedCache) {
+            return ((AbstractEmbeddedCache) c).buildKey(key);
+        } else if (c instanceof AbstractExternalCache) {
+            byte bytes[] = ((AbstractExternalCache) c).buildKey(key);
+            return ByteBuffer.wrap(bytes);
+        } else if (c instanceof MultiLevelCache) {
+            c = ((MultiLevelCache) c).caches()[0];
+            return buildLoaderLockKey(c, key);
+        } else {
+            throw new CacheException("impossible");
+        }
     }
 
     @Override
@@ -155,4 +260,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     protected abstract CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
 
+    static class LoaderLock {
+        CountDownLatch signal = new CountDownLatch(1);
+        boolean success;
+        Object value;
+    }
 }

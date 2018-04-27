@@ -9,6 +9,7 @@ import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
+import com.alicp.jetcache.anno.support.PenetrationProtectConfig;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
@@ -41,6 +42,13 @@ public class CacheConfigUtil {
         if (cacheRefresh != null) {
             RefreshPolicy policy = parseRefreshPolicy(cacheRefresh);
             cc.setRefreshPolicy(policy);
+        }
+
+        CachePenetrationProtect penetrateProtect = m.getAnnotation(CachePenetrationProtect.class);
+        if (penetrateProtect != null) {
+            PenetrationProtectConfig protectConfig = new PenetrationProtectConfig();
+            protectConfig.setPenetrationProtect(penetrateProtect.value());
+            cc.setPenetrationProtectConfig(protectConfig);
         }
 
         return cc;

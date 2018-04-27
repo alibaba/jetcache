@@ -25,6 +25,7 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
 
     private Function<Object, Boolean> unlessEvaluator;
     private RefreshPolicy refreshPolicy;
+    private PenetrationProtectConfig penetrationProtectConfig;
 
     public boolean isEnabled() {
         return enabled;
@@ -104,5 +105,13 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
 
     public void setRefreshPolicy(RefreshPolicy refreshPolicy) {
         this.refreshPolicy = refreshPolicy;
+    }
+
+    public PenetrationProtectConfig getPenetrationProtectConfig() {
+        return penetrationProtectConfig;
+    }
+
+    public void setPenetrationProtectConfig(PenetrationProtectConfig penetrationProtectConfig) {
+        this.penetrationProtectConfig = penetrationProtectConfig;
     }
 }
