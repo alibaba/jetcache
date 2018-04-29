@@ -1,6 +1,8 @@
 jetcache:
   statIntervalMinutes: 15
   areaInCacheName: false
+  hidePackages: com.alibaba
+  penetrationProtect: false
 
   local:
     default:
