@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -696,8 +697,8 @@ public abstract class AbstractCacheTest {
 
         int loadSuccess[] = new int[1];
         Function loader = new Function() {
-            private int count1;
-            private int count2;
+            private AtomicInteger count1 = new AtomicInteger(0);
+            private AtomicInteger count2 = new AtomicInteger(0);
 
             @Override
             public Object apply(Object k) {
@@ -708,11 +709,11 @@ public abstract class AbstractCacheTest {
                 }
                 if ((keyPrefix + "1").equals(k)) {
                     // fail 1
-                    if (count1++ <= 0)
+                    if (count1.getAndIncrement() <= 0)
                         throw new RuntimeException();
                 } else if ((keyPrefix + "2").equals(k)) {
                     // fail 3 times
-                    if (count2++ <= 2)
+                    if (count2.getAndIncrement() <= 2)
                         throw new RuntimeException();
                 }
                 loadSuccess[0]++;
