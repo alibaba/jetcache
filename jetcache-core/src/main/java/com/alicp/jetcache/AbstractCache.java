@@ -190,6 +190,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else if (c instanceof MultiLevelCache) {
             c = ((MultiLevelCache) c).caches()[0];
             return buildLoaderLockKey(c, key);
+        } else if(c instanceof ProxyCache) {
+            c = ((ProxyCache) c).getTargetCache();
+            return buildLoaderLockKey(c, key);
         } else {
             throw new CacheException("impossible");
         }

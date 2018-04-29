@@ -89,8 +89,9 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 loaderFunction = CacheUtil.createProxyLoader(cache, loaderFunction, eventConsumer);
                 for(K key : keysNeedLoad) {
                     Consumer<V> cacheUpdater = (v) -> PUT(key, v);
-                    AbstractCache.synchronizedLoad(abstractCache, key, loaderFunction,
+                    V v = AbstractCache.synchronizedLoad(abstractCache, key, loaderFunction,
                             cacheUpdater, abstractCache.initOrGetLoaderMap());
+                    kvMap.put(key, v);
                 }
             }
             return kvMap;
