@@ -98,6 +98,10 @@ public class CreateCacheTest extends SpringTest {
             @CacheRefresh(timeUnit = TimeUnit.MILLISECONDS, refresh = 100)
             private Cache cacheWithRefresh;
 
+            @CreateCache
+            @CachePenetrationProtect
+            private Cache cacheWithProtect;
+
             private Cache getTarget(Cache cache) {
                 while(cache instanceof ProxyCache){
                     cache = ((ProxyCache) cache).getTargetCache();
@@ -109,6 +113,8 @@ public class CreateCacheTest extends SpringTest {
             public void test() throws Exception {
                 runGeneralTest();
                 refreshTest();
+                cacheWithoutConvertorTest();
+                AbstractCacheTest.penetrationProtectTest(cacheWithProtect);
 
                 cache1.put("KK1", "V1");
                 Assert.assertNull(cache_A1.get("KK1"));
@@ -142,7 +148,6 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertNull(localConfig.getKeyConvertor());
                 Assert.assertNull(remoteConfig.getKeyConvertor());
 
-                cacheWithoutConvertorTest();
             }
 
             private void runGeneralTest() throws Exception {
