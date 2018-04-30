@@ -17,11 +17,18 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 
     public AbstractExternalCache(ExternalCacheConfig<K, V> config) {
         this.config = config;
+        checkConfig();
+    }
+
+    protected void checkConfig() {
         if (config.getValueEncoder() == null) {
             throw new CacheConfigException("no value encoder");
         }
         if (config.getValueDecoder() == null) {
             throw new CacheConfigException("no value decoder");
+        }
+        if (config.getKeyPrefix() == null){
+            throw new CacheConfigException("keyPrefix is required");
         }
     }
 
