@@ -51,7 +51,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         }
         */
 
-        if (cac == null) {
+        if (cac == null || cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
             return invocation.proceed();
         }
 
