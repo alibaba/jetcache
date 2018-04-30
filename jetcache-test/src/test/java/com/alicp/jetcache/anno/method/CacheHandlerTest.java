@@ -74,7 +74,7 @@ public class CacheHandlerTest {
     }
 
     private CacheInvokeContext createCachedInvokeContext(Invoker invoker, Method method, Object[] args) {
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
+        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap, null);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
         c.setInvoker(invoker);
@@ -279,7 +279,7 @@ public class CacheHandlerTest {
     @Test
     public void invokeInvalidateMethod() throws Throwable {
         Method method = CountClass.class.getMethod("update", String.class, int.class);
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
+        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap, null);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(null);
         CacheInvalidateAnnoConfig invalidateAnnoConfig = new CacheInvalidateAnnoConfig();
@@ -328,7 +328,7 @@ public class CacheHandlerTest {
     @Test
     public void invokeUpdateMethod() throws Throwable {
         Method method = CountClass.class.getMethod("update", String.class, int.class);
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
+        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap, null);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(null);
         CacheUpdateAnnoConfig updateAnnoConfig = new CacheUpdateAnnoConfig();

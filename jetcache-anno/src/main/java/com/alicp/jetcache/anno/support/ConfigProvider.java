@@ -88,8 +88,8 @@ public class ConfigProvider {
         throw new CacheConfigException("not supported:" + convertor);
     }
 
-    public CacheNameGenerator createCacheNameGenerator(String[] hiddenPackages) {
-        return new DefaultCacheNameGenerator(hiddenPackages);
+    public CacheNameGenerator createCacheNameGenerator(String[] hiddenPackages, String targetClassName) {
+        return new DefaultCacheNameGenerator(hiddenPackages, targetClassName);
     }
 
     public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
