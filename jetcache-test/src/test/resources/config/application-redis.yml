@@ -40,6 +40,6 @@ jetcache:
       valueEncoder: kryo?useIdentityNumber=false
       valueDecoder: kryo?useIdentityNumber=false
       defaultExpireInMillis: 10000
-      keyPrefix: jedisTest
+      keyPrefix: jedisTest_A1
 
 

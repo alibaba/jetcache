@@ -19,11 +19,11 @@ jetcache:
       keyConvertor: fastjson
       uri: redis://127.0.0.1:6379/
       defaultExpireInMillis: 20000
-      keyPrefix: letteceTest1
+      keyPrefix: lettuceTest1
     A1:
       type: redis.lettuce
       keyConvertor: fastjson
       uri: redis-sentinel://127.0.0.1:26379,127.0.0.1:26380,127.0.0.1:26381/?sentinelMasterId=mymaster
-      keyPrefix: letteceTest2
+      keyPrefix: lettuceTest2
 
 

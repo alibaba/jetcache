@@ -124,6 +124,7 @@ public class ConfigTest implements ApplicationContextAware {
             remoteBuilder.setValueEncoder(JavaValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(JavaValueDecoder.INSTANCE);
             remoteBuilder.setExpireAfterWriteInMillis(90);
+            remoteBuilder.keyPrefix(null);
             remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
             remoteBuilder = new MockRemoteCacheBuilder();
