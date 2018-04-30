@@ -21,7 +21,7 @@ public class ProxyUtil {
         processType(configMap, target.getClass());
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap,
-                () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap),
+                () -> globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap, null),
                 globalCacheConfig.getHiddenPackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;

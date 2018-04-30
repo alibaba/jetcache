@@ -58,7 +58,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         if (globalCacheConfig == null) {
             globalCacheConfig = applicationContext.getBean(GlobalCacheConfig.class);
         }
-        CacheInvokeContext context = globalCacheConfig.getCacheContext().createCacheInvokeContext(cacheConfigMap);
+        CacheInvokeContext context = globalCacheConfig.getCacheContext().createCacheInvokeContext(cacheConfigMap, obj.getClass().getName());
         context.setInvoker(invocation::proceed);
         context.setMethod(method);
         context.setArgs(invocation.getArguments());

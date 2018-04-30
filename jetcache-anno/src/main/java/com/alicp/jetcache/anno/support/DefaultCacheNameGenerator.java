@@ -16,11 +16,13 @@ import java.util.regex.Pattern;
 public class DefaultCacheNameGenerator implements CacheNameGenerator {
 
     private String[] hiddenPackages;
+    private String targetClassName;
 
     private ConcurrentHashMap<Method, String> cacheNameMap = new ConcurrentHashMap();
 
-    public DefaultCacheNameGenerator(String[] hiddenPackages) {
+    public DefaultCacheNameGenerator(String[] hiddenPackages, String targetClassName) {
         this.hiddenPackages = hiddenPackages;
+        this.targetClassName = targetClassName;
     }
 
     @Override
@@ -30,7 +32,7 @@ public class DefaultCacheNameGenerator implements CacheNameGenerator {
         if (cacheName == null) {
             final StringBuilder sb = new StringBuilder();
 
-            String className = method.getDeclaringClass().getName();
+            String className = targetClassName == null ? method.getDeclaringClass().getName() : targetClassName;
             sb.append(ClassUtil.getShortClassName(removeHiddenPackage(hiddenPackages, className)));
             sb.append('.');
             sb.append(method.getName());

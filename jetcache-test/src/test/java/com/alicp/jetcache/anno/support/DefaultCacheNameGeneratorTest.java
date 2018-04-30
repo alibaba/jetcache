@@ -38,7 +38,7 @@ public class DefaultCacheNameGeneratorTest {
 
     @Test
     public void testGenerateCacheName() throws Exception {
-        DefaultCacheNameGenerator g = new DefaultCacheNameGenerator(hidePack);
+        DefaultCacheNameGenerator g = new DefaultCacheNameGenerator(hidePack, null);
 
         Method m1 = C1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo", I1.class);
@@ -53,12 +53,12 @@ public class DefaultCacheNameGeneratorTest {
         s2 = g.generateCacheName(m2);
         assertEquals(s1, s2);
 
-        g = new DefaultCacheNameGenerator(null);
+        g = new DefaultCacheNameGenerator(null, null);
         s1 = "c.a.j.a.s.DefaultCacheNameGeneratorTest$C1." + m3.getName() + "([Lc.a.j.a.s.DefaultCacheNameGeneratorTest$I1;)";
         s2 = g.generateCacheName(m3);
         assertEquals(s1, s2);
 
-        g = new DefaultCacheNameGenerator(hidePack);
+        g = new DefaultCacheNameGenerator(hidePack, null);
         s1 = "s.DefaultCacheNameGeneratorTest$C1." + m4.getName() + "(BSCIJFDZ)";
         s2 = g.generateCacheName(m4);
         assertEquals(s1, s2);
@@ -66,7 +66,7 @@ public class DefaultCacheNameGeneratorTest {
 
     @Test
     public void removeHiddenPackageTest() {
-        DefaultCacheNameGenerator g = new DefaultCacheNameGenerator(null);
+        DefaultCacheNameGenerator g = new DefaultCacheNameGenerator(null, null);
         String[] hs = {"com.foo", "com.bar."};
         assertEquals("Foo", g.removeHiddenPackage(hs, "com.foo.Foo"));
         assertEquals("foo.Bar", g.removeHiddenPackage(hs, "com.bar.foo.Bar"));
