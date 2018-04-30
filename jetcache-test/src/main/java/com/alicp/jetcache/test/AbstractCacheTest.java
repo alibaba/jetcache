@@ -708,13 +708,13 @@ public abstract class AbstractCacheTest {
                     throw new RuntimeException(e);
                 }
                 if ((keyPrefix + "1").equals(k)) {
-                    // fail 1
-                    if (count1.getAndIncrement() <= 0)
-                        throw new RuntimeException();
+                    // fail 2 times
+                    if (count1.getAndIncrement() <= 1)
+                        throw new RuntimeException("mock error");
                 } else if ((keyPrefix + "2").equals(k)) {
                     // fail 3 times
                     if (count2.getAndIncrement() <= 2)
-                        throw new RuntimeException();
+                        throw new RuntimeException("mock error");
                 }
                 loadSuccess[0]++;
                 return k + "_V";
@@ -734,7 +734,10 @@ public abstract class AbstractCacheTest {
                     if (!o.equals(key + "_V")) {
                         fail[0] = true;
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
+                    if(!"mock error".equals(e.getMessage())){
+                        e.printStackTrace();
+                    }
                     getFailCount[0]++;
                 }
                 countDownLatch.countDown();
