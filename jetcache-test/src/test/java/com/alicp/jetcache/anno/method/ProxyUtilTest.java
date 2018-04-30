@@ -431,11 +431,11 @@ public class ProxyUtilTest {
 
     public interface I10 {
         @Cached
-        int count1();
+        int count1(int p);
 
         @Cached
         @CachePenetrationProtect
-        int count2();
+        int count2(int p);
     }
 
     public class C10 implements I10 {
@@ -443,9 +443,9 @@ public class ProxyUtilTest {
         int count2;
 
         @Override
-        public int count1() {
+        public int count1(int p) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -453,9 +453,9 @@ public class ProxyUtilTest {
         }
 
         @Override
-        public int count2() {
+        public int count2(int p) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -468,16 +468,20 @@ public class ProxyUtilTest {
     public void testGetProxyByAnnotation10() throws Exception {
         I10 beanProxy = ProxyUtil.getProxyByAnnotation(new C10(), globalCacheConfig);
 
+        // preheat
+        beanProxy.count1(1);
+        beanProxy.count2(1);
+
         {
             int[] x = new int[1];
             int[] y = new int[1];
             CountDownLatch countDownLatch = new CountDownLatch(2);
             new Thread(() -> {
-                x[0] = beanProxy.count1();
+                x[0] = beanProxy.count1(2);
                 countDownLatch.countDown();
             }).start();
             new Thread(() -> {
-                y[0] = beanProxy.count1();
+                y[0] = beanProxy.count1(2);
                 countDownLatch.countDown();
             }).start();
             countDownLatch.await();
@@ -488,11 +492,11 @@ public class ProxyUtilTest {
             int[] y = new int[1];
             CountDownLatch countDownLatch = new CountDownLatch(2);
             new Thread(() -> {
-                x[0] = beanProxy.count2();
+                x[0] = beanProxy.count2(2);
                 countDownLatch.countDown();
             }).start();
             new Thread(() -> {
-                y[0] = beanProxy.count2();
+                y[0] = beanProxy.count2(2);
                 countDownLatch.countDown();
             }).start();
             countDownLatch.await();

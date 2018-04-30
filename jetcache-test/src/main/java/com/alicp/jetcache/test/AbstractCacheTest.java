@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
@@ -695,7 +696,7 @@ public abstract class AbstractCacheTest {
     private static void penetrationProtectTestWithComputeIfAbsent(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtect_";
 
-        int loadSuccess[] = new int[1];
+        AtomicInteger loadSuccess = new AtomicInteger(0);
         Function loader = new Function() {
             private AtomicInteger count1 = new AtomicInteger(0);
             private AtomicInteger count2 = new AtomicInteger(0);
@@ -716,15 +717,15 @@ public abstract class AbstractCacheTest {
                     if (count2.getAndIncrement() <= 2)
                         throw new RuntimeException("mock error");
                 }
-                loadSuccess[0]++;
+                loadSuccess.incrementAndGet();
                 return k + "_V";
             }
         };
 
         int threadCount = 20;
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
-        int[] getFailCount = new int[1];
-        boolean fail[] = new boolean[1];
+        AtomicInteger getFailCount = new AtomicInteger(0);
+        AtomicBoolean fail = new AtomicBoolean(false);
         for (int i = 0; i < threadCount; i++) {
             final int index = i;
             Thread t = new Thread(() -> {
@@ -732,13 +733,13 @@ public abstract class AbstractCacheTest {
                 try {
                     Object o = cache.computeIfAbsent(key, loader);
                     if (!o.equals(key + "_V")) {
-                        fail[0] = true;
+                        fail.set(true);
                     }
                 } catch (Throwable e) {
                     if(!"mock error".equals(e.getMessage())){
                         e.printStackTrace();
                     }
-                    getFailCount[0]++;
+                    getFailCount.incrementAndGet();
                 }
                 countDownLatch.countDown();
             });
@@ -746,9 +747,9 @@ public abstract class AbstractCacheTest {
         }
         countDownLatch.await();
 
-        Assert.assertFalse(fail[0]);
-        Assert.assertEquals(3, loadSuccess[0]);
-        Assert.assertEquals(1 + 3, getFailCount[0]);
+        Assert.assertFalse(fail.get());
+        Assert.assertEquals(3, loadSuccess.get());
+        Assert.assertEquals(2 + 3, getFailCount.get());
 
         cache.remove(keyPrefix + "0");
         cache.remove(keyPrefix + "1");
