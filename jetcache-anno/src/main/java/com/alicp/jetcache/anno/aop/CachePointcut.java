@@ -153,6 +153,14 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
     }
 
     private void parseByTargetClass(CacheInvokeConfig cac, Class<?> clazz, String name, Class<?>[] paramTypes) {
+        if (!clazz.isInterface() && clazz.getSuperclass() != null) {
+            parseByTargetClass(cac, clazz.getSuperclass(), name, paramTypes);
+        }
+        Class<?>[] intfs = clazz.getInterfaces();
+        for (Class<?> it : intfs) {
+            parseByTargetClass(cac, it, name, paramTypes);
+        }
+
         boolean matchThis = matchesThis(clazz);
         if (matchThis) {
             Method[] methods = clazz.getDeclaredMethods();
@@ -162,14 +170,6 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
                     break;
                 }
             }
-        }
-
-        if (!clazz.isInterface() && clazz.getSuperclass() != null) {
-            parseByTargetClass(cac, clazz.getSuperclass(), name, paramTypes);
-        }
-        Class<?>[] intfs = clazz.getInterfaces();
-        for (Class<?> it : intfs) {
-            parseByTargetClass(cac, it, name, paramTypes);
         }
     }
 
