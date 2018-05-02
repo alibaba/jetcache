@@ -30,6 +30,7 @@ public class CacheConfigUtil {
         cc.setEnabled(anno.enabled());
         cc.setTimeUnit(anno.timeUnit());
         cc.setExpire(anno.expire());
+        cc.setLocalExpire(anno.localExpire());
         cc.setLocalLimit(anno.localLimit());
         cc.setCacheNullValue(anno.cacheNullValue());
         cc.setCondition(anno.condition());

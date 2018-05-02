@@ -29,6 +29,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -102,6 +103,14 @@ public class CreateCacheTest extends SpringTest {
             @CachePenetrationProtect
             private Cache cacheWithProtect;
 
+            @CreateCache(expire = 2, localExpire = 1, cacheType = CacheType.BOTH)
+            private Cache cacheWithLocalExpire_1;
+            @CreateCache(expire = 2, cacheType = CacheType.BOTH)
+            private Cache cacheWithLocalExpire_2;
+            @CreateCache(expire = 2, localExpire = 1, cacheType = CacheType.LOCAL)
+            private Cache cacheWithLocalExpire_3;
+
+
             private Cache getTarget(Cache cache) {
                 while(cache instanceof ProxyCache){
                     cache = ((ProxyCache) cache).getTargetCache();
@@ -115,6 +124,7 @@ public class CreateCacheTest extends SpringTest {
                 refreshTest();
                 cacheWithoutConvertorTest();
                 AbstractCacheTest.penetrationProtectTest(cacheWithProtect);
+                testCacheWithLocalExpire();
 
                 cache1.put("KK1", "V1");
                 Assert.assertNull(cache_A1.get("KK1"));
@@ -148,6 +158,22 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertNull(localConfig.getKeyConvertor());
                 Assert.assertNull(remoteConfig.getKeyConvertor());
 
+            }
+
+            private void testCacheWithLocalExpire() {
+                MultiLevelCacheConfig<?,?> config = (MultiLevelCacheConfig) cacheWithLocalExpire_1.config();
+                Assert.assertTrue(config.isUseExpireOfSubCache());
+                Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
+                Assert.assertEquals(1000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
+                Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
+
+                config = (MultiLevelCacheConfig) cacheWithLocalExpire_2.config();
+                Assert.assertFalse(config.isUseExpireOfSubCache());
+                Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
+                Assert.assertEquals(2000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
+                Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
+
+                Assert.assertEquals(2000, cacheWithLocalExpire_3.config().getExpireAfterWriteInMillis());
             }
 
             private void runGeneralTest() throws Exception {

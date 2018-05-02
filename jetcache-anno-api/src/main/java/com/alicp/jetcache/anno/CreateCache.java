@@ -41,6 +41,11 @@ public @interface CreateCache {
      */
     int expire() default CacheConsts.UNDEFINED_INT;
 
+    /**
+     * Use to specify the local cache expire time when cacheType=CacheType.BOTH, use "expire" if absent.
+     * @return the local cache expire time
+     */
+    int localExpire() default CacheConsts.UNDEFINED_INT;
 
     /**
      * Type of the Cache instance. May be CacheType.REMOTE, CacheType.LOCAL, CacheType.BOTH.

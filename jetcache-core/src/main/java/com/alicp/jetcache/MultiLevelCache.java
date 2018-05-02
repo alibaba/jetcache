@@ -3,6 +3,7 @@ package com.alicp.jetcache;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Created on 16/9/13.
@@ -55,6 +56,29 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
     }
 
     @Override
+    public CacheResult PUT(K key, V value) {
+        if (key == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
+        if (config.isUseExpireOfSubCache()) {
+            return PUT(key, value, 0, null);
+        } else {
+            return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
+        if (map == null) {
+            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
+        }
+        if (config.isUseExpireOfSubCache()) {
+            return PUT_ALL(map, 0, null);
+        } else {
+            return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    @Override
     protected CacheGetResult<V> do_GET(K key) {
         if (key == null) {
             return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
@@ -89,9 +113,13 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         long currentExpire = h.getExpireTime();
         long now = System.currentTimeMillis();
         if (now <= currentExpire) {
-            long restTtl = currentExpire - now;
-            if (restTtl > 0) {
-                PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+            if(config.isUseExpireOfSubCache()){
+                PUT_caches(i, key, h.getValue(), 0, null);
+            } else {
+                long restTtl = currentExpire - now;
+                if (restTtl > 0) {
+                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
+                }
             }
         }
     }
@@ -143,13 +171,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         }
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache c : caches) {
-            Map newMap = new HashMap();
-            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> h = new CacheValueHolder<>(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                newMap.put(en.getKey(), h);
+            CacheResult r;
+            if(timeUnit == null) {
+                r = c.PUT_ALL(map);
+            } else {
+                r = c.PUT_ALL(map, expireAfterWrite, timeUnit);
             }
-
-            CacheResult r = c.PUT_ALL(newMap, expireAfterWrite, timeUnit);
             future = combine(future, r);
         }
         return new CacheResult(future);
@@ -159,8 +186,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
-            CacheValueHolder<V> h = new CacheValueHolder<>(value, timeUnit.toMillis(expire));
-            CacheResult r = cache.PUT(key, h, expire, timeUnit);
+            CacheResult r;
+            if (timeUnit == null) {
+                r = cache.PUT(key, value);
+            } else {
+                r = cache.PUT(key, value, expire, timeUnit);
+            }
             future = combine(future, r);
         }
         return new CacheResult(future);

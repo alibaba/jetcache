@@ -95,6 +95,7 @@ public class MultiLevelCacheMixTest {
         simpleTest();
         testTopCachePut();
         testSubCachePut();
+        testCompatibilityBefore_2_5_0();
     }
 
     private void simpleTest() {
@@ -109,6 +110,7 @@ public class MultiLevelCacheMixTest {
         cache.remove("SIMPLE_K2");
 
         l2Cache.put("SIMPLE_K3", "V3");
+        assertNull(l1Cache.get("SIMPLE_K3"));
         assertEquals("V3", cache.get("SIMPLE_K3"));
         assertEquals("V3", l1Cache.get("SIMPLE_K3"));
         cache.remove("SIMPLE_K3");
@@ -123,8 +125,8 @@ public class MultiLevelCacheMixTest {
         s.add("MIX_K3");
 
         withCacheValueHolder(cache, s);
-        withCacheValueHolderOfCacheValueHolder(l1Cache, s);
-        withCacheValueHolderOfCacheValueHolder(l2Cache, s);
+        withCacheValueHolder(l1Cache, s);
+        withCacheValueHolder(l2Cache, s);
 
         cache.removeAll(s);
     }
@@ -138,8 +140,26 @@ public class MultiLevelCacheMixTest {
         s.add("MIX_K3");
 
         withCacheValueHolder(cache, s);
-        withCacheValueHolderOfCacheValueHolder(l1Cache, s);
+        withCacheValueHolder(l1Cache, s);
         withCacheValueHolder(l2Cache, s);
+
+        cache.removeAll(s);
+    }
+
+    private void testCompatibilityBefore_2_5_0(){
+        CacheValueHolder h1 = new CacheValueHolder("V1", System.currentTimeMillis() + 2000);
+        CacheValueHolder h2 = new CacheValueHolder(null, System.currentTimeMillis() + 2000);
+        l2Cache.put("MIX_K1", h1);
+        l2Cache.put("MIX_K2", h2);
+
+        Set s = new HashSet();
+        s.add("MIX_K1");
+        s.add("MIX_K2");
+        s.add("MIX_K3");
+
+        withCacheValueHolder(cache, s);
+        withCacheValueHolder(l1Cache, s);
+        withCacheValueHolderOfCacheValueHolder(l2Cache, s);
 
         cache.removeAll(s);
     }

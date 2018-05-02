@@ -11,7 +11,7 @@ import com.alicp.jetcache.test.MockRemoteCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -163,6 +163,39 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
             System.out.println(h2.getExpireTime() + "," + ((CacheValueHolder) h2.getValue()).getExpireTime());
             Assert.fail();
         }
+
+        testUseExpireOfSubCache();
+    }
+
+    private void testUseExpireOfSubCache() throws Exception {
+        long oldExpire = l1Cache.config().getExpireAfterWriteInMillis();
+        ((MultiLevelCacheConfig<Object, Object>)cache.config()).setUseExpireOfSubCache(true);
+        l1Cache.config().setExpireAfterWriteInMillis(15);
+
+        cache.put("useSubExpire_key", "V1");
+        Thread.sleep(16);
+        Assert.assertNull(l1Cache.get("useSubExpire_key"));
+        Assert.assertEquals("V1", cache.get("useSubExpire_key"));
+        Assert.assertNotNull(l1Cache.get("useSubExpire_key"));
+        Thread.sleep(16);
+        Assert.assertNull(l1Cache.get("useSubExpire_key"));
+        cache.remove("useSubExpire_key");
+
+        Set s = new HashSet();
+        s.add("useSubExpire_key");
+        Map m = new HashMap();
+        m.put("useSubExpire_key", "V2");
+        cache.putAll(m);
+        Thread.sleep(16);
+        Assert.assertNull(l1Cache.get("useSubExpire_key"));
+        Assert.assertEquals("V2", cache.getAll(s).get("useSubExpire_key"));
+        Assert.assertNotNull(l1Cache.get("useSubExpire_key"));
+        Thread.sleep(16);
+        Assert.assertNull(l1Cache.get("useSubExpire_key"));
+        cache.remove("useSubExpire_key");
+
+        ((MultiLevelCacheConfig<Object, Object>)cache.config()).setUseExpireOfSubCache(false);
+        l1Cache.config().setExpireAfterAccessInMillis(oldExpire);
     }
 
     private AbstractCache getConcreteCache(Cache c) {

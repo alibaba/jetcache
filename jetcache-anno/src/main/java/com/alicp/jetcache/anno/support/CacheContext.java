@@ -146,9 +146,11 @@ public class CacheContext {
                 defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
             }
 
+            boolean useExpireOfSubCache = cachedAnnoConfig.getLocalExpire() > 0;
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
-                    .expireAfterWrite(local.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
+                    .expireAfterWrite(remote.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                     .addCache(local, remote)
+                    .useExpireOfSubCache(useExpireOfSubCache)
                     .buildCache();
         }
         cache.config().setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
@@ -206,7 +208,10 @@ public class CacheContext {
         if (cachedAnnoConfig.getLocalLimit() != CacheConsts.UNDEFINED_INT) {
             cacheBuilder.setLimit(cachedAnnoConfig.getLocalLimit());
         }
-        if (cachedAnnoConfig.getExpire() > 0) {
+        if (cachedAnnoConfig.getCacheType() == CacheType.BOTH &&
+                cachedAnnoConfig.getLocalExpire() > 0) {
+            cacheBuilder.expireAfterWrite(cachedAnnoConfig.getLocalExpire(), cachedAnnoConfig.getTimeUnit());
+        } else if (cachedAnnoConfig.getExpire() > 0) {
             cacheBuilder.expireAfterWrite(cachedAnnoConfig.getExpire(), cachedAnnoConfig.getTimeUnit());
         }
         if (!CacheConsts.UNDEFINED_STRING.equals(cachedAnnoConfig.getKeyConvertor())) {
