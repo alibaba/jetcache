@@ -59,6 +59,7 @@ Automatically refreshment:
 public interface SummaryService{
     @Cached(expire = 3600, cacheType = CacheType.REMOTE)
     @CacheRefresh(refresh = 1800, stopRefreshAfterLastAccess = 3600, timeUnit = TimeUnit.SECONDS)
+    @CachePenetrationProtect
     BigDecimal summaryOfToday(long catagoryId);
 }
 ```
@@ -116,6 +117,7 @@ Read through and automatically refreshment:
 ```java
 @CreateCache
 @CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60)
+@CachePenetrationProtect
 private Cache<String, Long> orderSumCache;
 
 @PostConstruct
