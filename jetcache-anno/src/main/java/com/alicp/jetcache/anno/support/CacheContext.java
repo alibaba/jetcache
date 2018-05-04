@@ -76,8 +76,7 @@ public class CacheContext {
             Cache cache = cacheAnnoConfig.getCache();
             if (cache == null) {
                 if (cacheAnnoConfig instanceof CachedAnnoConfig) {
-                    cache = createCacheByCachedConfig((CachedAnnoConfig) cacheAnnoConfig,
-                            invokeContext.getMethod(), invokeContext.getHiddenPackages());
+                    cache = createCacheByCachedConfig((CachedAnnoConfig) cacheAnnoConfig, invokeContext);
                 } else if ((cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) || (cacheAnnoConfig instanceof CacheUpdateAnnoConfig)) {
                     CacheInvokeConfig cacheDefineConfig = configMap.getByCacheName(cacheAnnoConfig.getArea(), cacheAnnoConfig.getName());
                     if (cacheDefineConfig == null) {
@@ -88,8 +87,7 @@ public class CacheContext {
                         logger.error("Cache operation aborted because can't find @Cached definition", e);
                         return null;
                     }
-                    cache = createCacheByCachedConfig(cacheDefineConfig.getCachedAnnoConfig(),
-                            invokeContext.getMethod(), invokeContext.getHiddenPackages());
+                    cache = createCacheByCachedConfig(cacheDefineConfig.getCachedAnnoConfig(), invokeContext);
                 }
                 cacheAnnoConfig.setCache(cache);
             }
@@ -98,11 +96,13 @@ public class CacheContext {
         return c;
     }
 
-    private Cache createCacheByCachedConfig(CachedAnnoConfig ac, Method method, String[] hiddenPackages) {
+    private Cache createCacheByCachedConfig(CachedAnnoConfig ac, CacheInvokeContext invokeContext) {
         String area = ac.getArea();
         String cacheName = ac.getName();
         if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
-            cacheName = configProvider.createCacheNameGenerator(hiddenPackages).generateCacheName(method);
+
+            cacheName = configProvider.createCacheNameGenerator(invokeContext.getHiddenPackages())
+                    .generateCacheName(invokeContext.getMethod(), invokeContext.getTargetObject());
         }
         Cache cache = __createOrGetCache(ac, area, cacheName);
         return cache;
