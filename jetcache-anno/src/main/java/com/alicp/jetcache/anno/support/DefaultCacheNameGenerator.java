@@ -15,9 +15,9 @@ import java.util.regex.Pattern;
  */
 public class DefaultCacheNameGenerator implements CacheNameGenerator {
 
-    private String[] hiddenPackages;
+    protected final String[] hiddenPackages;
 
-    private ConcurrentHashMap<Method, String> cacheNameMap = new ConcurrentHashMap();
+    protected final ConcurrentHashMap<Method, String> cacheNameMap = new ConcurrentHashMap();
 
     public DefaultCacheNameGenerator(String[] hiddenPackages) {
         this.hiddenPackages = hiddenPackages;
@@ -45,9 +45,9 @@ public class DefaultCacheNameGenerator implements CacheNameGenerator {
             String str = sb.toString();
             cacheNameMap.put(method, str);
             return str;
-        } else {
-            return cacheName;
         }
+
+        return cacheName;
     }
 
     @Override
