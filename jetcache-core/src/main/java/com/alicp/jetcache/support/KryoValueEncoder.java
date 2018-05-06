@@ -4,8 +4,6 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 
-import java.io.ByteArrayOutputStream;
-
 /**
  * Created on 2016/10/4.
  *
@@ -24,6 +22,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 //        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
         return kryo;
     });
+    private static ThreadLocal<Output> outputThreadLocal = ThreadLocal.withInitial(() -> new Output(256, -1));
 
     public KryoValueEncoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
@@ -33,14 +32,18 @@ public class KryoValueEncoder extends AbstractValueEncoder {
     public byte[] apply(Object value) {
         try {
             Kryo kryo = kryoThreadLocal.get();
-            ByteArrayOutputStream bos = new ByteArrayOutputStream(256);
-            Output output = new Output(bos);
+            Output output = outputThreadLocal.get();
             if (useIdentityNumber) {
                 output.writeInt(IDENTITY_NUMBER);
             }
-            kryo.writeClassAndObject(output, value);
-            output.close();
-            return bos.toByteArray();
+            try {
+                kryo.writeClassAndObject(output, value);
+                return output.toBytes();
+            } finally {
+                if(output != null){
+                    output.clear();
+                }
+            }
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Kryo Encode error. ");
             sb.append("msg=").append(e.getMessage());
