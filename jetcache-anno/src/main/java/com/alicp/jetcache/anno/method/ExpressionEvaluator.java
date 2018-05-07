@@ -7,6 +7,7 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
 import org.mvel2.MVEL;
 import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -90,6 +91,7 @@ class MvelEvaluator implements Function<Object, Object> {
 class SpelEvaluator implements Function<Object, Object> {
 
     private static ExpressionParser parser;
+    private static ParameterNameDiscoverer parameterNameDiscoverer;
 
     static {
         try {
@@ -108,7 +110,7 @@ class SpelEvaluator implements Function<Object, Object> {
         } catch (ClassNotFoundException e) {
             parser = new SpelExpressionParser();
         }
-
+        parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     }
 
     private final Expression expression;
@@ -117,7 +119,7 @@ class SpelEvaluator implements Function<Object, Object> {
     public SpelEvaluator(String script, Method defineMethod) {
         expression = parser.parseExpression(script);
         if (defineMethod.getParameterCount() > 0) {
-            parameterNames = new DefaultParameterNameDiscoverer().getParameterNames(defineMethod);
+            parameterNames = parameterNameDiscoverer.getParameterNames(defineMethod);
         }
     }
 
