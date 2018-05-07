@@ -4,6 +4,8 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created on 2016/10/4.
  *
@@ -15,18 +17,19 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 
     protected static int IDENTITY_NUMBER = 0x4A953A82;
 
-    private static int REUSE_MAX_BUFFER_SIZE = 4096;
-
     private static int INIT_BUFFER_SIZE = 256;
 
-    static ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
+    static ThreadLocal<Object[]> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
 //        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 //        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
-        return kryo;
+
+        Output output = new Output(INIT_BUFFER_SIZE, -1);
+
+        WeakReference<Output> ref = new WeakReference<>(output);
+        return new Object[]{kryo, ref};
     });
-    private static ThreadLocal<Output> outputThreadLocal = ThreadLocal.withInitial(() -> new Output(INIT_BUFFER_SIZE, -1));
 
     public KryoValueEncoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
@@ -35,8 +38,15 @@ public class KryoValueEncoder extends AbstractValueEncoder {
     @Override
     public byte[] apply(Object value) {
         try {
-            Kryo kryo = kryoThreadLocal.get();
-            Output output = outputThreadLocal.get();
+            Object[] kryoAndOutput = kryoThreadLocal.get();
+            Kryo kryo = (Kryo) kryoAndOutput[0];
+            WeakReference<Output> ref = (WeakReference<Output>) kryoAndOutput[1];
+            Output output = ref.get();
+            if (output == null) {
+                output = new Output(INIT_BUFFER_SIZE, -1);
+                kryoAndOutput[1] = new WeakReference<>(output);
+            }
+
             if (useIdentityNumber) {
                 output.writeInt(IDENTITY_NUMBER);
             }
@@ -45,13 +55,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
                 return output.toBytes();
             } finally {
                 //reuse buffer if possible
-                if(output != null){
-                    byte[] buffer = output.getBuffer();
-                    if(buffer.length > REUSE_MAX_BUFFER_SIZE){
-                        output.setBuffer(new byte[INIT_BUFFER_SIZE],-1);
-                    }
-                    output.clear();
-                }
+                output.clear();
             }
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Kryo Encode error. ");
