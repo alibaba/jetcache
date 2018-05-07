@@ -99,7 +99,7 @@ public class CacheContext {
     private Cache createCacheByCachedConfig(CachedAnnoConfig ac, CacheInvokeContext invokeContext) {
         String area = ac.getArea();
         String cacheName = ac.getName();
-        if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
+        if (CacheConsts.isUndefined(cacheName)) {
 
             cacheName = configProvider.createCacheNameGenerator(invokeContext.getHiddenPackages())
                     .generateCacheName(invokeContext.getMethod(), invokeContext.getTargetObject());
@@ -187,10 +187,10 @@ public class CacheContext {
             cacheBuilder.setKeyPrefix(cacheName);
         }
 
-        if (!CacheConsts.UNDEFINED_STRING.equals(cachedAnnoConfig.getKeyConvertor())) {
+        if (!CacheConsts.isUndefined(cachedAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
         }
-        if (!CacheConsts.UNDEFINED_STRING.equals(cachedAnnoConfig.getSerialPolicy())) {
+        if (!CacheConsts.isUndefined(cachedAnnoConfig.getSerialPolicy())) {
             cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cachedAnnoConfig.getSerialPolicy()));
             cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cachedAnnoConfig.getSerialPolicy()));
         }
@@ -214,7 +214,7 @@ public class CacheContext {
         } else if (cachedAnnoConfig.getExpire() > 0) {
             cacheBuilder.expireAfterWrite(cachedAnnoConfig.getExpire(), cachedAnnoConfig.getTimeUnit());
         }
-        if (!CacheConsts.UNDEFINED_STRING.equals(cachedAnnoConfig.getKeyConvertor())) {
+        if (!CacheConsts.isUndefined(cachedAnnoConfig.getKeyConvertor())) {
             cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
         }
         cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());

@@ -18,7 +18,7 @@ public class ConfigMap {
     public void putByMethodInfo(String key, CacheInvokeConfig config) {
         methodInfoMap.put(key, config);
         CachedAnnoConfig cac = config.getCachedAnnoConfig();
-        if (cac != null && !CacheConsts.UNDEFINED_STRING.equals(cac.getName())) {
+        if (cac != null && !CacheConsts.isUndefined(cac.getName())) {
             cacheNameMap.put(cac.getArea() + "_" + cac.getName(), config);
         }
     }

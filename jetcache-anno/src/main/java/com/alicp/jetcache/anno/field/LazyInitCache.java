@@ -87,7 +87,7 @@ class LazyInitCache implements ProxyCache {
         cac.setPenetrationProtectConfig(protectConfig);
 
         String cacheName = cac.getName();
-        if (CacheConsts.UNDEFINED_STRING.equalsIgnoreCase(cacheName)) {
+        if (CacheConsts.isUndefined(cacheName)) {
             String[] hiddenPackages = globalCacheConfig.getHiddenPackages();
             CacheNameGenerator g = globalCacheConfig.getConfigProvider().createCacheNameGenerator(hiddenPackages);
             cacheName = g.generateCacheName(field);

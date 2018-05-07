@@ -25,7 +25,7 @@ class ExpressionUtil {
         String condition = cac.getCondition();
         try {
             if (cac.getConditionEvaluator() == null) {
-                if (CacheConsts.UNDEFINED_STRING.equals(condition)) {
+                if (CacheConsts.isUndefined(condition)) {
                     cac.setConditionEvaluator(o -> true);
                 } else {
                     ExpressionEvaluator e = new ExpressionEvaluator(condition, cac.getDefineMethod());
@@ -43,7 +43,7 @@ class ExpressionUtil {
         String keyScript = cac.getKey();
         try {
             if (cac.getKeyEvaluator() == null) {
-                if (CacheConsts.UNDEFINED_STRING.equals(keyScript)) {
+                if (CacheConsts.isUndefined(keyScript)) {
                     cac.setKeyEvaluator(o -> {
                         CacheInvokeContext c = (CacheInvokeContext) o;
                         return c.getArgs() == null ? "_$JETCACHE_NULL_KEY$_" : c.getArgs();
