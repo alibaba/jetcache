@@ -132,6 +132,7 @@ class SpelEvaluator implements Function<Object, Object> {
                 context.setVariable(parameterNames[i], cic.getArgs()[i]);
             }
         }
+        context.setVariable("result", cic.getResult());
         return expression.getValue(context);
     }
 }

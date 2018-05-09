@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -321,6 +322,12 @@ public class ProxyUtilTest {
 
         @CacheInvalidate(name = "c2", key = "args[0]")
         void delete2(String id);
+
+        @CacheUpdate(name = "c1", key = "#id", value="#result")
+        int randomUpdate(String id);
+
+        @CacheUpdate(name = "c1", key = "#id", value="result")
+        int randomUpdate2(String id);
     }
 
     public class C8 implements I8 {
@@ -357,6 +364,16 @@ public class ProxyUtilTest {
         public void delete2(String theId) {
             m.remove(theId);
         }
+
+        @Override
+        public int randomUpdate(String id) {
+            return new Random().nextInt();
+        }
+
+        @Override
+        public int randomUpdate2(String id) {
+            return new Random().nextInt();
+        }
     }
 
 
@@ -383,6 +400,8 @@ public class ProxyUtilTest {
         assertEquals(i8_proxy.count("K1"), i8_proxy.count("K1"));
         assertNotEquals(i8_proxy.count("K1"), i8_proxy.count("K2"));
 
+        assertEquals(i8_proxy.randomUpdate("K1"), i8_proxy.count("K1"));
+        assertEquals(i8_proxy.randomUpdate2("K1"), i8_proxy.count("K1"));
     }
 
     public interface I9 {

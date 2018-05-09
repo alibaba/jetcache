@@ -19,6 +19,7 @@ public class CacheInvokeContext {
     private Object[] args;
     private CacheInvokeConfig cacheInvokeConfig;
     private Object targetObject;
+    private Object result;
 
     private BiFunction<CacheInvokeContext, CacheAnnoConfig, Cache> cacheFunction;
     private String[] hiddenPackages;
@@ -81,5 +82,13 @@ public class CacheInvokeContext {
 
     public void setTargetObject(Object targetObject) {
         this.targetObject = targetObject;
+    }
+
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
     }
 }

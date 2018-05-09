@@ -99,6 +99,7 @@ public class CacheHandler implements InvocationHandler {
 
     private static Object invokeWithInvalidateOrUpdate(CacheInvokeContext context) throws Throwable {
         Object originResult = invokeOrigin(context);
+        context.setResult(originResult);
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
 
         if (cic.getInvalidateAnnoConfig() != null) {
