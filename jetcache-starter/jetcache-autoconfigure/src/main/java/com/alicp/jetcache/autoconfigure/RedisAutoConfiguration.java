@@ -40,7 +40,7 @@ public class RedisAutoConfiguration {
         return new RedisAutoInit();
     }
 
-    public static class RedisCondition extends JetCacheConditon {
+    public static class RedisCondition extends JetCacheCondition {
         public RedisCondition() {
             super("redis");
         }
