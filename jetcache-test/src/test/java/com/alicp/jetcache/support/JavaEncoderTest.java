@@ -58,4 +58,11 @@ public class JavaEncoderTest extends AbstractEncoderTest {
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
     }
 
+    @Test
+    public void gcTest() {
+        encoder = JavaValueEncoder.INSTANCE;
+        decoder = JavaValueDecoder.INSTANCE;
+        super.gcTest();
+    }
+
 }

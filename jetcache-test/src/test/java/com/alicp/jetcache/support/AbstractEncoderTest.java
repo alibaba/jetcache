@@ -1,6 +1,8 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheValueHolder;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.Serializable;
@@ -21,6 +23,19 @@ public class AbstractEncoderTest {
     protected Function<Object, byte[]> encoder;
     protected Function<byte[], Object> decoder;
 
+    protected void gcTest() {
+        char[] cs = new char[500 * 1000];
+        for (int i = 0; i < cs.length; i++) {
+            cs[i] = 'a';
+        }
+        String largeString = new String(cs);
+
+        for (int i = 0; i < 200; i++) {
+            byte[] bytes = encoder.apply(largeString);
+            Object result = decoder.apply(bytes);
+            assertEquals(largeString, result);
+        }
+    }
 
     protected void baseTest() {
         assertEquals("123", decoder.apply(encoder.apply("123")));

@@ -2,7 +2,6 @@ package com.alicp.jetcache.support;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -61,17 +60,9 @@ public class KryoEncoderTest extends AbstractEncoderTest {
 
     @Test
     public void gcTest() {
-        char[] cs = new char[500 * 1000];
-        for (int i = 0; i < cs.length; i++) {
-            cs[i] = 'a';
-        }
-        String largeString = new String(cs);
-
-        for (int i = 0; i < 200; i++) {
-            byte[] bytes = KryoValueEncoder.INSTANCE.apply(largeString);
-            Object result = KryoValueDecoder.INSTANCE.apply(bytes);
-            assertEquals(largeString, result);
-        }
+        encoder = KryoValueEncoder.INSTANCE;
+        decoder = KryoValueDecoder.INSTANCE;
+        super.gcTest();
     }
 
 }
