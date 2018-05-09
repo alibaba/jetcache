@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class RedisLettuceAutoConfiguration {
     public static final String AUTO_INIT_BEAN_NAME = "redisLettuceAutoInit";
 
-    public static class RedisLettuceCondition extends JetCacheConditon {
+    public static class RedisLettuceCondition extends JetCacheCondition {
         public RedisLettuceCondition() {
             super("redis.lettuce");
         }

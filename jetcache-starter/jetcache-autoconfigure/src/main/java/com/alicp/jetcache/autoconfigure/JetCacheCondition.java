@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public abstract class JetCacheConditon extends SpringBootCondition {
+public abstract class JetCacheCondition extends SpringBootCondition {
 
     private String[] cacheTypes;
 
-    protected JetCacheConditon(String... cacheTypes) {
+    protected JetCacheCondition(String... cacheTypes) {
         Objects.requireNonNull(cacheTypes, "cacheTypes can't be null");
         Assert.isTrue(cacheTypes.length > 0, "cacheTypes length is 0");
         this.cacheTypes = cacheTypes;

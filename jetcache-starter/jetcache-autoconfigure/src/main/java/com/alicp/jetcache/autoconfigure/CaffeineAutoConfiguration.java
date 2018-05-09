@@ -25,7 +25,7 @@ public class CaffeineAutoConfiguration extends EmbeddedCacheAutoInit {
         return builder;
     }
 
-    public static class CaffeineCondition extends JetCacheConditon {
+    public static class CaffeineCondition extends JetCacheCondition {
         public CaffeineCondition() {
             super("caffeine");
         }

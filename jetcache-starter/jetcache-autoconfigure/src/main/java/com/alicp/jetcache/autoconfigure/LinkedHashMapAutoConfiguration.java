@@ -24,7 +24,7 @@ public class LinkedHashMapAutoConfiguration extends EmbeddedCacheAutoInit {
         return builder;
     }
 
-    public static class LinkedHashMapCondition extends JetCacheConditon {
+    public static class LinkedHashMapCondition extends JetCacheCondition {
         public LinkedHashMapCondition() {
             super("linkedhashmap");
         }
