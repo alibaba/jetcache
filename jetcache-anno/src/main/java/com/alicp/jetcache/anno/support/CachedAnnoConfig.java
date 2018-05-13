@@ -6,6 +6,7 @@ package com.alicp.jetcache.anno.support;
 import com.alicp.jetcache.RefreshPolicy;
 import com.alicp.jetcache.anno.CacheType;
 
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -23,6 +24,7 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     private boolean cacheNullValue;
     private String serialPolicy;
     private String keyConvertor;
+    private Random randomExtraExpireTimeGenerator;
 
     private Function<Object, Boolean> unlessEvaluator;
     private RefreshPolicy refreshPolicy;
@@ -122,5 +124,13 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
 
     public void setLocalExpire(long localExpire) {
         this.localExpire = localExpire;
+    }
+
+    public Random getRandomExtraExpireTimeGenerator() {
+        return randomExtraExpireTimeGenerator;
+    }
+
+    public void setRandomExtraExpireTimeGenerator(Random randomExtraExpireTimeGenerator) {
+        this.randomExtraExpireTimeGenerator = randomExtraExpireTimeGenerator;
     }
 }

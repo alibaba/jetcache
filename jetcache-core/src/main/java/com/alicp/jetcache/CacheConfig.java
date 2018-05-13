@@ -4,6 +4,8 @@ import com.alicp.jetcache.anno.CacheConsts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 /**
@@ -31,6 +33,10 @@ public class CacheConfig<K, V> implements Cloneable {
     private int tryLockLockCount = 2;
 
     private boolean cachePenetrationProtect = false;
+
+    private Random randomExtraExpireTimeGenerator;
+
+    private TimeUnit timeUnit;
 
     @Override
     public CacheConfig clone() {
@@ -152,5 +158,21 @@ public class CacheConfig<K, V> implements Cloneable {
 
     public void setCachePenetrationProtect(boolean cachePenetrationProtect) {
         this.cachePenetrationProtect = cachePenetrationProtect;
+    }
+
+    public Random getRandomExtraExpireTimeGenerator() {
+        return randomExtraExpireTimeGenerator;
+    }
+
+    public void setRandomExtraExpireTimeGenerator(Random randomExtraExpireTimeGenerator) {
+        this.randomExtraExpireTimeGenerator = randomExtraExpireTimeGenerator;
+    }
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(TimeUnit timeUnit) {
+        this.timeUnit = timeUnit;
     }
 }

@@ -357,10 +357,22 @@ public interface Cache<K, V> extends Closeable {
      * @return the result
      */
     default CacheResult PUT(K key, V value) {
+
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
+        long expireAfterWriteInMillis = config().getExpireAfterWriteInMillis();
+
+        try {
+            if (null != config().getRandomExtraExpireTimeGenerator()) {
+                long extraExpireTimeInMillis = config().getTimeUnit().toMillis(config().getRandomExtraExpireTimeGenerator().nextInt());
+                logger.debug("[extraExpireTime in milis : ] {}",extraExpireTimeInMillis);
+                expireAfterWriteInMillis+=extraExpireTimeInMillis;
+            }
+        } catch (Exception e) {
+            logger.error("RandomExtraExpireTimeGenerator error ");
+        }
+        return PUT(key, value, expireAfterWriteInMillis, TimeUnit.MILLISECONDS);
     }
 
     /**

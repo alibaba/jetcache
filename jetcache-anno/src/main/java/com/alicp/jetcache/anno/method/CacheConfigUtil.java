@@ -12,6 +12,7 @@ import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.PenetrationProtectConfig;
 
 import java.lang.reflect.Method;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,6 +40,13 @@ public class CacheConfigUtil {
         cc.setKey(anno.key());
         cc.setDefineMethod(m);
 
+        if (!anno.randomExtraExpireTimeGenerator().equals(CacheConsts.UNDEFINED_STRING)) {
+            try {
+                cc.setRandomExtraExpireTimeGenerator((Random) Class.forName(anno.randomExtraExpireTimeGenerator()).newInstance());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         CacheRefresh cacheRefresh = m.getAnnotation(CacheRefresh.class);
         if (cacheRefresh != null) {
             RefreshPolicy policy = parseRefreshPolicy(cacheRefresh);

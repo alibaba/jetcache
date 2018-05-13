@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno;
 
 import java.lang.annotation.*;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -108,5 +109,12 @@ public @interface Cached {
      * <p>Default is "", meaning the method is always cached.
      */
     String condition() default CacheConsts.UNDEFINED_STRING;
+
+    /**
+     * the class name of <code>java.util.Random</code> or it's subclass used for adding a random expire time to solve some kind of hot key problem.
+     *
+     * <p>Default is "", meaning the method is always cached.
+     */
+    String randomExtraExpireTimeGenerator () default CacheConsts.UNDEFINED_STRING;
 
 }
