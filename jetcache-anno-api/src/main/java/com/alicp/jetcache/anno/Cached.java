@@ -109,4 +109,11 @@ public @interface Cached {
      */
     String condition() default CacheConsts.UNDEFINED_STRING;
 
+    /**
+     * Expression attribute used to veto method caching.
+     * <p>Unlike {@link #condition()}, this expression is evaluated after the method
+     * has been called and can therefore refer to the {@code result}.
+     */
+    String unless() default CacheConsts.UNDEFINED_STRING;
+
 }

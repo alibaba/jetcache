@@ -54,6 +54,7 @@ public class CacheHandlerTest {
         cachedAnnoConfig.setLocalLimit(CacheConsts.DEFAULT_LOCAL_LIMIT);
         cachedAnnoConfig.setCacheNullValue(CacheConsts.DEFAULT_CACHE_NULL_VALUE);
         cachedAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
+        cachedAnnoConfig.setUnless(CacheConsts.UNDEFINED_STRING);
         cachedAnnoConfig.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
         cachedAnnoConfig.setKeyConvertor(KeyConvertor.FASTJSON);
         cachedAnnoConfig.setKey(CacheConsts.UNDEFINED_STRING);
@@ -63,7 +64,6 @@ public class CacheHandlerTest {
         cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
 
         configMap = new ConfigMap();
-        configMap.putByMethodInfo("balabala", cacheInvokeConfig);
 
         count = new CountClass();
     }
@@ -211,6 +211,20 @@ public class CacheHandlerTest {
         assertEquals(x1, x2);
     }
 
+    @Test
+    public void testStaticInvokeUnless() throws Throwable {
+        Method method = CountClass.class.getMethod("count");
+        cachedAnnoConfig.setDefineMethod(method);
+        int x1, x2, x3;
+        cachedAnnoConfig.setUnless("mvel{result%2==0}");
+        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
+        x1 = invokeQuery(method, null);//return 0, unless=true, so not cached
+        x2 = invokeQuery(method, null);//return 1, unless=false, so cached
+        x3 = invokeQuery(method, null);//cache hit
+        assertNotEquals(x1, x2);
+        assertEquals(x2, x3);
+    }
+
     private void assertResultEquals(DynamicQuery q1, int p1, DynamicQuery q2, int p2) throws Throwable {
         int x1, x2;
         Method method = CountClass.class.getMethod("count", DynamicQuery.class, int.class);
@@ -274,105 +288,6 @@ public class CacheHandlerTest {
         x3 = invokeQuery(method, null);
         assertEquals(x1, x2);
         assertEquals(x1, x3);
-    }
-
-    @Test
-    public void invokeInvalidateMethod() throws Throwable {
-        Method method = CountClass.class.getMethod("update", String.class, int.class);
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
-        c.setCacheInvokeConfig(cacheInvokeConfig);
-        cacheInvokeConfig.setCachedAnnoConfig(null);
-        CacheInvalidateAnnoConfig invalidateAnnoConfig = new CacheInvalidateAnnoConfig();
-        invalidateAnnoConfig.setDefineMethod(method);
-        invalidateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        cacheInvokeConfig.setInvalidateAnnoConfig(invalidateAnnoConfig);
-
-        invalidateAnnoConfig.setKey("args[0]");
-        cacheInvokeConfig.setCachedAnnoConfig(null);
-        c.setMethod(method);
-        c.setArgs(new Object[]{"KEY", 1000});
-        c.setInvoker(() -> c.getMethod().invoke(count, c.getArgs()));
-        c.setCacheFunction((a, b) -> cache);
-
-        cache.put("KEY", "V");
-        CacheHandler.invoke(c);
-        assertNull(cache.get("KEY"));
-
-        cache.put("KEY", "V");
-        invalidateAnnoConfig.setCondition("args[1]==1000");
-        invalidateAnnoConfig.setConditionEvaluator(null);
-        CacheHandler.invoke(c);
-        assertNull(cache.get("KEY"));
-
-        cache.put("KEY", "V");
-        invalidateAnnoConfig.setCondition("args[1]!=1000");
-        invalidateAnnoConfig.setConditionEvaluator(null);
-        CacheHandler.invoke(c);
-        assertNotNull(cache.get("KEY"));
-
-        cache.put("KEY", "V");
-        invalidateAnnoConfig.setCondition("bad condition");
-        invalidateAnnoConfig.setConditionEvaluator(null);
-        CacheHandler.invoke(c);
-        assertNotNull(cache.get("KEY"));
-
-        cache.put("KEY", "V");
-        invalidateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        invalidateAnnoConfig.setKey("bad key script");
-        invalidateAnnoConfig.setConditionEvaluator(null);
-        invalidateAnnoConfig.setKeyEvaluator(null);
-        CacheHandler.invoke(c);
-        assertNotNull(cache.get("KEY"));
-    }
-
-    @Test
-    public void invokeUpdateMethod() throws Throwable {
-        Method method = CountClass.class.getMethod("update", String.class, int.class);
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
-        c.setCacheInvokeConfig(cacheInvokeConfig);
-        cacheInvokeConfig.setCachedAnnoConfig(null);
-        CacheUpdateAnnoConfig updateAnnoConfig = new CacheUpdateAnnoConfig();
-        updateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        updateAnnoConfig.setDefineMethod(method);
-        cacheInvokeConfig.setUpdateAnnoConfig(updateAnnoConfig);
-
-        updateAnnoConfig.setKey("args[0]");
-        updateAnnoConfig.setValue("args[1]");
-        cacheInvokeConfig.setCachedAnnoConfig(null);
-        c.setMethod(method);
-        c.setArgs(new Object[]{"K1", 1000});
-        c.setInvoker(() -> c.getMethod().invoke(count, c.getArgs()));
-        c.setCacheFunction((a, b) -> cache);
-
-        cache.put("K1", "V");
-        CacheHandler.invoke(c);
-        assertEquals(1000, cache.get("K1"));
-
-        cache.put("K1", "V");
-        updateAnnoConfig.setCondition("args[1]==1000");
-        updateAnnoConfig.setConditionEvaluator(null);
-        CacheHandler.invoke(c);
-        assertEquals(1000, cache.get("K1"));
-
-        cache.put("K1", "V");
-        updateAnnoConfig.setCondition("args[1]!=1000");
-        updateAnnoConfig.setConditionEvaluator(null);
-        CacheHandler.invoke(c);
-        assertEquals("V", cache.get("K1"));
-
-        cache.put("K1", "V");
-        updateAnnoConfig.setCondition("bad condition");
-        updateAnnoConfig.setConditionEvaluator(null);
-        CacheHandler.invoke(c);
-        assertEquals("V", cache.get("K1"));
-
-        cache.put("K1", "V");
-        updateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        updateAnnoConfig.setKey("bad key script");
-        updateAnnoConfig.setConditionEvaluator(null);
-        updateAnnoConfig.setKeyEvaluator(null);
-        CacheHandler.invoke(c);
-        assertEquals("V", cache.get("K1"));
     }
 
     @Test

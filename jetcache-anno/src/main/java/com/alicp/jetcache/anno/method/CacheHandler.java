@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -104,23 +105,27 @@ public class CacheHandler implements InvocationHandler {
 
         if (cic.getInvalidateAnnoConfig() != null) {
             Cache cache = context.getCacheFunction().apply(context, cic.getInvalidateAnnoConfig());
-            boolean condition = ExpressionUtil.evalCondition(context, cic.getInvalidateAnnoConfig());
-            if (cache != null && condition) {
-                Object key = ExpressionUtil.evalKey(context, cic.getInvalidateAnnoConfig());
-                if (key != null) {
-                    cache.remove(key);
+            if (cache != null) {
+                boolean condition = ExpressionUtil.evalCondition(context, cic.getInvalidateAnnoConfig());
+                if (condition) {
+                    Object key = ExpressionUtil.evalKey(context, cic.getInvalidateAnnoConfig());
+                    if (key != null) {
+                        cache.remove(key);
+                    }
                 }
             }
         }
 
         if (cic.getUpdateAnnoConfig() != null) {
             Cache cache = context.getCacheFunction().apply(context, cic.getUpdateAnnoConfig());
-            boolean condition = ExpressionUtil.evalCondition(context, cic.getUpdateAnnoConfig());
-            if (cache != null && condition) {
-                Object key = ExpressionUtil.evalKey(context, cic.getUpdateAnnoConfig());
-                Object value = ExpressionUtil.evalValue(context, cic.getUpdateAnnoConfig());
-                if (key != null) {
-                    cache.put(key, value);
+            if (cache != null) {
+                boolean condition = ExpressionUtil.evalCondition(context, cic.getUpdateAnnoConfig());
+                if (condition) {
+                    Object key = ExpressionUtil.evalKey(context, cic.getUpdateAnnoConfig());
+                    Object value = ExpressionUtil.evalValue(context, cic.getUpdateAnnoConfig());
+                    if (key != null && value != ExpressionUtil.EVAL_FAILED) {
+                        cache.put(key, value);
+                    }
                 }
             }
         }
@@ -148,17 +153,24 @@ public class CacheHandler implements InvocationHandler {
         }
 
         try {
-            Object result = cache.computeIfAbsent(key, (k) -> {
-                try {
-                    return invokeOrigin(context);
-                } catch (Throwable e) {
-                    throw new CacheInvokeException(e.getMessage(), e);
+            CacheLoader loader = new CacheLoader() {
+                @Override
+                public Object load(Object k) throws Throwable {
+                    Object result = invokeOrigin(context);
+                    context.setResult(result);
+                    return result;
                 }
-            });
+
+                @Override
+                public boolean vetoCacheUpdate() {
+                    return ExpressionUtil.evalUnless(context, cic.getCachedAnnoConfig());
+                }
+            };
+            Object result = cache.computeIfAbsent(key, loader);
             if (cache instanceof CacheHandlerRefreshCache) {
                 // We invoke addOrUpdateRefreshTask manually
                 // because the cache has no loader(GET method will not invoke it)
-                ((CacheHandlerRefreshCache) cache).addOrUpdateRefreshTask(key, (unusedKey) -> invokeOrigin(context));
+                ((CacheHandlerRefreshCache) cache).addOrUpdateRefreshTask(key, loader);
             }
             return result;
         } catch (CacheInvokeException e) {

@@ -51,6 +51,11 @@ class CacheUtil {
                 }
                 return kvMap;
             }
+
+            @Override
+            public boolean vetoCacheUpdate() {
+                return loader.vetoCacheUpdate();
+            }
         };
     }
 

@@ -149,7 +149,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
             if (l != null) {
                 l = CacheUtil.createProxyLoader(cache, l, eventConsumer);
                 V v = l.load(key);
-                if (v != null || config.isCacheNullValue()) {
+                if (needUpdate(v, l)) {
                     cache.PUT(key, v);
                 }
             }

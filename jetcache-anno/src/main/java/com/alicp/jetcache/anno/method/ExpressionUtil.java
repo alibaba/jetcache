@@ -21,6 +21,8 @@ class ExpressionUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(ExpressionUtil.class);
 
+    static Object EVAL_FAILED = new Object();
+
     public static boolean evalCondition(CacheInvokeContext context, CacheAnnoConfig cac) {
         String condition = cac.getCondition();
         try {
@@ -36,6 +38,24 @@ class ExpressionUtil {
         } catch (Exception e) {
             logger.error("error occurs when eval condition \"" + condition + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
             return false;
+        }
+    }
+
+    public static boolean evalUnless(CacheInvokeContext context, CachedAnnoConfig cac) {
+        String unless = cac.getUnless();
+        try {
+            if (cac.getUnlessEvaluator() == null) {
+                if (CacheConsts.isUndefined(unless)) {
+                    cac.setUnlessEvaluator(o -> false);
+                } else {
+                    ExpressionEvaluator e = new ExpressionEvaluator(unless, cac.getDefineMethod());
+                    cac.setUnlessEvaluator((o) -> (Boolean) e.apply(o));
+                }
+            }
+            return cac.getUnlessEvaluator().apply(context);
+        } catch (Exception e) {
+            logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
+            return true;
         }
     }
 
@@ -70,7 +90,7 @@ class ExpressionUtil {
             return cac.getValueEvaluator().apply(context);
         } catch (Exception e) {
             logger.error("error occurs when eval value \"" + valueScript + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
-            return null;
+            return EVAL_FAILED;
         }
     }
 }

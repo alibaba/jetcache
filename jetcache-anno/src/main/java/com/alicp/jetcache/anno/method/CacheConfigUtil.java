@@ -34,6 +34,7 @@ public class CacheConfigUtil {
         cc.setLocalLimit(anno.localLimit());
         cc.setCacheNullValue(anno.cacheNullValue());
         cc.setCondition(anno.condition());
+        cc.setUnless(anno.unless());
         cc.setSerialPolicy(anno.serialPolicy());
         cc.setKeyConvertor(anno.keyConvertor());
         cc.setKey(anno.key());

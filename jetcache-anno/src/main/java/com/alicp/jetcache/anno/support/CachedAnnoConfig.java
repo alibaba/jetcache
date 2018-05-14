@@ -23,6 +23,7 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     private boolean cacheNullValue;
     private String serialPolicy;
     private String keyConvertor;
+    private String unless;
 
     private Function<Object, Boolean> unlessEvaluator;
     private RefreshPolicy refreshPolicy;
@@ -90,6 +91,15 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
 
     public void setTimeUnit(TimeUnit timeUnit) {
         this.timeUnit = timeUnit;
+    }
+
+
+    public String getUnless() {
+        return unless;
+    }
+
+    public void setUnless(String unless) {
+        this.unless = unless;
     }
 
     public Function<Object, Boolean> getUnlessEvaluator() {

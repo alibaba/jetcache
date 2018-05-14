@@ -45,7 +45,8 @@ public class CountClass implements Count {
     }
 
     @Override
-    public void update(String key, int newCount) {
+    public int update(String key, int newCount) {
         count = newCount;
+        return newCount;
     }
 }

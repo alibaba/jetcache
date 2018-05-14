@@ -110,6 +110,16 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                 expireAfterWrite, timeUnit, this);
     }
 
+    private static <K, V> boolean needUpdate(V loadedValue, boolean cacheNullWhenLoaderReturnNull, Function<K, V> loader) {
+        if (loadedValue == null && !cacheNullWhenLoaderReturnNull) {
+            return false;
+        }
+        if (loader instanceof CacheLoader && ((CacheLoader<K, V>) loader).vetoCacheUpdate()) {
+            return false;
+        }
+        return true;
+    }
+
     static <K, V> V computeIfAbsentImpl(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull,
                                                long expireAfterWrite, TimeUnit timeUnit, Cache<K, V> cache) {
         AbstractCache<K, V> abstractCache = CacheUtil.getAbstractCache(cache);
@@ -119,7 +129,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
             return r.getValue();
         } else {
             Consumer<V> cacheUpdater = (loadedValue) -> {
-                if (loadedValue != null || cacheNullWhenLoaderReturnNull) {
+                if(needUpdate(loadedValue, cacheNullWhenLoaderReturnNull, loader)) {
                     if (timeUnit != null) {
                         cache.PUT(key, loadedValue, expireAfterWrite, timeUnit);
                     } else {

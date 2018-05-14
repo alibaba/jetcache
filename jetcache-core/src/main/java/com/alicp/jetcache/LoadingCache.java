@@ -26,26 +26,25 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
         eventConsumer = CacheUtil.getAbstractCache(cache)::notify;
     }
 
-    private Function<K, V> toLoaderFunction(CacheLoader<K, V> loader) {
-        return (k) -> {
-            try {
-                return loader.load(k);
-            } catch (Throwable e) {
-                throw new CacheInvokeException(e);
-            }
-        };
-    }
-
     @Override
     public V get(K key) throws CacheInvokeException {
         CacheLoader<K, V> loader = config.getLoader();
         if (loader != null) {
-            Function<K, V> loaderFunction = toLoaderFunction(loader);
-            return AbstractCache.computeIfAbsentImpl(key, loaderFunction,
+            return AbstractCache.computeIfAbsentImpl(key, loader,
                     config.isCacheNullValue() ,0, null, this);
         } else {
             return cache.get(key);
         }
+    }
+
+    protected boolean needUpdate(V loadedValue, CacheLoader<K, V> loader) {
+        if (loadedValue == null && !config.isCacheNullValue()) {
+            return false;
+        }
+        if (loader.vetoCacheUpdate()) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -75,7 +74,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                     for (Map.Entry<K, V> en : loadResult.entrySet()) {
                         K key = en.getKey();
                         V loadedValue = en.getValue();
-                        if (loadedValue != null || config.isCacheNullValue()) {
+                        if (needUpdate(loadedValue, loader)) {
                             PUT(key, loadedValue);
                         }
                     }
@@ -85,11 +84,14 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 kvMap.putAll(loadResult);
             } else {
                 AbstractCache<K, V> abstractCache = CacheUtil.getAbstractCache(cache);
-                Function<K, V> loaderFunction = toLoaderFunction(loader);
-                loaderFunction = CacheUtil.createProxyLoader(cache, loaderFunction, eventConsumer);
+                loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
                 for(K key : keysNeedLoad) {
-                    Consumer<V> cacheUpdater = (v) -> PUT(key, v);
-                    V v = AbstractCache.synchronizedLoad(abstractCache, key, loaderFunction,
+                    Consumer<V> cacheUpdater = (v) -> {
+                        if(needUpdate(v, config.getLoader())) {
+                            PUT(key, v);
+                        }
+                    };
+                    V v = AbstractCache.synchronizedLoad(abstractCache, key, loader,
                             cacheUpdater, abstractCache.initOrGetLoaderMap());
                     kvMap.put(key, v);
                 }

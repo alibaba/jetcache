@@ -63,6 +63,9 @@ public class RefreshCacheTest extends AbstractCacheTest {
         refreshCacheTest2(cache);
         getRefreshCache(cache).stopRefresh();
 
+        vetoTest(cache);
+        getRefreshCache(cache).stopRefresh();
+
         cache.config().setLoader(oldLoader);
         cache.config().setRefreshPolicy(oldPolicy);
     }
@@ -82,6 +85,10 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache = builder.buildCache();
         refreshCacheTest2(cache);
         cache.close();
+
+        cache = builder.buildCache();
+        vetoTest(cache);
+        getRefreshCache(cache).stopRefresh();
     }
 
     private static RefreshCache getRefreshCache(Cache cache) {
@@ -100,6 +107,27 @@ public class RefreshCacheTest extends AbstractCacheTest {
             c = ((ProxyCache) c).getTargetCache();
         }
         return c instanceof MultiLevelCache;
+    }
+
+    private static void vetoTest(Cache cache) throws Exception {
+        CacheLoader oldLoader = cache.config().getLoader();
+        cache.config().setLoader(new CacheLoader() {
+            @Override
+            public Object load(Object key) throws Throwable {
+                return "A";
+            }
+
+            @Override
+            public boolean vetoCacheUpdate() {
+                return true;
+            }
+        });
+
+        cache.get("vetoTest");
+        Thread.sleep((long) (1.2 * cache.config().getRefreshPolicy().getRefreshMillis()));
+        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
+
+        cache.config().setLoader(oldLoader);
     }
 
     private static void refreshCacheTest1(Cache cache) throws Exception {
