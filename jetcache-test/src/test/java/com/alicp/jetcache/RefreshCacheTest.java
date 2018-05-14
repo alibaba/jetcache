@@ -63,6 +63,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
         refreshCacheTest2(cache);
         getRefreshCache(cache).stopRefresh();
 
+        cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(0);
         vetoTest(cache);
         getRefreshCache(cache).stopRefresh();
 
@@ -88,7 +89,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
 
         cache = builder.buildCache();
         vetoTest(cache);
-        getRefreshCache(cache).stopRefresh();
+        cache.close();
     }
 
     private static RefreshCache getRefreshCache(Cache cache) {

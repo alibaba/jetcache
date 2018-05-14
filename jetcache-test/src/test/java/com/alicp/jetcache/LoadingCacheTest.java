@@ -65,6 +65,12 @@ public class LoadingCacheTest extends AbstractCacheTest {
         cache.get("vetoTest");
         Thread.sleep(waitMillis);//wait for async operations
         Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
+
+        Set s = new HashSet();
+        s.add("vetoTest");
+        cache.getAll(s);
+        Thread.sleep(waitMillis);//wait for async operations
+        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
     }
 
     private static void nullValueTest(Cache cache, long waitMillis) throws Exception {
