@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -163,7 +162,7 @@ public class CacheHandler implements InvocationHandler {
 
                 @Override
                 public boolean vetoCacheUpdate() {
-                    return ExpressionUtil.evalUnless(context, cic.getCachedAnnoConfig());
+                    return !ExpressionUtil.evalPostCondition(context, cic.getCachedAnnoConfig());
                 }
             };
             Object result = cache.computeIfAbsent(key, loader);

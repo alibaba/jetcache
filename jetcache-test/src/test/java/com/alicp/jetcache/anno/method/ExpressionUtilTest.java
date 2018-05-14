@@ -57,26 +57,26 @@ public class ExpressionUtilTest {
     }
 
     @Test
-    public void testUnless1() {
-        cachedAnnoConfig.setUnless("result==null");
+    public void testPostCondition1() {
+        cachedAnnoConfig.setPostCondition("result==null");
         context.setArgs(new Object[]{"1234", 5678});
-        assertTrue(ExpressionUtil.evalUnless(context, cachedAnnoConfig));
+        assertTrue(ExpressionUtil.evalPostCondition(context, cachedAnnoConfig));
     }
 
     @Test
-    public void testUnless2() {
-        cachedAnnoConfig.setUnless("#p2==1000");
+    public void testPostCondition2() {
+        cachedAnnoConfig.setPostCondition("#p2==1000");
         context.setArgs(new Object[]{"1234", 5678});
-        assertFalse(ExpressionUtil.evalUnless(context, cachedAnnoConfig));
+        assertFalse(ExpressionUtil.evalPostCondition(context, cachedAnnoConfig));
         context.setArgs(new Object[]{"1234", 1000});
-        assertTrue(ExpressionUtil.evalUnless(context, cachedAnnoConfig));
+        assertTrue(ExpressionUtil.evalPostCondition(context, cachedAnnoConfig));
     }
 
     @Test
-    public void testUnless3() {
-        cachedAnnoConfig.setUnless(CacheConsts.UNDEFINED_STRING);
+    public void testPostCondition3() {
+        cachedAnnoConfig.setPostCondition(CacheConsts.UNDEFINED_STRING);
         context.setArgs(new Object[]{"1234", 5678});
-        assertFalse(ExpressionUtil.evalUnless(context, cachedAnnoConfig));
+        assertTrue(ExpressionUtil.evalPostCondition(context, cachedAnnoConfig));
     }
 
     @Test

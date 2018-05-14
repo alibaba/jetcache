@@ -23,9 +23,9 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     private boolean cacheNullValue;
     private String serialPolicy;
     private String keyConvertor;
-    private String unless;
+    private String postCondition;
 
-    private Function<Object, Boolean> unlessEvaluator;
+    private Function<Object, Boolean> postConditionEvaluator;
     private RefreshPolicy refreshPolicy;
     private PenetrationProtectConfig penetrationProtectConfig;
 
@@ -94,20 +94,20 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     }
 
 
-    public String getUnless() {
-        return unless;
+    public String getPostCondition() {
+        return postCondition;
     }
 
-    public void setUnless(String unless) {
-        this.unless = unless;
+    public void setPostCondition(String postCondition) {
+        this.postCondition = postCondition;
     }
 
-    public Function<Object, Boolean> getUnlessEvaluator() {
-        return unlessEvaluator;
+    public Function<Object, Boolean> getPostConditionEvaluator() {
+        return postConditionEvaluator;
     }
 
-    public void setUnlessEvaluator(Function<Object, Boolean> unlessEvaluator) {
-        this.unlessEvaluator = unlessEvaluator;
+    public void setPostConditionEvaluator(Function<Object, Boolean> postConditionEvaluator) {
+        this.postConditionEvaluator = postConditionEvaluator;
     }
 
     public RefreshPolicy getRefreshPolicy() {

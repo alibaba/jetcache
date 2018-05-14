@@ -54,7 +54,7 @@ public class CacheHandlerTest {
         cachedAnnoConfig.setLocalLimit(CacheConsts.DEFAULT_LOCAL_LIMIT);
         cachedAnnoConfig.setCacheNullValue(CacheConsts.DEFAULT_CACHE_NULL_VALUE);
         cachedAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        cachedAnnoConfig.setUnless(CacheConsts.UNDEFINED_STRING);
+        cachedAnnoConfig.setPostCondition(CacheConsts.UNDEFINED_STRING);
         cachedAnnoConfig.setSerialPolicy(CacheConsts.DEFAULT_SERIAL_POLICY);
         cachedAnnoConfig.setKeyConvertor(KeyConvertor.FASTJSON);
         cachedAnnoConfig.setKey(CacheConsts.UNDEFINED_STRING);
@@ -212,14 +212,14 @@ public class CacheHandlerTest {
     }
 
     @Test
-    public void testStaticInvokeUnless() throws Throwable {
+    public void testStaticInvokePostCondition() throws Throwable {
         Method method = CountClass.class.getMethod("count");
         cachedAnnoConfig.setDefineMethod(method);
         int x1, x2, x3;
-        cachedAnnoConfig.setUnless("mvel{result%2==0}");
-        cacheInvokeConfig.getCachedAnnoConfig().setUnlessEvaluator(null);
-        x1 = invokeQuery(method, null);//return 0, unless=true, so not cached
-        x2 = invokeQuery(method, null);//return 1, unless=false, so cached
+        cachedAnnoConfig.setPostCondition("mvel{result%2==1}");
+        cacheInvokeConfig.getCachedAnnoConfig().setPostConditionEvaluator(null);
+        x1 = invokeQuery(method, null);//return 0, postCondition=false, so not cached
+        x2 = invokeQuery(method, null);//return 1, postCondition=true, so cached
         x3 = invokeQuery(method, null);//cache hit
         assertNotEquals(x1, x2);
         assertEquals(x2, x3);

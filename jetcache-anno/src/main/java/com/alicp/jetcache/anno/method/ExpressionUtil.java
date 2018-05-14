@@ -10,10 +10,6 @@ import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -41,21 +37,21 @@ class ExpressionUtil {
         }
     }
 
-    public static boolean evalUnless(CacheInvokeContext context, CachedAnnoConfig cac) {
-        String unless = cac.getUnless();
+    public static boolean evalPostCondition(CacheInvokeContext context, CachedAnnoConfig cac) {
+        String postCondition = cac.getPostCondition();
         try {
-            if (cac.getUnlessEvaluator() == null) {
-                if (CacheConsts.isUndefined(unless)) {
-                    cac.setUnlessEvaluator(o -> false);
+            if (cac.getPostConditionEvaluator() == null) {
+                if (CacheConsts.isUndefined(postCondition)) {
+                    cac.setPostConditionEvaluator(o -> true);
                 } else {
-                    ExpressionEvaluator e = new ExpressionEvaluator(unless, cac.getDefineMethod());
-                    cac.setUnlessEvaluator((o) -> (Boolean) e.apply(o));
+                    ExpressionEvaluator e = new ExpressionEvaluator(postCondition, cac.getDefineMethod());
+                    cac.setPostConditionEvaluator((o) -> (Boolean) e.apply(o));
                 }
             }
-            return cac.getUnlessEvaluator().apply(context);
+            return cac.getPostConditionEvaluator().apply(context);
         } catch (Exception e) {
-            logger.error("error occurs when eval unless \"" + unless + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
-            return true;
+            logger.error("error occurs when eval postCondition \"" + postCondition + "\" in " + context.getMethod() + ":" + e.getMessage(), e);
+            return false;
         }
     }
 

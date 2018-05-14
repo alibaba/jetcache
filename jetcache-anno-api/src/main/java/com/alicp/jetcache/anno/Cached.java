@@ -104,16 +104,17 @@ public @interface Cached {
     boolean cacheNullValue() default CacheConsts.DEFAULT_CACHE_NULL_VALUE;
 
     /**
-     * Expression attribute used for conditioning the method caching.
-     * <p>Default is "", meaning the method is always cached.
+     * Expression script used for conditioning the method caching, the cache is not
+     * used when evaluation result is false.
+     * Evaluation occurs before real method invocation.
      */
     String condition() default CacheConsts.UNDEFINED_STRING;
 
     /**
-     * Expression attribute used to veto method caching.
-     * <p>Unlike {@link #condition()}, this expression is evaluated after the method
-     * has been called and can therefore refer to the {@code result}.
+     * Expression script used for conditioning the method cache updating,
+     * the cache updating action is vetoed when the evaluation result is false.
+     * Evaluation occurs after real method invocation so we can refer <i>#result</i> in script.
      */
-    String unless() default CacheConsts.UNDEFINED_STRING;
+    String postCondition() default CacheConsts.UNDEFINED_STRING;
 
 }
