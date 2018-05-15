@@ -47,10 +47,10 @@ public class KryoValueEncoder extends AbstractValueEncoder {
                 kryoAndOutput[1] = new WeakReference<>(output);
             }
 
-            if (useIdentityNumber) {
-                output.writeInt(IDENTITY_NUMBER);
-            }
             try {
+                if (useIdentityNumber) {
+                    output.writeInt(IDENTITY_NUMBER);
+                }
                 kryo.writeClassAndObject(output, value);
                 return output.toBytes();
             } finally {
