@@ -4,7 +4,7 @@
 [![GitHub release](https://img.shields.io/github/release/alibaba/jetcache.svg)](https://github.com/alibaba/jetcache/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-# introduction
+# Introduction
 JetCache is a Java cache abstraction which provides consistent use for various caching solutions. 
 It provides more powerful annotation than that in Spring Cache. The annotation in JetCache supports native TTL, 
 two level caching, and distributed automatically refreshment, also you can operate ```Cache``` instance by hand code. 
@@ -26,9 +26,9 @@ requirements:
 
 Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents.
 
-# getting started
+# Getting started
 
-## method cache
+## Method cache
 Declare method cache using ```@Cached``` annotation.  
 ```expire = 3600``` indicates that the elements will expires in 3600 seconds after put.
 JetCache auto generates cache key using all parameters.
@@ -63,8 +63,9 @@ public interface SummaryService{
     BigDecimal summaryOfToday(long catagoryId);
 }
 ```
+CachePenetrationProtect annotation indicates to synchronize load operation in multi-thread environment.
 
-## cache API
+## Cache API
 Create a ```Cache``` instance using ```@CreateCache``` annotation:
 ```java
 @CreateCache(expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
@@ -96,7 +97,7 @@ Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .buildCache();
 ```
 
-## advanced API
+## Advanced API
 Asynchronous API:
 ```java
 CacheGetResult r = cache.GET(userId);
@@ -116,7 +117,7 @@ cache.tryLockAndRun("key", 60, TimeUnit.SECONDS, () -> heavyDatabaseOperation())
 Read through and automatically refreshment:
 ```java
 @CreateCache
-@CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60)
+@CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60, stopRefreshAfterLastAccess = 100)
 @CachePenetrationProtect
 private Cache<String, Long> orderSumCache;
 
@@ -126,7 +127,7 @@ public void init(){
 }
 ```
 
-## configuration with Spring Boot
+## Configuration with Spring Boot
 
 pom:
 ```xml
@@ -173,5 +174,5 @@ jetcache:
       port: ${redis.port}
 ```
 
-## more docs
+## More docs
 Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more documents.

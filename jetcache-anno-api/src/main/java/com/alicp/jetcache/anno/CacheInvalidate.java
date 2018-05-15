@@ -34,7 +34,8 @@ public @interface CacheInvalidate {
     String key() default CacheConsts.UNDEFINED_STRING;
 
     /**
-     * Expression attribute used for conditioning the invalidation.
+     * Expression script used for conditioning the cache operation, the operation is vetoed when evaluation result is false.
+     * Evaluation occurs after real method invocation so we can refer <code>#result</code> in script.
      */
     String condition() default CacheConsts.UNDEFINED_STRING;
 }
