@@ -129,6 +129,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
         cacheStat.removeCount++;
         switch (result.getResultCode()) {
             case SUCCESS:
+            case NOT_EXISTS:
                 cacheStat.removeSuccessCount++;
                 break;
             case FAIL:
