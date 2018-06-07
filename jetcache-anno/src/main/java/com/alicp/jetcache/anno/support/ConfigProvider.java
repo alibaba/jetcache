@@ -70,10 +70,14 @@ public class ConfigProvider {
         if (SerialPolicy.KRYO.equalsIgnoreCase(valueDecoder)) {
             return new KryoValueDecoder(useIdentityNumber);
         } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueDecoder)) {
-            return new JavaValueDecoder(useIdentityNumber);
+            return javaValueDecoder(useIdentityNumber);
         } else {
             throw new CacheConfigException("not supported:" + valueDecoder);
         }
+    }
+
+    JavaValueDecoder javaValueDecoder(boolean useIdentityNumber) {
+        return new JavaValueDecoder(useIdentityNumber);
     }
 
     public Function<Object, Object> parseKeyConvertor(String convertor) {

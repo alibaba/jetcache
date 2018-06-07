@@ -2,6 +2,8 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.method.SpringCacheContext;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.SpringJavaValueDecoder;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -64,6 +66,11 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
                 return ((SerialPolicy)bean).decoder();
             }
         }
+    }
+
+    @Override
+    JavaValueDecoder javaValueDecoder(boolean useIdentityNumber) {
+        return new SpringJavaValueDecoder(useIdentityNumber);
     }
 
     @Override

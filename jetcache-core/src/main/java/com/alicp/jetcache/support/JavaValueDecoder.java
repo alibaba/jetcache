@@ -1,6 +1,7 @@
 package com.alicp.jetcache.support;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 
 /**
@@ -24,7 +25,11 @@ public class JavaValueDecoder extends AbstractValueDecoder {
         } else {
             in = new ByteArrayInputStream(buffer);
         }
-        ObjectInputStream ois = new ObjectInputStream(in);
+        ObjectInputStream ois = buildObjectInputStream(in);
         return ois.readObject();
+    }
+
+    protected ObjectInputStream buildObjectInputStream(ByteArrayInputStream in) throws IOException {
+        return new ObjectInputStream(in);
     }
 }
