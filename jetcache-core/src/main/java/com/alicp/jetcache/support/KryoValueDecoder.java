@@ -28,6 +28,7 @@ public class KryoValueDecoder extends AbstractValueDecoder {
         }
         Input input = new Input(in);
         Kryo kryo = (Kryo) KryoValueEncoder.kryoThreadLocal.get()[0];
+        kryo.setClassLoader(Thread.currentThread().getContextClassLoader());
         return kryo.readClassAndObject(input);
     }
 }
