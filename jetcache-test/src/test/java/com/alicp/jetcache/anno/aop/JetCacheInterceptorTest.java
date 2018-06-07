@@ -71,6 +71,10 @@ public class JetCacheInterceptorTest {
         interceptor.invoke(mi);
 
         verify(mi, times(1)).proceed();
+
+        globalCacheConfig.setEnableMethodCache(false);
+        interceptor.invoke(mi);
+        verify(mi, times(2)).proceed();
     }
 
     interface I2 {

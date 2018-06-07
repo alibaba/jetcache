@@ -14,6 +14,7 @@ public class JetCacheProperties {
     private int statIntervalMinutes;
     private boolean areaInCacheName = true;
     private boolean penetrationProtect = false;
+    private boolean enableMethodCache = true;
 
     public JetCacheProperties(){
     }
@@ -48,5 +49,13 @@ public class JetCacheProperties {
 
     public void setPenetrationProtect(boolean penetrationProtect) {
         this.penetrationProtect = penetrationProtect;
+    }
+
+    public boolean isEnableMethodCache() {
+        return enableMethodCache;
+    }
+
+    public void setEnableMethodCache(boolean enableMethodCache) {
+        this.enableMethodCache = enableMethodCache;
     }
 }

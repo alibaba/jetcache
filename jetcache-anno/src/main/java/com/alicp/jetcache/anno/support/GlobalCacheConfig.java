@@ -18,6 +18,7 @@ public class GlobalCacheConfig {
     protected int statIntervalMinutes;
     private boolean areaInCacheName = true;
     private boolean penetrationProtect = false;
+    private boolean enableMethodCache = true;
 
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
@@ -103,5 +104,13 @@ public class GlobalCacheConfig {
 
     public void setPenetrationProtect(boolean penetrationProtect) {
         this.penetrationProtect = penetrationProtect;
+    }
+
+    public boolean isEnableMethodCache() {
+        return enableMethodCache;
+    }
+
+    public void setEnableMethodCache(boolean enableMethodCache) {
+        this.enableMethodCache = enableMethodCache;
     }
 }
