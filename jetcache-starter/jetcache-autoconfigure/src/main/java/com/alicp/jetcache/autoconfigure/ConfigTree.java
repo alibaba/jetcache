@@ -40,7 +40,7 @@ public class ConfigTree {
                         .getPropertyNames()) {
                     if (name != null && name.startsWith(prefix)) {
                         String subKey = name.substring(prefix.length());
-                        m.put(subKey, source.getProperty(name));
+                        m.put(subKey, environment.getProperty(name));
                     }
                 }
             }
