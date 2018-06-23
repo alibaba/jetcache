@@ -7,8 +7,10 @@ import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.ReadFrom;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import io.lettuce.core.api.sync.RedisCommands;
@@ -16,6 +18,8 @@ import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
 import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.masterslave.MasterSlave;
+import io.lettuce.core.masterslave.StatefulRedisMasterSlaveConnection;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,7 +46,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
     @Test
     public void testSimple() throws Exception {
         RedisClient client = RedisClient.create("redis://127.0.0.1");
-        test(client);
+        test(client, null);
     }
 
     @Test
@@ -53,7 +57,28 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .withSentinel("127.0.0.1", 26381)
                 .build();
         RedisClient client = RedisClient.create(redisUri);
-        test(client);
+        test(client, null);
+    }
+
+    @Test
+    public void testSentinel2() throws Exception {
+        RedisURI redisUri = RedisURI.Builder
+                .sentinel("127.0.0.1", 26379, "mymaster")
+                .withSentinel("127.0.0.1", 26380)
+                .withSentinel("127.0.0.1", 26381)
+                .build();
+        RedisClient client = RedisClient.create();
+        StatefulRedisMasterSlaveConnection con = MasterSlave.connect(
+                client, new JetCacheCodec(), redisUri);
+        con.setReadFrom(ReadFrom.SLAVE_PREFERRED);
+        cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
+                .redisClient(client)
+                .connection(con)
+                .keyPrefix(new Random().nextInt() + "")
+                .buildCache();
+        cache.put("K1", "V1");
+        Thread.sleep(100);
+        Assert.assertEquals("V1", cache.get("K1"));
     }
 
     @Test
@@ -65,7 +90,31 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         RedisURI node2 = RedisURI.create("127.0.0.1", 7001);
         RedisURI node3 = RedisURI.create("127.0.0.1", 7002);
         RedisClusterClient client = RedisClusterClient.create(Arrays.asList(node1, node2, node3));
-        test(client);
+        test(client,null);
+    }
+
+    @Test
+    public void testCluster2() throws Exception {
+        if (!checkOS()) {
+            return;
+        }
+        RedisURI node1 = RedisURI.create("127.0.0.1", 7000);
+        RedisURI node2 = RedisURI.create("127.0.0.1", 7001);
+        RedisURI node3 = RedisURI.create("127.0.0.1", 7002);
+        RedisClient client = RedisClient.create();
+        StatefulRedisMasterSlaveConnection con = MasterSlave.connect(
+                client,
+                new JetCacheCodec(),
+                Arrays.asList(node1, node2, node3));
+        con.setReadFrom(ReadFrom.SLAVE_PREFERRED);
+        cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
+                .redisClient(client)
+                .connection(con)
+                .keyPrefix(new Random().nextInt() + "")
+                .buildCache();
+        cache.put("K1", "V1");
+        Thread.sleep(100);
+        Assert.assertEquals("V1", cache.get("K1"));
     }
 
     @Test
@@ -98,9 +147,10 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         LettuceConnectionManager.defaultManager().removeAndClose(client);
     }
 
-    private void test(AbstractRedisClient client) throws Exception {
+    private void test(AbstractRedisClient client, StatefulConnection connection) throws Exception {
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
+                .connection(connection)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)

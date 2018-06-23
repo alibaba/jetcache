@@ -71,10 +71,13 @@ public class RedisLettuceStarterTest extends SpringTest {
 
         if (RedisLettuceCacheTest.checkOS()) {
             key = "remote.A2";
-            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterClient.class).getObject() instanceof RedisClusterClient);
-            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterCommands.class).getObject() instanceof RedisClusterCommands);
-            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterAsyncCommands.class).getObject() instanceof RedisClusterAsyncCommands);
-            Assert.assertTrue(new LettuceFactory(acb, key , RedisClusterReactiveCommands.class).getObject() instanceof RedisClusterReactiveCommands);
+            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterClient.class).getObject() instanceof RedisClusterClient);
+            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterCommands.class).getObject() instanceof RedisClusterCommands);
+            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterAsyncCommands.class).getObject() instanceof RedisClusterAsyncCommands);
+            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterReactiveCommands.class).getObject() instanceof RedisClusterReactiveCommands);
+
+            key = "remote.A2_slave";
+            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterClient.class).getObject() instanceof RedisClient);
         }
     }
 
@@ -83,11 +86,18 @@ public class RedisLettuceStarterTest extends SpringTest {
         @CreateCache
         private Cache c1;
 
-        public void test() {
+        @CreateCache(area = "A1_slave")
+        private Cache a1SlaveCache;
+
+        public void test() throws Exception {
             Assert.assertNotNull(c1.unwrap(RedisClient.class));
             RedisLettuceCacheConfig cc1 = (RedisLettuceCacheConfig) c1.config();
             Assert.assertEquals(20000, cc1.getExpireAfterWriteInMillis());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
+
+            a1SlaveCache.put("K1", "V1");
+            Thread.sleep(100);
+            Assert.assertEquals("V1", a1SlaveCache.get("K1"));
         }
     }
 

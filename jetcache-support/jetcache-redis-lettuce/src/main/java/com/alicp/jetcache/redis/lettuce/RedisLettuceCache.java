@@ -55,8 +55,9 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
         }
 
         client = config.getRedisClient();
-        lettuceConnectionManager = LettuceConnectionManager.defaultManager();
 
+        lettuceConnectionManager = LettuceConnectionManager.defaultManager();
+        lettuceConnectionManager.init(client, config.getConnection());
         stringCommands = (RedisStringCommands<byte[], byte[]>) lettuceConnectionManager.commands(client);
         stringAsyncCommands = (RedisStringAsyncCommands<byte[], byte[]>) lettuceConnectionManager.asyncCommands(client);
         keyAsyncCommands = (RedisKeyAsyncCommands<byte[], byte[]>) stringAsyncCommands;

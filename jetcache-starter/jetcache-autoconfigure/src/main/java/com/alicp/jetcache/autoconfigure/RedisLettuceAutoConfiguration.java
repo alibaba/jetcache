@@ -3,12 +3,17 @@ package com.alicp.jetcache.autoconfigure;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.redis.lettuce.JetCacheCodec;
 import com.alicp.jetcache.redis.lettuce.LettuceConnectionManager;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.ReadFrom;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.masterslave.MasterSlave;
+import io.lettuce.core.masterslave.StatefulRedisMasterSlaveConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -48,25 +53,54 @@ public class RedisLettuceAutoConfiguration {
         @Override
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
             Map<String, Object> map = ct.subTree("uri"/*there is no dot*/).getProperties();
-            AbstractRedisClient client = null;
+            String readFromStr = ct.getProperty("readFrom");
+            ReadFrom readFrom = null;
+            if (readFromStr != null) {
+                readFrom = ReadFrom.valueOf(readFromStr.trim());
+            }
+
+            AbstractRedisClient client;
+            StatefulConnection connection = null;
             if (map == null || map.size() == 0) {
                 throw new CacheConfigException("uri is required");
             } else if (map.size() == 1) {
                 String uri = (String) map.values().iterator().next();
-                client = RedisClient.create(uri);
+                if (readFrom == null) {
+                    client = RedisClient.create(uri);
+                } else {
+                    client = RedisClient.create();
+                    StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
+                            (RedisClient) client,
+                            new JetCacheCodec(),
+                            RedisURI.create(uri));
+                    c.setReadFrom(readFrom);
+                    connection = c;
+                }
             } else {
                 List<RedisURI> list = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
                         .collect(Collectors.toList());
-                client = RedisClusterClient.create(list);
+                if (readFrom == null) {
+                    client = RedisClusterClient.create(list);
+                } else {
+                    client = RedisClient.create();
+                    StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
+                            (RedisClient) client,
+                            new JetCacheCodec(),
+                            list);
+                    c.setReadFrom(readFrom);
+                    connection = c;
+                }
             }
 
             ExternalCacheBuilder externalCacheBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
+                    .connection(connection)
                     .redisClient(client);
             parseGeneralConfig(externalCacheBuilder, ct);
 
             // eg: "remote.default.client"
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".client", client);
             LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
+            m.init(client, connection);
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".connection", m.connection(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".commands", m.commands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".asyncCommands", m.asyncCommands(client));

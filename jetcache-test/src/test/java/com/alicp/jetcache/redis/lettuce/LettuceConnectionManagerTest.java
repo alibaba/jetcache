@@ -19,6 +19,7 @@ public class LettuceConnectionManagerTest {
     public void test() {
         RedisClient client = RedisClient.create("redis://127.0.0.1");
         LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
+        m.init(client, null);
         Assert.assertSame(m.commands(client), m.commands(client));
         Assert.assertSame(m.asyncCommands(client), m.asyncCommands(client));
         Assert.assertSame(m.reactiveCommands(client), m.reactiveCommands(client));
@@ -35,6 +36,7 @@ public class LettuceConnectionManagerTest {
         RedisURI node3 = RedisURI.create("127.0.0.1", 7002);
         RedisClusterClient client = RedisClusterClient.create(Arrays.asList(node1, node2, node3));
         LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
+        m.init(client, null);
         Assert.assertSame(m.commands(client), m.commands(client));
         Assert.assertSame(m.asyncCommands(client), m.asyncCommands(client));
         Assert.assertSame(m.reactiveCommands(client), m.reactiveCommands(client));

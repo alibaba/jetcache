@@ -1,12 +1,14 @@
 package com.alicp.jetcache.redis.lettuce;
 
 import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheException;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.sentinel.api.StatefulRedisSentinelConnection;
 
 
 import java.util.Collections;
@@ -29,7 +31,7 @@ public class LettuceConnectionManager {
 
     private static final LettuceConnectionManager defaultManager = new LettuceConnectionManager();
 
-    private Map map = Collections.synchronizedMap(new WeakHashMap());
+    private Map<AbstractRedisClient, LettuceObjects> map = Collections.synchronizedMap(new WeakHashMap());
 
     private LettuceConnectionManager() {
     }
@@ -39,7 +41,19 @@ public class LettuceConnectionManager {
     }
 
     private LettuceObjects getLettuceObjectsFromMap(AbstractRedisClient redisClient) {
-        return (LettuceObjects) map.computeIfAbsent(redisClient, key -> new LettuceObjects());
+        LettuceObjects lo = map.get(redisClient);
+        if (lo == null) {
+            throw new CacheException("LettuceObjects is not initialized");
+        }
+        return lo;
+    }
+
+    public void init(AbstractRedisClient redisClient, StatefulConnection connection) {
+        map.computeIfAbsent(redisClient, key -> {
+            LettuceObjects lo = new LettuceObjects();
+            lo.connection = connection;
+            return lo;
+        });
     }
 
     public StatefulConnection connection(AbstractRedisClient redisClient) {
@@ -64,7 +78,9 @@ public class LettuceConnectionManager {
                 lo.commands = ((StatefulRedisConnection) lo.connection).sync();
             } else if (lo.connection instanceof StatefulRedisClusterConnection) {
                 lo.commands = ((StatefulRedisClusterConnection) lo.connection).sync();
-            } else {
+            } else if (lo.connection instanceof StatefulRedisSentinelConnection) {
+                lo.commands = ((StatefulRedisSentinelConnection) lo.connection).sync();
+            }else {
                 throw new CacheConfigException("type " + lo.connection.getClass() + " is not supported");
             }
         }
@@ -80,6 +96,8 @@ public class LettuceConnectionManager {
                 lo.asyncCommands = ((StatefulRedisConnection) lo.connection).async();
             } else if (lo.connection instanceof StatefulRedisClusterConnection) {
                 lo.asyncCommands = ((StatefulRedisClusterConnection) lo.connection).async();
+            } else if (lo.connection instanceof StatefulRedisSentinelConnection) {
+                lo.asyncCommands = ((StatefulRedisSentinelConnection) lo.connection).async();
             } else {
                 throw new CacheConfigException("type " + lo.connection.getClass() + " is not supported");
             }
@@ -95,6 +113,8 @@ public class LettuceConnectionManager {
                 lo.reactiveCommands = ((StatefulRedisConnection) lo.connection).reactive();
             } else if (lo.connection instanceof StatefulRedisClusterConnection) {
                 lo.reactiveCommands = ((StatefulRedisClusterConnection) lo.connection).reactive();
+            } else if (lo.connection instanceof StatefulRedisSentinelConnection) {
+                lo.reactiveCommands = ((StatefulRedisSentinelConnection) lo.connection).reactive();
             } else {
                 throw new CacheConfigException("type " + lo.connection.getClass() + " is not supported");
             }

@@ -2,6 +2,7 @@ package com.alicp.jetcache.redis.lettuce;
 
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.api.StatefulConnection;
 
 /**
  * Created on 2017/4/28.
@@ -35,5 +36,14 @@ public class RedisLettuceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
 
     public void setRedisClient(AbstractRedisClient redisClient) {
         getConfig().setRedisClient(redisClient);
+    }
+
+    public T connection(StatefulConnection connection) {
+        getConfig().setConnection(connection);
+        return self();
+    }
+
+    public void setConnection(StatefulConnection connection) {
+        getConfig().setConnection(connection);
     }
 }
