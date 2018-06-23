@@ -50,8 +50,17 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         if (needLogStackTrace(e)) {
             logger.error(sb.toString(), e);
         } else {
-            sb.append(" Exception=").append(e.getClass()).append(", Message:").append(e.getMessage());
-            logger.warn(sb.toString());
+            sb.append(' ');
+            while (e != null) {
+                sb.append(e.getClass().getName());
+                sb.append(':');
+                sb.append(e.getMessage());
+                e = e.getCause();
+                if (e != null) {
+                    sb.append("\ncause by ");
+                }
+            }
+            logger.error(sb.toString());
         }
 
     }
