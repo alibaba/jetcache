@@ -540,6 +540,7 @@ public abstract class AbstractCacheTest {
         d1.setName("HL");
         d2.setName("HL");
 
+        cache.get(d2);//warm up fastjson
         cache.put(d1, "V1");
         Assert.assertEquals("V1", cache.get(d2));
         Assert.assertNull(cache.get(d3));
