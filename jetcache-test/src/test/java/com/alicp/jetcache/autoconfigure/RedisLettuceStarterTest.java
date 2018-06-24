@@ -96,7 +96,7 @@ public class RedisLettuceStarterTest extends SpringTest {
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
 
             a1SlaveCache.put("K1", "V1");
-            Thread.sleep(100);
+            Thread.sleep(200);
             Assert.assertEquals("V1", a1SlaveCache.get("K1"));
         }
     }
