@@ -21,6 +21,7 @@ import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 import io.lettuce.core.masterslave.MasterSlave;
 import io.lettuce.core.masterslave.StatefulRedisMasterSlaveConnection;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -94,6 +95,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
     }
 
     @Test
+    @Ignore
     public void testCluster2() throws Exception {
         if (!checkOS()) {
             return;
