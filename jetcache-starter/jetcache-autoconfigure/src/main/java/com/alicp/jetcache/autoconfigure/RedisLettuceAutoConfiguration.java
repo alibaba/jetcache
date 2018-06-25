@@ -12,6 +12,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.masterslave.MasterSlave;
 import io.lettuce.core.masterslave.StatefulRedisMasterSlaveConnection;
 import org.springframework.context.annotation.Bean;
@@ -79,14 +80,9 @@ public class RedisLettuceAutoConfiguration {
             } else {
                 List<RedisURI> list = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
                         .collect(Collectors.toList());
-                if (readFrom == null) {
-                    client = RedisClusterClient.create(list);
-                } else {
-                    client = RedisClient.create();
-                    StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
-                            (RedisClient) client,
-                            new JetCacheCodec(),
-                            list);
+                client = RedisClusterClient.create(list);
+                if (readFrom != null) {
+                    StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
                     c.setReadFrom(readFrom);
                     connection = c;
                 }
