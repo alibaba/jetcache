@@ -15,6 +15,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.reactive.RedisReactiveCommands;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.lettuce.core.cluster.RedisClusterClient;
+import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
 import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
@@ -78,7 +79,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         cache.put("K1", "V1");
-        Thread.sleep(200);
+        Thread.sleep(100);
         Assert.assertEquals("V1", cache.get("K1"));
     }
 
@@ -103,11 +104,8 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         RedisURI node1 = RedisURI.create("127.0.0.1", 7000);
         RedisURI node2 = RedisURI.create("127.0.0.1", 7001);
         RedisURI node3 = RedisURI.create("127.0.0.1", 7002);
-        RedisClient client = RedisClient.create();
-        StatefulRedisMasterSlaveConnection con = MasterSlave.connect(
-                client,
-                new JetCacheCodec(),
-                Arrays.asList(node1, node2, node3));
+        RedisClusterClient client = RedisClusterClient.create(Arrays.asList(node1, node2, node3));
+        StatefulRedisClusterConnection con = client.connect(new JetCacheCodec());
         con.setReadFrom(ReadFrom.SLAVE_PREFERRED);
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
@@ -115,7 +113,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         cache.put("K1", "V1");
-        Thread.sleep(200);
+        Thread.sleep(100);
         Assert.assertEquals("V1", cache.get("K1"));
     }
 
