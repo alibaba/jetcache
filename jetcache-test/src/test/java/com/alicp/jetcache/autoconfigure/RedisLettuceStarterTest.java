@@ -77,7 +77,7 @@ public class RedisLettuceStarterTest extends SpringTest {
             Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterReactiveCommands.class).getObject() instanceof RedisClusterReactiveCommands);
 
             key = "remote.A2_slave";
-            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterClient.class).getObject() instanceof RedisClient);
+            Assert.assertTrue(new LettuceFactory(acb, key, RedisClusterClient.class).getObject() instanceof RedisClusterClient);
         }
     }
 
