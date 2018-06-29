@@ -103,7 +103,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
         RedisURI node2 = RedisURI.create("127.0.0.1", 7001);
         RedisURI node3 = RedisURI.create("127.0.0.1", 7002);
         RedisClusterClient client = RedisClusterClient.create(Arrays.asList(node1, node2, node3));
-        StatefulRedisClusterConnection con = client.connect();
+        StatefulRedisClusterConnection con = client.connect(new JetCacheCodec());
         con.setReadFrom(ReadFrom.SLAVE_PREFERRED);
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
