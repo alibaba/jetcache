@@ -78,7 +78,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         cache.put("K1", "V1");
-        Thread.sleep(200);
+        Thread.sleep(100);
         Assert.assertEquals("V1", cache.get("K1"));
     }
 
@@ -111,7 +111,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
         cache.put("K1", "V1");
-        Thread.sleep(1000);
+        Thread.sleep(100);
         Assert.assertEquals("V1", cache.get("K1"));
     }
 
