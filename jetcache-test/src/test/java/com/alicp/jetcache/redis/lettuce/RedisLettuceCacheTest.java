@@ -96,7 +96,6 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
     }
 
     @Test
-    @Ignore
     public void testCluster2() throws Exception {
         if (!checkOS()) {
             return;
