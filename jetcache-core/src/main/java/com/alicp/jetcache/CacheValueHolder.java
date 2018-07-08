@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * Created on 16/9/13.
- *
+ * This class is not thread safe.
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public final class CacheValueHolder<V> implements Serializable {
