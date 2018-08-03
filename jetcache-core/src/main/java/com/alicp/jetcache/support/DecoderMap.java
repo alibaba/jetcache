@@ -31,7 +31,7 @@ public class DecoderMap {
 
     static void registerBuildInDecoder() {
         if (!inited) {
-            register(JavaValueEncoder.IDENTITY_NUMBER, JavaValueDecoder.INSTANCE);
+            register(JavaValueEncoder.IDENTITY_NUMBER, SpringJavaValueDecoder.defaultJavaValueDecoder());
             register(KryoValueEncoder.IDENTITY_NUMBER, KryoValueDecoder.INSTANCE);
             inited = true;
         }

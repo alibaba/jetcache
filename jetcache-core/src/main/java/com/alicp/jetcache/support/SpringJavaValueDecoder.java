@@ -13,6 +13,9 @@ import java.io.ObjectInputStream;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class SpringJavaValueDecoder extends JavaValueDecoder {
+
+    public static final SpringJavaValueDecoder INSTANCE = new SpringJavaValueDecoder(true);
+
     public SpringJavaValueDecoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
     }
@@ -20,5 +23,14 @@ public class SpringJavaValueDecoder extends JavaValueDecoder {
     @Override
     protected ObjectInputStream buildObjectInputStream(ByteArrayInputStream in) throws IOException {
         return new ConfigurableObjectInputStream(in, Thread.currentThread().getContextClassLoader());
+    }
+
+    public static JavaValueDecoder defaultJavaValueDecoder() {
+        try {
+            Class.forName("org.springframework.core.ConfigurableObjectInputStream");
+            return INSTANCE;
+        } catch (ClassNotFoundException e) {
+            return JavaValueDecoder.INSTANCE;
+        }
     }
 }
