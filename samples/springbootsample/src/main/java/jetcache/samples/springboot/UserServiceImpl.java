@@ -1,7 +1,7 @@
 /**
  * Created on 2018/8/11.
  */
-package jetcache;
+package jetcache.samples.springboot;
 
 import org.springframework.stereotype.Repository;
 

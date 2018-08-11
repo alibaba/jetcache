@@ -1,7 +1,7 @@
 /**
  * Created on 2018/8/11.
  */
-package jetcache;
+package jetcache.samples.springboot;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
