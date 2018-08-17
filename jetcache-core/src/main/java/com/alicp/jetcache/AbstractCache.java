@@ -181,6 +181,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                 if (create[0]) {
                     // collect need load keys
                     lockMap.put(key, new AbstractMap.SimpleEntry<>(lockKey, ll));
+                    break;
                 } else {
                     try {
                         ll.signal.await();
