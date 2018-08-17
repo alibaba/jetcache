@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2017/5/17.
@@ -71,30 +72,51 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                 Map<K, V> loadResult;
                 try {
                     loadResult = loader.loadAll(keysNeedLoad);
-                    for (Map.Entry<K, V> en : loadResult.entrySet()) {
-                        K key = en.getKey();
-                        V loadedValue = en.getValue();
-                        if (needUpdate(loadedValue, loader)) {
-                            PUT(key, loadedValue);
-                        }
+
+                    CacheLoader<K, V> theLoader = loader;
+                    Map<K, V> updateValues = loadResult.entrySet().stream()
+                            .filter(kvEntry -> needUpdate(kvEntry.getValue(), theLoader))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                    // batch put
+                    if (!updateValues.isEmpty()) {
+                        PUT_ALL(updateValues);
                     }
+
                 } catch (Throwable e) {
                     throw new CacheInvokeException(e);
                 }
                 kvMap.putAll(loadResult);
             } else {
                 AbstractCache<K, V> abstractCache = CacheUtil.getAbstractCache(cache);
-                loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
-                for(K key : keysNeedLoad) {
-                    Consumer<V> cacheUpdater = (v) -> {
-                        if(needUpdate(v, config.getLoader())) {
-                            PUT(key, v);
-                        }
-                    };
-                    V v = AbstractCache.synchronizedLoad(abstractCache, key, loader,
-                            cacheUpdater, abstractCache.initOrGetLoaderMap());
-                    kvMap.put(key, v);
-                }
+                CacheLoader<K, V> theLoader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
+
+                Consumer<Map<K, V>> cacheUpdater = (Map<K, V> kv) -> {
+
+                    Map<K, V> updateValues = kv.entrySet().stream()
+                            .filter(kvEntry -> needUpdate(kvEntry.getValue(), theLoader))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                    // batch put
+                    if (!updateValues.isEmpty()) {
+                        PUT_ALL(updateValues);
+                    }
+                };
+
+                Map<K, V> map = AbstractCache.synchronizedLoad(abstractCache, keysNeedLoad, new Function<Set<K>, Map<K, V>>() {
+                            @Override
+                            public Map<K, V> apply(Set<K> ks) {
+                                try {
+                                    return theLoader.loadAll(ks);
+                                } catch (Throwable e) {
+                                    throw new CacheInvokeException(e.getMessage(), e);
+                                }
+                            }
+                        },
+                        cacheUpdater, abstractCache.initOrGetLoaderMap());
+
+
+                kvMap.putAll(map);
             }
             return kvMap;
         } else {

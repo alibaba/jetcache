@@ -8,14 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2016/10/7.
@@ -27,6 +26,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
 
     private ConcurrentHashMap<Object, LoaderLock> loaderMap;
+
 
     ConcurrentHashMap<Object, LoaderLock> initOrGetLoaderMap() {
         if (loaderMap == null) {
@@ -158,6 +158,67 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
             return loadedValue;
         }
+    }
+
+    static <K, V> Map<K, V> synchronizedLoad(Cache<K,V> abstractCache, Set<K> keys, Function<Set<K>, Map<K, V>> newLoader,
+                                             Consumer<Map<K, V>> cacheUpdater,
+                                             ConcurrentHashMap<Object, LoaderLock> loaderMap) {
+        Map<K, V> loadedValues = new HashMap<>();
+
+        // value is [lockKey, LoaderLock]
+        Map<K, Map.Entry<Object, LoaderLock>> lockMap = new HashMap<>();
+
+        for (K key : keys) {
+            Object lockKey = buildLoaderLockKey(abstractCache, key);
+
+            while (true) {
+                boolean create[] = new boolean[1];
+                LoaderLock ll = loaderMap.computeIfAbsent(lockKey, (unusedKey) -> {
+                    create[0] = true;
+                    LoaderLock loaderLock = new LoaderLock();
+                    return loaderLock;
+                });
+                if (create[0]) {
+                    // collect need load keys
+                    lockMap.put(key, new AbstractMap.SimpleEntry<>(lockKey, ll));
+                } else {
+                    try {
+                        ll.signal.await();
+                        if (ll.success) {
+                            loadedValues.put(key, (V) ll.value);
+                            break;
+                        } else {
+                            continue;
+                        }
+                    } catch (InterruptedException e) {
+                        throw new CacheException("loader wait interrupted", e);
+                    }
+                }
+            }
+        }
+
+        if (!lockMap.isEmpty()) {
+
+            try {
+                Map<K, V> newLoadedValues = newLoader.apply(lockMap.keySet());
+
+                for (Map.Entry<K, Map.Entry<Object, LoaderLock>> lockEntry : lockMap.entrySet()) {
+                    lockEntry.getValue().getValue().success = true;
+                    lockEntry.getValue().getValue().value = newLoadedValues.get(lockEntry.getKey());
+                }
+
+                loadedValues.putAll(newLoadedValues);
+                cacheUpdater.accept(newLoadedValues);
+            } finally {
+                for (Map.Entry<K, Map.Entry<Object, LoaderLock>> lockEntry : lockMap.entrySet()) {
+                    loaderMap.remove(lockEntry.getValue().getKey());
+                    lockEntry.getValue().getValue().signal.countDown();
+                }
+            }
+
+        }
+
+        return loadedValues;
     }
 
     static <K, V> V synchronizedLoad(Cache<K,V> abstractCache, K key, Function<K, V> newLoader,
