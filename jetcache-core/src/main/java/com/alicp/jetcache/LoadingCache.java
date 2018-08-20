@@ -65,7 +65,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                     keysNeedLoad.add(k);
                 }
             });
-            if (!config.isCachePenetrationProtect()) {
+            if (!loader.needCachePenetrationProtect(keysNeedLoad, config.isCachePenetrationProtect()) ) {
                 if (eventConsumer != null) {
                     loader = CacheUtil.createProxyLoader(cache, loader, eventConsumer);
                 }

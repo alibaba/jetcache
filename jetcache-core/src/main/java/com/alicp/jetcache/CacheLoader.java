@@ -38,4 +38,13 @@ public interface CacheLoader<K, V> extends Function<K ,V> {
         return false;
     }
 
+    /**
+     * have a chance to disable cachePenetrationProtect when use <code>loadAll</code>
+     * @param keys keys to loading.
+     * @param configValue value in config
+     * @return
+     */
+    default boolean needCachePenetrationProtect(Set<K> keys, boolean configValue) {
+        return configValue;
+    }
 }
