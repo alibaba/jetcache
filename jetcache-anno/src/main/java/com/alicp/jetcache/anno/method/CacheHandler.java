@@ -4,15 +4,14 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.support.CachedAnnoConfig;
-import com.alicp.jetcache.anno.support.CacheContext;
-import com.alicp.jetcache.anno.support.ConfigMap;
+import com.alicp.jetcache.anno.support.*;
 import com.alicp.jetcache.event.CacheLoadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -103,33 +102,74 @@ public class CacheHandler implements InvocationHandler {
         CacheInvokeConfig cic = context.getCacheInvokeConfig();
 
         if (cic.getInvalidateAnnoConfig() != null) {
-            Cache cache = context.getCacheFunction().apply(context, cic.getInvalidateAnnoConfig());
-            if (cache != null) {
-                boolean condition = ExpressionUtil.evalCondition(context, cic.getInvalidateAnnoConfig());
-                if (condition) {
-                    Object key = ExpressionUtil.evalKey(context, cic.getInvalidateAnnoConfig());
-                    if (key != null) {
-                        cache.remove(key);
-                    }
-                }
-            }
+            doInvalidate(context, cic);
         }
 
-        if (cic.getUpdateAnnoConfig() != null) {
-            Cache cache = context.getCacheFunction().apply(context, cic.getUpdateAnnoConfig());
-            if (cache != null) {
-                boolean condition = ExpressionUtil.evalCondition(context, cic.getUpdateAnnoConfig());
-                if (condition) {
-                    Object key = ExpressionUtil.evalKey(context, cic.getUpdateAnnoConfig());
-                    Object value = ExpressionUtil.evalValue(context, cic.getUpdateAnnoConfig());
-                    if (key != null && value != ExpressionUtil.EVAL_FAILED) {
-                        cache.put(key, value);
-                    }
-                }
-            }
+        CacheUpdateAnnoConfig updateAnnoConfig = cic.getUpdateAnnoConfig();
+        if (updateAnnoConfig != null) {
+            doUpdate(context, updateAnnoConfig);
         }
 
         return originResult;
+    }
+
+    private static void doInvalidate(CacheInvokeContext context, CacheInvokeConfig cic) {
+        CacheInvalidateAnnoConfig annoConfig = cic.getInvalidateAnnoConfig();
+        Cache cache = context.getCacheFunction().apply(context, annoConfig);
+        if (cache == null) {
+            return;
+        }
+        boolean condition = ExpressionUtil.evalCondition(context, annoConfig);
+        if (!condition) {
+            return;
+        }
+        Object key = ExpressionUtil.evalKey(context, annoConfig);
+        if (key == null) {
+            return;
+        }
+        if (annoConfig.isMulti() && (key instanceof Iterable)) {
+            Iterable it = (Iterable) key;
+            Set keys = new HashSet();
+            it.forEach(k -> keys.add(k));
+            cache.removeAll(keys);
+        } else {
+            cache.remove(key);
+        }
+    }
+
+    private static void doUpdate(CacheInvokeContext context, CacheUpdateAnnoConfig updateAnnoConfig) {
+        Cache cache = context.getCacheFunction().apply(context, updateAnnoConfig);
+        if (cache == null) {
+            return;
+        }
+        boolean condition = ExpressionUtil.evalCondition(context, updateAnnoConfig);
+        if (!condition) {
+            return;
+        }
+        Object key = ExpressionUtil.evalKey(context, updateAnnoConfig);
+        Object value = ExpressionUtil.evalValue(context, updateAnnoConfig);
+        if (key == null || value == ExpressionUtil.EVAL_FAILED) {
+            return;
+        }
+        if (updateAnnoConfig.isMulti() && (key instanceof Iterable) && (value instanceof Iterable)) {
+            Iterable keyIt = (Iterable) key;
+            Iterable valueIt = (Iterable) key;
+            List keyList = new ArrayList();
+            List valueList = new ArrayList();
+            keyIt.forEach(o -> keyList.add(o));
+            valueIt.forEach(o -> valueList.add(o));
+            if (keyList.size() != valueList.size()) {
+                logger.error("key size not equals with value size: " + updateAnnoConfig.getDefineMethod());
+            } else {
+                Map m = new HashMap();
+                for (int i = 0; i < valueList.size(); i++) {
+                    m.put(keyList.get(i), valueList.get(i));
+                }
+                cache.putAll(m);
+            }
+        } else {
+            cache.put(key, value);
+        }
     }
 
     private static Object invokeWithCached(CacheInvokeContext context)
@@ -187,7 +227,7 @@ public class CacheHandler implements InvocationHandler {
         } finally {
             t = System.currentTimeMillis() - t;
             CacheLoadEvent event = new CacheLoadEvent(cache, t, key, v, success);
-            while(cache instanceof ProxyCache){
+            while (cache instanceof ProxyCache) {
                 cache = ((ProxyCache) cache).getTargetCache();
             }
             if (cache instanceof AbstractCache) {

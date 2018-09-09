@@ -14,6 +14,7 @@ public interface CacheConsts {
     int DEFAULT_LOCAL_LIMIT = 100;
     boolean DEFAULT_CACHE_NULL_VALUE = false;
     String DEFAULT_SERIAL_POLICY = SerialPolicy.JAVA;
+    boolean DEFAULT_MULTI = false;
 
     String UNDEFINED_STRING = "$$undefined$$";
     int UNDEFINED_INT = Integer.MIN_VALUE;

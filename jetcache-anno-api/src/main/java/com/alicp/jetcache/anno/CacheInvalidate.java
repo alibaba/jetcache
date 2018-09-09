@@ -38,4 +38,10 @@ public @interface CacheInvalidate {
      * Evaluation occurs after real method invocation so we can refer <code>#result</code> in script.
      */
     String condition() default CacheConsts.UNDEFINED_STRING;
+
+    /**
+     * If evaluated key is a instance of java.lang.Iterable,
+     * set multi to true indicates jetcache to invalidate each element of the iterable keys.
+     */
+    boolean multi() default CacheConsts.DEFAULT_MULTI;
 }
