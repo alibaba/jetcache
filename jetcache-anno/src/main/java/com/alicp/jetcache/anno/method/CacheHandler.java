@@ -9,6 +9,7 @@ import com.alicp.jetcache.event.CacheLoadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -113,6 +114,25 @@ public class CacheHandler implements InvocationHandler {
         return originResult;
     }
 
+    private static Iterable toIterable(Object obj) {
+        if (obj.getClass().isArray()) {
+            if(obj instanceof Object[]) {
+                return Arrays.asList((Object[]) obj);
+            } else {
+                List list = new ArrayList();
+                int len = Array.getLength(obj);
+                for (int i = 0; i < len; i++) {
+                    list.add(Array.get(obj, i));
+                }
+                return list;
+            }
+        } else if (obj instanceof Iterable) {
+            return (Iterable) obj;
+        } else {
+            return null;
+        }
+    }
+
     private static void doInvalidate(CacheInvokeContext context, CacheInvokeConfig cic) {
         CacheInvalidateAnnoConfig annoConfig = cic.getInvalidateAnnoConfig();
         Cache cache = context.getCacheFunction().apply(context, annoConfig);
@@ -127,8 +147,12 @@ public class CacheHandler implements InvocationHandler {
         if (key == null) {
             return;
         }
-        if (annoConfig.isMulti() && (key instanceof Iterable)) {
-            Iterable it = (Iterable) key;
+        if (annoConfig.isMulti()) {
+            Iterable it = toIterable(key);
+            if (it == null) {
+                logger.error("jetcache @CacheInvalidate key is not instance of Iterable or array: " + annoConfig.getDefineMethod());
+                return;
+            }
             Set keys = new HashSet();
             it.forEach(k -> keys.add(k));
             cache.removeAll(keys);
@@ -151,15 +175,28 @@ public class CacheHandler implements InvocationHandler {
         if (key == null || value == ExpressionUtil.EVAL_FAILED) {
             return;
         }
-        if (updateAnnoConfig.isMulti() && (key instanceof Iterable) && (value instanceof Iterable)) {
-            Iterable keyIt = (Iterable) key;
-            Iterable valueIt = (Iterable) key;
+        if (updateAnnoConfig.isMulti()) {
+            if (value == null) {
+                return;
+            }
+            Iterable keyIt = toIterable(key);
+            Iterable valueIt = toIterable(value);
+            if (keyIt == null) {
+                logger.error("jetcache @CacheUpdate key is not instance of Iterable or array: " + updateAnnoConfig.getDefineMethod());
+                return;
+            }
+            if(valueIt == null) {
+                logger.error("jetcache @CacheUpdate value is not instance of Iterable or array: " + updateAnnoConfig.getDefineMethod());
+                return;
+            }
+
             List keyList = new ArrayList();
             List valueList = new ArrayList();
             keyIt.forEach(o -> keyList.add(o));
             valueIt.forEach(o -> valueList.add(o));
             if (keyList.size() != valueList.size()) {
-                logger.error("key size not equals with value size: " + updateAnnoConfig.getDefineMethod());
+                logger.error("jetcache @CacheUpdate key size not equals with value size: " + updateAnnoConfig.getDefineMethod());
+                return;
             } else {
                 Map m = new HashMap();
                 for (int i = 0; i < valueList.size(); i++) {

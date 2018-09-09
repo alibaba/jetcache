@@ -63,7 +63,7 @@ public class CacheHandlerInvalidateTest {
         cacheInvokeConfig.setCachedAnnoConfig(null);
         cacheInvokeContext.setMethod(method);
         cacheInvokeContext.setArgs(new Object[]{"KEY", 1000});
-        cacheInvokeContext.setInvoker(() -> cacheInvokeContext.getMethod().invoke(count, cacheInvokeContext.getArgs()));
+        cacheInvokeContext.setInvoker(() -> method.invoke(count, cacheInvokeContext.getArgs()));
         cacheInvokeContext.setCacheFunction((a, b) -> cache);
 
     }
@@ -105,5 +105,58 @@ public class CacheHandlerInvalidateTest {
         invalidateAnnoConfig.setKey("bad key script");
         CacheHandler.invoke(cacheInvokeContext);
         assertNotNull(cache.get("KEY"));
+    }
+
+
+    static class TestMulti {
+        public void update(String keys) {
+        }
+
+        public void update(String keys[]) {
+        }
+    }
+
+    @Test
+    public void testMulti() throws Throwable {
+        {
+            Method method = TestMulti.class.getMethod("update", String[].class);
+            invalidateAnnoConfig.setDefineMethod(method);
+            invalidateAnnoConfig.setKey("args[0]");
+            cacheInvokeContext.setMethod(method);
+            cacheInvokeContext.setArgs(new Object[]{new String[]{"K1", "K2"}});
+            cacheInvokeContext.setInvoker(() -> method.invoke(new TestMulti(), cacheInvokeContext.getArgs()));
+
+            cache.put("K1", "V1");
+            cache.put("K2", "V1");
+
+            CacheHandler.invoke(cacheInvokeContext);
+            assertNotNull(cache.get("K1"));
+            assertNotNull(cache.get("K2"));
+
+            invalidateAnnoConfig.setMulti(true);
+
+            cacheInvokeContext.setArgs(new Object[]{null});
+            CacheHandler.invoke(cacheInvokeContext);
+            assertNotNull(cache.get("K1"));
+            assertNotNull(cache.get("K2"));
+
+            cacheInvokeContext.setArgs(new Object[]{new String[]{"K1", "K2"}});
+            CacheHandler.invoke(cacheInvokeContext);
+            assertNull(cache.get("K1"));
+            assertNull(cache.get("K2"));
+        }
+        {
+            cache.put("K1", "V1");
+            Method method = TestMulti.class.getMethod("update", String.class);
+            invalidateAnnoConfig.setDefineMethod(method);
+            invalidateAnnoConfig.setKey("args[0]");
+            cacheInvokeContext.setMethod(method);
+            cacheInvokeContext.setArgs(new Object[]{"K1"});
+            cacheInvokeContext.setInvoker(() -> method.invoke(new TestMulti(), cacheInvokeContext.getArgs()));
+
+            invalidateAnnoConfig.setMulti(true);
+            CacheHandler.invoke(cacheInvokeContext);
+            assertNotNull(cache.get("K1"));
+        }
     }
 }
