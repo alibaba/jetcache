@@ -45,7 +45,7 @@ public @interface CacheUpdate {
     String condition() default CacheConsts.UNDEFINED_STRING;
 
     /**
-     * If both evaluated key and value are instance of java.lang.Iterable,
+     * If both evaluated key and value are array or instance of java.lang.Iterable,
      * set multi to true indicates jetcache to update K/V pair to cache instead of update single converted K/V.
      */
     boolean multi() default CacheConsts.DEFAULT_MULTI;
