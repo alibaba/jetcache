@@ -556,12 +556,11 @@ public abstract class AbstractCacheTest {
     private volatile AtomicLong lockAtommicCount2;
 
     protected void concurrentTest(int threadCount, int limit, int timeInMillis) throws Exception {
-        concurrentTest(threadCount, limit * 5, timeInMillis, true);
         concurrentTest(threadCount, limit, timeInMillis, false);
+        concurrentTest(threadCount, limit, timeInMillis, true);
     }
 
-    private void concurrentTest(int threadCount, int limit, int timeInMillis, boolean overflow) throws Exception {
-        int count = limit / threadCount;
+    private void concurrentTest(int threadCount, int limit, int timeInMillis, boolean lockTest) throws Exception {
         lockAtommicCount1 = new AtomicLong();
         lockAtommicCount2 = new AtomicLong();
         lockCount1 = new AtomicLong();
@@ -577,6 +576,7 @@ public abstract class AbstractCacheTest {
             }
 
             private void task1() {
+                int count = limit / threadCount;
                 int i = 0;
                 while (!stop) {
                     if (++i >= count) {
@@ -639,7 +639,7 @@ public abstract class AbstractCacheTest {
             @Override
             public void run() {
                 try {
-                    if (overflow) {
+                    if (!lockTest) {
                         task1();
                     } else {
                         task2();
