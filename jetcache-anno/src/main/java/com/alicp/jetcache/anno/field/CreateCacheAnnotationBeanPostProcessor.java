@@ -51,7 +51,12 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
     @Override
     public PropertyValues postProcessPropertyValues(
             PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeanCreationException {
+        return postProcessProperties(pvs, bean, beanName);
+    }
 
+    //@Override
+    //since 5.1
+    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
         InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
         try {
             metadata.inject(bean, beanName, pvs);
