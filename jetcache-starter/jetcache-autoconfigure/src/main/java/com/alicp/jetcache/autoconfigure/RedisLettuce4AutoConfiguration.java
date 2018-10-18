@@ -6,8 +6,10 @@ import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.lettuce4.LettuceConnectionManager;
 import com.alicp.jetcache.redis.lettuce4.RedisLettuceCacheBuilder;
 import com.lambdaworks.redis.AbstractRedisClient;
+import com.lambdaworks.redis.ClientOptions;
 import com.lambdaworks.redis.RedisClient;
 import com.lambdaworks.redis.RedisURI;
+import com.lambdaworks.redis.cluster.ClusterClientOptions;
 import com.lambdaworks.redis.cluster.RedisClusterClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -54,10 +56,15 @@ public class RedisLettuce4AutoConfiguration {
             } else if (map.size() == 1) {
                 String uri = (String) map.values().iterator().next();
                 client = RedisClient.create(uri);
+                client = RedisClient.create(uri);
+                ((RedisClient)client).setOptions(ClientOptions.builder().
+                        disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
             } else {
                 List<RedisURI> list = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
                         .collect(Collectors.toList());
                 client = RedisClusterClient.create(list);
+                ((RedisClusterClient)client).setOptions(ClusterClientOptions.builder().
+                        disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
             }
 
             ExternalCacheBuilder externalCacheBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()

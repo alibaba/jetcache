@@ -6,11 +6,9 @@ import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.lettuce.JetCacheCodec;
 import com.alicp.jetcache.redis.lettuce.LettuceConnectionManager;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
-import io.lettuce.core.AbstractRedisClient;
-import io.lettuce.core.ReadFrom;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.RedisURI;
+import io.lettuce.core.*;
 import io.lettuce.core.api.StatefulConnection;
+import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.masterslave.MasterSlave;
@@ -68,8 +66,12 @@ public class RedisLettuceAutoConfiguration {
                 String uri = (String) map.values().iterator().next();
                 if (readFrom == null) {
                     client = RedisClient.create(uri);
+                    ((RedisClient)client).setOptions(ClientOptions.builder().
+                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
                 } else {
                     client = RedisClient.create();
+                    ((RedisClient)client).setOptions(ClientOptions.builder().
+                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
                     StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
                             (RedisClient) client,
                             new JetCacheCodec(),
@@ -81,6 +83,8 @@ public class RedisLettuceAutoConfiguration {
                 List<RedisURI> list = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
                         .collect(Collectors.toList());
                 client = RedisClusterClient.create(list);
+                ((RedisClusterClient)client).setOptions(ClusterClientOptions.builder().
+                        disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
                 if (readFrom != null) {
                     StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
                     c.setReadFrom(readFrom);
