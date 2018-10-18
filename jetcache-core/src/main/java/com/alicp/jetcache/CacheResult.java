@@ -1,5 +1,7 @@
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.anno.CacheConsts;
+
 import java.time.Duration;
 import java.util.concurrent.*;
 
@@ -22,7 +24,7 @@ public class CacheResult {
     private String message;
     private CompletionStage<ResultData> future;
 
-    private static Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
+    private static Duration DEFAULT_TIMEOUT = CacheConsts.ASYNC_RESULT_TIMEOUT;
     private Duration timeout = DEFAULT_TIMEOUT;
 
     public CacheResult(CompletionStage<ResultData> future) {
