@@ -14,6 +14,8 @@ public class CacheResult {
 
     public static final String MSG_ILLEGAL_ARGUMENT = "illegal argument";
 
+    private static Duration DEFAULT_TIMEOUT = CacheConsts.ASYNC_RESULT_TIMEOUT;
+
     public static final CacheResult SUCCESS_WITHOUT_MSG = new CacheResult(CacheResultCode.SUCCESS, null);
     public static final CacheResult PART_SUCCESS_WITHOUT_MSG = new CacheResult(CacheResultCode.PART_SUCCESS, null);
     public static final CacheResult FAIL_WITHOUT_MSG = new CacheResult(CacheResultCode.FAIL, null);
@@ -24,7 +26,6 @@ public class CacheResult {
     private String message;
     private CompletionStage<ResultData> future;
 
-    private static Duration DEFAULT_TIMEOUT = CacheConsts.ASYNC_RESULT_TIMEOUT;
     private Duration timeout = DEFAULT_TIMEOUT;
 
     public CacheResult(CompletionStage<ResultData> future) {
