@@ -3,6 +3,8 @@
  */
 package com.alicp.jetcache.anno;
 
+import java.time.Duration;
+
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -15,6 +17,8 @@ public interface CacheConsts {
     boolean DEFAULT_CACHE_NULL_VALUE = false;
     String DEFAULT_SERIAL_POLICY = SerialPolicy.JAVA;
     boolean DEFAULT_MULTI = false;
+
+    Duration ASYNC_RESULT_TIMEOUT = Duration.ofMillis(1000);
 
     String UNDEFINED_STRING = "$$undefined$$";
     int UNDEFINED_INT = Integer.MIN_VALUE;

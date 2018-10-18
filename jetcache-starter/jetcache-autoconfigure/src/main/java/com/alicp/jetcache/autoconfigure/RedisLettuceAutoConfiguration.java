@@ -2,6 +2,7 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.lettuce.JetCacheCodec;
 import com.alicp.jetcache.redis.lettuce.LettuceConnectionManager;
@@ -53,6 +54,8 @@ public class RedisLettuceAutoConfiguration {
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
             Map<String, Object> map = ct.subTree("uri"/*there is no dot*/).getProperties();
             String readFromStr = ct.getProperty("readFrom");
+            long asyncResultTimeoutInMillis = Long.parseLong(
+                    ct.getProperty("asyncResultTimeoutInMillis", Long.toString(CacheConsts.ASYNC_RESULT_TIMEOUT.toMillis())));
             ReadFrom readFrom = null;
             if (readFromStr != null) {
                 readFrom = ReadFrom.valueOf(readFromStr.trim());
@@ -94,7 +97,8 @@ public class RedisLettuceAutoConfiguration {
 
             ExternalCacheBuilder externalCacheBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                     .connection(connection)
-                    .redisClient(client);
+                    .redisClient(client)
+                    .asyncResultTimeoutInMillis(asyncResultTimeoutInMillis);
             parseGeneralConfig(externalCacheBuilder, ct);
 
             // eg: "remote.default.client"
