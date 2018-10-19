@@ -1,5 +1,3 @@
-package com.alicp.jetcache.examples;
-
 import com.alibaba.fastjson.JSON;
 import com.alicp.jetcache.support.AbstractValueDecoder;
 

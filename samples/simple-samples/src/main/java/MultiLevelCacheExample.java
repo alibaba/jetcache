@@ -1,5 +1,3 @@
-package com.alicp.jetcache.examples;
-
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.embedded.CaffeineCache;

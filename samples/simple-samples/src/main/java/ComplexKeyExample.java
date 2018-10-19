@@ -1,5 +1,3 @@
-package com.alicp.jetcache.examples;
-
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
