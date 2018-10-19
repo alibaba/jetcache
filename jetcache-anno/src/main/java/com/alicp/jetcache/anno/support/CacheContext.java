@@ -108,6 +108,16 @@ public class CacheContext {
         return cache;
     }
 
+    public <K, V> Cache<K, V> getCache(String cacheName) {
+        return getCache(CacheConsts.DEFAULT_AREA, cacheName);
+    }
+
+    public <K, V> Cache<K, V> getCache(String area, String cacheName) {
+        String fullCacheName = area + "_" + cacheName;
+        Cache cache = cacheManager.get(fullCacheName);
+        return cache;
+    }
+
     public Cache __createOrGetCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         String fullCacheName = area + "_" + cacheName;
         Cache cache = cacheManager.get(fullCacheName);

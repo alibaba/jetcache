@@ -22,6 +22,7 @@ import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -74,6 +75,10 @@ public class CreateCacheTest extends SpringTest {
         }
 
         public static class Foo extends AbstractCacheTest {
+
+            @Autowired
+            private GlobalCacheConfig globalCacheConfig;
+
             @CreateCache
             private Cache cache1;
 
@@ -131,6 +136,8 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertNull(cache2.get("KK1"));
 
                 Assert.assertSame(getTarget(cacheSameName1), getTarget(cacheSameName2));
+                Assert.assertSame(getTarget(cacheSameName1),
+                        getTarget(globalCacheConfig.getCacheContext().getCache("sameCacheName")));
                 Assert.assertNotSame(getTarget(cacheSameName1), getTarget(cache1));
 
                 cacheSameName1.put("SameKey", "SameValue");
