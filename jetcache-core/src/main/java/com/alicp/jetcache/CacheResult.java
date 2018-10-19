@@ -45,6 +45,10 @@ public class CacheResult {
     }
 
     protected void waitForResult() {
+        waitForResult(timeout);
+    }
+
+    public void waitForResult(Duration timeout) {
         if (resultCode != null) {
             return;
         }
