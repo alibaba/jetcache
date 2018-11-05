@@ -58,7 +58,7 @@ public class JetCacheAutoConfiguration {
         }
         _globalCacheConfig = new GlobalCacheConfig();
         _globalCacheConfig.setConfigProvider(configProvider);
-        _globalCacheConfig.setHiddenPackages(props.getHidePackages());
+        _globalCacheConfig.setHiddenPackages(props.getHiddenPackages());
         _globalCacheConfig.setStatIntervalMinutes(props.getStatIntervalMinutes());
         _globalCacheConfig.setAreaInCacheName(props.isAreaInCacheName());
         _globalCacheConfig.setPenetrationProtect(props.isPenetrationProtect());
