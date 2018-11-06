@@ -161,6 +161,7 @@ public class CacheContext {
                     .expireAfterWrite(remote.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                     .addCache(local, remote)
                     .useExpireOfSubCache(useExpireOfSubCache)
+                    .cacheNullValue(cachedAnnoConfig.isCacheNullValue())
                     .buildCache();
         }
         cache.config().setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
