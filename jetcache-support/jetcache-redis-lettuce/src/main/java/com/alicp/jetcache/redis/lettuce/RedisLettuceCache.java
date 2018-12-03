@@ -127,7 +127,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
                 RedisFuture<String> resp = stringAsyncCommands.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
+                future = future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
             }
             CacheResult result = new CacheResult(future.handle((failCount, ex) -> {
                 if (ex != null) {
