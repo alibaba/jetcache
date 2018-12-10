@@ -3,6 +3,8 @@ package com.alicp.jetcache.test;
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.*;
@@ -20,6 +22,7 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public abstract class AbstractCacheTest {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     protected Cache<Object, Object> cache;
 
     protected void baseTest() throws Exception {
@@ -227,9 +230,9 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V2", cache.get("PIA_K2"));
         Assert.assertTrue(cache.remove("PIA_K2"));
 
-        Assert.assertTrue(cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).isSuccess());
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
         Thread.sleep(10);
-        Assert.assertTrue(cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).isSuccess());
+        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
         cache.remove("PIA_K3");
     }
 
@@ -603,7 +606,7 @@ public abstract class AbstractCacheTest {
                     m.put(k2, value);
                     Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
                     MultiGetResult<Object, Object> multiGetResult = cache.GET_ALL(m.keySet());
-                    Assert.assertTrue(multiGetResult.isSuccess());
+                    Assert.assertEquals(CacheResultCode.SUCCESS, multiGetResult.getResultCode());
                     checkResult(k2, value, multiGetResult.getValues().get(k2));
                     Assert.assertTrue(cache.REMOVE_ALL(m.keySet()).isSuccess());
                 }
@@ -639,26 +642,27 @@ public abstract class AbstractCacheTest {
             @Override
             public void run() {
                 try {
+                    logger.info("Thread started");
                     if (!lockTest) {
                         task1();
                     } else {
                         task2();
                     }
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    logger.error("catch exception in thread", e);
                     cocurrentFail = true;
+                } finally {
+                    countDownLatch.countDown();
+                    logger.info("Thread finished");
                 }
-                countDownLatch.countDown();
             }
 
             private void checkResult(String key, Integer value, CacheGetResult result) {
                 if (result.getResultCode() != CacheResultCode.SUCCESS && result.getResultCode() != CacheResultCode.NOT_EXISTS) {
-                    System.out.println("key:" + key + ",code:" + result.getResultCode());
-                    cocurrentFail = true;
+                    throw new AssertionError("key:" + key + ",code:" + result.getResultCode() + ",msg=" + result.getMessage());
                 }
                 if (result.isSuccess() && !result.getValue().equals(value)) {
-                    System.out.println("key:" + key + ",value:" + result.getValue());
-                    cocurrentFail = true;
+                    throw new AssertionError("key:" + key + ",value:" + result.getValue() + ",msg=" + result.getMessage());
                 }
             }
         }
