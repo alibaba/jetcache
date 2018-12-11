@@ -1,6 +1,9 @@
 package com.alicp.jetcache.test;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.support.DefaultCacheMonitor;
+import com.alicp.jetcache.support.StatInfo;
+import com.alicp.jetcache.support.StatInfoLogger;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -14,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -549,6 +553,26 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(cache.get(d3));
     }
 
+    protected void doWithMonitor(Cache cache, Runnable runnable) {
+        DefaultCacheMonitor monitor = new DefaultCacheMonitor("concurrentTest");
+        cache.config().getMonitors().add(monitor);
+        StatInfoLogger statInfoLogger = new StatInfoLogger(true);
+
+        StatInfo statInfo = new StatInfo();
+        statInfo.setStartTime(System.currentTimeMillis());
+
+        try {
+            runnable.run();
+        } finally {
+            statInfo.setEndTime(System.currentTimeMillis());
+            statInfo.setStats(new ArrayList<>());
+            statInfo.getStats().add(monitor.getCacheStat());
+            statInfoLogger.accept(statInfo);
+
+            cache.config().getMonitors().remove(monitor);
+        }
+    }
+
 
     private volatile boolean cocurrentFail = false;
 
@@ -558,9 +582,23 @@ public abstract class AbstractCacheTest {
     private volatile AtomicLong lockAtommicCount1;
     private volatile AtomicLong lockAtommicCount2;
 
-    protected void concurrentTest(int threadCount, int limit, int timeInMillis) throws Exception {
-        concurrentTest(threadCount, limit, timeInMillis, false);
-        concurrentTest(threadCount, limit, timeInMillis, true);
+    protected void concurrentTest(int threadCount, int limit, int timeInMillis) {
+        doWithMonitor(cache, () -> {
+            try {
+                concurrentTest(threadCount, limit, timeInMillis, false);
+            } catch (Exception e) {
+                logger.error("", e);
+                throw new AssertionError(e);
+            }
+        });
+        doWithMonitor(cache, () -> {
+            try {
+                concurrentTest(threadCount, limit, timeInMillis, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                throw new AssertionError(e);
+            }
+        });
     }
 
     private void concurrentTest(int threadCount, int limit, int timeInMillis, boolean lockTest) throws Exception {
@@ -642,7 +680,6 @@ public abstract class AbstractCacheTest {
             @Override
             public void run() {
                 try {
-                    logger.info("Thread started");
                     if (!lockTest) {
                         task1();
                     } else {
@@ -653,7 +690,6 @@ public abstract class AbstractCacheTest {
                     cocurrentFail = true;
                 } finally {
                     countDownLatch.countDown();
-                    logger.info("Thread finished");
                 }
             }
 
@@ -666,6 +702,8 @@ public abstract class AbstractCacheTest {
                 }
             }
         }
+
+        logger.info("run concurrentTest, lockTest=" + lockTest);
 
         T[] t = new T[threadCount];
         for (int i = 0; i < threadCount; i++) {

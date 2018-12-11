@@ -186,6 +186,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
+        ((RedisLettuceCacheConfig) cache.config()).setAsyncResultTimeoutInMillis(1100);
         concurrentTest(thread, 500, time);
         LettuceConnectionManager.defaultManager().removeAndClose(client);
     }
