@@ -113,7 +113,7 @@ public @interface Cached {
     /**
      * Expression script used for conditioning the method cache updating,
      * the cache updating action is vetoed when the evaluation result is false.
-     * Evaluation occurs after real method invocation so we can refer <i>#result</i> in script.
+     * Evaluation occurs after real method invocation so we can refer <i>result</i> in script.
      */
     String postCondition() default CacheConsts.UNDEFINED_STRING;
 
