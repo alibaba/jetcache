@@ -56,7 +56,6 @@ public class RedisLettuce4AutoConfiguration {
             } else if (map.size() == 1) {
                 String uri = (String) map.values().iterator().next();
                 client = RedisClient.create(uri);
-                client = RedisClient.create(uri);
                 ((RedisClient)client).setOptions(ClientOptions.builder().
                         disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
             } else {
