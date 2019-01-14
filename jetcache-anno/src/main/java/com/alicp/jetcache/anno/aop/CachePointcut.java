@@ -87,6 +87,9 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         if (name.indexOf("$$EnhancerBySpringCGLIB$$") >= 0) {
             return true;
         }
+        if (name.indexOf("$$FastClassBySpringCGLIB$$") >= 0) {
+            return true;
+        }
         return false;
     }
 
