@@ -170,9 +170,11 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
             LoaderLock ll = loaderMap.computeIfAbsent(lockKey, (unusedKey) -> {
                 create[0] = true;
                 LoaderLock loaderLock = new LoaderLock();
+                loaderLock.signal = new CountDownLatch(1);
+                loaderLock.loaderThread = Thread.currentThread();
                 return loaderLock;
             });
-            if (create[0]) {
+            if (create[0] || ll.loaderThread == Thread.currentThread()) {
                 try {
                     loadedValue = newLoader.apply(key);
                     ll.success = true;
@@ -180,8 +182,10 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                     cacheUpdater.accept(loadedValue);
                     break;
                 } finally {
-                    loaderMap.remove(lockKey);
                     ll.signal.countDown();
+                    if (create[0]) {
+                        loaderMap.remove(lockKey);
+                    }
                 }
             } else {
                 try {
@@ -283,7 +287,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     protected abstract CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
 
     static class LoaderLock {
-        CountDownLatch signal = new CountDownLatch(1);
+        CountDownLatch signal;
+        Thread loaderThread;
         boolean success;
         Object value;
     }
