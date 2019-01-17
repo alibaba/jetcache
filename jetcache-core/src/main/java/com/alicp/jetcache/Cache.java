@@ -451,7 +451,7 @@ public interface Cache<K, V> extends Closeable {
      * @param expireAfterWrite the TTL(time to live) of the KV association
      * @param timeUnit the time unit of expireAfterWrite
      * @return SUCCESS if the specified key is not already associated with a value,
-     * or EXISTS if the specified key is not already associated with a value,
+     * or EXISTS if the specified key is already associated with a value,
      * or FAIL if error occurs.
      */
     CacheResult PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
