@@ -4,13 +4,13 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>TRACE</level>
         </filter>
     </appender>
     <appender name="NULL" class="ch.qos.logback.core.helpers.NOPAppender"/>
 
-    <logger name="com.alicp" level="TRACE">
-        <appender-ref ref="NULL" />
+    <logger name="com.alicp" level="INFO">
+        <appender-ref ref="STDOUT" />
     </logger>
 
     <root level="info">
