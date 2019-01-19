@@ -117,6 +117,9 @@ public class CachePointcut extends StaticMethodMatcherPointcut implements ClassF
         if (!matchesThis(method.getDeclaringClass())) {
             return false;
         }
+        if (exclude(targetClass.getName())) {
+            return false;
+        }
         String key = getKey(method, targetClass);
         CacheInvokeConfig cac = cacheConfigMap.getByMethodInfo(key);
         if (cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
