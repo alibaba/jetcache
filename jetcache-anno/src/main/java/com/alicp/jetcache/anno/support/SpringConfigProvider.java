@@ -25,7 +25,11 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
 
     @Override
     public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
-        return new SpringCacheContext(globalCacheConfig, applicationContext);
+        CacheContext c = new SpringCacheContext(globalCacheConfig, applicationContext);
+        if (getCacheManager() != null) {
+            c.setCacheManager(getCacheManager());
+        }
+        return c;
     }
 
     private String parseBeanName(String str) {

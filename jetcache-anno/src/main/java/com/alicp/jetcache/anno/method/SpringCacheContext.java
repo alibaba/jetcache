@@ -2,6 +2,7 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.SimpleCacheManager;
 import org.springframework.context.ApplicationContext;
 
 /**

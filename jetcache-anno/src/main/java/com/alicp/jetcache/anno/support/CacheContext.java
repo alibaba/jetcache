@@ -42,21 +42,23 @@ public class CacheContext {
     private GlobalCacheConfig globalCacheConfig;
 
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
-    private ConcurrentHashMap<String, Cache> cacheManager;
+    private SimpleCacheManager cacheManager = SimpleCacheManager.defaultManager;
+    private boolean inited;
 
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
+        this.cacheManager = cacheManager;
         this.configProvider = globalCacheConfig.getConfigProvider();
     }
 
     public synchronized void init() {
-        if (cacheManager == null) {
-            this.cacheManager = new ConcurrentHashMap<>();
+        if (!inited) {
             if (globalCacheConfig.getStatIntervalMinutes() > 0) {
                 defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
                         TimeUnit.MINUTES, globalCacheConfig.getConfigProvider().statCallback());
                 defaultCacheMonitorManager.start();
             }
+            inited = true;
         }
     }
 
@@ -64,10 +66,13 @@ public class CacheContext {
         if (defaultCacheMonitorManager != null) {
             defaultCacheMonitorManager.stop();
         }
-        ConcurrentHashMap<String, Cache> m = cacheManager;
-        cacheManager = null;
-        m.forEach((k, c) -> c.close());
         defaultCacheMonitorManager = null;
+        cacheManager.shutdown();
+        inited = false;
+    }
+
+    public void setCacheManager(SimpleCacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
     public CacheInvokeContext createCacheInvokeContext(ConfigMap configMap) {
@@ -113,17 +118,16 @@ public class CacheContext {
     }
 
     public <K, V> Cache<K, V> getCache(String area, String cacheName) {
-        String fullCacheName = area + "_" + cacheName;
-        Cache cache = cacheManager.get(fullCacheName);
+        Cache cache = cacheManager.getCache(area, cacheName);
         return cache;
     }
 
     public Cache __createOrGetCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         String fullCacheName = area + "_" + cacheName;
-        Cache cache = cacheManager.get(fullCacheName);
+        Cache cache = cacheManager.getCache(area, cacheName);
         if (cache == null) {
             synchronized (this) {
-                cache = cacheManager.get(fullCacheName);
+                cache = cacheManager.getCache(area, cacheName);
                 if (cache == null) {
                     if (globalCacheConfig.isAreaInCacheName()) {
                         // for compatible reason, if we use default configuration, the prefix should same to that version <=2.4.3
@@ -131,7 +135,7 @@ public class CacheContext {
                     } else {
                         cache = buildCache(cachedAnnoConfig, area, cacheName);
                     }
-                    cacheManager.put(fullCacheName, cache);
+                    cacheManager.putCache(area, cacheName, cache);
                 }
             }
         }

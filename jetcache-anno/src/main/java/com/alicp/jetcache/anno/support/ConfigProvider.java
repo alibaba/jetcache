@@ -18,6 +18,8 @@ import java.util.function.Function;
  */
 public class ConfigProvider {
 
+    private SimpleCacheManager cacheManager;
+
     protected static Map<String, String> parseQueryParameters(String query) {
         Map<String, String> m = new HashMap<>();
         if (query != null) {
@@ -97,10 +99,22 @@ public class ConfigProvider {
     }
 
     public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
-        return new CacheContext(globalCacheConfig);
+        CacheContext c = new CacheContext(globalCacheConfig);
+        if (getCacheManager() != null) {
+            c.setCacheManager(getCacheManager());
+        }
+        return c;
     }
 
     public Consumer<StatInfo> statCallback() {
         return new StatInfoLogger(false);
+    }
+
+    public void setCacheManager(SimpleCacheManager cacheManager) {
+        this.cacheManager = cacheManager;
+    }
+
+    public SimpleCacheManager getCacheManager() {
+        return cacheManager;
     }
 }
