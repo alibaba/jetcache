@@ -11,6 +11,7 @@ import io.lettuce.core.api.async.RedisAsyncCommands;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -141,7 +142,7 @@ public class RedisLettuceCacheFailTest {
 
     @Test
     public void test_REMOVE_ALL() {
-        when(asyncCommands.del((byte[][]) any()))
+        when(asyncCommands.del(ArgumentMatchers.any()))
                 .thenThrow(new RuntimeException("err"))
                 .thenReturn(mockFuture(null, new RuntimeException()));
         HashSet s = new HashSet();

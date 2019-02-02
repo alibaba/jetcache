@@ -141,7 +141,7 @@ public class RedisLettuceCacheFailTest {
 
     @Test
     public void test_REMOVE_ALL() {
-        when(asyncCommands.del((byte[][]) any()))
+        when(asyncCommands.del(any()))
                 .thenThrow(new RuntimeException("err"))
                 .thenReturn(mockFuture(null, new RuntimeException()));
         HashSet s = new HashSet();
