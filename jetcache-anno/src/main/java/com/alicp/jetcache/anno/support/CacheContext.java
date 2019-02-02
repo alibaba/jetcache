@@ -47,7 +47,6 @@ public class CacheContext {
 
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
-        this.cacheManager = cacheManager;
         this.configProvider = globalCacheConfig.getConfigProvider();
     }
 
@@ -63,12 +62,14 @@ public class CacheContext {
     }
 
     public synchronized void shutdown() {
-        if (defaultCacheMonitorManager != null) {
-            defaultCacheMonitorManager.stop();
+        if (inited) {
+            if (defaultCacheMonitorManager != null) {
+                defaultCacheMonitorManager.stop();
+            }
+            defaultCacheMonitorManager = null;
+            cacheManager.shutdown();
+            inited = false;
         }
-        defaultCacheMonitorManager = null;
-        cacheManager.shutdown();
-        inited = false;
     }
 
     public void setCacheManager(SimpleCacheManager cacheManager) {
