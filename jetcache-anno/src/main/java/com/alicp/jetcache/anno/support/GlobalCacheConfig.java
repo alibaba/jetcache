@@ -6,6 +6,7 @@ package com.alicp.jetcache.anno.support;
 import com.alicp.jetcache.CacheBuilder;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -23,6 +24,7 @@ public class GlobalCacheConfig implements InitializingBean, DisposableBean {
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
 
+    @Autowired(required = false)
     private ConfigProvider configProvider = new SpringConfigProvider();
 
     private CacheContext cacheContext;

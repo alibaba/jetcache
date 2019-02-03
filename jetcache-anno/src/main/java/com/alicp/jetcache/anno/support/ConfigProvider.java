@@ -4,6 +4,7 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.KeyConvertor;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.support.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.function.Function;
  */
 public class ConfigProvider {
 
+    @Autowired(required = false)
     private SimpleCacheManager cacheManager;
 
     protected static Map<String, String> parseQueryParameters(String query) {

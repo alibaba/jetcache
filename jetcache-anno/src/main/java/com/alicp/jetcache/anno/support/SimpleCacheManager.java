@@ -23,7 +23,7 @@ public class SimpleCacheManager implements CacheManager {
     public SimpleCacheManager() {
     }
 
-    public void shutdown() {
+    public void rebuild() {
         caches.forEach((area, areaMap) -> {
             areaMap.forEach((cacheName, cache) -> {
                 try {

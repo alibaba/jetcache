@@ -19,8 +19,6 @@ import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -67,7 +65,7 @@ public class CacheContext {
                 defaultCacheMonitorManager.stop();
             }
             defaultCacheMonitorManager = null;
-            cacheManager.shutdown();
+            cacheManager.rebuild();
             inited = false;
         }
     }
