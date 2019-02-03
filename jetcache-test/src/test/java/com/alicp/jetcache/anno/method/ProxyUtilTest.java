@@ -437,8 +437,17 @@ public class ProxyUtilTest {
             int x1 = beanProxy.count();
             int x2 = beanProxy.count();
             assertEquals(x1, x2);
-            Thread.sleep(150);
-            assertNotEquals(x2, beanProxy.count());
+            int i = 0;
+            while (true) { //auto refreshment may take some time to init
+                assertTrue(i < 10);
+                Thread.sleep(150);
+                if (x2 == beanProxy.count()) {
+                    i++;
+                    continue;
+                } else {
+                    break;
+                }
+            }
         }
         {
             int x1 = beanProxy.count(1, 2);
