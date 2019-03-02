@@ -18,7 +18,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -64,7 +63,7 @@ public abstract class AbstractCacheTest {
 
         asyncTest();
 
-        penetrationProtectTest(cache);
+        penetrationProtectTestWrapper(cache);
     }
 
     private void illegalArgTest() {
@@ -725,6 +724,17 @@ public abstract class AbstractCacheTest {
         Assert.assertFalse(cocurrentFail);
     }
 
+    private static void penetrationProtectTestWrapper(Cache cache) throws Exception {
+        boolean oldPenetrationProtect = cache.config().isCachePenetrationProtect();
+        Duration oldTime = cache.config().getPenetrationProtectTimeout();
+        cache.config().setCachePenetrationProtect(true);
+
+        penetrationProtectTest(cache);
+
+        cache.config().setCachePenetrationProtect(oldPenetrationProtect);
+        cache.config().setPenetrationProtectTimeout(oldTime);
+    }
+
     public static void penetrationProtectTest(Cache cache) throws Exception {
         boolean oldPenetrationProtect = cache.config().isCachePenetrationProtect();
         Duration oldTime = cache.config().getPenetrationProtectTimeout();
@@ -734,6 +744,8 @@ public abstract class AbstractCacheTest {
         if (cache instanceof LoadingCache) {
             penetrationProtectTestWithLoadingCache(cache);
         }
+
+        penetrationProtectReEntryTest(cache);
 
         penetrationProtectTimeoutTest(cache);
 
@@ -875,12 +887,18 @@ public abstract class AbstractCacheTest {
         cache.config().setLoader(oldLoader);
     }
 
+    private static void penetrationProtectReEntryTest(Cache cache) {
+        Object v = cache.computeIfAbsent("penetrationProtectReEntryTest",
+                (k) -> cache.computeIfAbsent(k, (k2) -> "V"));
+        Assert.assertEquals("V", v);
+    }
+
     private static void penetrationProtectTimeoutTest(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtectTimeoutTest_";
         AtomicInteger loadSuccess = new AtomicInteger(0);
         Function loader = k -> {
             try {
-                Thread.sleep(50);
+                Thread.sleep(75);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -906,6 +924,7 @@ public abstract class AbstractCacheTest {
         Thread t3 = new Thread(runnable);
         t1.start();
         t2.start();
+        Thread.sleep(25);
         t3.start();
         Thread.sleep(25);
         t3.interrupt();

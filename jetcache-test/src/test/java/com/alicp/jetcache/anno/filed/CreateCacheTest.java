@@ -105,7 +105,7 @@ public class CreateCacheTest extends SpringTest {
             private Cache cacheWithRefresh;
 
             @CreateCache
-            @CachePenetrationProtect
+            @CachePenetrationProtect(timeout = 1)
             private Cache cacheWithProtect;
 
             @CreateCache(expire = 2, localExpire = 1, cacheType = CacheType.BOTH)
