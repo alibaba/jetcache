@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -726,6 +727,7 @@ public abstract class AbstractCacheTest {
 
     public static void penetrationProtectTest(Cache cache) throws Exception {
         boolean oldPenetrationProtect = cache.config().isCachePenetrationProtect();
+        Duration oldTime = cache.config().getPenetrationProtectTimeout();
         cache.config().setCachePenetrationProtect(true);
 
         penetrationProtectTestWithComputeIfAbsent(cache);
@@ -733,7 +735,10 @@ public abstract class AbstractCacheTest {
             penetrationProtectTestWithLoadingCache(cache);
         }
 
+        penetrationProtectTimeoutTest(cache);
+
         cache.config().setCachePenetrationProtect(oldPenetrationProtect);
+        cache.config().setPenetrationProtectTimeout(oldTime);
     }
 
     private static void penetrationProtectTestWithComputeIfAbsent(Cache cache) throws Exception {
@@ -868,5 +873,45 @@ public abstract class AbstractCacheTest {
         Assert.assertNull(failMsg[0]);
 
         cache.config().setLoader(oldLoader);
+    }
+
+    private static void penetrationProtectTimeoutTest(Cache cache) throws Exception {
+        String keyPrefix = "penetrationProtectTimeoutTest_";
+        AtomicInteger loadSuccess = new AtomicInteger(0);
+        Function loader = k -> {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            loadSuccess.incrementAndGet();
+            return k + "_V";
+        };
+
+        cache.config().setPenetrationProtectTimeout(Duration.ofMillis(1));
+        Runnable runnable = () -> cache.computeIfAbsent(keyPrefix + 1, loader);
+        Thread t1 = new Thread(runnable);
+        Thread t2 = new Thread(runnable);
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        Assert.assertEquals(2, loadSuccess.intValue());
+
+        cache.config().setPenetrationProtectTimeout(Duration.ofMillis(200));
+        loadSuccess.set(0);
+        runnable = () -> cache.computeIfAbsent(keyPrefix + 2, loader);
+        t1 = new Thread(runnable);
+        t2 = new Thread(runnable);
+        Thread t3 = new Thread(runnable);
+        t1.start();
+        t2.start();
+        t3.start();
+        Thread.sleep(25);
+        t3.interrupt();
+        t1.join();
+        t2.join();
+        t3.join();
+        Assert.assertEquals(2, loadSuccess.intValue());
     }
 }
