@@ -171,8 +171,10 @@ public class CacheContext {
         cache = new CacheHandler.CacheHandlerRefreshCache(cache);
 
         cache.config().setCachePenetrationProtect(globalCacheConfig.isPenetrationProtect());
-        if (cachedAnnoConfig.getPenetrationProtectConfig() != null) {
-            cache.config().setCachePenetrationProtect(cachedAnnoConfig.getPenetrationProtectConfig().isPenetrationProtect());
+        PenetrationProtectConfig protectConfig = cachedAnnoConfig.getPenetrationProtectConfig();
+        if (protectConfig != null) {
+            cache.config().setCachePenetrationProtect(protectConfig.isPenetrationProtect());
+            cache.config().setPenetrationProtectTimeout(protectConfig.getPenetrationProtectTimeout());
         }
 
 

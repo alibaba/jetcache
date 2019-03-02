@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -95,8 +94,7 @@ public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
                             PUT(key, v);
                         }
                     };
-                    V v = AbstractCache.synchronizedLoad(abstractCache, key, loader,
-                            cacheUpdater, abstractCache.initOrGetLoaderMap());
+                    V v = AbstractCache.synchronizedLoad(config, abstractCache, key, loader, cacheUpdater);
                     kvMap.put(key, v);
                 }
             }

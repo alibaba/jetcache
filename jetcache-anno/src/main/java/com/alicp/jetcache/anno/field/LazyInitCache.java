@@ -44,8 +44,7 @@ class LazyInitCache implements ProxyCache {
         }
         CachePenetrationProtect penetrateProtect = field.getAnnotation(CachePenetrationProtect.class);
         if (penetrateProtect != null) {
-            protectConfig = new PenetrationProtectConfig();
-            protectConfig.setPenetrationProtect(penetrateProtect.value());
+            protectConfig = CacheConfigUtil.parsePenetrationProtectConfig(penetrateProtect);
         }
     }
 
