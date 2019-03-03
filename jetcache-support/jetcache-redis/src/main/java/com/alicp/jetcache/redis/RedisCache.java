@@ -7,6 +7,7 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -21,17 +22,28 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     Function<Object, byte[]> valueEncoder;
     Function<byte[], Object> valueDecoder;
-    private Pool<Jedis> pool;
+
+    private static ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public RedisCache(RedisCacheConfig<K, V> config) {
         super(config);
         this.config = config;
-        this.pool = config.getJedisPool();
         this.valueEncoder = config.getValueEncoder();
         this.valueDecoder = config.getValueDecoder();
 
-        if (pool == null) {
+        if (config.getJedisPool() == null) {
             throw new CacheConfigException("no pool");
+        }
+        if (config.isReadFromSlave()) {
+            if (config.getJedisSlavePools() == null || config.getJedisSlavePools().length == 0) {
+                throw new CacheConfigException("slaves not config");
+            }
+            if (config.getSlaveReadWeights() == null) {
+                int len = config.getJedisSlavePools().length;
+                int[] weights = new int[len];
+                Arrays.fill(weights, 100);
+                config.setSlaveReadWeights(weights);
+            }
         }
         if (config.isExpireAfterAccess()) {
             throw new CacheConfigException("expireAfterAccess is not supported");
@@ -45,16 +57,35 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        if (clazz.equals(Pool.class)) {
-            return (T) pool;
-        }
-        if (clazz.equals(JedisPool.class)) {
-            return (T) pool;
-        }
-        if (clazz.equals(JedisSentinelPool.class)) {
-            return (T) pool;
+        if (Pool.class.isAssignableFrom(clazz)) {
+            return (T) config.getJedisPool();
         }
         throw new IllegalArgumentException(clazz.getName());
+    }
+
+    Pool<Jedis> getReadPool() {
+        if (!config.isReadFromSlave()) {
+            return config.getJedisPool();
+        }
+        int[] weights = config.getSlaveReadWeights();
+        int index = randomIndex(weights);
+        return config.getJedisSlavePools()[index];
+    }
+
+    static int randomIndex(int[] weights) {
+        int sumOfWeights = 0;
+        for (int w : weights) {
+            sumOfWeights += w;
+        }
+        int r = random.nextInt(sumOfWeights);
+        int x = 0;
+        for (int i = 0; i < weights.length; i++) {
+            x += weights[i];
+            if(r < x){
+                return i;
+            }
+        }
+        throw new CacheException("assert false");
     }
 
     @Override
@@ -62,7 +93,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = getReadPool().getResource()) {
             byte[] newKey = buildKey(key);
             byte[] bytes = jedis.get(newKey);
             if (bytes != null) {
@@ -85,7 +116,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = getReadPool().getResource()) {
             ArrayList<K> keyList = new ArrayList<K>(keys);
             byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
 
@@ -121,7 +152,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             String rt = jedis.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
@@ -141,7 +172,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
             Pipeline p = jedis.pipelined();
@@ -173,7 +204,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     private CacheResult REMOVE_impl(Object key, byte[] newKey) {
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             Long rt = jedis.del(newKey);
             if (rt == null) {
                 return CacheResult.FAIL_WITHOUT_MSG;
@@ -195,7 +226,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
             jedis.del(newKeys);
             return CacheResult.SUCCESS_WITHOUT_MSG;
@@ -210,7 +241,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expireAfterWrite));

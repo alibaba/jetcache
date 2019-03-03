@@ -1,6 +1,6 @@
 package com.alicp.jetcache.redis;
 
-import com.alicp.jetcache.LoadingCache;
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.RefreshCacheTest;
 import com.alicp.jetcache.support.*;
@@ -63,7 +63,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .buildCache();
 
         Assert.assertSame(pool, cache.unwrap(Pool.class));
-        if(pool instanceof JedisPool){
+        if (pool instanceof JedisPool) {
             Assert.assertSame(pool, cache.unwrap(JedisPool.class));
         } else {
             Assert.assertSame(pool, cache.unwrap(JedisSentinelPool.class));
@@ -105,6 +105,64 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .jedisPool(pool)
                 .keyPrefix(new Random().nextInt() + "")
                 .buildCache();
-        concurrentTest(thread, 500 , time);
+        concurrentTest(thread, 500, time);
+    }
+
+    @Test
+    public void testRandomIndex() {
+        {
+            int[] ws = new int[]{100, 100, 100};
+            int[] result = new int[3];
+            for (int i = 0; i < 10000; i++) {
+                int index = RedisCache.randomIndex(ws);
+                result[index]++;
+            }
+            Assert.assertEquals(1.0, 1.0 * result[1] / result[0], 0.2);
+            Assert.assertEquals(1.0, 1.0 * result[2] / result[0], 0.2);
+        }
+        {
+            int[] ws = new int[]{1, 2, 3};
+            int[] result = new int[3];
+            for (int i = 0; i < 10000; i++) {
+                int index = RedisCache.randomIndex(ws);
+                result[index]++;
+            }
+            Assert.assertEquals(2.0, 1.0 * result[1] / result[0], 0.2);
+            Assert.assertEquals(3.0, 1.0 * result[2] / result[0], 0.4);
+        }
+    }
+
+    @Test
+    public void readFromSlaveTest() throws Exception {
+        GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
+        pc.setMinIdle(2);
+        pc.setMaxIdle(10);
+        pc.setMaxTotal(10);
+        JedisPool pool1 = new JedisPool(pc, "localhost", 6379);
+        JedisPool pool2 = new JedisPool(pc, "localhost", 6380);
+        JedisPool pool3 = new JedisPool(pc, "localhost", 6381);
+
+        RedisCacheBuilder builder = RedisCacheBuilder.createRedisCacheBuilder();
+        builder.setJedisPool(pool1);
+        builder.setReadFromSlave(true);
+        builder.setJedisSlavePools(pool2, pool3);
+        builder.setSlaveReadWeights(1, 1);
+        builder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        builder.setValueEncoder(JavaValueEncoder.INSTANCE);
+        builder.setValueDecoder(JavaValueDecoder.INSTANCE);
+        builder.setKeyPrefix(new Random().nextInt() + "");
+        builder.setExpireAfterWriteInMillis(500);
+
+        Cache cache = builder.buildCache();
+        cache.put("readFromSlaveTest_K1", "V1");
+        Assert.assertNotSame(pool1, ((RedisCache) cache).getReadPool());
+        Assert.assertNotSame(pool1, ((RedisCache) cache).getReadPool());
+        Assert.assertNotSame(pool1, ((RedisCache) cache).getReadPool());
+        Assert.assertNotSame(pool1, ((RedisCache) cache).getReadPool());
+        Thread.sleep(15);
+        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
     }
 }
