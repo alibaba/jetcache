@@ -54,6 +54,7 @@ public class RedisLettuceAutoConfiguration {
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
             Map<String, Object> map = ct.subTree("uri"/*there is no dot*/).getProperties();
             String readFromStr = ct.getProperty("readFrom");
+            String mode = ct.getProperty("mode");
             long asyncResultTimeoutInMillis = Long.parseLong(
                     ct.getProperty("asyncResultTimeoutInMillis", Long.toString(CacheConsts.ASYNC_RESULT_TIMEOUT.toMillis())));
             ReadFrom readFrom = null;
@@ -64,34 +65,46 @@ public class RedisLettuceAutoConfiguration {
             AbstractRedisClient client;
             StatefulConnection connection = null;
             if (map == null || map.size() == 0) {
-                throw new CacheConfigException("uri is required");
-            } else if (map.size() == 1) {
-                String uri = (String) map.values().iterator().next();
-                if (readFrom == null) {
-                    client = RedisClient.create(uri);
-                    ((RedisClient)client).setOptions(ClientOptions.builder().
-                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                } else {
-                    client = RedisClient.create();
-                    ((RedisClient)client).setOptions(ClientOptions.builder().
-                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                    StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
-                            (RedisClient) client,
-                            new JetCacheCodec(),
-                            RedisURI.create(uri));
-                    c.setReadFrom(readFrom);
-                    connection = c;
-                }
+                throw new CacheConfigException("lettuce uri is required");
             } else {
-                List<RedisURI> list = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
+                List<RedisURI> uriList = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
                         .collect(Collectors.toList());
-                client = RedisClusterClient.create(list);
-                ((RedisClusterClient)client).setOptions(ClusterClientOptions.builder().
-                        disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                if (readFrom != null) {
-                    StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
-                    c.setReadFrom(readFrom);
-                    connection = c;
+                if (uriList.size() == 1) {
+                    RedisURI uri = uriList.get(0);
+                    if (readFrom == null) {
+                        client = RedisClient.create(uri);
+                        ((RedisClient) client).setOptions(ClientOptions.builder().
+                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                    } else {
+                        client = RedisClient.create();
+                        ((RedisClient) client).setOptions(ClientOptions.builder().
+                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                        StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
+                                (RedisClient) client, new JetCacheCodec(), uri);
+                        c.setReadFrom(readFrom);
+                        connection = c;
+                    }
+                } else {
+                    if (mode != null && mode.equalsIgnoreCase("MasterSlave")) {
+                        client = RedisClient.create();
+                        ((RedisClient) client).setOptions(ClientOptions.builder().
+                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                        StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
+                                (RedisClient) client, new JetCacheCodec(), uriList);
+                        if (readFrom != null) {
+                            c.setReadFrom(readFrom);
+                        }
+                        connection = c;
+                    } else {
+                        client = RedisClusterClient.create(uriList);
+                        ((RedisClusterClient) client).setOptions(ClusterClientOptions.builder().
+                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                        if (readFrom != null) {
+                            StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
+                            c.setReadFrom(readFrom);
+                            connection = c;
+                        }
+                    }
                 }
             }
 
