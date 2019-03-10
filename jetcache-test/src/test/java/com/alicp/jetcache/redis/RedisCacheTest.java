@@ -24,6 +24,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void testSimplePool() throws Exception {
+        System.out.println("RedisCacheTest.testSimplePool");
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
@@ -35,6 +36,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void testSentinel() throws Exception {
+        System.out.println("RedisCacheTest.testSentinel");
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
@@ -51,6 +53,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void shardTest() throws Exception {
+        System.out.println("RedisCacheTest.shardTest");
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
@@ -149,6 +152,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void readFromSlaveTest() throws Exception {
+        System.out.println("RedisCacheTest.readFromSlaveTest");
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
