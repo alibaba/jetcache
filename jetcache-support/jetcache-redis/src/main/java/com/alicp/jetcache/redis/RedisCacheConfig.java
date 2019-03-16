@@ -11,24 +11,24 @@ import redis.clients.util.Pool;
  */
 public class RedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
-    private Pool jedisPool;
-    private Pool[] jedisSlavePools;
+    private Pool<Jedis> jedisPool;
+    private Pool<Jedis>[] jedisSlavePools;
     private boolean readFromSlave;
     private int[] slaveReadWeights;
 
-    public Pool getJedisPool() {
+    public Pool<Jedis> getJedisPool() {
         return jedisPool;
     }
 
-    public void setJedisPool(Pool jedisPool) {
+    public void setJedisPool(Pool<Jedis> jedisPool) {
         this.jedisPool = jedisPool;
     }
 
-    public Pool[] getJedisSlavePools() {
+    public Pool<Jedis>[] getJedisSlavePools() {
         return jedisSlavePools;
     }
 
-    public void setJedisSlavePools(Pool... jedisSlavePools) {
+    public void setJedisSlavePools(Pool<Jedis>... jedisSlavePools) {
         this.jedisSlavePools = jedisSlavePools;
     }
 

@@ -63,7 +63,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         throw new IllegalArgumentException(clazz.getName());
     }
 
-    Pool getReadPool() {
+    Pool<Jedis> getReadPool() {
         if (!config.isReadFromSlave()) {
             return config.getJedisPool();
         }
@@ -93,26 +93,21 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        try (AutoCloseable resource = (AutoCloseable) getReadPool().getResource()) {
-            BinaryJedisCommands commands = (BinaryJedisCommands) resource;
-            return do_GET_impl(key, commands);
+        try (Jedis jedis = getReadPool().getResource()) {
+            byte[] newKey = buildKey(key);
+            byte[] bytes = jedis.get(newKey);
+            if (bytes != null) {
+                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(bytes);
+                if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                    return CacheGetResult.EXPIRED_WITHOUT_MSG;
+                }
+                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
+            } else {
+                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
+            }
         } catch (Exception ex) {
             logError("GET", key, ex);
             return new CacheGetResult(ex);
-        }
-    }
-
-    private CacheGetResult<V> do_GET_impl(K key, BinaryJedisCommands commands) {
-        byte[] newKey = buildKey(key);
-        byte[] bytes = commands.get(newKey);
-        if (bytes != null) {
-            CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(bytes);
-            if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                return CacheGetResult.EXPIRED_WITHOUT_MSG;
-            }
-            return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
-        } else {
-            return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
         }
     }
 
@@ -121,46 +116,30 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null) {
             return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
         }
-        try (AutoCloseable resource = (AutoCloseable) getReadPool().getResource()) {
-            Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
-            if (resource instanceof MultiKeyBinaryCommands) {
-                MultiKeyBinaryCommands jedis = (MultiKeyBinaryCommands) resource;
-                ArrayList<K> keyList = new ArrayList<K>(keys);
-                byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
+        try (Jedis jedis = getReadPool().getResource()) {
+            ArrayList<K> keyList = new ArrayList<K>(keys);
+            byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
 
-                if (newKeys.length > 0) {
-                    List mgetResults = jedis.mget(newKeys);
-                    for (int i = 0; i < mgetResults.size(); i++) {
-                        Object value = mgetResults.get(i);
-                        K key = keyList.get(i);
-                        if (value != null) {
-                            CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
-                            if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                                resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
-                            } else {
-                                CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
-                                resultMap.put(key, r);
-                            }
+            Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
+            if (newKeys.length > 0) {
+                List mgetResults = jedis.mget(newKeys);
+                for (int i = 0; i < mgetResults.size(); i++) {
+                    Object value = mgetResults.get(i);
+                    K key = keyList.get(i);
+                    if (value != null) {
+                        CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
+                        if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                            resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
                         } else {
-                            resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
+                            CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
+                            resultMap.put(key, r);
                         }
+                    } else {
+                        resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
                     }
                 }
-                return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
-            } else { // for ShardedJedis
-                BinaryJedisCommands commands = (BinaryJedisCommands) resource;
-                int failCount = 0;
-                for (K k : keys) {
-                    CacheGetResult<V> r = do_GET_impl(k, commands);
-                    resultMap.put(k, r);
-                    if (!r.isSuccess()) {
-                        failCount++;
-                    }
-                }
-                CacheResultCode code = failCount == 0 ? CacheResultCode.SUCCESS :
-                        failCount == keys.size() ? CacheResultCode.FAIL : CacheResultCode.PART_SUCCESS;
-                return new MultiGetResult<>(code, null, resultMap);
             }
+            return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
         } catch (Exception ex) {
             logError("GET_ALL", "keys(" + keys.size() + ")", ex);
             return new MultiGetResult<K, V>(ex);
@@ -173,23 +152,18 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (AutoCloseable resource = (AutoCloseable) config.getJedisPool().getResource()) {
-            BinaryJedisCommands commands = (BinaryJedisCommands) resource;
-            return do_PUT_impl(key, value, expireAfterWrite, timeUnit, commands);
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
+            byte[] newKey = buildKey(key);
+            String rt = jedis.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
+            if ("OK".equals(rt)) {
+                return CacheResult.SUCCESS_WITHOUT_MSG;
+            } else {
+                return new CacheResult(CacheResultCode.FAIL, rt);
+            }
         } catch (Exception ex) {
             logError("PUT", key, ex);
             return new CacheResult(ex);
-        }
-    }
-
-    private CacheResult do_PUT_impl(K key, V value, long expireAfterWrite, TimeUnit timeUnit, BinaryJedisCommands commands) {
-        CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
-        byte[] newKey = buildKey(key);
-        String rt = commands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-        if ("OK".equals(rt)) {
-            return CacheResult.SUCCESS_WITHOUT_MSG;
-        } else {
-            return new CacheResult(CacheResultCode.FAIL, rt);
         }
     }
 
@@ -198,32 +172,19 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (AutoCloseable resource = (AutoCloseable) config.getJedisPool().getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             int failCount = 0;
-            if (resource instanceof Jedis) {
-                Jedis jedis = (Jedis) resource;
-
-                List<Response<String>> responses = new ArrayList<>();
-                Pipeline p = jedis.pipelined();
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                    Response<String> resp = p.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                    responses.add(resp);
-                }
-                p.sync();
-                for (Response<String> resp : responses) {
-                    if (!"OK".equals(resp.get())) {
-                        failCount++;
-                    }
-                }
-            } else { // for ShardedJedis
-                BinaryJedisCommands commands = (BinaryJedisCommands) resource;
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheResult result = do_PUT_impl(en.getKey(), en.getValue(),
-                            expireAfterWrite, TimeUnit.MILLISECONDS, commands);
-                    if (!result.isSuccess()) {
-                        failCount++;
-                    }
+            List<Response<String>> responses = new ArrayList<>();
+            Pipeline p = jedis.pipelined();
+            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+                Response<String> resp = p.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
+                responses.add(resp);
+            }
+            p.sync();
+            for (Response<String> resp : responses) {
+                if(!"OK".equals(resp.get())){
+                    failCount++;
                 }
             }
             return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
@@ -239,25 +200,24 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (AutoCloseable resource = (AutoCloseable) config.getJedisPool().getResource()) {
-            BinaryJedisCommands jedis = (BinaryJedisCommands) resource;
-            return do_REMOVE_impl(key, jedis);
+        return REMOVE_impl(key, buildKey(key));
+    }
+
+    private CacheResult REMOVE_impl(Object key, byte[] newKey) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            Long rt = jedis.del(newKey);
+            if (rt == null) {
+                return CacheResult.FAIL_WITHOUT_MSG;
+            } else if (rt == 1) {
+                return CacheResult.SUCCESS_WITHOUT_MSG;
+            } else if (rt == 0) {
+                return new CacheResult(CacheResultCode.NOT_EXISTS, null);
+            } else {
+                return CacheResult.FAIL_WITHOUT_MSG;
+            }
         } catch (Exception ex) {
             logError("REMOVE", key, ex);
             return new CacheResult(ex);
-        }
-    }
-
-    private CacheResult do_REMOVE_impl(K key, BinaryJedisCommands commands) {
-        Long rt = commands.del(buildKey(key));
-        if (rt == null) {
-            return CacheResult.FAIL_WITHOUT_MSG;
-        } else if (rt == 1) {
-            return CacheResult.SUCCESS_WITHOUT_MSG;
-        } else if (rt == 0) {
-            return new CacheResult(CacheResultCode.NOT_EXISTS, null);
-        } else {
-            return CacheResult.FAIL_WITHOUT_MSG;
         }
     }
 
@@ -266,24 +226,10 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (AutoCloseable resource = (AutoCloseable) config.getJedisPool().getResource()) {
-            if (resource instanceof MultiKeyBinaryCommands) {
-                MultiKeyBinaryCommands commands = (MultiKeyBinaryCommands) resource;
-                byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
-                commands.del(newKeys);
-                return CacheResult.SUCCESS_WITHOUT_MSG;
-            } else { // for ShardedJedis
-                int failCount = 0;
-                BinaryJedisCommands jedisCommands = (BinaryJedisCommands) resource;
-                for(K k: keys) {
-                    CacheResult r = do_REMOVE_impl(k, jedisCommands);
-                    if(!r.isSuccess()){
-                        failCount++;
-                    }
-                }
-                return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                        failCount == keys.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
-            }
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
+            jedis.del(newKeys);
+            return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
             logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
             return new CacheResult(ex);
@@ -295,11 +241,10 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (key == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;
         }
-        try (AutoCloseable resource = (AutoCloseable) config.getJedisPool().getResource()) {
-            BinaryJedisCommands commands = (BinaryJedisCommands) resource;
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
-            String rt = commands.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expireAfterWrite));
+            String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expireAfterWrite));
             if ("OK".equals(rt)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             } else if (rt == null) {
