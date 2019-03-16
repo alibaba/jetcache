@@ -8,11 +8,14 @@ import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Assert;
 import org.junit.Test;
-import redis.clients.jedis.*;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.util.Pool;
-import redis.clients.util.ShardInfo;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -49,25 +52,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         testWithPool(pool);
     }
 
-    @Test
-    public void shardTest() throws Exception {
-        GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
-        pc.setMinIdle(2);
-        pc.setMaxIdle(10);
-        pc.setMaxTotal(10);
-
-        List list = new ArrayList();
-        ShardInfo si0 = new JedisShardInfo("localhost", 6379);
-        ShardInfo si1 = new JedisShardInfo("localhost", 6379);
-        list.add(si0);
-        list.add(si1);
-
-        ShardedJedisPool pool = new ShardedJedisPool(pc, list);
-
-        testWithPool(pool);
-    }
-
-    private void testWithPool(Pool pool) throws Exception {
+    private void testWithPool(Pool<Jedis> pool) throws Exception {
         cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)

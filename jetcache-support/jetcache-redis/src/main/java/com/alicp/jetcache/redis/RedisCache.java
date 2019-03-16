@@ -153,7 +153,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 for (K k : keys) {
                     CacheGetResult<V> r = do_GET_impl(k, commands);
                     resultMap.put(k, r);
-                    if (r.getResultCode() == CacheResultCode.FAIL || r.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                    if (!r.isSuccess()) {
                         failCount++;
                     }
                 }
@@ -219,9 +219,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             } else { // for ShardedJedis
                 BinaryJedisCommands commands = (BinaryJedisCommands) resource;
                 for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheResult r = do_PUT_impl(en.getKey(), en.getValue(),
+                    CacheResult result = do_PUT_impl(en.getKey(), en.getValue(),
                             expireAfterWrite, TimeUnit.MILLISECONDS, commands);
-                    if (r.getResultCode() == CacheResultCode.FAIL || r.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                    if (!result.isSuccess()) {
                         failCount++;
                     }
                 }
@@ -277,7 +277,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 BinaryJedisCommands jedisCommands = (BinaryJedisCommands) resource;
                 for(K k: keys) {
                     CacheResult r = do_REMOVE_impl(k, jedisCommands);
-                    if (r.getResultCode() == CacheResultCode.FAIL || r.getResultCode() == CacheResultCode.PART_SUCCESS) {
+                    if(!r.isSuccess()){
                         failCount++;
                     }
                 }
