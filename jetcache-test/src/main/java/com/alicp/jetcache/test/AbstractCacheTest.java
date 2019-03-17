@@ -450,8 +450,9 @@ public abstract class AbstractCacheTest {
                             }
                         }
                     });
-            if (b)
+            if (b) {
                 runCount[0]++;
+            }
             countDownLatch.countDown();
         };
         for (int i = 0; i < count; i++) {
@@ -770,12 +771,14 @@ public abstract class AbstractCacheTest {
                 }
                 if ((keyPrefix + "1").equals(k)) {
                     // fail 2 times
-                    if (count1.getAndIncrement() <= 1)
+                    if (count1.getAndIncrement() <= 1) {
                         throw new RuntimeException("mock error");
+                    }
                 } else if ((keyPrefix + "2").equals(k)) {
                     // fail 3 times
-                    if (count2.getAndIncrement() <= 2)
+                    if (count2.getAndIncrement() <= 2) {
                         throw new RuntimeException("mock error");
+                    }
                 }
                 loadSuccess.incrementAndGet();
                 return k + "_V";

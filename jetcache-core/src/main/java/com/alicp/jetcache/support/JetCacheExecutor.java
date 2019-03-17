@@ -14,6 +14,7 @@ public class JetCacheExecutor {
 
     private static int threadCount;
 
+    @SuppressWarnings("PMD.ThreadPoolCreationRule")
     public static ScheduledExecutorService defaultExecutor() {
         if (defaultExecutor != null) {
             return defaultExecutor;
@@ -30,6 +31,7 @@ public class JetCacheExecutor {
         return defaultExecutor;
     }
 
+    @SuppressWarnings("PMD.ThreadPoolCreationRule")
     public static ScheduledExecutorService heavyIOExecutor() {
         if (heavyIOExecutor != null) {
             return heavyIOExecutor;
