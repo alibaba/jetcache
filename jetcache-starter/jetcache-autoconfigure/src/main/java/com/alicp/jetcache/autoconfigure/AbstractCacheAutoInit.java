@@ -10,11 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.Assert;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Created on 2016/11/29.
@@ -44,6 +40,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
         this.typeNames = cacheTypes;
     }
 
+    @Override
     public void afterPropertiesSet() {
         if (!inited) {
             synchronized (this) {
@@ -59,7 +56,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
     private void process(String prefix, Map cacheBuilders, boolean local) {
         ConfigTree resolver = new ConfigTree(environment, prefix);
         Map<String, Object> m = resolver.getProperties();
-        Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
+        Set<String> cacheAreaNames = resolver.directChildrenKeys();
         for (String cacheArea : cacheAreaNames) {
             final Object configType = m.get(cacheArea + ".type");
             boolean match = Arrays.stream(typeNames).anyMatch((tn) -> tn.equals(configType));

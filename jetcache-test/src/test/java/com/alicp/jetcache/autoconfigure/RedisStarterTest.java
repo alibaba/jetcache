@@ -6,6 +6,7 @@ import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
+import com.alicp.jetcache.redis.RedisCacheConfig;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
@@ -24,6 +25,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.util.Pool;
 
 import javax.annotation.PostConstruct;
+import java.util.Arrays;
 
 /**
  * Created on 2016/11/23.
@@ -57,6 +59,9 @@ public class RedisStarterTest extends SpringTest {
         @CreateCache(cacheType = CacheType.LOCAL)
         private Cache c1;
 
+        @CreateCache
+        private Cache c2;
+
         public void test() {
             Assert.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
             EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) c1.config();
@@ -64,6 +69,13 @@ public class RedisStarterTest extends SpringTest {
             Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
             Assert.assertFalse(cc1.isExpireAfterAccess());
             Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
+
+            RedisCacheConfig c = (RedisCacheConfig) c2.config();
+            Assert.assertFalse(c.isReadFromSlave());
+            Pool[] slavePools = c.getJedisSlavePools();
+            Assert.assertEquals(2, slavePools.length);
+            int[] ws = c.getSlaveReadWeights();
+            Assert.assertTrue(Arrays.equals(new int[]{30, 100}, ws) || Arrays.equals(new int[]{100, 30}, ws));
         }
     }
 

@@ -2,6 +2,8 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.util.Pool;
@@ -17,6 +19,8 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
+
+    private static Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
     private RedisCacheConfig<K, V> config;
 
@@ -39,15 +43,22 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 throw new CacheConfigException("slaves not config");
             }
             if (config.getSlaveReadWeights() == null) {
-                int len = config.getJedisSlavePools().length;
-                int[] weights = new int[len];
-                Arrays.fill(weights, 100);
-                config.setSlaveReadWeights(weights);
+                initDefaultWeights(config);
+            } else if (config.getSlaveReadWeights().length != config.getJedisSlavePools().length) {
+                logger.error("length of slaveReadWeights and jedisSlavePools not equals, using default weights");
+                initDefaultWeights(config);
             }
         }
         if (config.isExpireAfterAccess()) {
             throw new CacheConfigException("expireAfterAccess is not supported");
         }
+    }
+
+    private void initDefaultWeights(RedisCacheConfig<K, V> config) {
+        int len = config.getJedisSlavePools().length;
+        int[] weights = new int[len];
+        Arrays.fill(weights, 100);
+        config.setSlaveReadWeights(weights);
     }
 
     @Override

@@ -153,6 +153,13 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         builder.setKeyPrefix(new Random().nextInt() + "");
         builder.setExpireAfterWriteInMillis(500);
 
+        readFromSlaveTestAsserts(pool1, builder);
+
+        builder.setSlaveReadWeights(null);
+        readFromSlaveTestAsserts(pool1, builder);
+    }
+
+    private void readFromSlaveTestAsserts(JedisPool pool1, RedisCacheBuilder builder) throws InterruptedException {
         Cache cache = builder.buildCache();
         cache.put("readFromSlaveTest_K1", "V1");
         Assert.assertNotSame(pool1, ((RedisCache) cache).getReadPool());

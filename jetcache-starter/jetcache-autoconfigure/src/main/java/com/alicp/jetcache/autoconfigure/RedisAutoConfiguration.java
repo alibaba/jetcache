@@ -20,9 +20,7 @@ import redis.clients.util.Pool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Created on 2016/11/25.
@@ -56,8 +54,40 @@ public class RedisAutoConfiguration {
 
         @Override
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
-            GenericObjectPoolConfig poolConfig = parsePoolConfig(ct);
+            Pool jedisPool = parsePool(ct);
+            Pool[] slavesPool = null;
+            int[] slavesPoolWeights = null;
+            boolean readFromSlave = Boolean.parseBoolean(ct.getProperty("readFromSlave", "False"));
+            ConfigTree slaves = ct.subTree("slaves.");
+            Set<String> slaveNames = slaves.directChildrenKeys();
+            if (slaveNames.size() > 0) {
+                slavesPool = new Pool[slaveNames.size()];
+                slavesPoolWeights = new int[slaveNames.size()];
+                int i = 0;
+                for (String slaveName: slaveNames) {
+                    ConfigTree slaveConfig = slaves.subTree(slaveName + ".");
+                    slavesPool[i] = parsePool(slaveConfig);
+                    slavesPoolWeights[i] = Integer.parseInt(slaveConfig.getProperty("weight","100"));
+                    i++;
+                }
+            }
 
+            ExternalCacheBuilder externalCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
+                    .jedisPool(jedisPool)
+                    .readFromSlave(readFromSlave)
+                    .jedisSlavePools(slavesPool)
+                    .slaveReadWeights(slavesPoolWeights);
+
+            parseGeneralConfig(externalCacheBuilder, ct);
+
+            // eg: "jedisPool.remote.default"
+            autoConfigureBeans.getCustomContainer().put("jedisPool." + cacheAreaWithPrefix, jedisPool);
+
+            return externalCacheBuilder;
+        }
+
+        private Pool<Jedis> parsePool(ConfigTree ct) {
+            GenericObjectPoolConfig poolConfig = parsePoolConfig(ct);
 
             String host = ct.getProperty("host", (String) null);
             int port = Integer.parseInt(ct.getProperty("port", "0"));
@@ -88,16 +118,7 @@ public class RedisAutoConfiguration {
                 }
                 jedisPool = new JedisSentinelPool(masterName, sentinelsSet, poolConfig, timeout, password, database, clientName);
             }
-
-
-            ExternalCacheBuilder externalCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                    .jedisPool(jedisPool);
-            parseGeneralConfig(externalCacheBuilder, ct);
-
-            // eg: "jedisPool.remote.default"
-            autoConfigureBeans.getCustomContainer().put("jedisPool." + cacheAreaWithPrefix, jedisPool);
-
-            return externalCacheBuilder;
+            return jedisPool;
         }
 
         private GenericObjectPoolConfig parsePoolConfig(ConfigTree ct) {

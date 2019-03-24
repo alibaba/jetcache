@@ -35,7 +35,7 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
         return self();
     }
 
-    public void setJedisPool(JedisPool jedisPool) {
+    public void setJedisPool(Pool<Jedis> jedisPool) {
         getConfig().setJedisPool(jedisPool);
     }
 
@@ -48,12 +48,12 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
         getConfig().setReadFromSlave(readFromSlave);
     }
 
-    public T jedisSlavePools(JedisPool... jedisSlavePools) {
+    public T jedisSlavePools(Pool<Jedis>... jedisSlavePools) {
         getConfig().setJedisSlavePools(jedisSlavePools);
         return self();
     }
 
-    public void setJedisSlavePools(JedisPool... jedisSlavePools) {
+    public void setJedisSlavePools(Pool<Jedis>... jedisSlavePools) {
         getConfig().setJedisSlavePools(jedisSlavePools);
     }
 
