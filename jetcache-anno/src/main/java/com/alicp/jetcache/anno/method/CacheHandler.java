@@ -52,6 +52,7 @@ public class CacheHandler implements InvocationHandler {
         this.hiddenPackages = hiddenPackages;
     }
 
+    @Override
     public Object invoke(Object proxy, final Method method, final Object[] args) throws Throwable {
         CacheInvokeContext context = null;
 

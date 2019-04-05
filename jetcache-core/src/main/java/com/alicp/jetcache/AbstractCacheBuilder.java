@@ -33,6 +33,7 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return buildCache();
     }
 
+    @Override
     public final <K, V> Cache<K, V> buildCache() {
         if (buildFunc == null) {
             throw new CacheConfigException("no buildFunc");

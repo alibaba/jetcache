@@ -67,6 +67,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         }
     }
 
+    @Override
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
         if (map == null) {
             return CacheResult.FAIL_ILLEGAL_ARGUMENT;

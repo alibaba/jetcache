@@ -54,8 +54,10 @@ public class SpringTest extends SpringTestBase {
 
     }
 
+    @SuppressWarnings("AliAccessStaticViaInstance")
     private void testTestBean(TestBean bean) throws Exception {
         Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
+        //noinspection AliAccessStaticViaInstance
         Assert.assertEquals(bean.staticCount(), bean.staticCount());
         Assert.assertEquals(bean.count(), bean.count());
         Assert.assertEquals(bean.countWithLocalCache(), bean.countWithLocalCache());

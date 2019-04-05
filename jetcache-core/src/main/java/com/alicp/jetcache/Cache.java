@@ -141,6 +141,7 @@ public interface Cache<K, V> extends Closeable {
     /**
      * Clean resources created by this cache.
      */
+    @Override
     default void close() {
     }
 
