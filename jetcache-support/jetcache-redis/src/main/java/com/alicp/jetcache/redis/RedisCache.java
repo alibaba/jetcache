@@ -101,9 +101,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheGetResult<V> do_GET(K key) {
-        if (key == null) {
-            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         try (Jedis jedis = getReadPool().getResource()) {
             byte[] newKey = buildKey(key);
             byte[] bytes = jedis.get(newKey);
@@ -124,9 +121,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         try (Jedis jedis = getReadPool().getResource()) {
             ArrayList<K> keyList = new ArrayList<K>(keys);
             byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
@@ -160,9 +154,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
@@ -180,9 +171,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
-        if (map == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try (Jedis jedis = config.getJedisPool().getResource()) {
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
@@ -208,9 +196,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE(K key) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         return REMOVE_impl(key, buildKey(key));
     }
 
@@ -234,9 +219,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try (Jedis jedis = config.getJedisPool().getResource()) {
             byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
             jedis.del(newKeys);
@@ -249,9 +231,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);

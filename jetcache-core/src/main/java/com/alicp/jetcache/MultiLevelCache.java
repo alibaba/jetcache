@@ -57,9 +57,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public CacheResult PUT(K key, V value) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         if (config.isUseExpireOfSubCache()) {
             return PUT(key, value, 0, null);
         } else {
@@ -69,9 +66,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
-        if (map == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         if (config.isUseExpireOfSubCache()) {
             return PUT_ALL(map, 0, null);
         } else {
@@ -81,9 +75,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheGetResult<V> do_GET(K key) {
-        if (key == null) {
-            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         for (int i = 0; i < caches.length; i++) {
             Cache cache = caches[i];
             CacheGetResult result = cache.GET(key);
@@ -127,9 +118,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         HashMap<K, CacheGetResult<V>> resultMap = new HashMap<>();
         Set<K> restKeys = new HashSet<>(keys);
         for (int i = 0; i < caches.length; i++) {
@@ -159,17 +147,11 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         return PUT_caches(caches.length, key, value, expireAfterWrite, timeUnit);
     }
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
-        if (map == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache c : caches) {
             CacheResult r;
@@ -212,9 +194,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE(K key) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache cache : caches) {
             CacheResult r = cache.REMOVE(key);
@@ -225,9 +204,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache cache : caches) {
             CacheResult r = cache.REMOVE_ALL(keys);

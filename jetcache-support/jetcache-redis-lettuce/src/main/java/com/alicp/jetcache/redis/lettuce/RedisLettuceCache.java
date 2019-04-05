@@ -90,9 +90,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
@@ -119,9 +116,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
-        if (map == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             CompletionStage<Integer> future = CompletableFuture.completedFuture(0);
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
@@ -153,9 +147,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheGetResult<V> do_GET(K key) {
-        if (key == null) {
-            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         try {
             byte[] newKey = buildKey(key);
             RedisFuture<byte[]> future = stringAsyncCommands.get(newKey);
@@ -186,9 +177,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         try {
             ArrayList<K> keyList = new ArrayList<K>(keys);
             byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
@@ -231,9 +219,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE(K key) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             RedisFuture<Long> future = keyAsyncCommands.del(buildKey(key));
             CacheResult result = new CacheResult(future.handle((rt, ex) -> {
@@ -262,9 +247,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
             RedisFuture<Long> future = keyAsyncCommands.del(newKeys);
@@ -286,9 +268,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
