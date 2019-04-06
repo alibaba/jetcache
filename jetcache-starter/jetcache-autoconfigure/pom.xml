@@ -24,12 +24,6 @@
         </dependency>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-redis-lettuce4</artifactId>
-            <version>${project.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-redis-lettuce</artifactId>
             <version>${project.version}</version>
             <optional>true</optional>
