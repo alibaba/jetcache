@@ -21,8 +21,7 @@ import org.springframework.context.annotation.Import;
 @Import({RedisAutoConfiguration.class,
         CaffeineAutoConfiguration.class,
         LinkedHashMapAutoConfiguration.class,
-        RedisLettuceAutoConfiguration.class,
-        RedisLettuce4AutoConfiguration.class})
+        RedisLettuceAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
     public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";
