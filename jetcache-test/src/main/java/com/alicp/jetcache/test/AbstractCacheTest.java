@@ -113,7 +113,7 @@ public abstract class AbstractCacheTest {
         try {
             cache.unwrap(String.class);
             Assert.fail();
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
         }
 
         Assert.assertNull(cache.tryLock(null, 1, TimeUnit.SECONDS));
