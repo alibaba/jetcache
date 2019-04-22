@@ -6,7 +6,7 @@
     <groupId>com.alicp.jetcache</groupId>
     <artifactId>jetcache-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.6.0.M1</version>
+    <version>2.6.0.M2-SNAPSHOT</version>
 
     <name>jetcache</name>
     <description>a Java cache abstraction which provides consistent use for various caching solutions</description>
@@ -199,6 +199,7 @@
 
         <spring.framework.version>5.1.6.RELEASE</spring.framework.version>
         <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
+        <lettuce.version>5.1.6.RELEASE</lettuce.version>
 
         <!--
         <spring.framework.version>5.1.1.RELEASE</spring.framework.version>
