@@ -38,6 +38,10 @@ public class SpringDataRedisAutoConfiguration {
 
         private ApplicationContext applicationContext;
 
+        public SpringDataRedisAutoInit() {
+            super("redis.springdata");
+        }
+
         @Override
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
             Map<String, RedisConnectionFactory> beans = applicationContext.getBeansOfType(RedisConnectionFactory.class);
