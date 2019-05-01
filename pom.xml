@@ -190,6 +190,7 @@
         <module>jetcache-starter/jetcache-autoconfigure</module>
         <module>jetcache-starter/jetcache-starter-redis</module>
         <module>jetcache-starter/jetcache-starter-redis-lettuce</module>
+        <module>jetcache-starter/jetcache-starter-redis-springdata</module>
     </modules>
 
     <properties>
