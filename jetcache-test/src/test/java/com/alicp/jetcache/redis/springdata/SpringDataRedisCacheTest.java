@@ -6,7 +6,9 @@ import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.junit.Test;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +21,22 @@ import java.util.concurrent.TimeUnit;
 public class SpringDataRedisCacheTest extends AbstractExternalCacheTest {
 
     @Test
-    public void test() throws Exception {
+    public void jedisTest() throws Exception {
         RedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        doTest(connectionFactory);
+    }
+
+    @Test
+    public void lettuceTest() throws Exception {
+        LettuceConnectionFactory connectionFactory =  new LettuceConnectionFactory(
+                new RedisStandaloneConfiguration("127.0.0.1", 6379));
+        connectionFactory.afterPropertiesSet();
+        doTest(connectionFactory);
+    }
+
+
+    private void doTest(RedisConnectionFactory connectionFactory) throws Exception {
+
 
         cache = SpringDataRedisCacheBuilder.createBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
