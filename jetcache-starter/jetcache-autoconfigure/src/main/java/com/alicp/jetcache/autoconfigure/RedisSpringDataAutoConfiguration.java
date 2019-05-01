@@ -3,7 +3,7 @@ package com.alicp.jetcache.autoconfigure;
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import com.alicp.jetcache.redis.springdata.SpringDataRedisCacheBuilder;
+import com.alicp.jetcache.redis.springdata.RedisSpringDataCacheBuilder;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,8 +20,8 @@ import java.util.Map;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
-@Conditional(SpringDataRedisAutoConfiguration.SpringDataRedisCondition.class)
-public class SpringDataRedisAutoConfiguration {
+@Conditional(RedisSpringDataAutoConfiguration.SpringDataRedisCondition.class)
+public class RedisSpringDataAutoConfiguration {
 
     public static class SpringDataRedisCondition extends JetCacheCondition {
         public SpringDataRedisCondition() {
@@ -61,7 +61,7 @@ public class SpringDataRedisAutoConfiguration {
                 }
                 factory = beans.get(connectionFactoryName);
             }
-            ExternalCacheBuilder builder = SpringDataRedisCacheBuilder.createBuilder().connectionFactory(factory);
+            ExternalCacheBuilder builder = RedisSpringDataCacheBuilder.createBuilder().connectionFactory(factory);
             parseGeneralConfig(builder, ct);
             return builder;
         }

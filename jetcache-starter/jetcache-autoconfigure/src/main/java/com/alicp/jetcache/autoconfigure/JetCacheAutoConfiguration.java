@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Import;
         CaffeineAutoConfiguration.class,
         LinkedHashMapAutoConfiguration.class,
         RedisLettuceAutoConfiguration.class,
-        SpringDataRedisAutoConfiguration.class})
+        RedisSpringDataAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
     public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";

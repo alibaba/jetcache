@@ -19,17 +19,17 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class SpringDataRedisCache<K, V> extends AbstractExternalCache<K, V> {
+public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
 
-    private Logger logger = LoggerFactory.getLogger(SpringDataRedisCache.class);
+    private Logger logger = LoggerFactory.getLogger(RedisSpringDataCache.class);
 
     private RedisConnectionFactory connectionFactory;
-    private SpringDataRedisCacheConfig<K, V> config;
+    private RedisSpringDataCacheConfig<K, V> config;
 
     private Function<Object, byte[]> valueEncoder;
     private Function<byte[], Object> valueDecoder;
 
-    public SpringDataRedisCache(SpringDataRedisCacheConfig<K, V> config) {
+    public RedisSpringDataCache(RedisSpringDataCacheConfig<K, V> config) {
         super(config);
         this.connectionFactory = config.getConnectionFactory();
         if (connectionFactory == null) {
@@ -227,11 +227,11 @@ public class SpringDataRedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        throw new UnsupportedOperationException("SpringDataRedisCache does not support unwrap");
+        throw new UnsupportedOperationException("RedisSpringDataCache does not support unwrap");
     }
 
     @Override
-    public SpringDataRedisCacheConfig<K, V> config() {
+    public RedisSpringDataCacheConfig<K, V> config() {
         return config;
     }
 

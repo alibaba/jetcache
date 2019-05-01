@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class SpringDataRedisCacheTest extends AbstractExternalCacheTest {
+public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void jedisTest() throws Exception {
@@ -38,7 +38,7 @@ public class SpringDataRedisCacheTest extends AbstractExternalCacheTest {
     private void doTest(RedisConnectionFactory connectionFactory) throws Exception {
 
 
-        cache = SpringDataRedisCacheBuilder.createBuilder()
+        cache = RedisSpringDataCacheBuilder.createBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
@@ -51,13 +51,13 @@ public class SpringDataRedisCacheTest extends AbstractExternalCacheTest {
         fastjsonKeyCoverterTest();
         expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
 
-        LoadingCacheTest.loadingCacheTest(SpringDataRedisCacheBuilder.createBuilder()
+        LoadingCacheTest.loadingCacheTest(RedisSpringDataCacheBuilder.createBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .connectionFactory(connectionFactory)
                 .keyPrefix(new Random().nextInt() + ""), 0);
-        RefreshCacheTest.refreshCacheTest(SpringDataRedisCacheBuilder.createBuilder()
+        RefreshCacheTest.refreshCacheTest(RedisSpringDataCacheBuilder.createBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
@@ -65,7 +65,7 @@ public class SpringDataRedisCacheTest extends AbstractExternalCacheTest {
                 .keyPrefix(new Random().nextInt() + ""), 200, 100);
 
 
-        cache = SpringDataRedisCacheBuilder.createBuilder()
+        cache = RedisSpringDataCacheBuilder.createBuilder()
                 .keyConvertor(null)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)
@@ -76,7 +76,7 @@ public class SpringDataRedisCacheTest extends AbstractExternalCacheTest {
 
         int thread = 10;
         int time = 3000;
-        cache = SpringDataRedisCacheBuilder.createBuilder()
+        cache = RedisSpringDataCacheBuilder.createBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)

@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class SpringDataRedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
+public class RedisSpringDataCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     private RedisConnectionFactory connectionFactory;
 
