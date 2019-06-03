@@ -11,7 +11,7 @@ import java.util.Date;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class ExternaKeyUtilTest {
+public class ExternalKeyUtilTest {
 
     private static class C implements Serializable {
         private static final long serialVersionUID = 3412272275328699372L;
