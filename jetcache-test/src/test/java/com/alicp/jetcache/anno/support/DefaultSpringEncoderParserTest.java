@@ -4,7 +4,6 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.SerialPolicy;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,27 +21,27 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class SpringConfigProviderTest {
+public class DefaultSpringEncoderParserTest {
     private StaticApplicationContext context;
     private DefaultListableBeanFactory beanFactory;
-    private SpringConfigProvider cp;
+    private DefaultSpringEncoderParser parser;
 
 
     @BeforeEach
     public void setup() {
         context = new StaticApplicationContext();
         beanFactory = context.getDefaultListableBeanFactory();
-        cp = new SpringConfigProvider();
-        cp.setApplicationContext(context);
+        parser = new DefaultSpringEncoderParser();
+        parser.setApplicationContext(context);
     }
 
     @Test
     public void testParseValueEncoder() {
-        assertEquals(JavaValueEncoder.class, cp.parseValueEncoder("java").getClass());
+        assertEquals(JavaValueEncoder.class, parser.parseEncoder("java").getClass());
 
         Function<Object, byte[]> func = o -> null;
         beanFactory.registerSingleton("myBean", func);
-        assertSame(func, cp.parseValueEncoder("bean:myBean"));
+        assertSame(func, parser.parseEncoder("bean:myBean"));
 
         SerialPolicy sp = new SerialPolicy() {
             @Override
@@ -56,18 +55,18 @@ public class SpringConfigProviderTest {
             }
         };
         beanFactory.registerSingleton("sp", sp);
-        assertSame(func, cp.parseValueEncoder("bean:sp"));
+        assertSame(func, parser.parseEncoder("bean:sp"));
 
-        assertThrows(NoSuchBeanDefinitionException.class, () -> cp.parseValueEncoder("bean:not_exists"));
+        assertThrows(NoSuchBeanDefinitionException.class, () -> parser.parseEncoder("bean:not_exists"));
     }
 
     @Test
     public void testParseValueDecoder() {
-        assertEquals(KryoValueDecoder.class, cp.parseValueDecoder("kryo").getClass());
+        assertEquals(KryoValueDecoder.class, parser.parseDecoder("kryo").getClass());
 
         Function<byte[], Object> func = o -> null;
         beanFactory.registerSingleton("myBean", func);
-        assertSame(func, cp.parseValueDecoder("bean:myBean"));
+        assertSame(func, parser.parseDecoder("bean:myBean"));
 
         SerialPolicy sp = new SerialPolicy() {
             @Override
@@ -81,18 +80,9 @@ public class SpringConfigProviderTest {
             }
         };
         beanFactory.registerSingleton("sp", sp);
-        assertSame(func, cp.parseValueDecoder("bean:sp"));
+        assertSame(func, parser.parseDecoder("bean:sp"));
 
-        assertThrows(NoSuchBeanDefinitionException.class, () -> cp.parseValueDecoder("bean:not_exists"));
-    }
-
-    @Test
-    public void testParseKeyConvertor() {
-        assertSame(FastjsonKeyConvertor.INSTANCE, cp.parseKeyConvertor("fastjson"));
-        Function<Object, Object> func = o -> null;
-        beanFactory.registerSingleton("cvt", func);
-        assertSame(func, cp.parseKeyConvertor("bean:cvt"));
-        assertThrows(NoSuchBeanDefinitionException.class, () -> cp.parseKeyConvertor("bean:not_exists"));
+        assertThrows(NoSuchBeanDefinitionException.class, () -> parser.parseDecoder("bean:not_exists"));
     }
 
 }

@@ -40,7 +40,7 @@ public class CacheContext {
     private GlobalCacheConfig globalCacheConfig;
 
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
-    private SimpleCacheManager cacheManager = SimpleCacheManager.defaultManager;
+    private SimpleCacheManager cacheManager;
     private boolean inited;
 
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
@@ -50,6 +50,7 @@ public class CacheContext {
 
     public synchronized void init() {
         if (!inited) {
+            cacheManager = configProvider.getCacheManager();
             if (globalCacheConfig.getStatIntervalMinutes() > 0) {
                 defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
                         TimeUnit.MINUTES, globalCacheConfig.getConfigProvider().statCallback());
