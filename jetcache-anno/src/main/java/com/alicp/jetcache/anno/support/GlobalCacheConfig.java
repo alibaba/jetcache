@@ -4,16 +4,15 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.util.Map;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class GlobalCacheConfig implements InitializingBean, DisposableBean {
+public class GlobalCacheConfig {
 
     private String[] hiddenPackages;
     protected int statIntervalMinutes;
@@ -24,7 +23,6 @@ public class GlobalCacheConfig implements InitializingBean, DisposableBean {
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
 
-    @Autowired(required = false)
     private ConfigProvider configProvider = new SpringConfigProvider();
 
     private CacheContext cacheContext;
@@ -32,24 +30,16 @@ public class GlobalCacheConfig implements InitializingBean, DisposableBean {
     public GlobalCacheConfig() {
     }
 
-    public void init() {
-        afterPropertiesSet();
-    }
-
-    @Override
-    public synchronized void afterPropertiesSet() {
+    @PostConstruct
+    public synchronized void init() {
         if (cacheContext == null) {
             cacheContext = configProvider.newContext(this);
             cacheContext.init();
         }
     }
 
-    public void shutdown() {
-        destroy();
-    }
-
-    @Override
-    public synchronized void destroy() {
+    @PreDestroy
+    public synchronized void shutdown() {
         if (cacheContext != null) {
             cacheContext.shutdown();
             cacheContext = null;
