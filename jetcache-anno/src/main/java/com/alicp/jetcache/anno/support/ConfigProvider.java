@@ -14,6 +14,7 @@ public class ConfigProvider extends AbstractLifecycle {
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
     protected CacheMonitorInstaller cacheMonitorInstaller;
+    private CacheMonitorInstaller defaultCacheMonitorInstaller = new DefaultCacheMonitorInstaller();
 
     @Resource
     protected GlobalCacheConfig globalCacheConfig;
@@ -24,7 +25,7 @@ public class ConfigProvider extends AbstractLifecycle {
         cacheManager = SimpleCacheManager.defaultManager;
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
-        cacheMonitorInstaller = new DefaultCacheMonitorInstaller();
+        cacheMonitorInstaller = defaultCacheMonitorInstaller;
     }
 
     @Override
@@ -34,7 +35,7 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected void initDefaultCacheMonitorInstaller() {
-        if (cacheMonitorInstaller instanceof DefaultCacheMonitorInstaller) {
+        if (cacheMonitorInstaller == defaultCacheMonitorInstaller) {
             ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).setGlobalCacheConfig(globalCacheConfig);
             ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).init();
         }
@@ -48,7 +49,7 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorInstaller instanceof DefaultCacheMonitorInstaller) {
+        if (cacheMonitorInstaller == defaultCacheMonitorInstaller) {
             ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).shutdown();
         }
     }
