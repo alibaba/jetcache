@@ -39,7 +39,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         if (configProvider == null) {
             configProvider = applicationContext.getBean(ConfigProvider.class);
         }
-        if (globalCacheConfig == null) {
+        if (configProvider != null && globalCacheConfig == null) {
             globalCacheConfig = configProvider.getGlobalCacheConfig();
         }
         if (globalCacheConfig == null || !globalCacheConfig.isEnableMethodCache()) {

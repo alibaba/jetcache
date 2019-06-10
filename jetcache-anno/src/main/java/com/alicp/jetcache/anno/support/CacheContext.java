@@ -140,7 +140,9 @@ public class CacheContext {
             cache.config().setPenetrationProtectTimeout(protectConfig.getPenetrationProtectTimeout());
         }
 
-        configProvider.getCacheMonitorInstaller().addMonitors(cacheName, cache);
+        if (configProvider.getCacheMonitorInstaller() != null) {
+            configProvider.getCacheMonitorInstaller().addMonitors(cacheName, cache);
+        }
         return cache;
     }
 
