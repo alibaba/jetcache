@@ -1,8 +1,6 @@
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.support.*;
-
-import java.util.function.Consumer;
+import javax.annotation.Resource;
 import java.util.function.Function;
 
 /**
@@ -10,26 +8,71 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class ConfigProvider {
+public class ConfigProvider extends AbstractLifecycle {
 
-    private SimpleCacheManager cacheManager;
+    protected SimpleCacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
+    protected CacheMonitorInstaller cacheMonitorInstaller;
+
+    @Resource
+    protected GlobalCacheConfig globalCacheConfig;
+
+    private CacheContext cacheContext;
 
     public ConfigProvider() {
         cacheManager = SimpleCacheManager.defaultManager;
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
+        cacheMonitorInstaller = new DefaultCacheMonitorInstaller();
     }
 
+    @Override
+    public void doInit() {
+        initDefaultCacheMonitorInstaller();
+        cacheContext = newContext();
+    }
+
+    protected void initDefaultCacheMonitorInstaller() {
+        if (cacheMonitorInstaller instanceof DefaultCacheMonitorInstaller) {
+            ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).setGlobalCacheConfig(globalCacheConfig);
+            ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).init();
+        }
+        cacheContext = null;
+    }
+
+    @Override
+    public void doShutdown() {
+        shutdownDefaultCacheMonitorInstaller();
+        cacheManager.rebuild();
+    }
+
+    protected void shutdownDefaultCacheMonitorInstaller() {
+        if (cacheMonitorInstaller instanceof DefaultCacheMonitorInstaller) {
+            ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).shutdown();
+        }
+    }
+
+    /**
+     * Keep this method for backward compatibility.
+     * NOTICE: there is no getter for encoderParser.
+     */
     public Function<Object, byte[]> parseValueEncoder(String valueEncoder) {
         return encoderParser.parseEncoder(valueEncoder);
     }
 
+    /**
+     * Keep this method for backward compatibility.
+     * NOTICE: there is no getter for encoderParser.
+     */
     public Function<byte[], Object> parseValueDecoder(String valueDecoder) {
         return encoderParser.parseDecoder(valueDecoder);
     }
 
+    /**
+     * Keep this method for backward compatibility.
+     * NOTICE: there is no getter for keyConvertorParser.
+     */
     public Function<Object, Object> parseKeyConvertor(String convertor) {
         return keyConvertorParser.parseKeyConvertor(convertor);
     }
@@ -38,12 +81,8 @@ public class ConfigProvider {
         return new DefaultCacheNameGenerator(hiddenPackages);
     }
 
-    public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
-        return new CacheContext(globalCacheConfig);
-    }
-
-    public Consumer<StatInfo> statCallback() {
-        return new StatInfoLogger(false);
+    protected CacheContext newContext() {
+        return new CacheContext(this, globalCacheConfig);
     }
 
     public void setCacheManager(SimpleCacheManager cacheManager) {
@@ -60,5 +99,25 @@ public class ConfigProvider {
 
     public void setKeyConvertorParser(KeyConvertorParser keyConvertorParser) {
         this.keyConvertorParser = keyConvertorParser;
+    }
+
+    public CacheMonitorInstaller getCacheMonitorInstaller() {
+        return cacheMonitorInstaller;
+    }
+
+    public void setCacheMonitorInstaller(CacheMonitorInstaller cacheMonitorInstaller) {
+        this.cacheMonitorInstaller = cacheMonitorInstaller;
+    }
+
+    public GlobalCacheConfig getGlobalCacheConfig() {
+        return globalCacheConfig;
+    }
+
+    public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
+        this.globalCacheConfig = globalCacheConfig;
+    }
+
+    public CacheContext getCacheContext() {
+        return cacheContext;
     }
 }

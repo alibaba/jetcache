@@ -6,10 +6,7 @@ import com.alicp.jetcache.anno.CachePenetrationProtect;
 import com.alicp.jetcache.anno.CacheRefresh;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.method.CacheConfigUtil;
-import com.alicp.jetcache.anno.support.CacheNameGenerator;
-import com.alicp.jetcache.anno.support.CachedAnnoConfig;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.anno.support.PenetrationProtectConfig;
+import com.alicp.jetcache.anno.support.*;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Field;
@@ -70,6 +67,7 @@ class LazyInitCache implements ProxyCache {
             throw new IllegalStateException();
         }
         GlobalCacheConfig globalCacheConfig = beanFactory.getBean(GlobalCacheConfig.class);
+        ConfigProvider configProvider = beanFactory.getBean(ConfigProvider.class);
 
         CachedAnnoConfig cac = new CachedAnnoConfig();
         cac.setArea(ann.area());
@@ -88,10 +86,10 @@ class LazyInitCache implements ProxyCache {
         String cacheName = cac.getName();
         if (CacheConsts.isUndefined(cacheName)) {
             String[] hiddenPackages = globalCacheConfig.getHiddenPackages();
-            CacheNameGenerator g = globalCacheConfig.getConfigProvider().createCacheNameGenerator(hiddenPackages);
+            CacheNameGenerator g = configProvider.createCacheNameGenerator(hiddenPackages);
             cacheName = g.generateCacheName(field);
         }
-        cache = globalCacheConfig.getCacheContext().__createOrGetCache(cac, ann.area(), cacheName);
+        cache = configProvider.getCacheContext().__createOrGetCache(cac, ann.area(), cacheName);
     }
 
     @Override

@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.test.anno;
 
+import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.test.MockRemoteCacheBuilder;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.ConfigProvider;
@@ -20,7 +21,7 @@ import java.util.Map;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class TestUtil {
-    public static GlobalCacheConfig createGloableConfig(ConfigProvider configProvider) {
+    public static GlobalCacheConfig createGloableConfig() {
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder();
         localBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
@@ -42,12 +43,22 @@ public class TestUtil {
         remoteBuilders.put("A1", remoteBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setConfigProvider(configProvider);
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
 
-//        globalCacheConfig.init();
         return globalCacheConfig;
+    }
+
+    public static ConfigProvider createConfigProvider() {
+        ConfigProvider configProvider = new ConfigProvider();
+        configProvider.setGlobalCacheConfig(createGloableConfig());
+        return configProvider;
+    }
+
+    public static SpringConfigProvider createSpringConfigProvider() {
+        SpringConfigProvider configProvider = new SpringConfigProvider();
+        configProvider.setGlobalCacheConfig(createGloableConfig());
+        return configProvider;
     }
 
 }

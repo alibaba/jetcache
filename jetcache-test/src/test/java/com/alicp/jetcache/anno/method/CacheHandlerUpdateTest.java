@@ -7,15 +7,16 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigMap;
+import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.testsupport.CountClass;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheHandlerUpdateTest {
-    private GlobalCacheConfig globalCacheConfig;
+    private ConfigProvider configProvider;
     private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
     private Cache cache;
@@ -33,10 +34,10 @@ public class CacheHandlerUpdateTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setLocalCacheBuilders(new HashMap<>());
-        globalCacheConfig.setRemoteCacheBuilders(new HashMap<>());
-        globalCacheConfig.init();
+        GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
+        configProvider = new ConfigProvider();
+        configProvider.setGlobalCacheConfig(globalCacheConfig);
+        configProvider.init();
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -49,7 +50,7 @@ public class CacheHandlerUpdateTest {
         count = new CountClass();
 
         Method method = CountClass.class.getMethod("update", String.class, int.class);
-        cacheInvokeContext = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
+        cacheInvokeContext = configProvider.getCacheContext().createCacheInvokeContext(configMap);
         cacheInvokeContext.setCacheInvokeConfig(cacheInvokeConfig);
         updateAnnoConfig = new CacheUpdateAnnoConfig();
         updateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
@@ -63,6 +64,12 @@ public class CacheHandlerUpdateTest {
         cacheInvokeContext.setInvoker(() -> cacheInvokeContext.getMethod().invoke(count, cacheInvokeContext.getArgs()));
         cacheInvokeContext.setCacheFunction((a, b) -> cache);
     }
+
+    @AfterEach
+    public void tearDown() {
+        configProvider.shutdown();
+    }
+
 
     @Test
     public void testUpdate() throws Throwable {

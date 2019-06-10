@@ -2,6 +2,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.method.SpringCacheContext;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -31,11 +32,32 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     }
 
     @Override
-    public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
-        CacheContext c = new SpringCacheContext(globalCacheConfig, applicationContext);
-        if (getCacheManager() != null) {
-            c.setCacheManager(getCacheManager());
-        }
-        return c;
+    protected CacheContext newContext() {
+        return new SpringCacheContext(this, globalCacheConfig, applicationContext);
     }
+
+    @Autowired(required = false)
+    @Override
+    public void setCacheManager(SimpleCacheManager cacheManager) {
+        super.setCacheManager(cacheManager);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setEncoderParser(EncoderParser encoderParser) {
+        super.setEncoderParser(encoderParser);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setKeyConvertorParser(KeyConvertorParser keyConvertorParser) {
+        super.setKeyConvertorParser(keyConvertorParser);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setCacheMonitorInstaller(CacheMonitorInstaller cacheMonitorInstaller) {
+        super.setCacheMonitorInstaller(cacheMonitorInstaller);
+    }
+
 }

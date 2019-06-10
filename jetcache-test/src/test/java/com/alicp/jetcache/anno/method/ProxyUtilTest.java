@@ -6,13 +6,10 @@ package com.alicp.jetcache.anno.method;
 import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigProvider;
-import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,24 +17,25 @@ import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ProxyUtilTest {
 
-    private GlobalCacheConfig globalCacheConfig;
+    private ConfigProvider configProvider;
 
     @BeforeEach
     public void setup() {
-        globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
-        globalCacheConfig.init();
+        configProvider = TestUtil.createConfigProvider();
+        configProvider.init();
     }
 
     @AfterEach
     public void stop() {
-        globalCacheConfig.shutdown();
+        configProvider.shutdown();
     }
 
     public interface I1 {
@@ -63,7 +61,7 @@ public class ProxyUtilTest {
     //annotation on class
     public void testGetProxyByAnnotation1() {
         I1 c1 = new C1();
-        I1 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+        I1 c2 = ProxyUtil.getProxyByAnnotation(c1, configProvider);
         assertNotEquals(c1.count(), c1.count());
         assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
         assertEquals(c2.count(), c2.count());
@@ -105,7 +103,7 @@ public class ProxyUtilTest {
     //annotation on intface
     public void testGetProxyByAnnotation2() {
         I2 c1 = new C2();
-        I2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+        I2 c2 = ProxyUtil.getProxyByAnnotation(c1, configProvider);
 
         assertNotEquals(c1.count(), c1.count());
         assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
@@ -113,7 +111,7 @@ public class ProxyUtilTest {
         assertNotEquals(c2.countWithoutCache(), c2.countWithoutCache());
 
         I2 c3 = new C22();
-        I2 c4 = ProxyUtil.getProxyByAnnotation(c3, globalCacheConfig);
+        I2 c4 = ProxyUtil.getProxyByAnnotation(c3, configProvider);
         assertEquals(c2.count(), c4.count());
     }
 
@@ -145,7 +143,7 @@ public class ProxyUtilTest {
     //annotation on super interface
     public void testGetProxyByAnnotation3() {
         I3_2 c1 = new C3();
-        I3_2 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+        I3_2 c2 = ProxyUtil.getProxyByAnnotation(c1, configProvider);
         assertNotEquals(c1.count(), c1.count());
         assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
         assertEquals(c2.count(), c2.count());
@@ -179,7 +177,7 @@ public class ProxyUtilTest {
     //with super interface
     public void testGetProxyByAnnotation4() {
         I4_1 c1 = new C4();
-        I4_1 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+        I4_1 c2 = ProxyUtil.getProxyByAnnotation(c1, configProvider);
         assertNotEquals(c1.count(), c1.count());
         assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
         assertEquals(c2.count(), c2.count());
@@ -209,7 +207,7 @@ public class ProxyUtilTest {
     //enabled=false
     public void testGetProxyByAnnotation5() {
         I5 c1 = new C5();
-        I5 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+        I5 c2 = ProxyUtil.getProxyByAnnotation(c1, configProvider);
         assertNotEquals(c1.count(), c1.count());
         assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
         assertNotEquals(c2.count(), c2.count());
@@ -247,7 +245,7 @@ public class ProxyUtilTest {
     //enabled=false+EnableCache
     public void testGetProxyByAnnotation6() {
         I6 c1 = new C6();
-        I6 c2 = ProxyUtil.getProxyByAnnotation(c1, globalCacheConfig);
+        I6 c2 = ProxyUtil.getProxyByAnnotation(c1, configProvider);
         assertNotEquals(c1.count(), c1.count());
         assertNotEquals(c1.countWithoutCache(), c1.countWithoutCache());
         assertEquals(c2.count(), c2.count());
@@ -298,11 +296,11 @@ public class ProxyUtilTest {
     //enabled=false+EnableCache（enable in caller）
     public void testGetProxyByAnnotation7() {
         I7_1 c1_1 = new C7_1();
-        I7_1 c1_2 = ProxyUtil.getProxyByAnnotation(c1_1, globalCacheConfig);
+        I7_1 c1_2 = ProxyUtil.getProxyByAnnotation(c1_1, configProvider);
 
         C7_2 c2_1 = new C7_2();
         c2_1.service = c1_2;
-        I7_2 c2_2 = ProxyUtil.getProxyByAnnotation(c2_1, globalCacheConfig);
+        I7_2 c2_2 = ProxyUtil.getProxyByAnnotation(c2_1, configProvider);
         assertNotEquals(c2_1.count(), c2_1.count());
         assertNotEquals(c2_2.countWithoutCache(), c2_2.countWithoutCache());
         assertEquals(c2_2.count(), c2_2.count());
@@ -382,7 +380,7 @@ public class ProxyUtilTest {
     // @CacheUpdate and @CacheInvalidate test
     public void testGetProxyByAnnotation8() {
         I8 i8 = new C8();
-        I8 i8_proxy = ProxyUtil.getProxyByAnnotation(i8, globalCacheConfig);
+        I8 i8_proxy = ProxyUtil.getProxyByAnnotation(i8, configProvider);
 
         int v1 = i8_proxy.count("K1");
         assertEquals(v1, i8_proxy.count("K1"));
@@ -432,7 +430,7 @@ public class ProxyUtilTest {
     @Test
     // refresh test
     public void testGetProxyByAnnotation9() throws Exception {
-        I9 beanProxy = ProxyUtil.getProxyByAnnotation(new C9(), globalCacheConfig);
+        I9 beanProxy = ProxyUtil.getProxyByAnnotation(new C9(), configProvider);
         {
             int x1 = beanProxy.count();
             int x2 = beanProxy.count();
@@ -495,7 +493,7 @@ public class ProxyUtilTest {
     @Test
     // protect test
     public void testGetProxyByAnnotation10() throws Exception {
-        I10 beanProxy = ProxyUtil.getProxyByAnnotation(new C10(), globalCacheConfig);
+        I10 beanProxy = ProxyUtil.getProxyByAnnotation(new C10(), configProvider);
 
         // preheat
         beanProxy.count1(1);

@@ -106,7 +106,7 @@ public class ConfigTest implements ApplicationContextAware {
         }
 
         @Bean
-        public GlobalCacheConfig config(SpringConfigProvider configProvider) {
+        public GlobalCacheConfig config() {
             Map localFactories = new HashMap();
             EmbeddedCacheBuilder localFactory = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                     .limit(20).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterWrite(50, TimeUnit.MILLISECONDS);
@@ -135,7 +135,7 @@ public class ConfigTest implements ApplicationContextAware {
             remoteFactories.put("A1", remoteBuilder);
 
             GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-            globalCacheConfig.setConfigProvider(configProvider);
+//            globalCacheConfig.setConfigProvider(configProvider);
             globalCacheConfig.setLocalCacheBuilders(localFactories);
             globalCacheConfig.setRemoteCacheBuilders(remoteFactories);
 
