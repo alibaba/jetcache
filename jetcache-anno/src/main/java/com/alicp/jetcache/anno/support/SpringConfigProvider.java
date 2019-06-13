@@ -1,10 +1,14 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.method.SpringCacheContext;
+import com.alicp.jetcache.support.CacheUpdatePublisher;
+import com.alicp.jetcache.support.StatInfo;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+
+import java.util.function.Consumer;
 
 /**
  * Created on 2016/12/1.
@@ -58,6 +62,18 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     @Override
     public void setCacheMonitorInstaller(CacheMonitorInstaller cacheMonitorInstaller) {
         super.setCacheMonitorInstaller(cacheMonitorInstaller);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setStatCallback(Consumer<StatInfo> statCallback) {
+        super.setStatCallback(statCallback);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setCacheUpdatePublisher(CacheUpdatePublisher cacheUpdatePublisher) {
+        super.setCacheUpdatePublisher(cacheUpdatePublisher);
     }
 
 }

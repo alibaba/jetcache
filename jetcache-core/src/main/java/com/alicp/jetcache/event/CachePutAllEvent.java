@@ -12,6 +12,9 @@ import java.util.Map;
  */
 public class CachePutAllEvent extends CacheEvent {
     private final long millis;
+    /**
+     * key, value map.
+     */
     private final Map map;
     private final CacheResult result;
 

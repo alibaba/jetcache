@@ -1,6 +1,12 @@
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.support.CacheUpdatePublisher;
+import com.alicp.jetcache.support.CacheUpdateReceiver;
+import com.alicp.jetcache.support.StatInfo;
+import com.alicp.jetcache.support.StatInfoLogger;
+
 import javax.annotation.Resource;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -10,14 +16,17 @@ import java.util.function.Function;
  */
 public class ConfigProvider extends AbstractLifecycle {
 
+    @Resource
+    protected GlobalCacheConfig globalCacheConfig;
+
     protected SimpleCacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
     protected CacheMonitorInstaller cacheMonitorInstaller;
-    private CacheMonitorInstaller defaultCacheMonitorInstaller = new DefaultCacheMonitorInstaller();
+    private Consumer<StatInfo> statCallback = new StatInfoLogger(false);
+    private CacheUpdatePublisher cacheUpdatePublisher;
 
-    @Resource
-    protected GlobalCacheConfig globalCacheConfig;
+    private CacheMonitorInstaller defaultCacheMonitorInstaller = new DefaultCacheMonitorInstaller();
 
     private CacheContext cacheContext;
 
@@ -36,8 +45,13 @@ public class ConfigProvider extends AbstractLifecycle {
 
     protected void initDefaultCacheMonitorInstaller() {
         if (cacheMonitorInstaller == defaultCacheMonitorInstaller) {
-            ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).setGlobalCacheConfig(globalCacheConfig);
-            ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).init();
+            DefaultCacheMonitorInstaller installer = (DefaultCacheMonitorInstaller) cacheMonitorInstaller;
+            installer.setGlobalCacheConfig(globalCacheConfig);
+            installer.setStatCallback(statCallback);
+            if (cacheUpdatePublisher != null) {
+                installer.setCacheUpdatePublisher(cacheUpdatePublisher);
+            }
+            installer.init();
         }
         cacheContext = null;
     }
@@ -120,5 +134,13 @@ public class ConfigProvider extends AbstractLifecycle {
 
     public CacheContext getCacheContext() {
         return cacheContext;
+    }
+
+    public void setStatCallback(Consumer<StatInfo> statCallback) {
+        this.statCallback = statCallback;
+    }
+
+    public void setCacheUpdatePublisher(CacheUpdatePublisher cacheUpdatePublisher) {
+        this.cacheUpdatePublisher = cacheUpdatePublisher;
     }
 }

@@ -9,5 +9,5 @@ import com.alicp.jetcache.Cache;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public interface CacheMonitorInstaller {
-    void addMonitors(String cacheName, Cache cache);
+    void addMonitors(String area, String cacheName, Cache cache);
 }

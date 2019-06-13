@@ -141,7 +141,7 @@ public class CacheContext {
         }
 
         if (configProvider.getCacheMonitorInstaller() != null) {
-            configProvider.getCacheMonitorInstaller().addMonitors(cacheName, cache);
+            configProvider.getCacheMonitorInstaller().addMonitors(area, cacheName, cache);
         }
         return cache;
     }
