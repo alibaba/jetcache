@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Import;
 @EnableConfigurationProperties(JetCacheProperties.class)
 @Import({RedisAutoConfiguration.class,
         CaffeineAutoConfiguration.class,
+        MockRemoteCacheAutoConfiguration.class,
         LinkedHashMapAutoConfiguration.class,
         RedisLettuceAutoConfiguration.class,
         RedisSpringDataAutoConfiguration.class})
