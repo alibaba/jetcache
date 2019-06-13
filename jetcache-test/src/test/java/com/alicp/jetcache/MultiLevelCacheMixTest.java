@@ -9,7 +9,7 @@ import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
-import com.alicp.jetcache.test.MockRemoteCacheBuilder;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import io.lettuce.core.RedisClient;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.jupiter.api.Test;

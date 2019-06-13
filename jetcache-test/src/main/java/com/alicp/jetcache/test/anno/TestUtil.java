@@ -4,7 +4,7 @@
 package com.alicp.jetcache.test.anno;
 
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
-import com.alicp.jetcache.test.MockRemoteCacheBuilder;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
