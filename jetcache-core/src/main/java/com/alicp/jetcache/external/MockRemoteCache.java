@@ -1,16 +1,12 @@
 /**
  * Created on  13-09-22 16:54
  */
-package com.alicp.jetcache.test;
+package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
-import com.alicp.jetcache.support.JavaValueDecoder;
-import com.alicp.jetcache.support.JavaValueEncoder;
-import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -24,19 +20,6 @@ import java.util.stream.Collectors;
 public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     private Cache<ByteBuffer, byte[]> cache;
     private ExternalCacheConfig<K, V> config;
-
-    public static class MockRemoteCacheTest extends AbstractCacheTest {
-        @Test
-        public void Test() throws Exception {
-            MockRemoteCacheBuilder b = new MockRemoteCacheBuilder();
-            b.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
-            b.setValueDecoder(JavaValueDecoder.INSTANCE);
-            b.setValueEncoder(JavaValueEncoder.INSTANCE);
-            cache = b.buildCache();
-            baseTest();
-        }
-    }
-
 
     public MockRemoteCache(MockRemoteCacheConfig<K, V> config) {
         super(config);

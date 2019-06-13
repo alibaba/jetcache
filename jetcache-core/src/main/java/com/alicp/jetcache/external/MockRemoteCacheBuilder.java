@@ -1,6 +1,4 @@
-package com.alicp.jetcache.test;
-
-import com.alicp.jetcache.external.ExternalCacheBuilder;
+package com.alicp.jetcache.external;
 
 /**
  * Created on 2016/10/20.

@@ -6,7 +6,7 @@ import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import com.alicp.jetcache.test.MockRemoteCacheBuilder;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.testsupport.Sleeper;
 import org.junit.Assert;
 import org.junit.Test;
