@@ -125,11 +125,11 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         DefaultCacheMonitor m1_again = new DefaultCacheMonitor("l1_monitor_again");
         DefaultCacheMonitor m2 = new DefaultCacheMonitor("l2");
         DefaultCacheMonitor mc = new DefaultCacheMonitor("mc");
-        l1Cache = new MonitoredCache(l1Cache, m1);
-        l1Cache = new MonitoredCache(l1Cache, m1_again);
-        l2Cache = new MonitoredCache(l2Cache, m2);
+        l1Cache.config().getMonitors().add(m1);
+        l1Cache.config().getMonitors().add(m1_again);
+        l2Cache.config().getMonitors().add(m2);
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
-        cache = new MonitoredCache<>(cache, mc);
+        cache.config().getMonitors().add(mc);
         DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
         logger.add(m1, m1_again, m2, mc);
         logger.start();

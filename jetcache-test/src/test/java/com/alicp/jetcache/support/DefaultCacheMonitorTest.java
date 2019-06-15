@@ -1,7 +1,6 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.MonitoredCache;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import org.junit.Assert;
@@ -118,20 +117,12 @@ public class DefaultCacheMonitorTest {
     }
 
     public static void testMonitor(Cache cache) {
-        {
-            // old style test
-            DefaultCacheMonitor monitor = new DefaultCacheMonitor("Test");
-            cache = new MonitoredCache(cache, monitor);
-            basetest(cache, monitor);
-        }
-        {
-            // new style test
-            List monitors = cache.config().getMonitors();
-            monitors.clear();
-            DefaultCacheMonitor monitor = new DefaultCacheMonitor("Test");
-            monitors.add(monitor);
-            basetest(cache, monitor);
-        }
+        // new style test
+        List monitors = cache.config().getMonitors();
+        monitors.clear();
+        DefaultCacheMonitor monitor = new DefaultCacheMonitor("Test");
+        monitors.add(monitor);
+        basetest(cache, monitor);
     }
 
     @Test
@@ -147,8 +138,8 @@ public class DefaultCacheMonitorTest {
         Cache c2 = createCache();
         DefaultCacheMonitor m2 = new DefaultCacheMonitor("cache2");
 
-        c1 = new MonitoredCache(c1, m1);
-        c2 = new MonitoredCache(c2, m2);
+        c1.config().getMonitors().add(m1);
+        c2.config().getMonitors().add(m2);
         DefaultCacheMonitorManager manager = new DefaultCacheMonitorManager(10, TimeUnit.SECONDS, true);
         manager.start();
         manager.add(m1, m2);
@@ -158,7 +149,7 @@ public class DefaultCacheMonitorTest {
 
         Cache mc = new MultiLevelCache(c1, c2);
         DefaultCacheMonitor mcm = new DefaultCacheMonitor("multiCache");
-        mc = new MonitoredCache(mc, mcm);
+        mc.config().getMonitors().add(mcm);
         manager.add(mcm);
         basetest(mc, mcm);
 
