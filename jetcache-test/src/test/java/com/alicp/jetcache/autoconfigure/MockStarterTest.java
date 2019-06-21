@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
- * Created on 2019/5/1.
+ * Created on 2019/6/21.
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -27,12 +27,12 @@ import javax.annotation.PostConstruct;
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
-public class SpringDataRedisStarterTest extends SpringTest {
+public class MockStarterTest extends SpringTest {
 
     @Test
     public void tests() throws Exception {
-        System.setProperty("spring.profiles.active", "redis-springdata");
-        context = SpringApplication.run(SpringDataRedisStarterTest.class);
+        System.setProperty("spring.profiles.active", "mock");
+        context = SpringApplication.run(MockStarterTest.class);
         doTest();
     }
 
