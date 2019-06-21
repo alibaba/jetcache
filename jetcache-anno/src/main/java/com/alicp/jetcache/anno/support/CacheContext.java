@@ -40,7 +40,7 @@ public class CacheContext {
     private GlobalCacheConfig globalCacheConfig;
 
     private DefaultCacheMonitorManager defaultCacheMonitorManager;
-    private SimpleCacheManager cacheManager = SimpleCacheManager.defaultManager;
+    protected SimpleCacheManager cacheManager = SimpleCacheManager.defaultManager;
     private boolean inited;
 
     public CacheContext(GlobalCacheConfig globalCacheConfig) {
@@ -112,21 +112,23 @@ public class CacheContext {
         return cache;
     }
 
+    @Deprecated
     public <K, V> Cache<K, V> getCache(String cacheName) {
         return getCache(CacheConsts.DEFAULT_AREA, cacheName);
     }
 
+    @Deprecated
     public <K, V> Cache<K, V> getCache(String area, String cacheName) {
-        Cache cache = cacheManager.getCache(area, cacheName);
+        Cache cache = cacheManager.getCacheWithoutCreate(area, cacheName);
         return cache;
     }
 
     public Cache __createOrGetCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         String fullCacheName = area + "_" + cacheName;
-        Cache cache = cacheManager.getCache(area, cacheName);
+        Cache cache = cacheManager.getCacheWithoutCreate(area, cacheName);
         if (cache == null) {
             synchronized (this) {
-                cache = cacheManager.getCache(area, cacheName);
+                cache = cacheManager.getCacheWithoutCreate(area, cacheName);
                 if (cache == null) {
                     if (globalCacheConfig.isAreaInCacheName()) {
                         // for compatible reason, if we use default configuration, the prefix should same to that version <=2.4.3

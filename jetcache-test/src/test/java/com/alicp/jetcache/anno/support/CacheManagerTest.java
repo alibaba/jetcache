@@ -7,11 +7,11 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.spring.SpringTestBase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.Assert;
+import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -53,8 +53,8 @@ public class CacheManagerTest extends SpringTestBase {
     }
 
 
-    @Before
-    @After
+    @BeforeEach
+    @AfterEach
     public void init() {
         SimpleCacheManager.defaultManager.rebuild();
     }
@@ -66,6 +66,11 @@ public class CacheManagerTest extends SpringTestBase {
         Assert.assertEquals(value, bean.count("K1"));
         CacheManager.defaultManager().getCache("C1").remove("K1");
         Assert.assertNotEquals(value, bean.count("K1"));
+    }
+
+    @Test
+    public void test2() {
+        Assert.assertNotNull(CacheManager.defaultManager().getCache("C1"));
     }
 
 }
