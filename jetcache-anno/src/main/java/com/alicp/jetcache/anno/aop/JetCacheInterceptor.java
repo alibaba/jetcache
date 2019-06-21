@@ -12,6 +12,7 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -24,6 +25,7 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
 
     //private static final Logger logger = LoggerFactory.getLogger(JetCacheInterceptor.class);
 
+    @Autowired
     private ConfigMap cacheConfigMap;
     private ApplicationContext applicationContext;
     private GlobalCacheConfig globalCacheConfig;

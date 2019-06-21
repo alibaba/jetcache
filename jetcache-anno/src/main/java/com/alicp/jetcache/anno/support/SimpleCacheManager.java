@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -17,6 +18,7 @@ public class SimpleCacheManager implements CacheManager {
     private static final Logger logger = LoggerFactory.getLogger(SimpleCacheManager.class);
 
     private ConcurrentHashMap<String, ConcurrentHashMap<String, Cache>> caches = new ConcurrentHashMap<>();
+    private BiFunction<String, String, Cache> cacheCreator;
 
     static SimpleCacheManager defaultManager = new SimpleCacheManager();
 
@@ -43,11 +45,25 @@ public class SimpleCacheManager implements CacheManager {
     @Override
     public Cache getCache(String area, String cacheName) {
         ConcurrentHashMap<String, Cache> areaMap = getCachesByArea(area);
+        Cache c = areaMap.get(cacheName);
+        if (c == null && cacheCreator != null) {
+            return cacheCreator.apply(area, cacheName);
+        } else {
+            return c;
+        }
+    }
+
+    public Cache getCacheWithoutCreate(String area, String cacheName) {
+        ConcurrentHashMap<String, Cache> areaMap = getCachesByArea(area);
         return areaMap.get(cacheName);
     }
 
     public void putCache(String area, String cacheName, Cache cache) {
         ConcurrentHashMap<String, Cache> areaMap = getCachesByArea(area);
         areaMap.put(cacheName, cache);
+    }
+
+    public void setCacheCreator(BiFunction<String, String, Cache> cacheCreator) {
+        this.cacheCreator = cacheCreator;
     }
 }

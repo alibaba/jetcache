@@ -44,20 +44,25 @@ public class JetCacheProxyConfiguration implements ImportAware, ApplicationConte
 
     @Bean(name = CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public CacheAdvisor jetcacheAdvisor() {
-        ConfigMap configMap = new ConfigMap();
-
-        JetCacheInterceptor jetCacheInterceptor = new JetCacheInterceptor();
-        jetCacheInterceptor.setCacheConfigMap(configMap);
-        jetCacheInterceptor.setApplicationContext(applicationContext);
-
+    public CacheAdvisor jetcacheAdvisor(JetCacheInterceptor jetCacheInterceptor) {
         CacheAdvisor advisor = new CacheAdvisor();
         advisor.setAdviceBeanName(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME);
         advisor.setAdvice(jetCacheInterceptor);
         advisor.setBasePackages(this.enableMethodCache.getStringArray("basePackages"));
-        advisor.setCacheConfigMap(configMap);
         advisor.setOrder(this.enableMethodCache.<Integer>getNumber("order"));
         return advisor;
+    }
+
+    @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+    public JetCacheInterceptor jetCacheInterceptor() {
+        return new JetCacheInterceptor();
+    }
+
+    @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+    public ConfigMap jetcacheConfigMap() {
+        return new ConfigMap();
     }
 
 }
