@@ -52,7 +52,6 @@ public class ConfigProvider extends AbstractLifecycle {
             }
             installer.init();
         }
-        cacheContext = null;
     }
 
     @Override
