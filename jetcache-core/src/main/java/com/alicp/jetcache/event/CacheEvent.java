@@ -1,9 +1,12 @@
+/**
+ * Created on 2017/2/22.
+ */
 package com.alicp.jetcache.event;
 
 import com.alicp.jetcache.Cache;
 
 /**
- * Created on 2017/2/22.
+ * The CacheEvent is used in single JVM while CacheMessage used for distributed message.
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */

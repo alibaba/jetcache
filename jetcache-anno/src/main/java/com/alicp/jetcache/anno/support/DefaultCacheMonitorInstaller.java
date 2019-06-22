@@ -10,10 +10,7 @@ import com.alicp.jetcache.event.CachePutAllEvent;
 import com.alicp.jetcache.event.CachePutEvent;
 import com.alicp.jetcache.event.CacheRemoveAllEvent;
 import com.alicp.jetcache.event.CacheRemoveEvent;
-import com.alicp.jetcache.support.CacheUpdatePublisher;
-import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
-import com.alicp.jetcache.support.StatInfo;
+import com.alicp.jetcache.support.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -34,7 +31,7 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     private Consumer<StatInfo> statCallback;
 
     @Autowired(required = false)
-    private CacheUpdatePublisher cacheUpdatePublisher;
+    private CacheMessagePublisher cacheMessagePublisher;
 
     @Override
     public void addMonitors(String area, String cacheName, Cache cache) {
@@ -43,14 +40,31 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     }
 
     protected void addCacheUpdateMonitor(String area, String cacheName, Cache cache) {
-        if (cacheUpdatePublisher != null) {
+        if (cacheMessagePublisher != null) {
             CacheMonitor monitor = event -> {
-                if (event instanceof CachePutEvent
-                        || event instanceof CacheRemoveEvent
-                        || event instanceof CachePutAllEvent
-                        || event instanceof CacheRemoveAllEvent) {
-                    cacheUpdatePublisher.publish(area, cacheName, event);
+                CacheMessage m = new CacheMessage();
+                if (event instanceof CachePutEvent) {
+                    CachePutEvent e = (CachePutEvent) event;
+                    m.setType(CacheMessage.TYPE_PUT);
+                    m.setKeys(new Object[]{e.getKey()});
+                } else if (event instanceof CacheRemoveEvent) {
+                    CacheRemoveEvent e = (CacheRemoveEvent) event;
+                    m.setType(CacheMessage.TYPE_REMOVE);
+                    m.setKeys(new Object[]{e.getKey()});
+                } else if (event instanceof CachePutAllEvent) {
+                    CachePutAllEvent e = (CachePutAllEvent) event;
+                    m.setType(CacheMessage.TYPE_PUT_ALL);
+                    if (e.getMap() != null) {
+                        m.setKeys(e.getMap().keySet().toArray());
+                    }
+                } else if (event instanceof CacheRemoveAllEvent) {
+                    CacheRemoveAllEvent e = (CacheRemoveAllEvent) event;
+                    m.setType(CacheMessage.TYPE_REMOVE_ALL);
+                    if (e.getKeys() != null) {
+                        m.setKeys(e.getKeys().toArray());
+                    }
                 }
+                cacheMessagePublisher.publish(area, cacheName, m);
             };
             cache.config().getMonitors().add(monitor);
         }
@@ -110,8 +124,8 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
         this.statCallback = statCallback;
     }
 
-    public void setCacheUpdatePublisher(CacheUpdatePublisher cacheUpdatePublisher) {
-        this.cacheUpdatePublisher = cacheUpdatePublisher;
+    public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
+        this.cacheMessagePublisher = cacheMessagePublisher;
     }
 
 }

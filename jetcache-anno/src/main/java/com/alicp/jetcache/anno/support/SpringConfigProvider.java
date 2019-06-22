@@ -1,7 +1,7 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.anno.method.SpringCacheContext;
-import com.alicp.jetcache.support.CacheUpdatePublisher;
+import com.alicp.jetcache.support.CacheMessagePublisher;
 import com.alicp.jetcache.support.StatInfo;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,8 +72,8 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
 
     @Autowired(required = false)
     @Override
-    public void setCacheUpdatePublisher(CacheUpdatePublisher cacheUpdatePublisher) {
-        super.setCacheUpdatePublisher(cacheUpdatePublisher);
+    public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
+        super.setCacheMessagePublisher(cacheMessagePublisher);
     }
 
 }

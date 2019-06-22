@@ -8,7 +8,7 @@ import com.alicp.jetcache.event.CacheEvent;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public interface CacheUpdatePublisher {
-    void publish(String area, String cacheName, CacheEvent event);
+public interface CacheMessagePublisher {
+    void publish(String area, String cacheName, CacheMessage cacheMessage);
 
 }

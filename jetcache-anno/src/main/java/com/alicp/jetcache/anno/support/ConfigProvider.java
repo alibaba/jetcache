@@ -1,7 +1,6 @@
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.support.CacheUpdatePublisher;
-import com.alicp.jetcache.support.CacheUpdateReceiver;
+import com.alicp.jetcache.support.CacheMessagePublisher;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
 
@@ -24,7 +23,7 @@ public class ConfigProvider extends AbstractLifecycle {
     protected KeyConvertorParser keyConvertorParser;
     protected CacheMonitorInstaller cacheMonitorInstaller;
     private Consumer<StatInfo> statCallback = new StatInfoLogger(false);
-    private CacheUpdatePublisher cacheUpdatePublisher;
+    private CacheMessagePublisher cacheMessagePublisher;
 
     private CacheMonitorInstaller defaultCacheMonitorInstaller = new DefaultCacheMonitorInstaller();
 
@@ -48,8 +47,8 @@ public class ConfigProvider extends AbstractLifecycle {
             DefaultCacheMonitorInstaller installer = (DefaultCacheMonitorInstaller) cacheMonitorInstaller;
             installer.setGlobalCacheConfig(globalCacheConfig);
             installer.setStatCallback(statCallback);
-            if (cacheUpdatePublisher != null) {
-                installer.setCacheUpdatePublisher(cacheUpdatePublisher);
+            if (cacheMessagePublisher != null) {
+                installer.setCacheMessagePublisher(cacheMessagePublisher);
             }
             installer.init();
         }
@@ -140,7 +139,7 @@ public class ConfigProvider extends AbstractLifecycle {
         this.statCallback = statCallback;
     }
 
-    public void setCacheUpdatePublisher(CacheUpdatePublisher cacheUpdatePublisher) {
-        this.cacheUpdatePublisher = cacheUpdatePublisher;
+    public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
+        this.cacheMessagePublisher = cacheMessagePublisher;
     }
 }
