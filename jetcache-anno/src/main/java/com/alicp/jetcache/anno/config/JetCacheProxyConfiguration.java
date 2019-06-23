@@ -2,7 +2,6 @@ package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.anno.aop.CacheAdvisor;
 import com.alicp.jetcache.anno.aop.JetCacheInterceptor;
-import com.alicp.jetcache.anno.support.ConfigMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
@@ -13,8 +12,6 @@ import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created on 2016/11/16.
@@ -57,12 +54,6 @@ public class JetCacheProxyConfiguration implements ImportAware, ApplicationConte
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
     public JetCacheInterceptor jetCacheInterceptor() {
         return new JetCacheInterceptor();
-    }
-
-    @Bean
-    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public ConfigMap jetcacheConfigMap() {
-        return new ConfigMap();
     }
 
 }
