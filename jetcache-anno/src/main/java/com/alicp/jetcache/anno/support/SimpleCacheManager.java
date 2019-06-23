@@ -36,6 +36,7 @@ public class SimpleCacheManager implements CacheManager {
             });
         });
         caches.clear();
+        cacheCreator = null;
     }
 
     private ConcurrentHashMap<String, Cache> getCachesByArea(String area) {
