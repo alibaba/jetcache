@@ -7,9 +7,7 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.spring.SpringTestBase;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
@@ -21,14 +19,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = CacheManagerTest2.class)
+@ContextConfiguration(classes = ConfigProvider_DefaultCacheManager_Test.class)
 @Configuration
-@EnableMethodCache(basePackages = {"com.alicp.jetcache.anno.support.CacheManagerTest2"})
-public class CacheManagerTest2 extends SpringTestBase {
-    @Bean
-    public SimpleCacheManager cacheManager() {
-        return new SimpleCacheManager();
-    }
+@EnableMethodCache(basePackages = {"com.alicp.jetcache.anno.support.ConfigProvider_DefaultCacheManager_Test"})
+public class ConfigProvider_DefaultCacheManager_Test extends SpringTestBase {
 
     @Bean
     public SpringConfigProvider springConfigProvider() {
@@ -40,6 +34,7 @@ public class CacheManagerTest2 extends SpringTestBase {
         GlobalCacheConfig pc = TestUtil.createGloableConfig();
         return pc;
     }
+
 
     public static class CountBean {
         private int i;
@@ -55,23 +50,18 @@ public class CacheManagerTest2 extends SpringTestBase {
         return new CountBean();
     }
 
-
-    @Before
-    @After
-    public void init() {
-        SimpleCacheManager.defaultManager.rebuild();
-    }
-
     @Test
     public void test() {
         CountBean bean = context.getBean(CountBean.class);
         String value = (bean.count("K1"));
         Assert.assertEquals(value, bean.count("K1"));
-
-        Assert.assertNull(CacheManager.defaultManager().getCache("C1"));
-
-        context.getBean(CacheManager.class).getCache("C1").remove("K1");
+        CacheManager.defaultManager().getCache("C1").remove("K1");
         Assert.assertNotEquals(value, bean.count("K1"));
+    }
+
+    @Test
+    public void test2() {
+        Assert.assertNotNull(CacheManager.defaultManager().getCache("C1"));
     }
 
 }
