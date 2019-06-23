@@ -14,7 +14,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-class CacheUtil {
+public class CacheUtil {
 
     public static <K, V> CacheLoader<K, V> createProxyLoader(Cache<K, V> cache,
                                                              CacheLoader<K, V> loader,

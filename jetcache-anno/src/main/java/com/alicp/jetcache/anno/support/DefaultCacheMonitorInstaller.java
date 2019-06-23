@@ -5,6 +5,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheMonitor;
+import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.event.CachePutAllEvent;
 import com.alicp.jetcache.event.CachePutEvent;
@@ -72,6 +73,7 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
 
     protected void addMetricsMonitor(String area, String cacheName, Cache cache) {
         if (defaultCacheMonitorManager != null) {
+            cache = CacheUtil.getAbstractCache(cache);
             if (cache instanceof MultiLevelCache) {
                 MultiLevelCache mc = (MultiLevelCache) cache;
                 if (mc.caches().length == 2) {
