@@ -29,12 +29,12 @@ public class DefaultMetricsManager {
 
     private int resetTime;
     private TimeUnit resetTimeUnit;
-    private Consumer<StatInfo> statCallback;
+    private Consumer<StatInfo> metricsCallback;
 
-    public DefaultMetricsManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> statCallback) {
+    public DefaultMetricsManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> metricsCallback) {
         this.resetTime = resetTime;
         this.resetTimeUnit = resetTimeUnit;
-        this.statCallback = statCallback;
+        this.metricsCallback = metricsCallback;
     }
 
     public DefaultMetricsManager(int resetTime, TimeUnit resetTimeUnit) {
@@ -44,7 +44,7 @@ public class DefaultMetricsManager {
     public DefaultMetricsManager(int resetTime, TimeUnit resetTimeUnit, boolean verboseLog) {
         this.resetTime = resetTime;
         this.resetTimeUnit = resetTimeUnit;
-        this.statCallback = new StatInfoLogger(verboseLog);
+        this.metricsCallback = new StatInfoLogger(verboseLog);
     }
 
     Runnable cmd = new Runnable() {
@@ -66,7 +66,7 @@ public class DefaultMetricsManager {
                 statInfo.setStats(stats);
                 time = endTime;
 
-                statCallback.accept(statInfo);
+                metricsCallback.accept(statInfo);
             } catch (Exception e) {
                 logger.error("jetcache DefaultMetricsManager error", e);
             }

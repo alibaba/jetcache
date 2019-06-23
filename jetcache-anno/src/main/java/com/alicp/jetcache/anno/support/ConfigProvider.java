@@ -22,7 +22,7 @@ public class ConfigProvider extends AbstractLifecycle {
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
     protected CacheMonitorInstaller cacheMonitorInstaller;
-    private Consumer<StatInfo> statCallback = new StatInfoLogger(false);
+    private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
     private CacheMessagePublisher cacheMessagePublisher;
 
     private CacheMonitorInstaller defaultCacheMonitorInstaller = new DefaultCacheMonitorInstaller();
@@ -46,7 +46,7 @@ public class ConfigProvider extends AbstractLifecycle {
         if (cacheMonitorInstaller == defaultCacheMonitorInstaller) {
             DefaultCacheMonitorInstaller installer = (DefaultCacheMonitorInstaller) cacheMonitorInstaller;
             installer.setGlobalCacheConfig(globalCacheConfig);
-            installer.setStatCallback(statCallback);
+            installer.setMetricsCallback(metricsCallback);
             if (cacheMessagePublisher != null) {
                 installer.setCacheMessagePublisher(cacheMessagePublisher);
             }
@@ -134,8 +134,8 @@ public class ConfigProvider extends AbstractLifecycle {
         return cacheContext;
     }
 
-    public void setStatCallback(Consumer<StatInfo> statCallback) {
-        this.statCallback = statCallback;
+    public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {
+        this.metricsCallback = metricsCallback;
     }
 
     public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {

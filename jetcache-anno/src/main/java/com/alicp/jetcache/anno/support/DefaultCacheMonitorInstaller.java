@@ -29,7 +29,7 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     private GlobalCacheConfig globalCacheConfig;
 
     @Autowired(required = false)
-    private Consumer<StatInfo> statCallback;
+    private Consumer<StatInfo> metricsCallback;
 
     @Autowired(required = false)
     private CacheMessagePublisher cacheMessagePublisher;
@@ -107,7 +107,7 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     protected void initMetricsMonitor() {
         if (globalCacheConfig.getStatIntervalMinutes() > 0) {
             defaultMetricsManager = new DefaultMetricsManager(globalCacheConfig.getStatIntervalMinutes(),
-                    TimeUnit.MINUTES, statCallback);
+                    TimeUnit.MINUTES, metricsCallback);
             defaultMetricsManager.start();
         }
     }
@@ -128,8 +128,8 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
         this.globalCacheConfig = globalCacheConfig;
     }
 
-    public void setStatCallback(Consumer<StatInfo> statCallback) {
-        this.statCallback = statCallback;
+    public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {
+        this.metricsCallback = metricsCallback;
     }
 
     public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
