@@ -43,29 +43,35 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     protected void addCacheUpdateMonitor(String area, String cacheName, Cache cache) {
         if (cacheMessagePublisher != null) {
             CacheMonitor monitor = event -> {
-                CacheMessage m = new CacheMessage();
                 if (event instanceof CachePutEvent) {
+                    CacheMessage m = new CacheMessage();
                     CachePutEvent e = (CachePutEvent) event;
                     m.setType(CacheMessage.TYPE_PUT);
                     m.setKeys(new Object[]{e.getKey()});
+                    cacheMessagePublisher.publish(area, cacheName, m);
                 } else if (event instanceof CacheRemoveEvent) {
+                    CacheMessage m = new CacheMessage();
                     CacheRemoveEvent e = (CacheRemoveEvent) event;
                     m.setType(CacheMessage.TYPE_REMOVE);
                     m.setKeys(new Object[]{e.getKey()});
+                    cacheMessagePublisher.publish(area, cacheName, m);
                 } else if (event instanceof CachePutAllEvent) {
+                    CacheMessage m = new CacheMessage();
                     CachePutAllEvent e = (CachePutAllEvent) event;
                     m.setType(CacheMessage.TYPE_PUT_ALL);
                     if (e.getMap() != null) {
                         m.setKeys(e.getMap().keySet().toArray());
                     }
+                    cacheMessagePublisher.publish(area, cacheName, m);
                 } else if (event instanceof CacheRemoveAllEvent) {
+                    CacheMessage m = new CacheMessage();
                     CacheRemoveAllEvent e = (CacheRemoveAllEvent) event;
                     m.setType(CacheMessage.TYPE_REMOVE_ALL);
                     if (e.getKeys() != null) {
                         m.setKeys(e.getKeys().toArray());
                     }
+                    cacheMessagePublisher.publish(area, cacheName, m);
                 }
-                cacheMessagePublisher.publish(area, cacheName, m);
             };
             cache.config().getMonitors().add(monitor);
         }
