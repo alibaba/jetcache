@@ -14,6 +14,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({CreateCacheAnnotationBeanPostProcessor.class})
+@Import({CommonConfiguration.class, CreateCacheAnnotationBeanPostProcessor.class})
 public @interface EnableCreateCacheAnnotation {
 }
