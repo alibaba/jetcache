@@ -27,12 +27,17 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void doInit() {
         if (encoderParser instanceof ApplicationContextAware) {
             ((ApplicationContextAware) encoderParser).setApplicationContext(applicationContext);
         }
         if (keyConvertorParser instanceof ApplicationContextAware) {
             ((ApplicationContextAware) keyConvertorParser).setApplicationContext(applicationContext);
         }
+        super.doInit();
     }
 
     @Override
