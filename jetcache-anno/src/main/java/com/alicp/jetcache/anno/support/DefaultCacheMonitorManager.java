@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements CacheMonitorInstaller {
+public class DefaultCacheMonitorManager extends AbstractLifecycle implements CacheMonitorManager {
 
     private DefaultMetricsManager defaultMetricsManager;
 

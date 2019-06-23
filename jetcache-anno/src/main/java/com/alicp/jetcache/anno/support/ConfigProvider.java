@@ -21,11 +21,11 @@ public class ConfigProvider extends AbstractLifecycle {
     protected SimpleCacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
-    protected CacheMonitorInstaller cacheMonitorInstaller;
+    protected CacheMonitorManager cacheMonitorManager;
     private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
     private CacheMessagePublisher cacheMessagePublisher;
 
-    private CacheMonitorInstaller defaultCacheMonitorInstaller = new DefaultCacheMonitorInstaller();
+    private CacheMonitorManager defaultCacheMonitorManager = new DefaultCacheMonitorManager();
 
     private CacheContext cacheContext;
 
@@ -33,7 +33,7 @@ public class ConfigProvider extends AbstractLifecycle {
         cacheManager = SimpleCacheManager.defaultManager;
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
-        cacheMonitorInstaller = defaultCacheMonitorInstaller;
+        cacheMonitorManager = defaultCacheMonitorManager;
     }
 
     @Override
@@ -43,8 +43,8 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected void initDefaultCacheMonitorInstaller() {
-        if (cacheMonitorInstaller == defaultCacheMonitorInstaller) {
-            DefaultCacheMonitorInstaller installer = (DefaultCacheMonitorInstaller) cacheMonitorInstaller;
+        if (cacheMonitorManager == defaultCacheMonitorManager) {
+            DefaultCacheMonitorManager installer = (DefaultCacheMonitorManager) cacheMonitorManager;
             installer.setGlobalCacheConfig(globalCacheConfig);
             installer.setMetricsCallback(metricsCallback);
             if (cacheMessagePublisher != null) {
@@ -61,8 +61,8 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorInstaller == defaultCacheMonitorInstaller) {
-            ((DefaultCacheMonitorInstaller) cacheMonitorInstaller).shutdown();
+        if (cacheMonitorManager == defaultCacheMonitorManager) {
+            ((DefaultCacheMonitorManager) cacheMonitorManager).shutdown();
         }
     }
 
@@ -114,12 +114,12 @@ public class ConfigProvider extends AbstractLifecycle {
         this.keyConvertorParser = keyConvertorParser;
     }
 
-    public CacheMonitorInstaller getCacheMonitorInstaller() {
-        return cacheMonitorInstaller;
+    public CacheMonitorManager getCacheMonitorManager() {
+        return cacheMonitorManager;
     }
 
-    public void setCacheMonitorInstaller(CacheMonitorInstaller cacheMonitorInstaller) {
-        this.cacheMonitorInstaller = cacheMonitorInstaller;
+    public void setCacheMonitorManager(CacheMonitorManager cacheMonitorManager) {
+        this.cacheMonitorManager = cacheMonitorManager;
     }
 
     public GlobalCacheConfig getGlobalCacheConfig() {
