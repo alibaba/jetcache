@@ -7,7 +7,9 @@ import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.spring.SpringTestBase;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +35,12 @@ public class ConfigProvider_DefaultCacheManager_Test extends SpringTestBase {
     public GlobalCacheConfig config() {
         GlobalCacheConfig pc = TestUtil.createGloableConfig();
         return pc;
+    }
+
+    @Before
+    @After
+    public void init() {
+        SimpleCacheManager.defaultManager.rebuild();
     }
 
 
