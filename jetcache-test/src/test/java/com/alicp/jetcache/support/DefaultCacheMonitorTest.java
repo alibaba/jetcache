@@ -140,7 +140,7 @@ public class DefaultCacheMonitorTest {
 
         c1.config().getMonitors().add(m1);
         c2.config().getMonitors().add(m2);
-        DefaultCacheMonitorManager manager = new DefaultCacheMonitorManager(10, TimeUnit.SECONDS, true);
+        DefaultMetricsManager manager = new DefaultMetricsManager(10, TimeUnit.SECONDS, true);
         manager.start();
         manager.add(m1, m2);
 

@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  */
 public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements CacheMonitorInstaller {
 
-    private DefaultCacheMonitorManager defaultCacheMonitorManager;
+    private DefaultMetricsManager defaultMetricsManager;
 
     @Resource
     private GlobalCacheConfig globalCacheConfig;
@@ -78,7 +78,7 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     }
 
     protected void addMetricsMonitor(String area, String cacheName, Cache cache) {
-        if (defaultCacheMonitorManager != null) {
+        if (defaultMetricsManager != null) {
             cache = CacheUtil.getAbstractCache(cache);
             if (cache instanceof MultiLevelCache) {
                 MultiLevelCache mc = (MultiLevelCache) cache;
@@ -89,13 +89,13 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
                     local.config().getMonitors().add(localMonitor);
                     DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(cacheName + "_remote");
                     remote.config().getMonitors().add(remoteMonitor);
-                    defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
+                    defaultMetricsManager.add(localMonitor, remoteMonitor);
                 }
             }
 
             DefaultCacheMonitor monitor = new DefaultCacheMonitor(cacheName);
             cache.config().getMonitors().add(monitor);
-            defaultCacheMonitorManager.add(monitor);
+            defaultMetricsManager.add(monitor);
         }
     }
 
@@ -106,9 +106,9 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
 
     protected void initMetricsMonitor() {
         if (globalCacheConfig.getStatIntervalMinutes() > 0) {
-            defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
+            defaultMetricsManager = new DefaultMetricsManager(globalCacheConfig.getStatIntervalMinutes(),
                     TimeUnit.MINUTES, statCallback);
-            defaultCacheMonitorManager.start();
+            defaultMetricsManager.start();
         }
     }
 
@@ -118,10 +118,10 @@ public class DefaultCacheMonitorInstaller extends AbstractLifecycle implements C
     }
 
     protected void shutdownMetricsMonitor() {
-        if (defaultCacheMonitorManager != null) {
-            defaultCacheMonitorManager.stop();
+        if (defaultMetricsManager != null) {
+            defaultMetricsManager.stop();
         }
-        defaultCacheMonitorManager = null;
+        defaultMetricsManager = null;
     }
 
     public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {

@@ -2,7 +2,7 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.DefaultMetricsManager;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
@@ -130,7 +130,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l2Cache.config().getMonitors().add(m2);
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
         cache.config().getMonitors().add(mc);
-        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
+        DefaultMetricsManager logger = new DefaultMetricsManager(1, TimeUnit.SECONDS, verboseLog);
         logger.add(m1, m1_again, m2, mc);
         logger.start();
 

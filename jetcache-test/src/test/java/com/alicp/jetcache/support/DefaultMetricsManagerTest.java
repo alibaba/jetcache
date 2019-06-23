@@ -11,41 +11,41 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class DefaultCacheMonitorManagerTest {
+public class DefaultMetricsManagerTest {
     @Test
     public void testFirstResetTime() {
         LocalDateTime t = LocalDateTime.of(2016, 11, 11, 23, 50, 33, 123243242);
 
-        LocalDateTime rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 1, TimeUnit.SECONDS);
+        LocalDateTime rt = DefaultMetricsManager.computeFirstResetTime(t, 1, TimeUnit.SECONDS);
         Assert.assertEquals(t.withSecond(34).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 13, TimeUnit.SECONDS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 13, TimeUnit.SECONDS);
         Assert.assertEquals(t.withSecond(34).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 30, TimeUnit.SECONDS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 30, TimeUnit.SECONDS);
         Assert.assertEquals(t.withMinute(51).withSecond(0).withNano(0), rt);
 
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 1, TimeUnit.MINUTES);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 1, TimeUnit.MINUTES);
         Assert.assertEquals(t.withMinute(51).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 7, TimeUnit.MINUTES);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 7, TimeUnit.MINUTES);
         Assert.assertEquals(t.withMinute(51).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 5, TimeUnit.MINUTES);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 5, TimeUnit.MINUTES);
         Assert.assertEquals(t.withMinute(55).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 15, TimeUnit.MINUTES);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 15, TimeUnit.MINUTES);
         Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
 
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 1, TimeUnit.HOURS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 1, TimeUnit.HOURS);
         Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 5, TimeUnit.HOURS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 5, TimeUnit.HOURS);
         Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 6, TimeUnit.HOURS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 6, TimeUnit.HOURS);
         Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
 
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 1, TimeUnit.DAYS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 1, TimeUnit.DAYS);
         Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
-        rt = DefaultCacheMonitorManager.computeFirstResetTime(t, 2, TimeUnit.DAYS);
+        rt = DefaultMetricsManager.computeFirstResetTime(t, 2, TimeUnit.DAYS);
         Assert.assertEquals(t.withDayOfMonth(12).withHour(0).withMinute(0).withSecond(0).withNano(0), rt);
 
         try {
-            DefaultCacheMonitorManager.computeFirstResetTime(t, 1, TimeUnit.MILLISECONDS);
+            DefaultMetricsManager.computeFirstResetTime(t, 1, TimeUnit.MILLISECONDS);
             Assert.fail();
         } catch (Exception e) {
         }
