@@ -3,12 +3,13 @@ package com.alicp.jetcache;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.testsupport.Sleeper;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Function;
 
 /**
  * Created on 2017/5/31.
@@ -25,13 +27,26 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RefreshCacheTest extends AbstractCacheTest {
-    @Test
-    public void test() throws Exception {
+
+    @Before
+    public void setup() {
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .buildCache();
         cache = new RefreshCache<>(cache);
-        baseTest();
+    }
 
+    @Test
+    public void baseTest() throws Exception {
+        super.baseTest();
+    }
+
+    @Test
+    public void refreshTest() throws Exception {
+        refreshCacheTest(cache, 200, 100);
+    }
+
+    @Test
+    public void badLoaderTest() throws InterruptedException {
         cache.put("K1", "V1");
         cache.config().setLoader(k -> {
             throw new SQLException();
@@ -41,8 +56,38 @@ public class RefreshCacheTest extends AbstractCacheTest {
         Thread.sleep(75);
         Assert.assertEquals("V1", cache.get("K1"));
         ((RefreshCache<Object, Object>)cache).stopRefresh();
+    }
 
-        refreshCacheTest(cache, 200, 100);
+    @Test
+    public void computeIfAbsentTest() throws Exception {
+        computeIfAbsentTest(cache);
+    }
+
+    public static void computeIfAbsentTest(Cache<Object, Object> cache) throws Exception {
+        RefreshPolicy oldPolicy = cache.config().getRefreshPolicy();
+        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(50, TimeUnit.MILLISECONDS));
+
+        AtomicLong value = new AtomicLong();
+        Function loader = k-> value.incrementAndGet();
+        long t = cache.config().getRefreshPolicy().getRefreshMillis();
+
+        Object v = cache.computeIfAbsent("k1", loader);
+        Assert.assertEquals(v, cache.get("k1"));
+        Thread.sleep((long) (t * 1.5));
+        Assert.assertNotEquals(v, cache.get("k1"));
+
+        v = cache.computeIfAbsent("k2", loader, false);
+        Assert.assertEquals(v, cache.get("k2"));
+        Thread.sleep((long) (t * 1.5));
+        Assert.assertNotEquals(v, cache.get("k2"));
+
+        v = cache.computeIfAbsent("k3", loader, false, 10, TimeUnit.SECONDS);
+        Assert.assertEquals(v, cache.get("k3"));
+        Thread.sleep((long) (t * 1.5));
+        Assert.assertNotEquals(v, cache.get("k3"));
+
+        getRefreshCache(cache).stopRefresh();
+        cache.config().setRefreshPolicy(oldPolicy);
     }
 
     public static void refreshCacheTest(Cache cache, long refresh, long stopRefreshAfterLastAccess) throws Exception {
@@ -107,6 +152,12 @@ public class RefreshCacheTest extends AbstractCacheTest {
             c = ((ProxyCache) c).getTargetCache();
         }
         return c instanceof MultiLevelCache;
+    }
+
+    @Test
+    public void vetoTest() throws Exception {
+        cache.config().setRefreshPolicy(RefreshPolicy.newPolicy(100, TimeUnit.MILLISECONDS));
+        vetoTest(cache);
     }
 
     private static void vetoTest(Cache cache) throws Exception {

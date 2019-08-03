@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 /**
  * Created on 2017/5/25.
@@ -48,6 +49,24 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private boolean hasLoader() {
         return config.getLoader() != null;
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<K, V> loader) {
+        return computeIfAbsent(key, loader, config().isCacheNullValue());
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull) {
+        return AbstractCache.computeIfAbsentImpl(key, loader, cacheNullWhenLoaderReturnNull,
+                0, null, this);
+    }
+
+    @Override
+    public V computeIfAbsent(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull,
+                             long expireAfterWrite, TimeUnit timeUnit) {
+        return AbstractCache.computeIfAbsentImpl(key, loader, cacheNullWhenLoaderReturnNull,
+                expireAfterWrite, timeUnit, this);
     }
 
     protected Cache concreteCache() {

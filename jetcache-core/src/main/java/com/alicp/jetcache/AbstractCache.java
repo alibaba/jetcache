@@ -143,13 +143,20 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     static <K, V> V computeIfAbsentImpl(K key, Function<K, V> loader, boolean cacheNullWhenLoaderReturnNull,
                                                long expireAfterWrite, TimeUnit timeUnit, Cache<K, V> cache) {
         AbstractCache<K, V> abstractCache = CacheUtil.getAbstractCache(cache);
-        Function<K, V> newLoader = CacheUtil.createProxyLoader(cache, loader, abstractCache::notify);
-        CacheGetResult<V> r = cache.GET(key);
+        CacheLoader<K, V> newLoader = CacheUtil.createProxyLoader(cache, loader, abstractCache::notify);
+        CacheGetResult<V> r;
+        if (cache instanceof RefreshCache) {
+            RefreshCache<K, V> refreshCache = ((RefreshCache<K, V>) cache);
+            r = refreshCache.getTargetCache().GET(key);
+            refreshCache.addOrUpdateRefreshTask(key, newLoader);
+        } else {
+            r = cache.GET(key);
+        }
         if (r.isSuccess()) {
             return r.getValue();
         } else {
             Consumer<V> cacheUpdater = (loadedValue) -> {
-                if(needUpdate(loadedValue, cacheNullWhenLoaderReturnNull, loader)) {
+                if(needUpdate(loadedValue, cacheNullWhenLoaderReturnNull, newLoader)) {
                     if (timeUnit != null) {
                         cache.PUT(key, loadedValue, expireAfterWrite, timeUnit);
                     } else {

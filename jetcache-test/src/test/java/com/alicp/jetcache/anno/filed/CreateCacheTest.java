@@ -10,11 +10,11 @@ import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
+import com.alicp.jetcache.external.MockRemoteCache;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import com.alicp.jetcache.external.MockRemoteCache;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
@@ -188,6 +188,7 @@ public class CreateCacheTest extends SpringTest {
                 super.baseTest();
                 LoadingCacheTest.loadingCacheTest(cache1, 0);
                 RefreshCacheTest.refreshCacheTest(cache1, 200, 100);
+                RefreshCacheTest.computeIfAbsentTest(cache1);
             }
 
             private void cacheWithoutConvertorTest() {
