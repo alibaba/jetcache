@@ -147,7 +147,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         CacheGetResult<V> r;
         if (cache instanceof RefreshCache) {
             RefreshCache<K, V> refreshCache = ((RefreshCache<K, V>) cache);
-            r = refreshCache.getTargetCache().GET(key);
+            r = refreshCache.GET(key);
             refreshCache.addOrUpdateRefreshTask(key, newLoader);
         } else {
             r = cache.GET(key);
