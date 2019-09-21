@@ -27,7 +27,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
 
-    private ConcurrentHashMap<Object, LoaderLock> loaderMap;
+    private volatile ConcurrentHashMap<Object, LoaderLock> loaderMap;
 
     ConcurrentHashMap<Object, LoaderLock> initOrGetLoaderMap() {
         if (loaderMap == null) {
