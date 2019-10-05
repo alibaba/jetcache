@@ -33,9 +33,6 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
     }
 
     public Object buildKey(K key) {
-        if (key == null) {
-            return null;
-        }
         Object newKey = key;
         Function<K, Object> keyConvertor = config.getKeyConvertor();
         if (keyConvertor != null) {
