@@ -164,9 +164,9 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
             Consumer<V> cacheUpdater = (loadedValue) -> {
                 if(needUpdate(loadedValue, cacheNullWhenLoaderReturnNull, newLoader)) {
                     if (timeUnit != null) {
-                        cache.PUT(key, loadedValue, expireAfterWrite, timeUnit);
+                        cache.PUT(key, loadedValue, expireAfterWrite, timeUnit).waitForResult();
                     } else {
-                        cache.put(key, loadedValue);
+                        cache.PUT(key, loadedValue).waitForResult();
                     }
                 }
             };
