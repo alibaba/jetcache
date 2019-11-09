@@ -16,7 +16,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 /**
@@ -95,7 +96,7 @@ public class RedisCacheFailTest {
 
     @Test
     public void test_PUT_IF_ABSENT() {
-        when(jedis.set((byte[])any(), any(), any(), any(), anyLong()))
+        when(jedis.set((byte[])any(), any(), any()))
                 .thenThrow(new JedisConnectionException("err"))
                 .thenReturn("XXX");
         CacheResult cr = cache.PUT_IF_ABSENT("K", "V", 1, TimeUnit.SECONDS);
