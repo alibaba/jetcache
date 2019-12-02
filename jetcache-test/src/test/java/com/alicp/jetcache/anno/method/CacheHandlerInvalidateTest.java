@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -58,7 +59,7 @@ public class CacheHandlerInvalidateTest {
         invalidateAnnoConfig = new CacheInvalidateAnnoConfig();
         invalidateAnnoConfig.setDefineMethod(method);
         invalidateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        cacheInvokeConfig.setInvalidateAnnoConfig(invalidateAnnoConfig);
+        cacheInvokeConfig.setInvalidateAnnoConfigs(Collections.singletonList(invalidateAnnoConfig));
 
         invalidateAnnoConfig.setKey("args[0]");
         cacheInvokeConfig.setCachedAnnoConfig(null);

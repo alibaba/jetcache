@@ -63,7 +63,7 @@ public class CacheConfigUtilTest {
 
         cic = new CacheInvokeConfig();
         CacheConfigUtil.parse(cic, I.class.getMethod("m3"));
-        assertNotNull(cic.getInvalidateAnnoConfig());
+        assertNotNull(cic.getInvalidateAnnoConfigs());
 
         cic = new CacheInvokeConfig();
         CacheConfigUtil.parse(cic, I.class.getMethod("m4"));
@@ -75,7 +75,7 @@ public class CacheConfigUtilTest {
 
         cic = new CacheInvokeConfig();
         CacheConfigUtil.parse(cic, I.class.getMethod("m7"));
-        assertNotNull(cic.getInvalidateAnnoConfig());
+        assertNotNull(cic.getInvalidateAnnoConfigs());
         assertNotNull(cic.getUpdateAnnoConfig());
 
     }
