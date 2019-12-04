@@ -3,19 +3,18 @@
  */
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 
-import java.util.function.Function;
+import java.util.List;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheInvokeConfig {
     private CachedAnnoConfig cachedAnnoConfig;
-    private CacheInvalidateAnnoConfig invalidateAnnoConfig;
+    private List<CacheInvalidateAnnoConfig> invalidateAnnoConfigs;
     private CacheUpdateAnnoConfig updateAnnoConfig;
     private boolean enableCacheContext;
 
@@ -41,12 +40,12 @@ public class CacheInvokeConfig {
         this.enableCacheContext = enableCacheContext;
     }
 
-    public CacheInvalidateAnnoConfig getInvalidateAnnoConfig() {
-        return invalidateAnnoConfig;
+    public List<CacheInvalidateAnnoConfig> getInvalidateAnnoConfigs() {
+        return invalidateAnnoConfigs;
     }
 
-    public void setInvalidateAnnoConfig(CacheInvalidateAnnoConfig invalidateAnnoConfig) {
-        this.invalidateAnnoConfig = invalidateAnnoConfig;
+    public void setInvalidateAnnoConfigs(List<CacheInvalidateAnnoConfig> invalidateAnnoConfigs) {
+        this.invalidateAnnoConfigs = invalidateAnnoConfigs;
     }
 
     public CacheUpdateAnnoConfig getUpdateAnnoConfig() {
