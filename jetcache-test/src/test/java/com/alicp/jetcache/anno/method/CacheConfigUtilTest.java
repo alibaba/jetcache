@@ -42,6 +42,10 @@ public class CacheConfigUtilTest {
         @CacheInvalidate(name = "foo")
         @CacheUpdate(name = "foo", value = "bar")
         void m7();
+
+        @CacheInvalidate(name = "foo")
+        @CacheInvalidate(name = "bar")
+        void m8();
     }
 
     @Test
@@ -78,5 +82,9 @@ public class CacheConfigUtilTest {
         assertNotNull(cic.getInvalidateAnnoConfigs());
         assertNotNull(cic.getUpdateAnnoConfig());
 
+        cic = new CacheInvokeConfig();
+        CacheConfigUtil.parse(cic, I.class.getMethod("m8"));
+        assertNotNull(cic.getInvalidateAnnoConfigs());
+        assertEquals(2, cic.getInvalidateAnnoConfigs().size());
     }
 }
