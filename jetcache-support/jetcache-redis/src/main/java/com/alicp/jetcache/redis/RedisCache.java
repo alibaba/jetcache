@@ -1,42 +1,36 @@
 package com.alicp.jetcache.redis;
 
-import com.alicp.jetcache.*;
-import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.redis.jedis.AbstractJedisPipeline;
+import com.alicp.jetcache.redis.jedis.AbstractRedisJedisCache;
+import com.alicp.jetcache.redis.jedis.JedisPipeline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Pipeline;
-import redis.clients.jedis.Response;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.util.Pool;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * Created on 2016/10/7.
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
+public class RedisCache<K, V> extends AbstractRedisJedisCache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
     private RedisCacheConfig<K, V> config;
-
-    Function<Object, byte[]> valueEncoder;
-    Function<byte[], Object> valueDecoder;
 
     private static ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public RedisCache(RedisCacheConfig<K, V> config) {
         super(config);
         this.config = config;
-        this.valueEncoder = config.getValueEncoder();
-        this.valueDecoder = config.getValueDecoder();
 
         if (config.getJedisPool() == null) {
             throw new CacheConfigException("no pool");
@@ -57,7 +51,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         }
     }
 
-    private void initDefaultWeights(RedisCacheConfig<K, V> config) {
+    private void initDefaultWeights(final RedisCacheConfig<K, V> config) {
         int len = config.getJedisSlavePools().length;
         int[] weights = new int[len];
         Arrays.fill(weights, 100);
@@ -65,19 +59,54 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
-    public CacheConfig<K, V> config() {
-        return config;
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> clazz) {
+    public <T> T unwrap(final Class<T> clazz) {
         if (Pool.class.isAssignableFrom(clazz)) {
             return (T) config.getJedisPool();
         }
         throw new IllegalArgumentException(clazz.getName());
     }
 
-    Pool<Jedis> getReadPool() {
+    @Override
+    protected byte[] jedisGet(final byte[] key) {
+        try (Jedis jedis = getReadPool().getResource()) {
+            return jedis.get(key);
+        }
+    }
+
+    @Override
+    protected List<byte[]> jedisMget(final byte[]... keys) {
+        try (Jedis jedis = getReadPool().getResource()) {
+            return jedis.mget(keys);
+        }
+    }
+
+    @Override
+    protected String jedisPsetex(final byte[] key, final long milliseconds, final byte[] value) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            return jedis.psetex(key, milliseconds, value);
+        }
+    }
+
+    @Override
+    protected Long jedisDel(byte[]... keys) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            return jedis.del(keys);
+        }
+    }
+
+    @Override
+    protected String jedisSet(byte[] key, byte[] value, SetParams params) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            return jedis.set(key, value, params);
+        }
+    }
+
+    @Override
+    protected AbstractJedisPipeline getJedisPipeline() {
+        return new JedisPipeline(config.getJedisPool().getResource());
+    }
+
+    protected Pool<Jedis> getReadPool() {
         if (!config.isReadFromSlave()) {
             return config.getJedisPool();
         }
@@ -86,7 +115,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         return config.getJedisSlavePools()[index];
     }
 
-    static int randomIndex(int[] weights) {
+    protected static int randomIndex(final int[] weights) {
         int sumOfWeights = 0;
         for (int w : weights) {
             sumOfWeights += w;
@@ -95,170 +124,10 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         int x = 0;
         for (int i = 0; i < weights.length; i++) {
             x += weights[i];
-            if(r < x){
+            if (r < x) {
                 return i;
             }
         }
         throw new CacheException("assert false");
-    }
-
-    @Override
-    protected CacheGetResult<V> do_GET(K key) {
-        try (Jedis jedis = getReadPool().getResource()) {
-            byte[] newKey = buildKey(key);
-            byte[] bytes = jedis.get(newKey);
-            if (bytes != null) {
-                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(bytes);
-                if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                    return CacheGetResult.EXPIRED_WITHOUT_MSG;
-                }
-                return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
-            } else {
-                return CacheGetResult.NOT_EXISTS_WITHOUT_MSG;
-            }
-        } catch (Exception ex) {
-            logError("GET", key, ex);
-            return new CacheGetResult(ex);
-        }
-    }
-
-    @Override
-    protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
-        try (Jedis jedis = getReadPool().getResource()) {
-            ArrayList<K> keyList = new ArrayList<K>(keys);
-            byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
-
-            Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
-            if (newKeys.length > 0) {
-                List mgetResults = jedis.mget(newKeys);
-                for (int i = 0; i < mgetResults.size(); i++) {
-                    Object value = mgetResults.get(i);
-                    K key = keyList.get(i);
-                    if (value != null) {
-                        CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) value);
-                        if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                            resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
-                        } else {
-                            CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
-                            resultMap.put(key, r);
-                        }
-                    } else {
-                        resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
-                    }
-                }
-            }
-            return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
-        } catch (Exception ex) {
-            logError("GET_ALL", "keys(" + keys.size() + ")", ex);
-            return new MultiGetResult<K, V>(ex);
-        }
-    }
-
-
-    @Override
-    protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        try (Jedis jedis = config.getJedisPool().getResource()) {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
-            byte[] newKey = buildKey(key);
-            String rt = jedis.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-            if ("OK".equals(rt)) {
-                return CacheResult.SUCCESS_WITHOUT_MSG;
-            } else {
-                return new CacheResult(CacheResultCode.FAIL, rt);
-            }
-        } catch (Exception ex) {
-            logError("PUT", key, ex);
-            return new CacheResult(ex);
-        }
-    }
-
-    @Override
-    protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
-        try (Jedis jedis = config.getJedisPool().getResource()) {
-            int failCount = 0;
-            List<Response<String>> responses = new ArrayList<>();
-            Pipeline p = jedis.pipelined();
-            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                Response<String> resp = p.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                responses.add(resp);
-            }
-            p.sync();
-            for (Response<String> resp : responses) {
-                if(!"OK".equals(resp.get())){
-                    failCount++;
-                }
-            }
-            return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
-        } catch (Exception ex) {
-            logError("PUT_ALL", "map(" + map.size() + ")", ex);
-            return new CacheResult(ex);
-        }
-    }
-
-    @Override
-    protected CacheResult do_REMOVE(K key) {
-        return REMOVE_impl(key, buildKey(key));
-    }
-
-    private CacheResult REMOVE_impl(Object key, byte[] newKey) {
-        try (Jedis jedis = config.getJedisPool().getResource()) {
-            Long rt = jedis.del(newKey);
-            if (rt == null) {
-                return CacheResult.FAIL_WITHOUT_MSG;
-            } else if (rt == 1) {
-                return CacheResult.SUCCESS_WITHOUT_MSG;
-            } else if (rt == 0) {
-                return new CacheResult(CacheResultCode.NOT_EXISTS, null);
-            } else {
-                return CacheResult.FAIL_WITHOUT_MSG;
-            }
-        } catch (Exception ex) {
-            logError("REMOVE", key, ex);
-            return new CacheResult(ex);
-        }
-    }
-
-    @Override
-    protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
-        try (Jedis jedis = config.getJedisPool().getResource()) {
-            byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
-            jedis.del(newKeys);
-            return CacheResult.SUCCESS_WITHOUT_MSG;
-        } catch (Exception ex) {
-            logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
-            return new CacheResult(ex);
-        }
-    }
-
-    @Override
-    protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        try (Jedis jedis = config.getJedisPool().getResource()) {
-            CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
-            byte[] newKey = buildKey(key);
-            SetParams params = new SetParams();
-            params.nx()
-                    .px(timeUnit.toMillis(expireAfterWrite));
-            String rt = jedis.set(newKey, valueEncoder.apply(holder), params);
-            if ("OK".equals(rt)) {
-                return CacheResult.SUCCESS_WITHOUT_MSG;
-            } else if (rt == null) {
-                return CacheResult.EXISTS_WITHOUT_MSG;
-            } else {
-                return new CacheResult(CacheResultCode.FAIL, rt);
-            }
-        } catch (Exception ex) {
-            logError("PUT_IF_ABSENT", key, ex);
-            return new CacheResult(ex);
-        }
-    }
-
-    @Override
-    protected boolean needLogStackTrace(Throwable e) {
-        if (e instanceof JedisConnectionException) {
-            return false;
-        }
-        return true;
     }
 }

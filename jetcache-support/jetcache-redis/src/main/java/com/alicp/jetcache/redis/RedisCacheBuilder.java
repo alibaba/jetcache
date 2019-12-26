@@ -10,6 +10,7 @@ import redis.clients.jedis.util.Pool;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends ExternalCacheBuilder<T> {
+
     public static class RedisCacheBuilderImpl extends RedisCacheBuilder<RedisCacheBuilderImpl> {
     }
 
@@ -64,5 +65,4 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
     public void setSlaveReadWeights(int... slaveReadWeights) {
         getConfig().setSlaveReadWeights(slaveReadWeights);
     }
-
 }
