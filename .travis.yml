@@ -4,8 +4,5 @@ jdk:
 services:
   - docker
 before_install:
-  - docker pull areyouok/redis-sentinel
-  - docker pull areyouok/redis-cluster
-  - docker run -d -p 6379-6381:6379-6381 -p 26379-26381:26379-26381 areyouok/redis-sentinel
-  - docker run -d --net=host areyouok/redis-cluster
+  - docker-compose up -d
 script: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report
