@@ -17,7 +17,7 @@
 
 1.2.c Run tests in Windows
 
-    docker run -it --rm --network host -v /c/Users/hl_20/.m2:/root/.m2 -v /IdeaProjects/jetcache/jetcache:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean install
+    docker run -it --rm --network host -v /c/Users/hl_20/.m2:/root/.m2 -v /IdeaProjects/jetcache/jetcache:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean test
 
     You need change /c/Users/hl_20 and /IdeaProjects/jetcache/jetcache to your local path.
 
