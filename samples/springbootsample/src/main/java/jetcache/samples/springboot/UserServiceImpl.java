@@ -19,4 +19,13 @@ public class UserServiceImpl implements UserService {
         user.setUserName("user" + userId);
         return user;
     }
+
+    @Override
+    public User loadUserWithJedisCluster(long userId) {
+        System.out.println("load cluser mode user: " + userId);
+        User user = new User();
+        user.setUserId(userId);
+        user.setUserName("user" + userId);
+        return user;
+    }
 }

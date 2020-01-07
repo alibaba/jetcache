@@ -9,6 +9,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -64,7 +65,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
                 continue;
             }
             ConfigTree ct = resolver.subTree(cacheArea + ".");
-            logger.info("init cache area {} , type= {}", cacheArea, typeNames[0]);
+            logger.info("init cache area {} , type= {}", cacheArea, configType);
             CacheBuilder c = initCache(ct, local ? "local." + cacheArea : "remote." + cacheArea);
             cacheBuilders.put(cacheArea, c);
         }

@@ -17,3 +17,21 @@ jetcache:
         maxTotal: 50
       host: 127.0.0.1
       port: 6379
+    mycluster:
+      type: redis.jedis
+      keyConvertor: fastjson
+      valueEncoder: java
+      valueDecoder: java
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      defaultExpireInMillis: 10000
+      keyPrefix: jedisTest
+      mode: cluster
+      clusterPipelineEnable: true
+      maxAttempts: 1
+      uri:
+        - redis://192.168.142.107:8381
+        - redis://192.168.142.108:8381
+        - redis://192.168.142.109:8381

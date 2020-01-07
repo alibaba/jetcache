@@ -4,59 +4,89 @@ import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
+import com.alicp.jetcache.redis.jedis.JedisClusterCacheBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.PropertyValues;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisSentinelPool;
-import redis.clients.jedis.Protocol;
+import org.springframework.util.StringUtils;
+import redis.clients.jedis.*;
 import redis.clients.jedis.util.Pool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.net.URI;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2016/11/25.
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ *
+ * Support jedis cluster mode, updated on 2019/12/12
+ * @author <a href="mailto:eason.fengys@gmail.com">fengyingsheng</a>
+ * @author <a href="mailto:redzippo@foxmail.com">gezhen</a>
  */
 @Configuration
-@Conditional(RedisAutoConfiguration.RedisCondition.class)
+@Conditional(RedisAutoConfiguration.RedisJedisCondition.class)
 public class RedisAutoConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(RedisAutoConfiguration.class);
 
     public static final String AUTO_INIT_BEAN_NAME = "redisAutoInit";
 
+    enum Mode {
+        /**
+         * jedis cluster mode.
+         */
+        CLUSTER("cluster"),
+
+        /**
+         * jedis standalone mode.
+         */
+        STANDALONE("standalone");
+
+        private String name;
+
+        Mode(String name) {
+            this.name = name;
+        }
+
+        String getName(){
+            return this.name;
+        }
+    }
+
     @Bean(name = AUTO_INIT_BEAN_NAME)
-    public RedisAutoInit redisAutoInit() {
-        return new RedisAutoInit();
+    public RedisJedisAutoInit redisJedisAutoInit() {
+        return new RedisJedisAutoInit();
     }
 
-    public static class RedisCondition extends JetCacheCondition {
-        public RedisCondition() {
-            super("redis");
+    public static class RedisJedisCondition extends JetCacheCondition {
+        public RedisJedisCondition() {
+            super("redis", "redis.jedis");
         }
     }
 
-    public static class RedisAutoInit extends ExternalCacheAutoInit {
-        public RedisAutoInit() {
-            super("redis");
+    public static class RedisJedisAutoInit extends ExternalCacheAutoInit {
+        public RedisJedisAutoInit() {
+            super("redis", "redis.jedis");
         }
-
-        @Autowired
-        private AutoConfigureBeans autoConfigureBeans;
 
         @Override
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
+            final String mode = ct.getProperty("mode");
+            if (Mode.CLUSTER.getName().equals(mode)) {
+                return initJedisClusterBuilder(ct, cacheAreaWithPrefix);
+            }
+            logger.info("init cache area={}, mode=standalone" , cacheAreaWithPrefix.contains(".") ?
+                    cacheAreaWithPrefix.split("\\.")[1] : cacheAreaWithPrefix);
             Pool jedisPool = parsePool(ct);
             Pool[] slavesPool = null;
             int[] slavesPoolWeights = null;
@@ -89,12 +119,49 @@ public class RedisAutoConfiguration {
             return externalCacheBuilder;
         }
 
+        private CacheBuilder initJedisClusterBuilder(final ConfigTree ct, final String cacheAreaWithPrefix) {
+            logger.info("init cache area {}, mode= cluster" , cacheAreaWithPrefix.contains(".") ?
+                    cacheAreaWithPrefix.split("\\.")[1] : cacheAreaWithPrefix);
+            final Set<HostAndPort> hostAndPorts = new HashSet<>();
+            Map<String, Object> map = ct.subTree("uri").getProperties();
+            final List<URI> uriList = map.values().stream().map(k -> URI.create(k.toString()))
+                    .collect(Collectors.toList());
+            if (uriList != null && !uriList.isEmpty()) {
+                for (URI uri : uriList) {
+                    HostAndPort hostAndPort = new HostAndPort(uri.getHost(), uri.getPort());
+                    hostAndPorts.add(hostAndPort);
+                }
+            } else {
+                throw new CacheConfigException("there is no uri in configuration for jedis cluster.");
+            }
+            final int timeout = this.getTimeout(ct);
+            GenericObjectPoolConfig poolConfig = this.parsePoolConfig(ct);
+            String maxAttempts = ct.getProperty("maxAttempts");
+            JedisCluster jedisCluster = null;
+            if (StringUtils.isEmpty(maxAttempts)) {
+                jedisCluster = new JedisCluster(hostAndPorts, timeout, poolConfig);
+            } else {
+                final int maxAttempt = Integer.parseInt(maxAttempts);
+                jedisCluster = new JedisCluster(hostAndPorts, timeout, maxAttempt, poolConfig);
+            }
+            boolean clusterPipelineEnable = ct.getProperty("clusterPipelineEnable");
+            ExternalCacheBuilder externalCacheBuilder = JedisClusterCacheBuilder.createJedisClusterCacheBuilder()
+                    .jedisCluster(jedisCluster);
+            parseGeneralConfig(externalCacheBuilder, ct);
+            autoConfigureBeans.getCustomContainer().put("jedisCluster." + cacheAreaWithPrefix, jedisCluster);
+            return externalCacheBuilder;
+        }
+
+        private int getTimeout(final ConfigTree ct) {
+            return Integer.parseInt(ct.getProperty("timeout", String.valueOf(Protocol.DEFAULT_TIMEOUT)));
+        }
+
         private Pool<Jedis> parsePool(ConfigTree ct) {
             GenericObjectPoolConfig poolConfig = parsePoolConfig(ct);
 
             String host = ct.getProperty("host", (String) null);
             int port = Integer.parseInt(ct.getProperty("port", "0"));
-            int timeout = Integer.parseInt(ct.getProperty("timeout", String.valueOf(Protocol.DEFAULT_TIMEOUT)));
+            int timeout = this.getTimeout(ct);
             String password = ct.getProperty("password", (String) null);
             int database = Integer.parseInt(ct.getProperty("database", String.valueOf(Protocol.DEFAULT_DATABASE)));
             String clientName = ct.getProperty("clientName", (String) null);

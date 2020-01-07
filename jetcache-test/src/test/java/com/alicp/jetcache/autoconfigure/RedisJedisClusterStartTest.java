@@ -1,13 +1,15 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.RedisCacheConfig;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.redis.jedis.JedisClusterCacheConfig;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
@@ -20,98 +22,101 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.util.Pool;
+import redis.clients.jedis.JedisCluster;
 
 import javax.annotation.PostConstruct;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Created on 2016/11/23.
- *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
- */
+ * @author eason.feng at 2019/12/12/0012 17:25
+ **/
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
-public class RedisStarterTest extends SpringTest {
+public class RedisJedisClusterStartTest extends SpringTest {
 
     @Test
-    public void tests() throws Exception {
-        System.setProperty("spring.profiles.active", "redis");
-        context = SpringApplication.run(RedisStarterTest.class);
-        doTest();
+    public void test() throws Exception {
+        System.setProperty("spring.profiles.active", "rediscluster");
+        context = SpringApplication.run(RedisJedisClusterStartTest.class);
         A bean = context.getBean(A.class);
         bean.test();
-
-        Pool<Jedis> t1 = (Pool<Jedis>) context.getBean("defaultPool");
-        Pool<Jedis> t2 = (Pool<Jedis>) context.getBean("A1Pool");
-        Assert.assertNotNull(t1);
-        Assert.assertNotNull(t2);
-        Assert.assertNotSame(t1, t2);
     }
 
     @Component
     public static class A {
+
         @CreateCache(cacheType = CacheType.LOCAL)
         private Cache c1;
 
-        @CreateCache
+        @CreateCache(cacheType = CacheType.REMOTE, area = "A1")
         private Cache c2;
+
+        @CreateCache(cacheType = CacheType.REMOTE, area = "default")
+        private Cache<String, String> c3;
+
+        @Cached(cacheType = CacheType.REMOTE, area = "default", expire = 20)
+        public String getId(String id) {
+            return id;
+        }
 
         public void test() {
             Assert.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
-            EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) c1.config();
-            Assert.assertEquals(200, cc1.getLimit());
-            Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
-            Assert.assertFalse(cc1.isExpireAfterAccess());
-            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
 
             RedisCacheConfig c = (RedisCacheConfig) c2.config();
-            Assert.assertFalse(c.isReadFromSlave());
-            Pool[] slavePools = c.getJedisSlavePools();
-            Assert.assertEquals(2, slavePools.length);
-            int[] ws = c.getSlaveReadWeights();
-            Assert.assertTrue(Arrays.equals(new int[]{30, 100}, ws) || Arrays.equals(new int[]{100, 30}, ws));
+            Assert.assertNotNull(c);
+            Map<String, String> map = new HashMap<>();
+            map.put("a", "a");
+            map.put("#1", "a");
+            map.put("*1", "a");
+            map.put("---!===", "a");
+            map.put("mmmm", "a");
+            CacheResult result = c2.PUT_ALL(map);
+            Assert.assertTrue(result.getResultCode() == CacheResultCode.SUCCESS);
+            JedisClusterCacheConfig c3Config = (JedisClusterCacheConfig) c3.config();
+            Assert.assertNotNull(c3Config);
+            result = c3.PUT_ALL(map);
+            Assert.assertTrue(result.getResultCode() == CacheResultCode.SUCCESS);
+            String a = c3.get("a");
+            Assert.assertEquals(a, map.get("a"));
+
+            getId("id");
+            Assert.assertNotNull(getId("id"));
         }
     }
 
     @Component
     public static class B {
         @Autowired
-        private Pool<Jedis> defaultPool;
+        private JedisCluster defaultCluster;
 
         @Autowired
-        private Pool<Jedis> A1Pool;
+        private JedisCluster a1CLUSTER;
 
         @PostConstruct
         public void init() {
-            Assert.assertNotNull(defaultPool);
-            Assert.assertNotNull(A1Pool);
+            Assert.assertNotNull(defaultCluster);
+//            Assert.assertNotNull(a1CLUSTER);
         }
     }
 
     @Configuration
     public static class Config {
+
         @Bean(name = "factoryBeanTarget")
         public MyFactoryBean factoryBean() {
             return new MyFactoryBean();
         }
 
-        @Bean(name = "defaultPool")
+        @Bean(name = "defaultCluster")
         @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)
-        public JedisPoolFactory defaultPool() {
-            return new JedisPoolFactory("remote.default", JedisPool.class);
+        public JedisClusterFactory defaultCluster() {
+            return new JedisClusterFactory("remote.default", JedisCluster.class);
         }
 
-        @Bean(name = "A1Pool")
-        @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)
-        public JedisPoolFactory A1Pool() {
-            return new JedisPoolFactory("remote.A1", JedisPool.class);
-        }
     }
 
 }

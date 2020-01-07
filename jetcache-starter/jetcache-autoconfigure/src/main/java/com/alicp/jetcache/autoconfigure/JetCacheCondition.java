@@ -31,7 +31,7 @@ public abstract class JetCacheCondition extends SpringBootCondition {
         if (match(ct, "local.") || match(ct, "remote.")) {
             return ConditionOutcome.match();
         } else {
-            return ConditionOutcome.noMatch("no match for " + cacheTypes[0]);
+            return ConditionOutcome.noMatch("no match for " + Arrays.asList(cacheTypes).toString());
         }
     }
 

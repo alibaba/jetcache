@@ -17,6 +17,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -32,6 +34,7 @@ public class CacheHandlerInvalidateTest {
     private ConfigMap configMap;
     private CacheInvalidateAnnoConfig invalidateAnnoConfig;
     private CacheInvokeContext cacheInvokeContext;
+    private Method method;
 
     @BeforeEach
     public void setup() throws Exception {
@@ -50,7 +53,7 @@ public class CacheHandlerInvalidateTest {
 
         count = new CountClass();
 
-        Method method = CountClass.class.getMethod("update", String.class, int.class);
+        method = CountClass.class.getMethod("update", String.class, int.class);
         cacheInvokeContext = configProvider.getCacheContext().createCacheInvokeContext(configMap);
         cacheInvokeContext.setCacheInvokeConfig(cacheInvokeConfig);
 
@@ -58,7 +61,7 @@ public class CacheHandlerInvalidateTest {
         invalidateAnnoConfig = new CacheInvalidateAnnoConfig();
         invalidateAnnoConfig.setDefineMethod(method);
         invalidateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);
-        cacheInvokeConfig.setInvalidateAnnoConfig(invalidateAnnoConfig);
+        cacheInvokeConfig.setInvalidateAnnoConfigs(Collections.singletonList(invalidateAnnoConfig));
 
         invalidateAnnoConfig.setKey("args[0]");
         cacheInvokeConfig.setCachedAnnoConfig(null);
@@ -79,6 +82,24 @@ public class CacheHandlerInvalidateTest {
         cache.put("KEY", "V");
         CacheHandler.invoke(cacheInvokeContext);
         assertNull(cache.get("KEY"));
+    }
+
+    @Test
+    public void testInvalidates() throws Throwable {
+        CacheInvalidateAnnoConfig anno1 = new CacheInvalidateAnnoConfig();
+        anno1.setDefineMethod(method);
+        anno1.setCondition(CacheConsts.UNDEFINED_STRING);
+        anno1.setKey("args[0] + 1");
+        CacheInvalidateAnnoConfig anno2 = new CacheInvalidateAnnoConfig();
+        anno2.setDefineMethod(method);
+        anno2.setCondition(CacheConsts.UNDEFINED_STRING);
+        anno2.setKey("args[0] + 2");
+        cacheInvokeConfig.setInvalidateAnnoConfigs(Arrays.asList(anno1, anno2));
+        cache.put("KEY1", "V");
+        cache.put("KEY2", "V");
+        CacheHandler.invoke(cacheInvokeContext);
+        assertNull(cache.get("KEY1"));
+        assertNull(cache.get("KEY2"));
     }
 
     @Test

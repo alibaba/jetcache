@@ -11,4 +11,7 @@ import com.alicp.jetcache.anno.Cached;
 public interface UserService {
     @Cached(name = "loadUser", expire = 10)
     User loadUser(long userId);
+
+    @Cached(area = "mycluster", name = "loadUserWithJedisCluster", expire = 10)
+    User loadUserWithJedisCluster(long userId);
 }
