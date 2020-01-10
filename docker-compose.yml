@@ -1,0 +1,123 @@
+version: '3.7'
+services:
+  master:
+    image: "redis:${IMG_VER}"
+    container_name: master
+    command:  redis-server --port 6379
+    network_mode: "host"
+  slave1:
+    image: "redis:${IMG_VER}"
+    container_name: slave1
+    command:  redis-server --port 6380 --slaveof 127.0.0.1 6379
+    network_mode: "host"
+  slave2:
+    image: "redis:${IMG_VER}"
+    container_name: slave2
+    command:  redis-server --port 6381 --slaveof 127.0.0.1 6379
+    network_mode: "host"
+  sentinel1:
+    image: "redis:${IMG_VER}"
+    container_name: sentinel1
+    command: bash -c "sleep 3;
+      echo port 26379 > /etc/sentinel.conf;
+      sed -i '$$a sentinel monitor mymaster 127.0.0.1 6379 2' /etc/sentinel.conf;
+      sed -i '$$a sentinel down-after-milliseconds mymaster 2000' /etc/sentinel.conf;
+      sed -i '$$a sentinel failover-timeout mymaster 5000' /etc/sentinel.conf;
+      sed -i '$$a sentinel parallel-syncs mymaster 1' /etc/sentinel.conf;
+      sed -i '$$a sentinel announce-ip 127.0.0.1' /etc/sentinel.conf;
+      sed -i '$$a sentinel announce-port 26379' /etc/sentinel.conf;
+      redis-sentinel /etc/sentinel.conf"
+    network_mode: "host"
+  sentinel2:
+    image: "redis:${IMG_VER}"
+    container_name: sentinel2
+    command: bash -c "sleep 3;
+      echo port 26380 > /etc/sentinel.conf;
+      sed -i '$$a sentinel monitor mymaster 127.0.0.1 6379 2' /etc/sentinel.conf;
+      sed -i '$$a sentinel down-after-milliseconds mymaster 2000' /etc/sentinel.conf;
+      sed -i '$$a sentinel failover-timeout mymaster 5000' /etc/sentinel.conf;
+      sed -i '$$a sentinel parallel-syncs mymaster 1' /etc/sentinel.conf;
+      sed -i '$$a sentinel announce-ip 127.0.0.1' /etc/sentinel.conf;
+      sed -i '$$a sentinel announce-port 26380' /etc/sentinel.conf;
+      redis-sentinel /etc/sentinel.conf"
+    network_mode: "host"
+  sentinel3:
+    image: "redis:${IMG_VER}"
+    container_name: sentinel3
+    command: bash -c "sleep 3;
+      echo port 26381 > /etc/sentinel.conf;
+      sed -i '$$a sentinel monitor mymaster 127.0.0.1 6379 2' /etc/sentinel.conf;
+      sed -i '$$a sentinel down-after-milliseconds mymaster 2000' /etc/sentinel.conf;
+      sed -i '$$a sentinel failover-timeout mymaster 5000' /etc/sentinel.conf;
+      sed -i '$$a sentinel parallel-syncs mymaster 1' /etc/sentinel.conf;
+      sed -i '$$a sentinel announce-ip 127.0.0.1' /etc/sentinel.conf;
+      sed -i '$$a sentinel announce-port 26381' /etc/sentinel.conf;
+      redis-sentinel /etc/sentinel.conf"
+    network_mode: "host"
+  cluster1:
+    image: "redis:${IMG_VER}"
+    container_name: cluster1
+    command: bash -c "echo port 7000 > /etc/cluster.conf;
+      sed -i '$$a cluster-enabled yes' /etc/cluster.conf;
+      sed -i '$$a cluster-config-file nodes.conf' /etc/cluster.conf;
+      sed -i '$$a cluster-node-timeout 5000' /etc/cluster.conf;
+      sed -i '$$a appendonly yes' /etc/cluster.conf;
+      redis-server /etc/cluster.conf"
+    network_mode: "host"
+  cluster2:
+    image: "redis:${IMG_VER}"
+    container_name: cluster2
+    command: bash -c "echo port 7001 > /etc/cluster.conf;
+      sed -i '$$a cluster-enabled yes' /etc/cluster.conf;
+      sed -i '$$a cluster-config-file nodes.conf' /etc/cluster.conf;
+      sed -i '$$a cluster-node-timeout 5000' /etc/cluster.conf;
+      sed -i '$$a appendonly yes' /etc/cluster.conf;
+      redis-server /etc/cluster.conf"
+    network_mode: "host"
+  cluster3:
+    image: "redis:${IMG_VER}"
+    container_name: cluster3
+    command: bash -c "echo port 7002 > /etc/cluster.conf;
+      sed -i '$$a cluster-enabled yes' /etc/cluster.conf;
+      sed -i '$$a cluster-config-file nodes.conf' /etc/cluster.conf;
+      sed -i '$$a cluster-node-timeout 5000' /etc/cluster.conf;
+      sed -i '$$a appendonly yes' /etc/cluster.conf;
+      redis-server /etc/cluster.conf"
+    network_mode: "host"
+  cluster4:
+    image: "redis:${IMG_VER}"
+    container_name: cluster4
+    command: bash -c "echo port 7003 > /etc/cluster.conf;
+      sed -i '$$a cluster-enabled yes' /etc/cluster.conf;
+      sed -i '$$a cluster-config-file nodes.conf' /etc/cluster.conf;
+      sed -i '$$a cluster-node-timeout 5000' /etc/cluster.conf;
+      sed -i '$$a appendonly yes' /etc/cluster.conf;
+      redis-server /etc/cluster.conf"
+    network_mode: "host"
+  cluster5:
+    image: "redis:${IMG_VER}"
+    container_name: cluster5
+    command: bash -c "echo port 7004 > /etc/cluster.conf;
+      sed -i '$$a cluster-enabled yes' /etc/cluster.conf;
+      sed -i '$$a cluster-config-file nodes.conf' /etc/cluster.conf;
+      sed -i '$$a cluster-node-timeout 5000' /etc/cluster.conf;
+      sed -i '$$a appendonly yes' /etc/cluster.conf;
+      redis-server /etc/cluster.conf"
+    network_mode: "host"
+  cluster6:
+    image: "redis:${IMG_VER}"
+    container_name: cluster6
+    command: bash -c "echo port 7005 > /etc/cluster.conf;
+      sed -i '$$a cluster-enabled yes' /etc/cluster.conf;
+      sed -i '$$a cluster-config-file nodes.conf' /etc/cluster.conf;
+      sed -i '$$a cluster-node-timeout 5000' /etc/cluster.conf;
+      sed -i '$$a appendonly yes' /etc/cluster.conf;
+      redis-server /etc/cluster.conf"
+    network_mode: "host"
+  clusterCreator:
+    image: "redis:${IMG_VER}"
+    container_name: clusterCreator
+    command: bash -c "sleep 3;
+      echo yes | redis-cli --cluster create 127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005 --cluster-replicas 1;
+      echo cluster created"
+    network_mode: "host"

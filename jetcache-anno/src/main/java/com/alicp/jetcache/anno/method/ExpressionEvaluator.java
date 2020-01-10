@@ -4,18 +4,15 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.CacheException;
 import org.mvel2.MVEL;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -94,22 +91,7 @@ class SpelEvaluator implements Function<Object, Object> {
     private static ParameterNameDiscoverer parameterNameDiscoverer;
 
     static {
-        try {
-            //since spring 4.1
-            Class modeClass = Class.forName("org.springframework.expression.spel.SpelCompilerMode");
-
-            try {
-                Constructor<SpelParserConfiguration> c = SpelParserConfiguration.class
-                        .getConstructor(modeClass, ClassLoader.class);
-                Object mode = modeClass.getField("IMMEDIATE").get(null);
-                SpelParserConfiguration config = c.newInstance(mode, SpelEvaluator.class.getClassLoader());
-                parser = new SpelExpressionParser(config);
-            } catch (Exception e) {
-                throw new CacheException(e);
-            }
-        } catch (ClassNotFoundException e) {
-            parser = new SpelExpressionParser();
-        }
+        parser = new SpelExpressionParser();
         parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
     }
 
