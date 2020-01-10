@@ -13,11 +13,21 @@ public class JedisClusterCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     private JedisCluster jedisCluster;
 
+    private boolean enablePipeline = false;
+
     public JedisCluster getJedisCluster() {
         return jedisCluster;
     }
 
     public void setJedisCluster(final JedisCluster jedisCluster) {
         this.jedisCluster = jedisCluster;
+    }
+
+    public boolean isEnablePipeline() {
+        return enablePipeline;
+    }
+
+    public void setEnablePipeline(boolean enablePipeline) {
+        this.enablePipeline = enablePipeline;
     }
 }

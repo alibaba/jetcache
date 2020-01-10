@@ -1,5 +1,6 @@
 package com.alicp.jetcache.redis.jedis;
 
+import com.alicp.jetcache.CacheException;
 import redis.clients.jedis.BinaryJedisCluster;
 import redis.clients.jedis.Client;
 import redis.clients.jedis.Jedis;
@@ -15,6 +16,7 @@ import redis.clients.jedis.util.SafeEncoder;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -53,16 +55,22 @@ public class JedisClusterPipeline extends Pipeline implements AbstractJedisPipel
 
     @Override
     public void sync() {
-        for (Client client : clients) {
+        Iterator<Client> clientIterator = clients.iterator();
+        while (clientIterator.hasNext()) {
+            Client client = clientIterator.next();
             generateResponse(client.getOne());
+            clientIterator.remove();
         }
     }
 
     @Override
     public List<Object> syncAndReturnAll() {
         List<Object> formatted = new ArrayList<Object>();
-        for (Client client : clients) {
-            formatted.add(generateResponse(client.getOne()).get());
+        Iterator<Client> clientIterator = clients.iterator();
+        while (clientIterator.hasNext()) {
+            Client client = clientIterator.next();
+            formatted.add(generateResponse(client.getOne()));
+            clientIterator.remove();
         }
         return formatted;
     }
@@ -107,7 +115,7 @@ public class JedisClusterPipeline extends Pipeline implements AbstractJedisPipel
 
             return field;
         } catch (NoSuchFieldException | SecurityException e) {
-            throw new RuntimeException(
+            throw new CacheException(
                     String.format("Can not find or access field '%s' from '%s' .", fieldName, cls.getName()), e);
         }
     }

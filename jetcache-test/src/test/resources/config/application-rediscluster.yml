@@ -30,9 +30,9 @@ jetcache:
       mode: cluster
       maxAttempts: 1
       uri:
-        - redis://192.168.142.107:8381
-        - redis://192.168.142.108:8381
-        - redis://192.168.142.109:8381
+        - redis://127.0.0.1:7000
+        - redis://127.0.0.1:7001
+        - redis://127.0.0.1:7002
     A1:
       type: redis
       keyConvertor: fastjson

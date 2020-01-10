@@ -15,6 +15,7 @@ public class JedisPipeline extends Pipeline implements AbstractJedisPipeline {
 
     public JedisPipeline(final Jedis jedis) {
         this.jedis = jedis;
+        super.setClient(jedis.getClient());
     }
 
     @Override

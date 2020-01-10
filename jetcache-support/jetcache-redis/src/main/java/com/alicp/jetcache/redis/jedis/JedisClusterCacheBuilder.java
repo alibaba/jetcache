@@ -30,8 +30,13 @@ public class JedisClusterCacheBuilder<T extends ExternalCacheBuilder<T>> extends
         return (JedisClusterCacheConfig) config;
     }
 
-    public T jedisCluster(JedisCluster jedisCluster) {
+    public T jedisCluster(final JedisCluster jedisCluster) {
         getConfig().setJedisCluster(jedisCluster);
+        return self();
+    }
+
+    public T enablePipeline(final boolean enablePipeline) {
+        getConfig().setEnablePipeline(enablePipeline);
         return self();
     }
 }

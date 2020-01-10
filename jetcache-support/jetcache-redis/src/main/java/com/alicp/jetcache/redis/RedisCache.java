@@ -106,6 +106,11 @@ public class RedisCache<K, V> extends AbstractRedisJedisCache<K, V> {
         return new JedisPipeline(config.getJedisPool().getResource());
     }
 
+    @Override
+    protected boolean isEnablePipeline() {
+        return true;
+    }
+
     protected Pool<Jedis> getReadPool() {
         if (!config.isReadFromSlave()) {
             return config.getJedisPool();

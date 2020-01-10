@@ -144,9 +144,10 @@ public class RedisAutoConfiguration {
                 final int maxAttempt = Integer.parseInt(maxAttempts);
                 jedisCluster = new JedisCluster(hostAndPorts, timeout, maxAttempt, poolConfig);
             }
-            boolean clusterPipelineEnable = ct.getProperty("clusterPipelineEnable");
+            boolean clusterPipelineEnable = Boolean.parseBoolean(ct.getProperty("clusterPipelineEnable", "False"));
             ExternalCacheBuilder externalCacheBuilder = JedisClusterCacheBuilder.createJedisClusterCacheBuilder()
-                    .jedisCluster(jedisCluster);
+                    .jedisCluster(jedisCluster)
+                    .enablePipeline(clusterPipelineEnable);
             parseGeneralConfig(externalCacheBuilder, ct);
             autoConfigureBeans.getCustomContainer().put("jedisCluster." + cacheAreaWithPrefix, jedisCluster);
             return externalCacheBuilder;

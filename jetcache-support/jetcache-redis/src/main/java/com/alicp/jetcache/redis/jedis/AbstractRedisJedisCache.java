@@ -12,6 +12,7 @@ import redis.clients.jedis.Response;
 import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.SetParams;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +52,8 @@ public abstract class AbstractRedisJedisCache<K, V> extends AbstractExternalCach
     protected abstract String jedisSet(byte[] key, byte[] value, SetParams params);
 
     protected abstract AbstractJedisPipeline getJedisPipeline();
+
+    protected abstract boolean isEnablePipeline();
 
     @Override
     protected CacheGetResult<V> do_GET(final K key) {
@@ -125,6 +128,24 @@ public abstract class AbstractRedisJedisCache<K, V> extends AbstractExternalCach
     @Override
     protected CacheResult do_PUT_ALL(final Map<? extends K, ? extends V> map, final long expireAfterWrite,
             final TimeUnit timeUnit) {
+        try {
+            int failCount = 0;
+            if (isEnablePipeline()) {
+                failCount = doPutAllWithPipeline(map, expireAfterWrite, timeUnit);
+            } else {
+                failCount = doPutAllWithoutPipeline(map, expireAfterWrite, timeUnit);
+            }
+            return failCount == 0 ?
+                    CacheResult.SUCCESS_WITHOUT_MSG :
+                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+        } catch (Exception ex) {
+            logError("PUT_ALL", "map(" + map.size() + ")", ex);
+            return new CacheResult(ex);
+        }
+    }
+
+    private int doPutAllWithPipeline(final Map<? extends K, ? extends V> map, final long expireAfterWrite,
+            final TimeUnit timeUnit) throws IOException {
         try (AbstractJedisPipeline p = getJedisPipeline()) {
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
@@ -140,13 +161,22 @@ public abstract class AbstractRedisJedisCache<K, V> extends AbstractExternalCach
                     failCount++;
                 }
             }
-            return failCount == 0 ?
-                    CacheResult.SUCCESS_WITHOUT_MSG :
-                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
-        } catch (Exception ex) {
-            logError("PUT_ALL", "map(" + map.size() + ")", ex);
-            return new CacheResult(ex);
+            return failCount;
         }
+    }
+
+    private int doPutAllWithoutPipeline(final Map<? extends K, ? extends V> map, final long expireAfterWrite,
+            final TimeUnit timeUnit) {
+        int failCount = 0;
+        for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+            CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+            String rt = jedisPsetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite),
+                    valueEncoder.apply(holder));
+            if (!"OK".equals(rt)) {
+                failCount++;
+            }
+        }
+        return failCount;
     }
 
     @Override

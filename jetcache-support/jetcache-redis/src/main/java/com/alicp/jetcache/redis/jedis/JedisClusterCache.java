@@ -57,4 +57,9 @@ public class JedisClusterCache<K, V> extends AbstractRedisJedisCache<K, V> {
     protected AbstractJedisPipeline getJedisPipeline() {
         return new JedisClusterPipeline(config.getJedisCluster());
     }
+
+    @Override
+    protected boolean isEnablePipeline() {
+        return config.isEnablePipeline();
+    }
 }
