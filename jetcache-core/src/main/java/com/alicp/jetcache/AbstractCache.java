@@ -345,7 +345,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     static class LoaderLock {
         CountDownLatch signal;
         Thread loaderThread;
-        boolean success;
-        Object value;
+        volatile boolean success;
+        volatile Object value;
     }
 }
