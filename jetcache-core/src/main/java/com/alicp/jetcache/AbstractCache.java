@@ -204,8 +204,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                     cacheUpdater.accept(loadedValue);
                     return loadedValue;
                 } finally {
-                    ll.signal.countDown();
                     if (create[0]) {
+                        ll.signal.countDown();
                         loaderMap.remove(lockKey);
                     }
                 }
