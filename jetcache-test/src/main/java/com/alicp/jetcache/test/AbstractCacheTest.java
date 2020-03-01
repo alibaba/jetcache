@@ -765,7 +765,7 @@ public abstract class AbstractCacheTest {
             @Override
             public Object apply(Object k) {
                 try {
-                    Thread.sleep(50);
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
