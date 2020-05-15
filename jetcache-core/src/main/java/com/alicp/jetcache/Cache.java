@@ -133,8 +133,6 @@ public interface Cache<K, V> extends Closeable {
     /**
      * Clear all key values and corresponding values under the current name, similar to allEntries property of springcache
      * <a href="cycle_zhou@foxmail.com">cycle</a>
-     *
-     * @return
      */
     default void clear() {
         CLEAR();
@@ -477,8 +475,6 @@ public interface Cache<K, V> extends Closeable {
     /**
      * Clear all key values and corresponding values under the current name, similar to allEntries property of springcache
      * <a href="cycle_zhou@foxmail.com">cycle</a>
-     *
-     * @return
      */
     CacheResult CLEAR();
 
