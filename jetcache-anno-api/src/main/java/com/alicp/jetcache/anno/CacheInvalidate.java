@@ -17,12 +17,14 @@ public @interface CacheInvalidate {
     /**
      * If you want to use multi backend cache system, you can setup multi "cache area" in configuration,
      * this attribute specifies the name of the "cache area" you want to use.
+     *
      * @return the name of cache area
      */
     String area() default CacheConsts.DEFAULT_AREA;
 
     /**
      * The name of this Cache instance which need a remove operation.
+     *
      * @return the name of the cache which need a remove operation
      */
     String name();
@@ -30,6 +32,7 @@ public @interface CacheInvalidate {
     /**
      * Specify the key by expression script, optional. If not specified,
      * use all parameters of the target method and keyConvertor to generate one.
+     *
      * @return an expression script which specifies key
      */
     String key() default CacheConsts.UNDEFINED_STRING;
@@ -45,4 +48,13 @@ public @interface CacheInvalidate {
      * set multi to true indicates jetcache to invalidate each element of the iterable keys.
      */
     boolean multi() default CacheConsts.DEFAULT_MULTI;
+
+    /**
+     * Whether all the entries inside the cache(s) are removed.
+     * <p>By default, only the value under the associated key is removed.
+     * <p>Note that setting this parameter to {@code true} and specifying a
+     * {@link #key} is not allowed.
+     * <a href="cycle_zhou@foxmail.com">cycle</a>
+     */
+    boolean allEntries() default false;
 }

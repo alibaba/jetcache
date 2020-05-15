@@ -45,6 +45,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
     final class LRUMap extends LinkedHashMap implements InnerMap {
 
+        private static final long serialVersionUID = -1011270074024830520L;
         private final int max;
         private Object lock;
 
@@ -61,7 +62,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         void cleanExpiredEntry() {
             synchronized (lock) {
-                for (Iterator it = entrySet().iterator(); it.hasNext();) {
+                for (Iterator it = entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry en = (Map.Entry) it.next();
                     Object value = en.getValue();
                     if (value != null && value instanceof CacheValueHolder) {
@@ -132,6 +133,13 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
                 for (Object k : keys) {
                     remove(k);
                 }
+            }
+        }
+
+        @Override
+        public void clear() {
+            synchronized (lock) {
+                super.clear();
             }
         }
 

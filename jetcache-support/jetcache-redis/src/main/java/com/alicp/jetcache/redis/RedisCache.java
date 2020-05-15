@@ -1,6 +1,13 @@
 package com.alicp.jetcache.redis;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +18,12 @@ import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.util.Pool;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -95,7 +107,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         int x = 0;
         for (int i = 0; i < weights.length; i++) {
             x += weights[i];
-            if(r < x){
+            if (r < x) {
                 return i;
             }
         }
@@ -185,12 +197,12 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             }
             p.sync();
             for (Response<String> resp : responses) {
-                if(!"OK".equals(resp.get())){
+                if (!"OK".equals(resp.get())) {
                     failCount++;
                 }
             }
             return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+                   failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
             logError("PUT_ALL", "map(" + map.size() + ")", ex);
             return new CacheResult(ex);
@@ -233,13 +245,26 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
+    protected CacheResult do_CLEAR() {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
+            Set<String> keys = jedis.keys("*");
+            keys.stream().forEach((key) -> {
+                jedis.del(key);
+            });
+            return CacheResult.SUCCESS_WITHOUT_MSG;
+        } catch (Exception ex) {
+            return new CacheResult(ex);
+        }
+    }
+
+    @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             SetParams params = new SetParams();
             params.nx()
-                    .px(timeUnit.toMillis(expireAfterWrite));
+                  .px(timeUnit.toMillis(expireAfterWrite));
             String rt = jedis.set(newKey, valueEncoder.apply(holder), params);
             if ("OK".equals(rt)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;

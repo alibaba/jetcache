@@ -40,7 +40,7 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
             private long getRestTimeInNanos(CacheValueHolder value) {
                 long now = System.currentTimeMillis();
                 long ttl = value.getExpireTime() - now;
-                if(isExpireAfterAccess){
+                if (isExpireAfterAccess) {
                     ttl = Math.min(ttl, expireAfterAccess);
                 }
                 return TimeUnit.MILLISECONDS.toNanos(ttl);
@@ -94,6 +94,11 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
             @Override
             public void removeAllValues(Collection keys) {
                 cache.invalidateAll(keys);
+            }
+
+            @Override
+            public void clear() {
+                cache.invalidateAll();
             }
 
             @Override

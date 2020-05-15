@@ -142,13 +142,13 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
                 Boolean result = con.pSetEx(buildKey(en.getKey()),
-                        timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                if(!Boolean.TRUE.equals(result)){
+                                            timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
+                if (!Boolean.TRUE.equals(result)) {
                     failCount++;
                 }
             }
             return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+                   failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
             logError("PUT_ALL", "map(" + map.size() + ")", ex);
             return new CacheResult(ex);
@@ -202,6 +202,27 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
+    protected CacheResult do_CLEAR() {
+        RedisConnection con = null;
+        try {
+            con = connectionFactory.getConnection();
+            Set<byte[]> keys = con.keys(buildKey((K) "*"));
+            byte[][] newKeys = keys.stream().toArray((len) -> new byte[keys.size()][]);
+            Long result = con.del(newKeys);
+            if (result != null) {
+                return CacheResult.SUCCESS_WITHOUT_MSG;
+            } else {
+                return new CacheResult(CacheResultCode.FAIL, "result:" + result);
+            }
+        } catch (Exception ex) {
+            logError("CLEAR", null, ex);
+            return new CacheResult(ex);
+        } finally {
+            closeConnection(con);
+        }
+    }
+
+    @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         RedisConnection con = null;
         try {
@@ -209,7 +230,7 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             Boolean result = con.set(newKey, valueEncoder.apply(holder),
-                   Expiration.from(expireAfterWrite, timeUnit), RedisStringCommands.SetOption.ifAbsent());
+                                     Expiration.from(expireAfterWrite, timeUnit), RedisStringCommands.SetOption.ifAbsent());
             if (Boolean.TRUE.equals(result)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             }/* else if (result == null) {

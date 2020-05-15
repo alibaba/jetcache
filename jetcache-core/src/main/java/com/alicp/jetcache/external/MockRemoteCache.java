@@ -5,8 +5,6 @@ package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
-import com.alicp.jetcache.external.AbstractExternalCache;
-import com.alicp.jetcache.external.ExternalCacheConfig;
 
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
@@ -25,9 +23,9 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
         super(config);
         this.config = config;
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                .limit(config.getLimit())
-                .expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
-                .buildCache();
+                                         .limit(config.getLimit())
+                                         .expireAfterWrite(config.getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
+                                         .buildCache();
     }
 
     @Override
@@ -151,6 +149,11 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
         return cache.REMOVE_ALL(keys.stream().map((k) -> genKey(k)).collect(Collectors.toSet()));
+    }
+
+    @Override
+    protected CacheResult do_CLEAR() {
+        return cache.CLEAR();
     }
 
     @Override

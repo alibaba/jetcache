@@ -8,6 +8,7 @@ package com.alicp.jetcache.anno.support;
  */
 public class CacheInvalidateAnnoConfig extends CacheAnnoConfig {
     private boolean multi;
+    private boolean allEntries;
 
     public boolean isMulti() {
         return multi;
@@ -15,5 +16,13 @@ public class CacheInvalidateAnnoConfig extends CacheAnnoConfig {
 
     public void setMulti(boolean multi) {
         this.multi = multi;
+    }
+
+    public boolean isAllEntries() {
+        return allEntries;
+    }
+
+    public void setAllEntries(boolean allEntries) {
+        this.allEntries = allEntries;
     }
 }

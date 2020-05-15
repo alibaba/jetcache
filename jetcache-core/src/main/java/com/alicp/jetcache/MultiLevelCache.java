@@ -3,7 +3,6 @@ package com.alicp.jetcache;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * Created on 16/9/13.
@@ -105,7 +104,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         long currentExpire = h.getExpireTime();
         long now = System.currentTimeMillis();
         if (now <= currentExpire) {
-            if(config.isUseExpireOfSubCache()){
+            if (config.isUseExpireOfSubCache()) {
                 PUT_caches(i, key, h.getValue(), 0, null);
             } else {
                 long restTtl = currentExpire - now;
@@ -155,7 +154,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache c : caches) {
             CacheResult r;
-            if(timeUnit == null) {
+            if (timeUnit == null) {
                 r = c.PUT_ALL(map);
             } else {
                 r = c.PUT_ALL(map, expireAfterWrite, timeUnit);
@@ -207,6 +206,16 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache cache : caches) {
             CacheResult r = cache.REMOVE_ALL(keys);
+            future = combine(future, r);
+        }
+        return new CacheResult(future);
+    }
+
+    @Override
+    protected CacheResult do_CLEAR() {
+        CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
+        for (Cache cache : caches) {
+            CacheResult r = cache.CLEAR();
             future = combine(future, r);
         }
         return new CacheResult(future);

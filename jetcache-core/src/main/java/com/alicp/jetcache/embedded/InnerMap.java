@@ -23,4 +23,6 @@ public interface InnerMap {
     boolean putIfAbsentValue(Object key, Object value);
 
     void removeAllValues(Collection keys);
+    
+    void clear();
 }

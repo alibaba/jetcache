@@ -148,6 +148,12 @@ public class CacheHandler implements InvocationHandler {
         if (!condition) {
             return;
         }
+
+        if (annoConfig.isAllEntries()) {
+            cache.clear();
+            return;
+        }
+        
         Object key = ExpressionUtil.evalKey(context, annoConfig);
         if (key == null) {
             return;
@@ -164,6 +170,7 @@ public class CacheHandler implements InvocationHandler {
         } else {
             cache.remove(key);
         }
+
     }
 
     private static void doUpdate(CacheInvokeContext context, CacheUpdateAnnoConfig updateAnnoConfig) {

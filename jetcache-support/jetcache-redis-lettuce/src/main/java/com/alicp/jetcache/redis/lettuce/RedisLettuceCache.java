@@ -185,7 +185,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
             if (newKeys.length == 0) {
                 return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
             }
-            RedisFuture<List<KeyValue<byte[],byte[]>>> mgetResults = stringAsyncCommands.mget(newKeys);
+            RedisFuture<List<KeyValue<byte[], byte[]>>> mgetResults = stringAsyncCommands.mget(newKeys);
             MultiGetResult result = new MultiGetResult<K, V>(mgetResults.handle((list, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("GET_ALL", "keys(" + keys.size() + ")", ex));
@@ -267,6 +267,45 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @Override
+    protected CacheResult do_CLEAR() {
+        try {
+            byte[] newKey = buildKey((K) "*");
+            RedisFuture<List<byte[]>> future = keyAsyncCommands.keys(newKey);
+            CacheResult result = new CacheResult(future.handle((v, ex) -> {
+                if (ex != null) {
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("KEYS", null, ex));
+                    return new ResultData(ex);
+                } else {
+                    return new ResultData(CacheResultCode.SUCCESS, null, null);
+                }
+            }));
+            setTimeout(result);
+
+            if (!result.isSuccess()) {
+                return result;
+            }
+            
+            List<byte[]> data = future.get();
+            byte[][] newKeys = data.stream().toArray((len) -> new byte[data.size()][]);
+            RedisFuture<Long> clears = keyAsyncCommands.del(newKeys);
+            CacheResult resultClear = new CacheResult(clears.handle((c, e) -> {
+                if (e != null) {
+                    JetCacheExecutor.defaultExecutor().execute(() -> logError("CLEAR", null, e));
+                    return new ResultData(e);
+                } else {
+                    return new ResultData(CacheResultCode.SUCCESS, null, null);
+                }
+            }));
+
+            setTimeout(resultClear);
+            return resultClear;
+        } catch (Exception ex) {
+            logError("CLEAR", null, ex);
+            return new CacheGetResult(ex);
+        }
+    }
+
+    @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         try {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
@@ -282,7 +321,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     } else if (rt == null) {
                         return new ResultData(CacheResultCode.EXISTS, null, null);
                     } else {
-                        return new ResultData(CacheResultCode.FAIL, rt , null);
+                        return new ResultData(CacheResultCode.FAIL, rt, null);
                     }
                 }
             }));

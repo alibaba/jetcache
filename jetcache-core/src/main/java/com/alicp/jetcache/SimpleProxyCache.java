@@ -152,4 +152,9 @@ public class SimpleProxyCache<K, V> implements ProxyCache<K, V> {
     public void close() {
         cache.close();
     }
+
+	@Override
+	public CacheResult CLEAR() {
+		return cache.CLEAR();
+	}
 }

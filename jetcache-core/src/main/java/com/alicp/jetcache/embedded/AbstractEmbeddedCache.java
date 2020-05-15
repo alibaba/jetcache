@@ -127,6 +127,12 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         keys.forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
+    
+    @Override
+    protected CacheResult do_CLEAR() {
+        innerMap.clear();
+        return CacheResult.SUCCESS_WITHOUT_MSG;
+    }
 
     @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
