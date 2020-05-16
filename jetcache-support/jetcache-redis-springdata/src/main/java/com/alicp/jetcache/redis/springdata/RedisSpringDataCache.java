@@ -2,6 +2,7 @@ package com.alicp.jetcache.redis.springdata;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.ExternalKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -206,7 +207,8 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
         RedisConnection con = null;
         try {
             con = connectionFactory.getConnection();
-            Set<byte[]> keys = con.keys(buildKey((K) "*"));
+            byte[] newKey = ExternalKeyUtil.buildKeyAfterConvert("*", null);
+            Set<byte[]> keys = con.keys(newKey);
             byte[][] newKeys = keys.stream().toArray((len) -> new byte[keys.size()][]);
             Long result = con.del(newKeys);
             if (result != null) {

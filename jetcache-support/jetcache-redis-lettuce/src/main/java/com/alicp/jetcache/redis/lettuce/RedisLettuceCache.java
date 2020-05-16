@@ -2,6 +2,7 @@ package com.alicp.jetcache.redis.lettuce;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.ExternalKeyUtil;
 import com.alicp.jetcache.support.JetCacheExecutor;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.KeyValue;
@@ -269,7 +270,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
     @Override
     protected CacheResult do_CLEAR() {
         try {
-            byte[] newKey = buildKey((K) "*");
+            byte[] newKey = ExternalKeyUtil.buildKeyAfterConvert("*", null);
             RedisFuture<List<byte[]>> future = keyAsyncCommands.keys(newKey);
             CacheResult result = new CacheResult(future.handle((v, ex) -> {
                 if (ex != null) {
@@ -284,7 +285,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
             if (!result.isSuccess()) {
                 return result;
             }
-            
+
             List<byte[]> data = future.get();
             byte[][] newKeys = data.stream().toArray((len) -> new byte[data.size()][]);
             RedisFuture<Long> clears = keyAsyncCommands.del(newKeys);

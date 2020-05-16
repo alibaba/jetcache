@@ -1,6 +1,7 @@
 package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.CacheException;
+import org.springframework.util.ObjectUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,10 +42,14 @@ public class ExternalKeyUtil {
         } else {
             throw new CacheException("can't convert key of class: " + newKey.getClass());
         }
-        byte[] prefixBytes = prefix.getBytes("UTF-8");
-        byte[] rt = new byte[prefixBytes.length + keyBytesWithOutPrefix.length];
-        System.arraycopy(prefixBytes, 0, rt, 0, prefixBytes.length);
-        System.arraycopy(keyBytesWithOutPrefix, 0, rt, prefixBytes.length, keyBytesWithOutPrefix.length);
-        return rt;
+        if (ObjectUtils.isEmpty(prefix)) {
+            return keyBytesWithOutPrefix;
+        } else {
+            byte[] prefixBytes = prefix.getBytes("UTF-8");
+            byte[] rt = new byte[prefixBytes.length + keyBytesWithOutPrefix.length];
+            System.arraycopy(prefixBytes, 0, rt, 0, prefixBytes.length);
+            System.arraycopy(keyBytesWithOutPrefix, 0, rt, prefixBytes.length, keyBytesWithOutPrefix.length);
+            return rt;
+        }
     }
 }
