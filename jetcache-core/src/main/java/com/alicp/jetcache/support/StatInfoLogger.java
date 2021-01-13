@@ -26,6 +26,7 @@ public class StatInfoLogger implements Consumer<StatInfo> {
         this.verboseLog = verboseLog;
     }
 
+    @Override
     public void accept(StatInfo statInfo) {
         List<CacheStat> stats = statInfo.getStats();
         Collections.sort(stats, (o1, o2) -> {

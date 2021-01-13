@@ -10,7 +10,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "jetcache")
 public class JetCacheProperties {
 
-    private String[] hidePackages;
+    private String[] hiddenPackages;
     private int statIntervalMinutes;
     private boolean areaInCacheName = true;
     private boolean penetrationProtect = false;
@@ -19,12 +19,19 @@ public class JetCacheProperties {
     public JetCacheProperties(){
     }
 
-    public String[] getHidePackages() {
-        return hidePackages;
+    public String[] getHiddenPackages() {
+        // keep same with GlobalCacheConfig
+        return hiddenPackages;
+    }
+
+    public void setHiddenPackages(String[] hiddenPackages) {
+        // keep same with GlobalCacheConfig
+        this.hiddenPackages = hiddenPackages;
     }
 
     public void setHidePackages(String[] hidePackages) {
-        this.hidePackages = hidePackages;
+        // keep same with GlobalCacheConfig
+        this.hiddenPackages = hidePackages;
     }
 
     public int getStatIntervalMinutes() {

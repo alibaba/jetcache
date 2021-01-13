@@ -38,8 +38,8 @@ public class AnnoConfigTest extends SpringTest {
         }
 
         @Bean
-        public GlobalCacheConfig config(SpringConfigProvider configProvider) {
-            GlobalCacheConfig pc = TestUtil.createGloableConfig(configProvider);
+        public GlobalCacheConfig config() {
+            GlobalCacheConfig pc = TestUtil.createGloableConfig();
             return pc;
         }
 

@@ -16,6 +16,7 @@
 
     <bean id="factoryBeanTarget" class="com.alicp.jetcache.test.beans.MyFactoryBean"/>
 
+    <bean class="com.alicp.jetcache.anno.support.SpringConfigProvider"/>
     <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.support.GlobalCacheConfig">
         <property name="localCacheBuilders">
             <map>
@@ -29,15 +30,12 @@
                 <entry key="A1" value-ref="remoteCacheBuilder2"/>
             </map>
         </property>
-        <property name="configProvider">
-            <bean class="com.alicp.jetcache.anno.support.SpringConfigProvider"/>
-        </property>
     </bean>
     <bean id="fastjsonKeyConvertor" class="com.alicp.jetcache.support.FastjsonKeyConvertor"/>
     <bean id="localCacheBuilder" class="com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder">
         <property name="keyConvertor" ref="fastjsonKeyConvertor"/>
     </bean>
-    <bean id="remoteCacheBuilder" class="com.alicp.jetcache.test.MockRemoteCacheBuilder">
+    <bean id="remoteCacheBuilder" class="com.alicp.jetcache.external.MockRemoteCacheBuilder">
         <property name="keyPrefix" value="remote1"/>
         <property name="keyConvertor" ref="fastjsonKeyConvertor"/>
         <property name="valueEncoder">
@@ -47,7 +45,7 @@
             <util:constant static-field="com.alicp.jetcache.support.KryoValueDecoder.INSTANCE"/>
         </property>
     </bean>
-    <bean id="remoteCacheBuilder2" class="com.alicp.jetcache.test.MockRemoteCacheBuilder">
+    <bean id="remoteCacheBuilder2" class="com.alicp.jetcache.external.MockRemoteCacheBuilder">
         <property name="keyPrefix" value="remote2"/>
         <property name="keyConvertor" ref="fastjsonKeyConvertor"/>
         <property name="valueEncoder">

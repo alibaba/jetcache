@@ -2,12 +2,12 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.DefaultMetricsManager;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import com.alicp.jetcache.test.MockRemoteCache;
-import com.alicp.jetcache.test.MockRemoteCacheBuilder;
+import com.alicp.jetcache.external.MockRemoteCache;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -125,12 +125,12 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         DefaultCacheMonitor m1_again = new DefaultCacheMonitor("l1_monitor_again");
         DefaultCacheMonitor m2 = new DefaultCacheMonitor("l2");
         DefaultCacheMonitor mc = new DefaultCacheMonitor("mc");
-        l1Cache = new MonitoredCache(l1Cache, m1);
-        l1Cache = new MonitoredCache(l1Cache, m1_again);
-        l2Cache = new MonitoredCache(l2Cache, m2);
+        l1Cache.config().getMonitors().add(m1);
+        l1Cache.config().getMonitors().add(m1_again);
+        l2Cache.config().getMonitors().add(m2);
         cache = new MultiLevelCache<>(l1Cache, l2Cache);
-        cache = new MonitoredCache<>(cache, mc);
-        DefaultCacheMonitorManager logger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
+        cache.config().getMonitors().add(mc);
+        DefaultMetricsManager logger = new DefaultMetricsManager(1, TimeUnit.SECONDS, verboseLog);
         logger.add(m1, m1_again, m2, mc);
         logger.start();
 

@@ -1,8 +1,9 @@
 package com.alicp.jetcache;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
+import com.alicp.jetcache.anno.CacheConsts;
+
+import java.time.Duration;
+import java.util.concurrent.*;
 
 /**
  * Created on 2016/9/28.
@@ -13,6 +14,8 @@ public class CacheResult {
 
     public static final String MSG_ILLEGAL_ARGUMENT = "illegal argument";
 
+    private static Duration DEFAULT_TIMEOUT = CacheConsts.ASYNC_RESULT_TIMEOUT;
+
     public static final CacheResult SUCCESS_WITHOUT_MSG = new CacheResult(CacheResultCode.SUCCESS, null);
     public static final CacheResult PART_SUCCESS_WITHOUT_MSG = new CacheResult(CacheResultCode.PART_SUCCESS, null);
     public static final CacheResult FAIL_WITHOUT_MSG = new CacheResult(CacheResultCode.FAIL, null);
@@ -22,6 +25,8 @@ public class CacheResult {
     private CacheResultCode resultCode;
     private String message;
     private CompletionStage<ResultData> future;
+
+    private Duration timeout = DEFAULT_TIMEOUT;
 
     public CacheResult(CompletionStage<ResultData> future) {
         this.future = future;
@@ -40,13 +45,18 @@ public class CacheResult {
     }
 
     protected void waitForResult() {
+        waitForResult(timeout);
+    }
+
+    public void waitForResult(Duration timeout) {
         if (resultCode != null) {
             return;
         }
         try {
-            ResultData resultData = future.toCompletableFuture().get();
+            ResultData resultData = future.toCompletableFuture().get(
+                    timeout.toMillis(), TimeUnit.MILLISECONDS);
             fetchResultSuccess(resultData);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (TimeoutException | InterruptedException | ExecutionException e) {
             fetchResultFail(e);
         }
     }
@@ -73,5 +83,13 @@ public class CacheResult {
 
     public CompletionStage<ResultData> future() {
         return future;
+    }
+
+    public static void setDefaultTimeout(Duration defaultTimeout) {
+        DEFAULT_TIMEOUT = defaultTimeout;
+    }
+
+    public void setTimeout(Duration timeout) {
+        this.timeout = timeout;
     }
 }

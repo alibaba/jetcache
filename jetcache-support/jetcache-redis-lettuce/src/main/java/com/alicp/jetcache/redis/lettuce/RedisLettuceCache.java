@@ -13,9 +13,8 @@ import io.lettuce.core.api.sync.RedisStringCommands;
 import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
 import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -28,8 +27,6 @@ import java.util.function.Function;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
-
-    private static final Logger logger = LoggerFactory.getLogger(RedisLettuceCache.class);
 
     private RedisLettuceCacheConfig<K, V> config;
 
@@ -86,16 +83,18 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
         return config;
     }
 
+    private void setTimeout(CacheResult cr) {
+        Duration d = Duration.ofMillis(config.getAsyncResultTimeoutInMillis());
+        cr.setTimeout(d);
+    }
+
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             RedisFuture<String> future = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-            return new CacheResult(future.handle((rt, ex) -> {
+            CacheResult result = new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("PUT", key, ex));
                     return new ResultData(ex);
@@ -107,6 +106,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     }
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("PUT", key, ex);
             return new CacheResult(ex);
@@ -115,17 +116,14 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
-        if (map == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             CompletionStage<Integer> future = CompletableFuture.completedFuture(0);
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
                 RedisFuture<String> resp = stringAsyncCommands.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
+                future = future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
             }
-            return new CacheResult(future.handle((failCount, ex) -> {
+            CacheResult result = new CacheResult(future.handle((failCount, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("PUT_ALL", "map(" + map.size() + ")", ex));
                     return new ResultData(ex);
@@ -139,6 +137,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     }
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("PUT_ALL", "map(" + map.size() + ")", ex);
             return new CacheResult(ex);
@@ -147,13 +147,10 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheGetResult<V> do_GET(K key) {
-        if (key == null) {
-            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         try {
             byte[] newKey = buildKey(key);
             RedisFuture<byte[]> future = stringAsyncCommands.get(newKey);
-            return new CacheGetResult(future.handle((valueBytes, ex) -> {
+            CacheGetResult result = new CacheGetResult(future.handle((valueBytes, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("GET", key, ex));
                     return new ResultData(ex);
@@ -170,6 +167,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     }
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("GET", key, ex);
             return new CacheGetResult(ex);
@@ -178,9 +177,6 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
         try {
             ArrayList<K> keyList = new ArrayList<K>(keys);
             byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
@@ -190,7 +186,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                 return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
             }
             RedisFuture<List<KeyValue<byte[],byte[]>>> mgetResults = stringAsyncCommands.mget(newKeys);
-            return new MultiGetResult<K, V>(mgetResults.handle((list, ex) -> {
+            MultiGetResult result = new MultiGetResult<K, V>(mgetResults.handle((list, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("GET_ALL", "keys(" + keys.size() + ")", ex));
                     return new ResultData(ex);
@@ -213,6 +209,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     return new ResultData(CacheResultCode.SUCCESS, null, resultMap);
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("GET_ALL", "keys(" + keys.size() + ")", ex);
             return new MultiGetResult<K, V>(ex);
@@ -221,12 +219,9 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE(K key) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             RedisFuture<Long> future = keyAsyncCommands.del(buildKey(key));
-            return new CacheResult(future.handle((rt, ex) -> {
+            CacheResult result = new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("REMOVE", key, ex));
                     return new ResultData(ex);
@@ -242,6 +237,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     }
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("REMOVE", key, ex);
             return new CacheResult(ex);
@@ -250,13 +247,10 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
             RedisFuture<Long> future = keyAsyncCommands.del(newKeys);
-            return new CacheResult(future.handle((v, ex) -> {
+            CacheResult result = new CacheResult(future.handle((v, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex));
                     return new ResultData(ex);
@@ -264,6 +258,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     return new ResultData(CacheResultCode.SUCCESS, null, null);
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
             return new CacheResult(ex);
@@ -272,14 +268,11 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         try {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             RedisFuture<String> future = stringAsyncCommands.set(newKey, valueEncoder.apply(holder), SetArgs.Builder.nx().px(timeUnit.toMillis(expireAfterWrite)));
-            return new CacheResult(future.handle((rt, ex) -> {
+            CacheResult result = new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("PUT_IF_ABSENT", key, ex));
                     return new ResultData(ex);
@@ -293,6 +286,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                     }
                 }
             }));
+            setTimeout(result);
+            return result;
         } catch (Exception ex) {
             logError("PUT_IF_ABSENT", key, ex);
             return new CacheResult(ex);

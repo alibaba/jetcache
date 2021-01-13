@@ -1,7 +1,6 @@
 package com.alicp.jetcache.support;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 
 /**
  * Created on 2017/5/3.
@@ -14,17 +13,33 @@ public class JetCacheExecutor {
 
     private static int threadCount;
 
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                if (defaultExecutor != null) {
+                    defaultExecutor.shutdownNow();
+                }
+                if (heavyIOExecutor != null) {
+                    heavyIOExecutor.shutdownNow();
+                }
+            }
+        });
+    }
+
     public static ScheduledExecutorService defaultExecutor() {
         if (defaultExecutor != null) {
             return defaultExecutor;
         }
         synchronized (JetCacheExecutor.class) {
             if (defaultExecutor == null) {
-                defaultExecutor = Executors.newSingleThreadScheduledExecutor(r -> {
+                ThreadFactory tf = r -> {
                     Thread t = new Thread(r, "JetCacheDefaultExecutor");
                     t.setDaemon(true);
                     return t;
-                });
+                };
+                defaultExecutor = new ScheduledThreadPoolExecutor(
+                        1, tf, new ThreadPoolExecutor.DiscardPolicy());
             }
         }
         return defaultExecutor;
@@ -36,11 +51,13 @@ public class JetCacheExecutor {
         }
         synchronized (JetCacheExecutor.class) {
             if (heavyIOExecutor == null) {
-                heavyIOExecutor = Executors.newScheduledThreadPool(10, r -> {
+                ThreadFactory tf = r -> {
                     Thread t = new Thread(r, "JetCacheHeavyIOExecutor" + threadCount++);
                     t.setDaemon(true);
                     return t;
-                });
+                };
+                heavyIOExecutor = new ScheduledThreadPoolExecutor(
+                        10, tf, new ThreadPoolExecutor.DiscardPolicy());
             }
         }
         return heavyIOExecutor;

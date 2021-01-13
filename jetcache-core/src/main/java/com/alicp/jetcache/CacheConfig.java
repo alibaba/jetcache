@@ -2,6 +2,7 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.anno.CacheConsts;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -31,6 +32,7 @@ public class CacheConfig<K, V> implements Cloneable {
     private int tryLockLockCount = 2;
 
     private boolean cachePenetrationProtect = false;
+    private Duration penetrationProtectTimeout = null;
 
     @Override
     public CacheConfig clone() {
@@ -152,5 +154,13 @@ public class CacheConfig<K, V> implements Cloneable {
 
     public void setCachePenetrationProtect(boolean cachePenetrationProtect) {
         this.cachePenetrationProtect = cachePenetrationProtect;
+    }
+
+    public Duration getPenetrationProtectTimeout() {
+        return penetrationProtectTimeout;
+    }
+
+    public void setPenetrationProtectTimeout(Duration penetrationProtectTimeout) {
+        this.penetrationProtectTimeout = penetrationProtectTimeout;
     }
 }

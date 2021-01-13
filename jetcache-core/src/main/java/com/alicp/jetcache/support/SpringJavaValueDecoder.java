@@ -24,13 +24,4 @@ public class SpringJavaValueDecoder extends JavaValueDecoder {
     protected ObjectInputStream buildObjectInputStream(ByteArrayInputStream in) throws IOException {
         return new ConfigurableObjectInputStream(in, Thread.currentThread().getContextClassLoader());
     }
-
-    public static JavaValueDecoder defaultJavaValueDecoder() {
-        try {
-            Class.forName("org.springframework.core.ConfigurableObjectInputStream");
-            return INSTANCE;
-        } catch (ClassNotFoundException e) {
-            return JavaValueDecoder.INSTANCE;
-        }
-    }
 }

@@ -14,12 +14,7 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
     protected CacheConfig config;
     private Function<CacheConfig, Cache> buildFunc;
 
-    public CacheConfig getConfig() {
-        if (config == null) {
-            config = new CacheConfig();
-        }
-        return config;
-    }
+    public abstract CacheConfig getConfig();
 
     protected T self() {
         return (T) this;
@@ -38,6 +33,7 @@ public abstract class AbstractCacheBuilder<T extends AbstractCacheBuilder<T>> im
         return buildCache();
     }
 
+    @Override
     public final <K, V> Cache<K, V> buildCache() {
         if (buildFunc == null) {
             throw new CacheConfigException("no buildFunc");

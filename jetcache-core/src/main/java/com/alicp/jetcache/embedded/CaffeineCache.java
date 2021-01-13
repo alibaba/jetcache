@@ -46,14 +46,18 @@ public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
                 return TimeUnit.MILLISECONDS.toNanos(ttl);
             }
 
+            @Override
             public long expireAfterCreate(Object key, CacheValueHolder value, long currentTime) {
                 return getRestTimeInNanos(value);
             }
 
+            @Override
             public long expireAfterUpdate(Object key, CacheValueHolder value,
                                           long currentTime, long currentDuration) {
                 return currentDuration;
             }
+
+            @Override
             public long expireAfterRead(Object key, CacheValueHolder value,
                                         long currentTime, long currentDuration) {
                 return getRestTimeInNanos(value);

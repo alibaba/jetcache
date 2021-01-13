@@ -26,22 +26,25 @@ public class JetCacheInterceptorTest {
     private CachePointcut pc;
     private JetCacheInterceptor interceptor;
     private GlobalCacheConfig globalCacheConfig;
+    private ConfigProvider configProvider;
 
     @BeforeEach
     public void setup() {
-        globalCacheConfig = TestUtil.createGloableConfig(new ConfigProvider());
-        globalCacheConfig.init();
+        configProvider = TestUtil.createConfigProvider();
+        globalCacheConfig = configProvider.getGlobalCacheConfig();
+        configProvider.init();
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
         ConfigMap map = new ConfigMap();
         pc.setCacheConfigMap(map);
         interceptor = new JetCacheInterceptor();
         interceptor.setCacheConfigMap(map);
-        interceptor.globalCacheConfig = globalCacheConfig;
+        interceptor.configProvider = configProvider;
+
     }
 
     @AfterEach
     public void stop(){
-        globalCacheConfig.shutdown();
+        configProvider.shutdown();
     }
 
     interface I1 {

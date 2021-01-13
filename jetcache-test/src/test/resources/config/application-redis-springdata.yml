@@ -1,0 +1,37 @@
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  penetrationProtect: false
+
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+      limit: 200
+      defaultExpireInMillis: 10000
+    A1:
+      type: linkedhashmap
+      keyConvertor: fastjson
+      limit: 100
+      expireAfterAccess: true
+      defaultExpireInMillis: 10000
+  remote:
+    default:
+      type: redis.springdata
+      keyConvertor: fastjson
+      defaultExpireInMillis: 10000
+      keyPrefix: spring-data-redis
+    A1:
+      type: redis.springdata
+      keyConvertor: fastjson
+      defaultExpireInMillis: 10000
+      keyPrefix: spring-data-redis-A1
+
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    timeout: 1000
+
+
+

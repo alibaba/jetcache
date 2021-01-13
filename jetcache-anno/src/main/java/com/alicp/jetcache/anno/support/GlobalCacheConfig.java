@@ -5,8 +5,6 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.util.Map;
 
 /**
@@ -23,31 +21,7 @@ public class GlobalCacheConfig {
     private Map<String, CacheBuilder> localCacheBuilders;
     private Map<String, CacheBuilder> remoteCacheBuilders;
 
-    private ConfigProvider configProvider = new SpringConfigProvider();
-
-    private CacheContext cacheContext;
-
     public GlobalCacheConfig() {
-    }
-
-    @PostConstruct
-    public synchronized void init() {
-        if (cacheContext == null) {
-            cacheContext = configProvider.newContext(this);
-            cacheContext.init();
-        }
-    }
-
-    @PreDestroy
-    public synchronized void shutdown() {
-        if (cacheContext != null) {
-            cacheContext.shutdown();
-            cacheContext = null;
-        }
-    }
-
-    public CacheContext getCacheContext() {
-        return cacheContext;
     }
 
     public String[] getHiddenPackages() {
@@ -80,14 +54,6 @@ public class GlobalCacheConfig {
 
     public void setStatIntervalMinutes(int statIntervalMinutes) {
         this.statIntervalMinutes = statIntervalMinutes;
-    }
-
-    public ConfigProvider getConfigProvider() {
-        return configProvider;
-    }
-
-    public void setConfigProvider(ConfigProvider configProvider) {
-        this.configProvider = configProvider;
     }
 
     public boolean isAreaInCacheName() {

@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CacheAnnotationParser implements BeanDefinitionParser {
 
+    @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
         doParse(element, parserContext);
         return null;

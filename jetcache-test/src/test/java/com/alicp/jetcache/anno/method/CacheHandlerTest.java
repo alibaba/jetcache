@@ -16,18 +16,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheHandlerTest {
 
-    private GlobalCacheConfig globalCacheConfig;
+    private ConfigProvider configProvider;
     private CachedAnnoConfig cachedAnnoConfig;
     private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
@@ -36,10 +35,10 @@ public class CacheHandlerTest {
 
     @BeforeEach
     public void setup() {
-        globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setLocalCacheBuilders(new HashMap<>());
-        globalCacheConfig.setRemoteCacheBuilders(new HashMap<>());
-        globalCacheConfig.init();
+        GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
+        configProvider = new ConfigProvider();
+        configProvider.setGlobalCacheConfig(globalCacheConfig);
+        configProvider.init();
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -69,12 +68,13 @@ public class CacheHandlerTest {
     }
 
     @AfterEach
-    public void stop() {
-        globalCacheConfig.shutdown();
+    public void tearDown() {
+        configProvider.shutdown();
     }
 
+
     private CacheInvokeContext createCachedInvokeContext(Invoker invoker, Method method, Object[] args) {
-        CacheInvokeContext c = globalCacheConfig.getCacheContext().createCacheInvokeContext(configMap);
+        CacheInvokeContext c = configProvider.getCacheContext().createCacheInvokeContext(configMap);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
         c.setInvoker(invoker);

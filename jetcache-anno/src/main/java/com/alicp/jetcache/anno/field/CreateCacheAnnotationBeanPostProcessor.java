@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  * @see org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor
  */
+@SuppressWarnings("AliMissingOverrideAnnotation")
 @Component // necessary when spring boot version <= 1.2.X
 public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationBeanPostProcessor {
 
@@ -51,7 +52,13 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
     @Override
     public PropertyValues postProcessPropertyValues(
             PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeanCreationException {
+        return postProcessProperties(pvs, bean, beanName);
+    }
 
+    //@Override
+    //since 5.1
+    @SuppressWarnings("AliMissingOverrideAnnotation")
+    public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
         InjectionMetadata metadata = findAutowiringMetadata(beanName, bean.getClass(), pvs);
         try {
             metadata.inject(bean, beanName, pvs);

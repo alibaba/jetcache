@@ -31,9 +31,18 @@ public class DecoderMap {
 
     static void registerBuildInDecoder() {
         if (!inited) {
-            register(JavaValueEncoder.IDENTITY_NUMBER, SpringJavaValueDecoder.defaultJavaValueDecoder());
+            register(JavaValueEncoder.IDENTITY_NUMBER, defaultJavaValueDecoder());
             register(KryoValueEncoder.IDENTITY_NUMBER, KryoValueDecoder.INSTANCE);
             inited = true;
+        }
+    }
+
+    public static JavaValueDecoder defaultJavaValueDecoder() {
+        try {
+            Class.forName("org.springframework.core.ConfigurableObjectInputStream");
+            return SpringJavaValueDecoder.INSTANCE;
+        } catch (ClassNotFoundException e) {
+            return JavaValueDecoder.INSTANCE;
         }
     }
 

@@ -14,13 +14,9 @@ import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -41,33 +37,12 @@ public class CacheContext {
     private ConfigProvider configProvider;
     private GlobalCacheConfig globalCacheConfig;
 
-    private DefaultCacheMonitorManager defaultCacheMonitorManager;
-    private ConcurrentHashMap<String, Cache> cacheManager;
+    protected SimpleCacheManager cacheManager;
 
-    public CacheContext(GlobalCacheConfig globalCacheConfig) {
+    public CacheContext(ConfigProvider configProvider, GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
-        this.configProvider = globalCacheConfig.getConfigProvider();
-    }
-
-    public synchronized void init() {
-        if (cacheManager == null) {
-            this.cacheManager = new ConcurrentHashMap<>();
-            if (globalCacheConfig.getStatIntervalMinutes() > 0) {
-                defaultCacheMonitorManager = new DefaultCacheMonitorManager(globalCacheConfig.getStatIntervalMinutes(),
-                        TimeUnit.MINUTES, globalCacheConfig.getConfigProvider().statCallback());
-                defaultCacheMonitorManager.start();
-            }
-        }
-    }
-
-    public synchronized void shutdown() {
-        if (defaultCacheMonitorManager != null) {
-            defaultCacheMonitorManager.stop();
-        }
-        ConcurrentHashMap<String, Cache> m = cacheManager;
-        cacheManager = null;
-        m.forEach((k, c) -> c.close());
-        defaultCacheMonitorManager = null;
+        this.configProvider = configProvider;
+        cacheManager = configProvider.getCacheManager();
     }
 
     public CacheInvokeContext createCacheInvokeContext(ConfigMap configMap) {
@@ -108,12 +83,23 @@ public class CacheContext {
         return cache;
     }
 
+    @Deprecated
+    public <K, V> Cache<K, V> getCache(String cacheName) {
+        return getCache(CacheConsts.DEFAULT_AREA, cacheName);
+    }
+
+    @Deprecated
+    public <K, V> Cache<K, V> getCache(String area, String cacheName) {
+        Cache cache = cacheManager.getCacheWithoutCreate(area, cacheName);
+        return cache;
+    }
+
     public Cache __createOrGetCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         String fullCacheName = area + "_" + cacheName;
-        Cache cache = cacheManager.get(fullCacheName);
+        Cache cache = cacheManager.getCacheWithoutCreate(area, cacheName);
         if (cache == null) {
             synchronized (this) {
-                cache = cacheManager.get(fullCacheName);
+                cache = cacheManager.getCacheWithoutCreate(area, cacheName);
                 if (cache == null) {
                     if (globalCacheConfig.isAreaInCacheName()) {
                         // for compatible reason, if we use default configuration, the prefix should same to that version <=2.4.3
@@ -121,7 +107,7 @@ public class CacheContext {
                     } else {
                         cache = buildCache(cachedAnnoConfig, area, cacheName);
                     }
-                    cacheManager.put(fullCacheName, cache);
+                    cacheManager.putCache(area, cacheName, cache);
                 }
             }
         }
@@ -138,34 +124,26 @@ public class CacheContext {
             Cache local = buildLocal(cachedAnnoConfig, area);
             Cache remote = buildRemote(cachedAnnoConfig, area, cacheName);
 
-            if (defaultCacheMonitorManager != null) {
-                DefaultCacheMonitor localMonitor = new DefaultCacheMonitor(cacheName + "_local");
-                local.config().getMonitors().add(localMonitor);
-                DefaultCacheMonitor remoteMonitor = new DefaultCacheMonitor(cacheName + "_remote");
-                remote.config().getMonitors().add(remoteMonitor);
-                defaultCacheMonitorManager.add(localMonitor, remoteMonitor);
-            }
-
             boolean useExpireOfSubCache = cachedAnnoConfig.getLocalExpire() > 0;
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
                     .expireAfterWrite(remote.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                     .addCache(local, remote)
                     .useExpireOfSubCache(useExpireOfSubCache)
+                    .cacheNullValue(cachedAnnoConfig.isCacheNullValue())
                     .buildCache();
         }
         cache.config().setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
         cache = new CacheHandler.CacheHandlerRefreshCache(cache);
 
         cache.config().setCachePenetrationProtect(globalCacheConfig.isPenetrationProtect());
-        if (cachedAnnoConfig.getPenetrationProtectConfig() != null) {
-            cache.config().setCachePenetrationProtect(cachedAnnoConfig.getPenetrationProtectConfig().isPenetrationProtect());
+        PenetrationProtectConfig protectConfig = cachedAnnoConfig.getPenetrationProtectConfig();
+        if (protectConfig != null) {
+            cache.config().setCachePenetrationProtect(protectConfig.isPenetrationProtect());
+            cache.config().setPenetrationProtectTimeout(protectConfig.getPenetrationProtectTimeout());
         }
 
-
-        if (defaultCacheMonitorManager != null) {
-            DefaultCacheMonitor monitor = new DefaultCacheMonitor(cacheName);
-            cache.config().getMonitors().add(monitor);
-            defaultCacheMonitorManager.add(monitor);
+        if (configProvider.getCacheMonitorManager() != null) {
+            configProvider.getCacheMonitorManager().addMonitors(area, cacheName, cache);
         }
         return cache;
     }

@@ -14,12 +14,18 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-class CacheUtil {
+public class CacheUtil {
 
-    public static <K, V> CacheLoader<K, V> createProxyLoader(Cache<K, V> cache,
+    private interface ProxyLoader<K, V> extends CacheLoader<K, V> {
+    }
+
+    public static <K, V> ProxyLoader<K, V> createProxyLoader(Cache<K, V> cache,
                                                              CacheLoader<K, V> loader,
                                                              Consumer<CacheEvent> eventConsumer) {
-        return new CacheLoader<K, V>() {
+        if (loader instanceof ProxyLoader) {
+            return (ProxyLoader<K, V>) loader;
+        }
+        return new ProxyLoader<K, V>() {
             @Override
             public V load(K key) throws Throwable {
                 long t = System.currentTimeMillis();
@@ -59,10 +65,16 @@ class CacheUtil {
         };
     }
 
-    public static <K, V> Function<K, V> createProxyLoader(Cache<K, V> cache,
+    public static <K, V> ProxyLoader<K, V> createProxyLoader(Cache<K, V> cache,
                                                           Function<K, V> loader,
                                                           Consumer<CacheEvent> eventConsumer) {
-        return (k) -> {
+        if (loader instanceof ProxyLoader) {
+            return (ProxyLoader<K, V>) loader;
+        }
+        if (loader instanceof CacheLoader) {
+            return createProxyLoader(cache, (CacheLoader) loader, eventConsumer);
+        }
+        return k -> {
             long t = System.currentTimeMillis();
             V v = null;
             boolean success = false;

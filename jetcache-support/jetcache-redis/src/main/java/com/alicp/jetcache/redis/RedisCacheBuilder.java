@@ -2,8 +2,7 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 /**
  * Created on 2016/10/7.
@@ -30,13 +29,40 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
         return (RedisCacheConfig) config;
     }
 
-    public T jedisPool(Pool<Jedis> pool){
+    public T jedisPool(Pool<Jedis> pool) {
         getConfig().setJedisPool(pool);
         return self();
     }
 
-    public void setJedisPool(JedisPool jedisPool) {
+    public void setJedisPool(Pool<Jedis> jedisPool) {
         getConfig().setJedisPool(jedisPool);
+    }
+
+    public T readFromSlave(boolean readFromSlave) {
+        getConfig().setReadFromSlave(readFromSlave);
+        return self();
+    }
+
+    public void setReadFromSlave(boolean readFromSlave) {
+        getConfig().setReadFromSlave(readFromSlave);
+    }
+
+    public T jedisSlavePools(Pool<Jedis>... jedisSlavePools) {
+        getConfig().setJedisSlavePools(jedisSlavePools);
+        return self();
+    }
+
+    public void setJedisSlavePools(Pool<Jedis>... jedisSlavePools) {
+        getConfig().setJedisSlavePools(jedisSlavePools);
+    }
+
+    public T slaveReadWeights(int... slaveReadWeights) {
+        getConfig().setSlaveReadWeights(slaveReadWeights);
+        return self();
+    }
+
+    public void setSlaveReadWeights(int... slaveReadWeights) {
+        getConfig().setSlaveReadWeights(slaveReadWeights);
     }
 
 }

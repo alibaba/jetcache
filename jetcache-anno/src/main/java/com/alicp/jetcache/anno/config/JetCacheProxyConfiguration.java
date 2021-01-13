@@ -2,7 +2,6 @@ package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.anno.aop.CacheAdvisor;
 import com.alicp.jetcache.anno.aop.JetCacheInterceptor;
-import com.alicp.jetcache.anno.support.ConfigMap;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
@@ -13,8 +12,6 @@ import org.springframework.context.annotation.ImportAware;
 import org.springframework.context.annotation.Role;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
-
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created on 2016/11/16.
@@ -44,20 +41,19 @@ public class JetCacheProxyConfiguration implements ImportAware, ApplicationConte
 
     @Bean(name = CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    public CacheAdvisor jetcacheAdvisor() {
-        ConfigMap configMap = new ConfigMap();
-
-        JetCacheInterceptor jetCacheInterceptor = new JetCacheInterceptor();
-        jetCacheInterceptor.setCacheConfigMap(configMap);
-        jetCacheInterceptor.setApplicationContext(applicationContext);
-
+    public CacheAdvisor jetcacheAdvisor(JetCacheInterceptor jetCacheInterceptor) {
         CacheAdvisor advisor = new CacheAdvisor();
         advisor.setAdviceBeanName(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME);
         advisor.setAdvice(jetCacheInterceptor);
         advisor.setBasePackages(this.enableMethodCache.getStringArray("basePackages"));
-        advisor.setCacheConfigMap(configMap);
         advisor.setOrder(this.enableMethodCache.<Integer>getNumber("order"));
         return advisor;
+    }
+
+    @Bean
+    @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
+    public JetCacheInterceptor jetCacheInterceptor() {
+        return new JetCacheInterceptor();
     }
 
 }

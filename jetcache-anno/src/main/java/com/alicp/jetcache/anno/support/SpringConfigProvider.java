@@ -1,14 +1,14 @@
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.method.SpringCacheContext;
-import com.alicp.jetcache.support.JavaValueDecoder;
-import com.alicp.jetcache.support.SpringJavaValueDecoder;
+import com.alicp.jetcache.support.CacheMessagePublisher;
+import com.alicp.jetcache.support.StatInfo;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 /**
  * Created on 2016/12/1.
@@ -18,68 +18,67 @@ import java.util.function.Function;
 public class SpringConfigProvider extends ConfigProvider implements ApplicationContextAware {
     private ApplicationContext applicationContext;
 
+    public SpringConfigProvider() {
+        super();
+        encoderParser = new DefaultSpringEncoderParser();
+        keyConvertorParser = new DefaultSpringKeyConvertorParser();
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
     @Override
-    public CacheContext newContext(GlobalCacheConfig globalCacheConfig) {
-        return new SpringCacheContext(globalCacheConfig, applicationContext);
-    }
-
-    private String parseBeanName(String str) {
-        final String beanPrefix = "bean:";
-        int len = beanPrefix.length();
-        if (str != null && str.startsWith(beanPrefix) && str.length() > len) {
-            return str.substring(len);
-        } else {
-            return null;
+    public void doInit() {
+        if (encoderParser instanceof ApplicationContextAware) {
+            ((ApplicationContextAware) encoderParser).setApplicationContext(applicationContext);
         }
+        if (keyConvertorParser instanceof ApplicationContextAware) {
+            ((ApplicationContextAware) keyConvertorParser).setApplicationContext(applicationContext);
+        }
+        super.doInit();
     }
 
     @Override
-    public Function<Object, byte[]> parseValueEncoder(String valueEncoder) {
-        String beanName = parseBeanName(valueEncoder);
-        if (beanName == null) {
-            return super.parseValueEncoder(valueEncoder);
-        } else {
-            Object bean = applicationContext.getBean(beanName);
-            if (bean instanceof Function) {
-                return (Function<Object, byte[]>) bean;
-            } else {
-                return ((SerialPolicy) bean).encoder();
-            }
-        }
+    protected CacheContext newContext() {
+        return new SpringCacheContext(this, globalCacheConfig, applicationContext);
     }
 
+    @Autowired(required = false)
     @Override
-    public Function<byte[], Object> parseValueDecoder(String valueDecoder) {
-        String beanName = parseBeanName(valueDecoder);
-        if (beanName == null) {
-            return super.parseValueDecoder(valueDecoder);
-        } else {
-            Object bean = applicationContext.getBean(beanName);
-            if (bean instanceof Function) {
-                return (Function<byte[], Object>) bean;
-            } else {
-                return ((SerialPolicy)bean).decoder();
-            }
-        }
+    public void setCacheManager(SimpleCacheManager cacheManager) {
+        super.setCacheManager(cacheManager);
     }
 
+    @Autowired(required = false)
     @Override
-    JavaValueDecoder javaValueDecoder(boolean useIdentityNumber) {
-        return new SpringJavaValueDecoder(useIdentityNumber);
+    public void setEncoderParser(EncoderParser encoderParser) {
+        super.setEncoderParser(encoderParser);
     }
 
+    @Autowired(required = false)
     @Override
-    public Function<Object, Object> parseKeyConvertor(String convertor) {
-        String beanName = parseBeanName(convertor);
-        if (beanName == null) {
-            return super.parseKeyConvertor(convertor);
-        } else {
-            return (Function<Object, Object>) applicationContext.getBean(beanName);
-        }
+    public void setKeyConvertorParser(KeyConvertorParser keyConvertorParser) {
+        super.setKeyConvertorParser(keyConvertorParser);
     }
+
+    @Autowired(required = false)
+    @Override
+    public void setCacheMonitorManager(CacheMonitorManager cacheMonitorManager) {
+        super.setCacheMonitorManager(cacheMonitorManager);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {
+        super.setMetricsCallback(metricsCallback);
+    }
+
+    @Autowired(required = false)
+    @Override
+    public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
+        super.setCacheMessagePublisher(cacheMessagePublisher);
+    }
+
 }

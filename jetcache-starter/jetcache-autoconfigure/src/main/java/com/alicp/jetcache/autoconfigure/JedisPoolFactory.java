@@ -3,7 +3,7 @@ package com.alicp.jetcache.autoconfigure;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 /**
  * Created on 2016/12/28.

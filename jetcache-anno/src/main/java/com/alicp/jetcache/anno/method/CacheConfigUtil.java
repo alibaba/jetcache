@@ -12,6 +12,9 @@ import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.PenetrationProtectConfig;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,14 +49,23 @@ public class CacheConfigUtil {
             cc.setRefreshPolicy(policy);
         }
 
-        CachePenetrationProtect penetrateProtect = m.getAnnotation(CachePenetrationProtect.class);
-        if (penetrateProtect != null) {
-            PenetrationProtectConfig protectConfig = new PenetrationProtectConfig();
-            protectConfig.setPenetrationProtect(penetrateProtect.value());
+        CachePenetrationProtect protectAnno = m.getAnnotation(CachePenetrationProtect.class);
+        if (protectAnno != null) {
+            PenetrationProtectConfig protectConfig = parsePenetrationProtectConfig(protectAnno);
             cc.setPenetrationProtectConfig(protectConfig);
         }
 
         return cc;
+    }
+
+    public static PenetrationProtectConfig parsePenetrationProtectConfig(CachePenetrationProtect protectAnno) {
+        PenetrationProtectConfig protectConfig = new PenetrationProtectConfig();
+        protectConfig.setPenetrationProtect(protectAnno.value());
+        if (!CacheConsts.isUndefined(protectAnno.timeout())) {
+            long timeout = protectAnno.timeUnit().toMillis(protectAnno.timeout());
+            protectConfig.setPenetrationProtectTimeout(Duration.ofMillis(timeout));
+        }
+        return protectConfig;
     }
 
     public static RefreshPolicy parseRefreshPolicy(CacheRefresh cacheRefresh) {
@@ -63,17 +75,32 @@ public class CacheConfigUtil {
         if (!CacheConsts.isUndefined(cacheRefresh.stopRefreshAfterLastAccess())) {
             policy.setStopRefreshAfterLastAccessMillis(t.toMillis(cacheRefresh.stopRefreshAfterLastAccess()));
         }
-        if(!CacheConsts.isUndefined(cacheRefresh.refreshLockTimeout())){
+        if (!CacheConsts.isUndefined(cacheRefresh.refreshLockTimeout())) {
             policy.setRefreshLockTimeoutMillis(t.toMillis(cacheRefresh.refreshLockTimeout()));
         }
         return policy;
     }
 
-    private static CacheInvalidateAnnoConfig parseCacheInvalidate(Method m) {
-        CacheInvalidate anno = m.getAnnotation(CacheInvalidate.class);
-        if (anno == null) {
-            return null;
+    public static List<CacheInvalidateAnnoConfig> parseCacheInvalidates(Method m) {
+        List<CacheInvalidateAnnoConfig> annoList = null;
+        CacheInvalidate ci = m.getAnnotation(CacheInvalidate.class);
+        if (ci != null) {
+            annoList = new ArrayList<>(1);
+            annoList.add(createCacheInvalidateAnnoConfig(ci, m));
+        } else {
+            CacheInvalidateContainer cic = m.getAnnotation(CacheInvalidateContainer.class);
+            if (cic != null) {
+                CacheInvalidate[] cacheInvalidates = cic.value();
+                annoList = new ArrayList<>(cacheInvalidates.length);
+                for (CacheInvalidate cacheInvalidate : cacheInvalidates) {
+                    annoList.add(createCacheInvalidateAnnoConfig(cacheInvalidate, m));
+                }
+            }
         }
+        return annoList;
+    }
+
+    private static CacheInvalidateAnnoConfig createCacheInvalidateAnnoConfig(CacheInvalidate anno, Method m) {
         CacheInvalidateAnnoConfig cc = new CacheInvalidateAnnoConfig();
         cc.setArea(anno.area());
         cc.setName(anno.name());
@@ -82,6 +109,7 @@ public class CacheConfigUtil {
         }
         cc.setKey(anno.key());
         cc.setCondition(anno.condition());
+        cc.setMulti(anno.multi());
         cc.setDefineMethod(m);
         return cc;
     }
@@ -103,6 +131,7 @@ public class CacheConfigUtil {
             throw new CacheConfigException("value is required for @CacheUpdate: " + m.getClass().getName() + "." + m.getName());
         }
         cc.setCondition(anno.condition());
+        cc.setMulti(anno.multi());
         cc.setDefineMethod(m);
         return cc;
     }
@@ -125,9 +154,9 @@ public class CacheConfigUtil {
             cac.setEnableCacheContext(true);
             hasAnnotation = true;
         }
-        CacheInvalidateAnnoConfig invalidateAnnoConfig = parseCacheInvalidate(method);
-        if (invalidateAnnoConfig != null) {
-            cac.setInvalidateAnnoConfig(invalidateAnnoConfig);
+        List<CacheInvalidateAnnoConfig> invalidateAnnoConfigs = parseCacheInvalidates(method);
+        if (invalidateAnnoConfigs != null) {
+            cac.setInvalidateAnnoConfigs(invalidateAnnoConfigs);
             hasAnnotation = true;
         }
         CacheUpdateAnnoConfig updateAnnoConfig = parseCacheUpdate(method);
@@ -136,7 +165,7 @@ public class CacheConfigUtil {
             hasAnnotation = true;
         }
 
-        if (cachedConfig != null && (invalidateAnnoConfig != null || updateAnnoConfig != null)) {
+        if (cachedConfig != null && (invalidateAnnoConfigs != null || updateAnnoConfig != null)) {
             throw new CacheConfigException("@Cached can't coexists with @CacheInvalidate or @CacheUpdate: " + method);
         }
 

@@ -61,6 +61,7 @@ public class DefaultCacheNameGenerator implements CacheNameGenerator {
         return sb.toString();
     }
 
+    @SuppressWarnings("PMD.AvoidPatternCompileInMethodRule")
     protected String removeHiddenPackage(String[] hiddenPackages, String packageOrFullClassName) {
         if (hiddenPackages != null && packageOrFullClassName != null) {
             for (String p : hiddenPackages) {

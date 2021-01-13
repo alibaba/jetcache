@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Import({ConfigSelector.class})
+@Import({CommonConfiguration.class, ConfigSelector.class})
 public @interface EnableMethodCache {
 
     /**

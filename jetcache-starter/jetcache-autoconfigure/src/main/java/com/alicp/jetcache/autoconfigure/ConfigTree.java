@@ -6,7 +6,10 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2017/11/20.
@@ -68,5 +71,13 @@ public class ConfigTree {
 
     public String getPrefix() {
         return prefix;
+    }
+
+    public Set<String> directChildrenKeys() {
+        Map<String, Object> m = getProperties();
+        return m.keySet().stream().map(
+                s -> s.indexOf('.') >= 0 ? s.substring(0, s.indexOf('.')) : null)
+                .filter(s -> s != null)
+                .collect(Collectors.toSet());
     }
 }

@@ -15,9 +15,7 @@ import org.springframework.context.ApplicationContextAware;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class SpringTest implements ApplicationContextAware {
-
-    protected ApplicationContext context;
+public class SpringTest extends SpringTestBase {
 
     protected void doTest() throws Exception {
         Service service = (Service) context.getBean("service");
@@ -56,8 +54,10 @@ public class SpringTest implements ApplicationContextAware {
 
     }
 
+    @SuppressWarnings("AliAccessStaticViaInstance")
     private void testTestBean(TestBean bean) throws Exception {
         Assert.assertNotEquals(bean.noCacheCount(), bean.noCacheCount());
+        //noinspection AliAccessStaticViaInstance
         Assert.assertEquals(bean.staticCount(), bean.staticCount());
         Assert.assertEquals(bean.count(), bean.count());
         Assert.assertEquals(bean.countWithLocalCache(), bean.countWithLocalCache());
@@ -143,8 +143,4 @@ public class SpringTest implements ApplicationContextAware {
         Assert.assertNotEquals(bean.count("K1"), bean.count("K2"));
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.context = applicationContext;
-    }
 }

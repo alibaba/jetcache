@@ -5,23 +5,19 @@ import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Created on 2016/11/29.
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public abstract class AbstractCacheAutoInit {
+public abstract class AbstractCacheAutoInit implements InitializingBean {
 
     private static Logger logger = LoggerFactory.getLogger(AbstractCacheAutoInit.class);
 
@@ -44,8 +40,8 @@ public abstract class AbstractCacheAutoInit {
         this.typeNames = cacheTypes;
     }
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void afterPropertiesSet() {
         if (!inited) {
             synchronized (this) {
                 if (!inited) {
@@ -60,7 +56,7 @@ public abstract class AbstractCacheAutoInit {
     private void process(String prefix, Map cacheBuilders, boolean local) {
         ConfigTree resolver = new ConfigTree(environment, prefix);
         Map<String, Object> m = resolver.getProperties();
-        Set<String> cacheAreaNames = m.keySet().stream().map((s) -> s.substring(0, s.indexOf('.'))).collect(Collectors.toSet());
+        Set<String> cacheAreaNames = resolver.directChildrenKeys();
         for (String cacheArea : cacheAreaNames) {
             final Object configType = m.get(cacheArea + ".type");
             boolean match = Arrays.stream(typeNames).anyMatch((tn) -> tn.equals(configType));

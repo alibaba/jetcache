@@ -2,11 +2,17 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
-import redis.clients.jedis.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.Response;
 import redis.clients.jedis.exceptions.JedisConnectionException;
-import redis.clients.util.Pool;
+import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.util.Pool;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -17,25 +23,45 @@ import java.util.function.Function;
  */
 public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
+    private static Logger logger = LoggerFactory.getLogger(RedisCache.class);
+
     private RedisCacheConfig<K, V> config;
 
     Function<Object, byte[]> valueEncoder;
     Function<byte[], Object> valueDecoder;
-    private Pool<Jedis> pool;
+
+    private static ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public RedisCache(RedisCacheConfig<K, V> config) {
         super(config);
         this.config = config;
-        this.pool = config.getJedisPool();
         this.valueEncoder = config.getValueEncoder();
         this.valueDecoder = config.getValueDecoder();
 
-        if (pool == null) {
+        if (config.getJedisPool() == null) {
             throw new CacheConfigException("no pool");
+        }
+        if (config.isReadFromSlave()) {
+            if (config.getJedisSlavePools() == null || config.getJedisSlavePools().length == 0) {
+                throw new CacheConfigException("slaves not config");
+            }
+            if (config.getSlaveReadWeights() == null) {
+                initDefaultWeights(config);
+            } else if (config.getSlaveReadWeights().length != config.getJedisSlavePools().length) {
+                logger.error("length of slaveReadWeights and jedisSlavePools not equals, using default weights");
+                initDefaultWeights(config);
+            }
         }
         if (config.isExpireAfterAccess()) {
             throw new CacheConfigException("expireAfterAccess is not supported");
         }
+    }
+
+    private void initDefaultWeights(RedisCacheConfig<K, V> config) {
+        int len = config.getJedisSlavePools().length;
+        int[] weights = new int[len];
+        Arrays.fill(weights, 100);
+        config.setSlaveReadWeights(weights);
     }
 
     @Override
@@ -45,24 +71,40 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     public <T> T unwrap(Class<T> clazz) {
-        if (clazz.equals(Pool.class)) {
-            return (T) pool;
-        }
-        if (clazz.equals(JedisPool.class)) {
-            return (T) pool;
-        }
-        if (clazz.equals(JedisSentinelPool.class)) {
-            return (T) pool;
+        if (Pool.class.isAssignableFrom(clazz)) {
+            return (T) config.getJedisPool();
         }
         throw new IllegalArgumentException(clazz.getName());
     }
 
+    Pool<Jedis> getReadPool() {
+        if (!config.isReadFromSlave()) {
+            return config.getJedisPool();
+        }
+        int[] weights = config.getSlaveReadWeights();
+        int index = randomIndex(weights);
+        return config.getJedisSlavePools()[index];
+    }
+
+    static int randomIndex(int[] weights) {
+        int sumOfWeights = 0;
+        for (int w : weights) {
+            sumOfWeights += w;
+        }
+        int r = random.nextInt(sumOfWeights);
+        int x = 0;
+        for (int i = 0; i < weights.length; i++) {
+            x += weights[i];
+            if(r < x){
+                return i;
+            }
+        }
+        throw new CacheException("assert false");
+    }
+
     @Override
     protected CacheGetResult<V> do_GET(K key) {
-        if (key == null) {
-            return new CacheGetResult<V>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = getReadPool().getResource()) {
             byte[] newKey = buildKey(key);
             byte[] bytes = jedis.get(newKey);
             if (bytes != null) {
@@ -82,10 +124,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected MultiGetResult<K, V> do_GET_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return new MultiGetResult<>(CacheResultCode.FAIL, CacheResult.MSG_ILLEGAL_ARGUMENT, null);
-        }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = getReadPool().getResource()) {
             ArrayList<K> keyList = new ArrayList<K>(keys);
             byte[][] newKeys = keyList.stream().map((k) -> buildKey(k)).toArray(byte[][]::new);
 
@@ -118,10 +157,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             String rt = jedis.psetex(newKey, timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
@@ -138,10 +174,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
-        if (map == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
             Pipeline p = jedis.pipelined();
@@ -166,14 +199,11 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE(K key) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
         return REMOVE_impl(key, buildKey(key));
     }
 
     private CacheResult REMOVE_impl(Object key, byte[] newKey) {
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             Long rt = jedis.del(newKey);
             if (rt == null) {
                 return CacheResult.FAIL_WITHOUT_MSG;
@@ -192,10 +222,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_REMOVE_ALL(Set<? extends K> keys) {
-        if (keys == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
             jedis.del(newKeys);
             return CacheResult.SUCCESS_WITHOUT_MSG;
@@ -207,13 +234,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     @Override
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        if (key == null) {
-            return CacheResult.FAIL_ILLEGAL_ARGUMENT;
-        }
-        try (Jedis jedis = pool.getResource()) {
+        try (Jedis jedis = config.getJedisPool().getResource()) {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
-            String rt = jedis.set(newKey, valueEncoder.apply(holder), "NX".getBytes(), "PX".getBytes(), timeUnit.toMillis(expireAfterWrite));
+            SetParams params = new SetParams();
+            params.nx()
+                    .px(timeUnit.toMillis(expireAfterWrite));
+            String rt = jedis.set(newKey, valueEncoder.apply(holder), params);
             if ("OK".equals(rt)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             } else if (rt == null) {

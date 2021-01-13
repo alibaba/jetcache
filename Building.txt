@@ -1,0 +1,33 @@
+1. Unit test
+==========================================================
+1.1 Run redis
+    At first we run redis server using Docker, under jetcache directory, run:
+
+    docker-compose up
+
+    This will run 1 redis server with 2 slaves, 3 sentinels, and 6 redis cluster node (3 masters, 3 slaves).
+
+1.2.a Run tests in Linux
+
+    mvn clean test
+
+1.2.b Run tests in Mac
+
+    docker run -it --rm --network host -v $HOME/.m2:/root/.m2 -v `pwd`:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean test
+
+1.2.c Run tests in Windows
+
+    docker run -it --rm --network host -v /c/Users/hl_20/.m2:/root/.m2 -v /IdeaProjects/jetcache/jetcache:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean test
+
+    You need change /c/Users/hl_20 and /IdeaProjects/jetcache/jetcache to your local path.
+
+
+2. Change pom version
+==========================================================
+    Use this command to change version in all pom file:
+
+    mvn versions:set -DnewVersion=1.0.0-SNAPSHOT
+
+3. Building your own version
+===========================================================
+    mvn -DskipTests clean install
