@@ -3,23 +3,16 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.SerialPolicy;
-import com.alicp.jetcache.support.*;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.SpringJavaValueDecoder;
 
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class DefaultSpringEncoderParser extends DefaultEncoderParser implements ApplicationContextAware {
-    private ApplicationContext applicationContext;
+public class DefaultSpringEncoderParser extends DefaultEncoderParser{
 
     static String parseBeanName(String str) {
         final String beanPrefix = "bean:";
@@ -37,7 +30,7 @@ public class DefaultSpringEncoderParser extends DefaultEncoderParser implements 
         if (beanName == null) {
             return super.parseEncoder(valueEncoder);
         } else {
-            Object bean = applicationContext.getBean(beanName);
+            Object bean = SpringBeanUtil.getBean(beanName);
             if (bean instanceof Function) {
                 return (Function<Object, byte[]>) bean;
             } else {
@@ -52,11 +45,11 @@ public class DefaultSpringEncoderParser extends DefaultEncoderParser implements 
         if (beanName == null) {
             return super.parseDecoder(valueDecoder);
         } else {
-            Object bean = applicationContext.getBean(beanName);
+            Object bean = SpringBeanUtil.getBean(beanName);
             if (bean instanceof Function) {
                 return (Function<byte[], Object>) bean;
             } else {
-                return ((SerialPolicy)bean).decoder();
+                return ((SerialPolicy) bean).decoder();
             }
         }
     }
@@ -66,8 +59,5 @@ public class DefaultSpringEncoderParser extends DefaultEncoderParser implements 
         return new SpringJavaValueDecoder(useIdentityNumber);
     }
 
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
+
 }

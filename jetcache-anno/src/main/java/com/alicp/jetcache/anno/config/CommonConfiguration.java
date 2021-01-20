@@ -4,15 +4,18 @@
 package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.anno.support.ConfigMap;
+import com.alicp.jetcache.anno.support.SpringBeanUtil;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Role;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Configuration
+@Import(SpringBeanUtil.class)
 public class CommonConfiguration {
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
