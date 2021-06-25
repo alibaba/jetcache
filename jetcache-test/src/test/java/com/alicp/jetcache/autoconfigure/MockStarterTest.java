@@ -4,6 +4,9 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
@@ -16,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import java.util.function.Function;
 
 /**
  * Created on 2019/6/21.
@@ -51,4 +55,20 @@ public class MockStarterTest extends SpringTest {
     public MyFactoryBean factoryBean() {
         return new MyFactoryBean();
     }
+
+    @Bean
+    public Function<Object, byte[]> myEncoder() {
+        return new JavaValueEncoder(true);
+    }
+
+    @Bean
+    public Function<byte[], Object> myDecoder() {
+        return new JavaValueDecoder(true);
+    }
+
+    @Bean
+    public Function<Object, Object> myConvertor() {
+        return FastjsonKeyConvertor.INSTANCE;
+    }
+
 }
