@@ -3,6 +3,7 @@ package com.alicp.jetcache.external;
 import com.alicp.jetcache.AbstractCacheBuilder;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created on 16/9/9.
@@ -20,7 +21,12 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
     }
 
     public T keyPrefix(String keyPrefix){
-        getConfig().setKeyPrefix(keyPrefix);
+        getConfig().setKeyPrefixSupplier(() -> keyPrefix);
+        return self();
+    }
+
+    public T keyPrefixSupplier(Supplier<String> keyPrefixSupplier) {
+        getConfig().setKeyPrefixSupplier(keyPrefixSupplier);
         return self();
     }
 
@@ -35,7 +41,11 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
     }
 
     public void setKeyPrefix(String keyPrefix){
-        getConfig().setKeyPrefix(keyPrefix);
+        getConfig().setKeyPrefixSupplier(() -> keyPrefix);
+    }
+
+    public void setKeyPrefixSupplier(Supplier<String> keyPrefixSupplier){
+        getConfig().setKeyPrefixSupplier(keyPrefixSupplier);
     }
 
     public void setValueEncoder(Function<Object, byte[]> valueEncoder){
