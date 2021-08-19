@@ -18,7 +18,9 @@ jetcache:
   remote:
     default:
       type: mock
-      keyConvertor: fastjson
+      keyConvertor: bean:myConvertor
+      valueEncoder: bean:myEncoder
+      valueDecoder: bean:myDecoder
       defaultExpireInMillis: 10000
       keyPrefix: mockprefix
     A1:

@@ -72,7 +72,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
 
     protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
         AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
-        acb.keyConvertor(configProvider.parseKeyConvertor(ct.getProperty("keyConvertor")));
+        acb.keyConvertor(new FunctionWrapper<>(() -> configProvider.parseKeyConvertor(ct.getProperty("keyConvertor"))));
 
         String expireAfterWriteInMillis = ct.getProperty("expireAfterWriteInMillis");
         if (expireAfterWriteInMillis == null) {
