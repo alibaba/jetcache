@@ -13,24 +13,17 @@ import java.util.function.Supplier;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
-    @Deprecated
-    private String keyPrefix;
 
     private Supplier<String> keyPrefixSupplier;
     private Function<Object, byte[]> valueEncoder = JavaValueEncoder.INSTANCE;
     private Function<byte[], Object> valueDecoder = DecoderMap.defaultJavaValueDecoder();
 
     public String getKeyPrefix() {
-        // keyPrefix is higher priority.
-        if (keyPrefix == null && keyPrefixSupplier != null) {
-            return keyPrefixSupplier.get();
-        }
-        return keyPrefix;
+        return keyPrefixSupplier == null ? null : keyPrefixSupplier.get();
     }
 
-    @Deprecated
     public void setKeyPrefix(String keyPrefix) {
-        this.keyPrefix = keyPrefix;
+        this.keyPrefixSupplier = () -> keyPrefix;
     }
 
     public Supplier<String> getKeyPrefixSupplier() {
