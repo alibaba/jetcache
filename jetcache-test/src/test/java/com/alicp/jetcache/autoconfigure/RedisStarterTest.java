@@ -68,7 +68,6 @@ public class RedisStarterTest extends SpringTest {
             Assert.assertEquals(200, cc1.getLimit());
             Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
             Assert.assertFalse(cc1.isExpireAfterAccess());
-            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cc1.getKeyConvertor());
 
             RedisCacheConfig c = (RedisCacheConfig) c2.config();
             Assert.assertFalse(c.isReadFromSlave());
