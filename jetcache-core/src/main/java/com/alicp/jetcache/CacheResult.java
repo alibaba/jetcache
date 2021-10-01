@@ -22,11 +22,11 @@ public class CacheResult {
     public static final CacheResult FAIL_ILLEGAL_ARGUMENT = new CacheResult(CacheResultCode.FAIL, MSG_ILLEGAL_ARGUMENT);
     public static final CacheResult EXISTS_WITHOUT_MSG = new CacheResult(CacheResultCode.EXISTS, null);
 
-    private CacheResultCode resultCode;
-    private String message;
-    private CompletionStage<ResultData> future;
+    private volatile CacheResultCode resultCode;
+    private volatile String message;
+    private final CompletionStage<ResultData> future;
 
-    private Duration timeout = DEFAULT_TIMEOUT;
+    private volatile Duration timeout = DEFAULT_TIMEOUT;
 
     public CacheResult(CompletionStage<ResultData> future) {
         this.future = future;
@@ -62,13 +62,13 @@ public class CacheResult {
     }
 
     protected void fetchResultSuccess(ResultData resultData) {
-        resultCode = resultData.getResultCode();
         message = resultData.getMessage();
+        resultCode = resultData.getResultCode();
     }
 
     protected void fetchResultFail(Throwable e) {
-        resultCode = CacheResultCode.FAIL;
         message = e.getClass() + ":" + e.getMessage();
+        resultCode = CacheResultCode.FAIL;
     }
 
     public CacheResultCode getResultCode() {
