@@ -19,8 +19,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,8 +81,10 @@ public class ConfigProvider_CacheMessagePublisher_Test extends SpringTestBase {
         Assert.assertEquals(CacheMessage.TYPE_PUT, publisher.messageType);
         Assert.assertEquals("K1", publisher.keys[0]);
 
-        Map kvs = Stream.of(new String[]{"K1", "V1_new"}, new String[]{"K2", "V2"})
-                .collect(Collectors.toMap(kv -> kv[0], kv -> kv[1]));
+        SortedMap<String, String> kvs = new TreeMap(Stream.of(new String[]{"K1", "V1_new"},
+                                                              new String[]{"K2", "V2"})
+                                                   .collect(Collectors.toMap(kv -> kv[0],
+                                                                             kv -> kv[1])));
         bean.cache.putAll(kvs);
         Assert.assertEquals(CacheMessage.TYPE_PUT_ALL, publisher.messageType);
         Assert.assertEquals("K1", publisher.keys[0]);
@@ -90,7 +94,8 @@ public class ConfigProvider_CacheMessagePublisher_Test extends SpringTestBase {
         Assert.assertEquals(CacheMessage.TYPE_REMOVE, publisher.messageType);
         Assert.assertEquals("K3", publisher.keys[0]);
 
-        Set keys = Stream.of("K1", "K3").collect(Collectors.toSet());
+        SortedSet<String> keys = new TreeSet(Stream.of("K1", "K3")
+                                            .collect(Collectors.toSet()));
         bean.cache.removeAll(keys);
         Assert.assertEquals(CacheMessage.TYPE_REMOVE_ALL, publisher.messageType);
         Assert.assertEquals("K1", publisher.keys[0]);
