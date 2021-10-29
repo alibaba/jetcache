@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -826,7 +826,7 @@ public abstract class AbstractCacheTest {
         String failMsg[] = new String[1];
 
         Function<Integer, Integer> loaderFunction = new Function<Integer, Integer>() {
-            ConcurrentHashMap<Integer, Integer> map = new ConcurrentHashMap<>();
+            ConcurrentSkipListMap<Integer, Integer> map = new ConcurrentSkipListMap<>();
             @Override
             public Integer apply(Integer key) {
                 try {
@@ -875,10 +875,10 @@ public abstract class AbstractCacheTest {
         }).start();
         new Thread(() -> {
             Set<Integer> s = new HashSet<>();
-            s.add(2001);
+            s.add(2003);
             s.add(2002);
             Map<Integer, Integer> values = c.getAll(s);
-            if (values.get(2001) != 2101) {
+            if (values.get(2003) != 2103) {
                 failMsg[0] = "value error";
             }
             if (values.get(2002) != 2102) {
