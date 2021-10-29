@@ -868,6 +868,12 @@ public abstract class AbstractCacheTest {
             countDownLatch.countDown();
         }).start();
         new Thread(() -> {
+            if (c.get(2003) != 2103) {
+                failMsg[0] = "value error";
+            }
+            countDownLatch.countDown();
+        }).start();
+        new Thread(() -> {
             if (c.computeIfAbsent(2001, loaderFunction) != 2101) {
                 failMsg[0] = "value error";
             }
