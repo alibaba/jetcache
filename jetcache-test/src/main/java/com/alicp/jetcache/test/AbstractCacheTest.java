@@ -884,7 +884,7 @@ public abstract class AbstractCacheTest {
             s.add(2003);
             s.add(2002);
             Map<Integer, Integer> values = c.getAll(s);
-            if (values.get(2003) != 2101) {
+            if (values.get(2003) != 2103) {
                 failMsg[0] = "value error";
             }
             if (values.get(2002) != 2102) {
