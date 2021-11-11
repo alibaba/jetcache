@@ -198,11 +198,18 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
             });
             if (create[0] || ll.loaderThread == Thread.currentThread()) {
                 try {
-                    V loadedValue = newLoader.apply(key);
-                    ll.success = true;
-                    ll.value = loadedValue;
-                    cacheUpdater.accept(loadedValue);
-                    return loadedValue;
+                    CacheGetResult<V> getResult = abstractCache.GET(key);
+                    if (getResult.isSuccess()) {
+                        ll.success = true;
+                        ll.value = getResult.getValue();
+                        return getResult.getValue();
+                    } else {
+                        V loadedValue = newLoader.apply(key);
+                        ll.success = true;
+                        ll.value = loadedValue;
+                        cacheUpdater.accept(loadedValue);
+                        return loadedValue;
+                    }
                 } finally {
                     if (create[0]) {
                         ll.signal.countDown();
