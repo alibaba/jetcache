@@ -10,8 +10,8 @@ import java.util.concurrent.CompletionStage;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheGetResult<V> extends CacheResult {
-    private V value;
-    private CacheValueHolder<V> holder;
+    private volatile V value;
+    private volatile CacheValueHolder<V> holder;
 
     public static final CacheGetResult NOT_EXISTS_WITHOUT_MSG = new CacheGetResult(CacheResultCode.NOT_EXISTS, null, null);
     public static final CacheGetResult EXPIRED_WITHOUT_MSG = new CacheGetResult(CacheResultCode.EXPIRED, null ,null);
@@ -35,9 +35,9 @@ public class CacheGetResult<V> extends CacheResult {
 
     @Override
     protected void fetchResultSuccess(ResultData resultData) {
-        super.fetchResultSuccess(resultData);
         holder = (CacheValueHolder<V>) resultData.getOriginData();
         value = (V) unwrapValue(holder);
+        super.fetchResultSuccess(resultData);
     }
 
     static Object unwrapValue(Object holder) {
@@ -55,8 +55,8 @@ public class CacheGetResult<V> extends CacheResult {
 
     @Override
     protected void fetchResultFail(Throwable e) {
-        super.fetchResultFail(e);
         value = null;
+        super.fetchResultFail(e);
     }
 
     protected CacheValueHolder<V> getHolder() {

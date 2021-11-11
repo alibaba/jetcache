@@ -235,7 +235,8 @@ public abstract class AbstractCacheTest {
         Assert.assertTrue(cache.remove("PIA_K2"));
 
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
-        Thread.sleep(10);
+        // Time drift in docker (Mac)
+        Thread.sleep(50);
         Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
         cache.remove("PIA_K3");
     }
@@ -520,7 +521,8 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
         Assert.assertEquals("V1", r.getValue());
 
-        Thread.sleep(ttl / 2 + 2);
+        // Time drift in docker (Mac)
+        Thread.sleep(ttl / 2 + 50);
         r = cache.GET(key);
         Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
         Assert.assertNull(r.getValue());
@@ -719,10 +721,11 @@ public abstract class AbstractCacheTest {
         }
         countDownLatch.await();
 
+        Assert.assertFalse(cocurrentFail);
+
         Assert.assertEquals(lockAtommicCount1.get(), lockCount1.get());
         Assert.assertEquals(lockAtommicCount2.get(), lockCount2.get());
 
-        Assert.assertFalse(cocurrentFail);
     }
 
     private static void penetrationProtectTestWrapper(Cache cache) throws Exception {

@@ -159,8 +159,9 @@ public class CacheContext {
             cacheBuilder.expireAfterWrite(cachedAnnoConfig.getExpire(), cachedAnnoConfig.getTimeUnit());
         }
 
-        if (cacheBuilder.getConfig().getKeyPrefix() != null) {
-            cacheBuilder.setKeyPrefix(cacheBuilder.getConfig().getKeyPrefix() + cacheName);
+        if (cacheBuilder.getConfig().getKeyPrefixSupplier() != null) {
+            Supplier<String> supplier = cacheBuilder.getConfig().getKeyPrefixSupplier();
+            cacheBuilder.setKeyPrefixSupplier(() -> supplier.get() + cacheName);
         } else {
             cacheBuilder.setKeyPrefix(cacheName);
         }
