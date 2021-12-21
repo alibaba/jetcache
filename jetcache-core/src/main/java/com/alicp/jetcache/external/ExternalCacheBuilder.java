@@ -43,6 +43,8 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
     public void setKeyPrefix(String keyPrefix){
         if (keyPrefix != null) {
             getConfig().setKeyPrefixSupplier(() -> keyPrefix);
+        } else {
+            getConfig().setKeyPrefixSupplier(null);
         }
     }
 
