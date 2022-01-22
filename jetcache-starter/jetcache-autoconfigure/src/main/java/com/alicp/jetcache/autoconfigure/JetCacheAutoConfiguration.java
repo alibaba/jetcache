@@ -51,9 +51,7 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean(name = GLOBAL_CACHE_CONFIG_NAME)
-    public GlobalCacheConfig globalCacheConfig(SpringConfigProvider configProvider,
-                                                            AutoConfigureBeans autoConfigureBeans,
-                                                            JetCacheProperties props) {
+    public GlobalCacheConfig globalCacheConfig(AutoConfigureBeans autoConfigureBeans, JetCacheProperties props) {
         if (_globalCacheConfig != null) {
             return _globalCacheConfig;
         }
