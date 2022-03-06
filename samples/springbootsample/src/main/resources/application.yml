@@ -3,7 +3,7 @@ jetcache:
   areaInCacheName: false
   local:
     default:
-      type: linkedhashmap
+      type: caffeine
       keyConvertor: fastjson
   remote:
     default:
@@ -17,3 +17,5 @@ jetcache:
         maxTotal: 50
       host: 127.0.0.1
       port: 6379
+  cacheMessagePublisher:
+    topic: jetcache
