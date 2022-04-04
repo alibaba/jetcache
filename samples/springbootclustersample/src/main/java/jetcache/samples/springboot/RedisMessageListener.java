@@ -1,5 +1,6 @@
 package jetcache.samples.springboot;
 
+import java.util.Arrays;
 import com.alicp.jetcache.support.CacheMessage;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -23,9 +24,7 @@ public class RedisMessageListener implements MessageListener {
         CacheMessageWithName cacheMessageWithName = (CacheMessageWithName)
                 redisTemplate.getValueSerializer().deserialize(message.getBody());
 
-        CacheMessage cacheMessage = cacheMessageWithName.getCacheMessage();
-
-        if (cacheMessage == null) {
+        if (cacheMessageWithName.getKeys() == null) {
             return;
         }
 
@@ -36,26 +35,21 @@ public class RedisMessageListener implements MessageListener {
             return;
         }
 
-        switch (cacheMessage.getType()) {
-            case CacheMessage.TYPE_REMOVE: {
-                invalidateLocalCaches(localCache, cacheMessage.getKeys());
-            }
-            break;
-            case CacheMessage.TYPE_REMOVE_ALL: {
-                localCache.invalidateAll();
-            }
-            break;
+        if (RedisMessagePublisher.processId.equals(cacheMessageWithName.getProcessId())) {
+            return;
         }
 
-    }
-
-    private void invalidateLocalCaches(Cache localCache, Object[] keys) {
-        for (Object key : keys) {
-            Object value = localCache.getIfPresent(key);
-            if (null != value) {
-                localCache.invalidate(key);
-            }
+        switch (cacheMessageWithName.getType()) {
+            case CacheMessage.TYPE_PUT:
+            case CacheMessage.TYPE_REMOVE:
+                localCache.invalidate(cacheMessageWithName.getKeys()[0]);
+                break;
+            case CacheMessage.TYPE_PUT_ALL:
+            case CacheMessage.TYPE_REMOVE_ALL:
+                localCache.invalidateAll(Arrays.asList(cacheMessageWithName.getKeys()));
+                break;
         }
+
     }
 
 }

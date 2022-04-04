@@ -1,14 +1,12 @@
 package jetcache.samples.springboot;
 
-import com.alicp.jetcache.support.CacheMessage;
-
 public class CacheMessageWithName {
 
     private String area;
-
     private String cacheName;
-
-    private CacheMessage cacheMessage;
+    private String processId;
+    private int type;
+    private Object[] keys;
 
     public String getArea() {
         return area;
@@ -26,12 +24,27 @@ public class CacheMessageWithName {
         this.cacheName = cacheName;
     }
 
-    public CacheMessage getCacheMessage() {
-        return cacheMessage;
+    public String getProcessId() {
+        return processId;
     }
 
-    public void setCacheMessage(CacheMessage cacheMessage) {
-        this.cacheMessage = cacheMessage;
+    public void setProcessId(String processId) {
+        this.processId = processId;
     }
 
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public Object[] getKeys() {
+        return keys;
+    }
+
+    public void setKeys(Object[] keys) {
+        this.keys = keys;
+    }
 }

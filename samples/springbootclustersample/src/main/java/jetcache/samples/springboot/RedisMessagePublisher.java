@@ -1,5 +1,6 @@
 package jetcache.samples.springboot;
 
+import java.util.UUID;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.support.CacheMessage;
 import com.alicp.jetcache.support.CacheMessagePublisher;
@@ -16,8 +17,10 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @Component
 public class RedisMessagePublisher implements CacheMessagePublisher {
 
+    public static String processId = UUID.randomUUID().toString();
+
     @Value("${jetcache.cacheMessagePublisher.topic}")
-    String topicName;
+    private String topicName;
 
     @Autowired
     private ConfigProvider configProvider;
@@ -33,12 +36,6 @@ public class RedisMessagePublisher implements CacheMessagePublisher {
 
     @Override
     public void publish(String area, String cacheName, CacheMessage cacheMessage) {
-        int type = cacheMessage.getType();
-
-        if (type == CacheMessage.TYPE_PUT || type == CacheMessage.TYPE_PUT_ALL) {
-            return;
-        }
-
         Cache cache = configProvider.getCacheManager().getCache(area, cacheName);
 
         if (cache.config() instanceof RedisCacheConfig) {
@@ -49,7 +46,9 @@ public class RedisMessagePublisher implements CacheMessagePublisher {
 
         cacheMessageWithName.setArea(area);
         cacheMessageWithName.setCacheName(cacheName);
-        cacheMessageWithName.setCacheMessage(cacheMessage);
+        cacheMessageWithName.setProcessId(processId);
+        cacheMessageWithName.setType(cacheMessage.getType());
+        cacheMessageWithName.setKeys(cacheMessage.getKeys());
 
         redisTemplate.convertAndSend(topicName, cacheMessageWithName);
     }
