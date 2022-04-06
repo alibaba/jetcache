@@ -2,6 +2,7 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.support.ParserFunction;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 
 /**
@@ -19,9 +20,7 @@ public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
         super.parseGeneralConfig(builder, ct);
         ExternalCacheBuilder ecb = (ExternalCacheBuilder) builder;
         ecb.setKeyPrefix(ct.getProperty("keyPrefix"));
-        ecb.setValueEncoder(new FunctionWrapper<>(() -> configProvider.parseValueEncoder(
-                ct.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY))));
-        ecb.setValueDecoder(new FunctionWrapper<>(() -> configProvider.parseValueDecoder(
-                ct.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY))));
+        ecb.setValueEncoder(new ParserFunction<>(ct.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
+        ecb.setValueDecoder(new ParserFunction<>(ct.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
     }
 }

@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
@@ -166,12 +167,19 @@ public class CacheContext {
             cacheBuilder.setKeyPrefix(cacheName);
         }
 
-        if (!CacheConsts.isUndefined(cachedAnnoConfig.getKeyConvertor())) {
-            cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
-        }
+        processKeyConvertor(cachedAnnoConfig, cacheBuilder);
         if (!CacheConsts.isUndefined(cachedAnnoConfig.getSerialPolicy())) {
             cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(cachedAnnoConfig.getSerialPolicy()));
             cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(cachedAnnoConfig.getSerialPolicy()));
+        } else {
+            if (cacheBuilder.getConfig().getValueEncoder() instanceof ParserFunction) {
+                ParserFunction<Object, byte[]> f = (ParserFunction<Object, byte[]>) cacheBuilder.getConfig().getValueEncoder();
+                cacheBuilder.setValueEncoder(configProvider.parseValueEncoder(f.getValue()));
+            }
+            if (cacheBuilder.getConfig().getValueDecoder() instanceof ParserFunction) {
+                ParserFunction<byte[], Object> f = (ParserFunction<byte[], Object>) cacheBuilder.getConfig().getValueDecoder();
+                cacheBuilder.setValueDecoder(configProvider.parseValueDecoder(f.getValue()));
+            }
         }
         cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());
         return cacheBuilder.buildCache();
@@ -193,11 +201,18 @@ public class CacheContext {
         } else if (cachedAnnoConfig.getExpire() > 0) {
             cacheBuilder.expireAfterWrite(cachedAnnoConfig.getExpire(), cachedAnnoConfig.getTimeUnit());
         }
-        if (!CacheConsts.isUndefined(cachedAnnoConfig.getKeyConvertor())) {
-            cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
-        }
+        processKeyConvertor(cachedAnnoConfig, cacheBuilder);
         cacheBuilder.setCacheNullValue(cachedAnnoConfig.isCacheNullValue());
         return cacheBuilder.buildCache();
+    }
+
+    private void processKeyConvertor(CachedAnnoConfig cachedAnnoConfig, AbstractCacheBuilder cacheBuilder) {
+        if (!CacheConsts.isUndefined(cachedAnnoConfig.getKeyConvertor())) {
+            cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(cachedAnnoConfig.getKeyConvertor()));
+        } else if (cacheBuilder.getConfig().getKeyConvertor() instanceof ParserFunction) {
+            ParserFunction<Object, Object> f = (ParserFunction) cacheBuilder.getConfig().getKeyConvertor();
+            cacheBuilder.setKeyConvertor(configProvider.parseKeyConvertor(f.getValue()));
+        }
     }
 
     protected CacheInvokeContext newCacheInvokeContext() {

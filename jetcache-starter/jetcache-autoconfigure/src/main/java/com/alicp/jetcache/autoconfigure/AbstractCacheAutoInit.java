@@ -2,7 +2,8 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.CacheBuilder;
-import com.alicp.jetcache.anno.support.ConfigProvider;
+import com.alicp.jetcache.anno.KeyConvertor;
+import com.alicp.jetcache.anno.support.ParserFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -26,9 +27,6 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
 
     @Autowired
     protected AutoConfigureBeans autoConfigureBeans;
-
-    @Autowired
-    protected ConfigProvider configProvider;
 
     protected String[] typeNames;
 
@@ -72,7 +70,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
 
     protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
         AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
-        acb.keyConvertor(new FunctionWrapper<>(() -> configProvider.parseKeyConvertor(ct.getProperty("keyConvertor"))));
+        acb.keyConvertor(new ParserFunction<>(ct.getProperty("keyConvertor", KeyConvertor.FASTJSON)));
 
         String expireAfterWriteInMillis = ct.getProperty("expireAfterWriteInMillis");
         if (expireAfterWriteInMillis == null) {
