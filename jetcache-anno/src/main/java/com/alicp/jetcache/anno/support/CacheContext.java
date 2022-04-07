@@ -54,8 +54,8 @@ public class CacheContext {
                 if (cacheAnnoConfig instanceof CachedAnnoConfig) {
                     cache = createCacheByCachedConfig((CachedAnnoConfig) cacheAnnoConfig, invokeContext);
                 } else if ((cacheAnnoConfig instanceof CacheInvalidateAnnoConfig) || (cacheAnnoConfig instanceof CacheUpdateAnnoConfig)) {
-                    CacheInvokeConfig cacheDefineConfig = configMap.getByCacheName(cacheAnnoConfig.getArea(), cacheAnnoConfig.getName());
-                    if (cacheDefineConfig == null) {
+                    CachedAnnoConfig cac = configMap.getByCacheName(cacheAnnoConfig.getArea(), cacheAnnoConfig.getName());
+                    if (cac == null) {
                         String message = "can't find @Cached definition with area=" + cacheAnnoConfig.getArea()
                                 + " name=" + cacheAnnoConfig.getName() +
                                 ", specified in " + cacheAnnoConfig.getDefineMethod();
@@ -63,7 +63,7 @@ public class CacheContext {
                         logger.error("Cache operation aborted because can't find @Cached definition", e);
                         return null;
                     }
-                    cache = createCacheByCachedConfig(cacheDefineConfig.getCachedAnnoConfig(), invokeContext);
+                    cache = createCacheByCachedConfig(cac, invokeContext);
                 }
                 cacheAnnoConfig.setCache(cache);
             }
