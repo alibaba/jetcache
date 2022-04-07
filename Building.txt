@@ -1,4 +1,14 @@
-1. Unit test
+0. Unit test in IDE under Windows/macOS
+==========================================================
+    Run redis in docker:
+
+    docker run --rm -it -p 6379-6381:6379-6381 -p 26379-26381:26379-26381 areyouok/redis-sentinel
+
+    It starts 3 sentinel instances (port 16379,16380,16381) and 3 redis servers(port 6379,6380,6381) and can be connected from localhost.
+
+    Then you can run tests in IDE or command line, but all tests which need redis cluster mode will be skipped.
+
+1. Unit test (to run all tests)
 ==========================================================
 1.1 Run redis
     At first we run redis server using Docker, under jetcache directory, run:
@@ -11,15 +21,15 @@
 
     mvn clean test
 
-1.2.b Run tests in Mac
+1.2.b Run tests in macOS
 
     docker run -it --rm --network host -v $HOME/.m2:/root/.m2 -v `pwd`:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean test
 
 1.2.c Run tests in Windows
 
-    docker run -it --rm --network host -v /c/Users/hl_20/.m2:/root/.m2 -v /IdeaProjects/jetcache/jetcache:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean test
+    docker run -it --rm --network host -v /c/Users/hl_20/.m2:/root/.m2 -v /c/Users/hl_20/IdeaProjects/jetcache/jetcache:/usr/src/mymaven -w /usr/src/mymaven maven:3.6.2-jdk-8 mvn clean test
 
-    You need change /c/Users/hl_20 and /IdeaProjects/jetcache/jetcache to your local path.
+    You need change /c/Users/hl_20 and /c/Users/hl_20/IdeaProjects/jetcache/jetcache to your local path.
 
 
 2. Change pom version
