@@ -22,7 +22,8 @@ public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
 
     @Test
     public void jedisTest() throws Exception {
-        RedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        connectionFactory.afterPropertiesSet();
         doTest(connectionFactory);
     }
 
