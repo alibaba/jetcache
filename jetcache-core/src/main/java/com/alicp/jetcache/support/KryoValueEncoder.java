@@ -22,6 +22,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
     static ThreadLocal<Object[]> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+        kryo.setRegistrationRequired(false);
 //        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
 //        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
 
@@ -49,7 +50,13 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 
             try {
                 if (useIdentityNumber) {
-                    output.writeInt(IDENTITY_NUMBER);
+                    output.writeByte(IDENTITY_NUMBER >>> 24);
+                    output.writeByte(IDENTITY_NUMBER >>> 16);
+                    output.writeByte(IDENTITY_NUMBER >>> 8);
+                    output.writeByte(IDENTITY_NUMBER);
+
+                    // kryo5 change writeInt to little endian
+                    // output.writeInt(IDENTITY_NUMBER);
                 }
                 kryo.writeClassAndObject(output, value);
                 return output.toBytes();
