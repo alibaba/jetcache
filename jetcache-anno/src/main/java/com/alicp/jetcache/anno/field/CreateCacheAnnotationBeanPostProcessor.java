@@ -178,9 +178,9 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
         @Override
         protected void inject(Object bean, String beanName, PropertyValues pvs) throws Throwable {
             beanFactory.registerDependentBean(beanName, "globalCacheConfig");
-            LazyInitCache cache = new LazyInitCache(beanFactory, ann, field);
+            CreateCacheWrapper wrapper = new CreateCacheWrapper(beanFactory, ann, field);
             field.setAccessible(true);
-            field.set(bean, cache);
+            field.set(bean, wrapper.getCache());
         }
     }
 

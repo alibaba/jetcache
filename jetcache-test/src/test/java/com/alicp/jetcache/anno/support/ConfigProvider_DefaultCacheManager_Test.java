@@ -3,7 +3,10 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.CreateCache;
+import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.spring.SpringTestBase;
@@ -15,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.annotation.PostConstruct;
+
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -22,6 +27,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = ConfigProvider_DefaultCacheManager_Test.class)
 @Configuration
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.anno.support.ConfigProvider_DefaultCacheManager_Test"})
+@EnableCreateCacheAnnotation
 public class ConfigProvider_DefaultCacheManager_Test extends SpringTestBase {
 
     @Bean
@@ -37,6 +43,9 @@ public class ConfigProvider_DefaultCacheManager_Test extends SpringTestBase {
 
     public static class CountBean {
         private int i;
+
+        @CreateCache(name = "C2")
+        private Cache c2;
 
         @Cached(name = "C1", expire = 3, key = "#key")
         public String count(String key) {
@@ -61,6 +70,7 @@ public class ConfigProvider_DefaultCacheManager_Test extends SpringTestBase {
     @Test
     public void test2() {
         Assert.assertNotNull(CacheManager.defaultManager().getCache("C1"));
+        Assert.assertNotNull(CacheManager.defaultManager().getCache("C2"));
     }
 
 }
