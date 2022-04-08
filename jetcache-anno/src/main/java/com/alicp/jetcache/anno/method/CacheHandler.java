@@ -278,17 +278,4 @@ public class CacheHandler implements InvocationHandler {
         return context.getInvoker().invoke();
     }
 
-    public static class CacheHandlerRefreshCache<K, V> extends RefreshCache<K, V> {
-
-        public CacheHandlerRefreshCache(Cache cache) {
-            super(cache);
-        }
-
-        @Override
-        public void addOrUpdateRefreshTask(K key, CacheLoader<K, V> loader) {
-            super.addOrUpdateRefreshTask(key, loader);
-        }
-    }
-
-
 }

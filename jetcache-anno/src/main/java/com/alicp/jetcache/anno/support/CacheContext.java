@@ -7,6 +7,7 @@ import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
+import com.alicp.jetcache.RefreshCache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
@@ -134,7 +135,7 @@ public class CacheContext {
                     .buildCache();
         }
         cache.config().setRefreshPolicy(cachedAnnoConfig.getRefreshPolicy());
-        cache = new CacheHandler.CacheHandlerRefreshCache(cache);
+        cache = new RefreshCache(cache);
 
         cache.config().setCachePenetrationProtect(globalCacheConfig.isPenetrationProtect());
         PenetrationProtectConfig protectConfig = cachedAnnoConfig.getPenetrationProtectConfig();
