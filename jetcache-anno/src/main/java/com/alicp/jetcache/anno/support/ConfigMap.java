@@ -23,12 +23,6 @@ public class ConfigMap {
         }
     }
 
-    public void updateCacheNameMap(CachedAnnoConfig cac) {
-        if (cac != null && !CacheConsts.isUndefined(cac.getName())) {
-            cacheNameMap.put(cac.getArea() + "_" + cac.getName(), cac);
-        }
-    }
-
     public CacheInvokeConfig getByMethodInfo(String key) {
         return methodInfoMap.get(key);
     }

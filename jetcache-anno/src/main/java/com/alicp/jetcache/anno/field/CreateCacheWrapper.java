@@ -65,10 +65,6 @@ class CreateCacheWrapper {
             CacheNameGenerator g = configProvider.createCacheNameGenerator(hiddenPackages);
             cacheName = g.generateCacheName(field);
         }
-        ConfigMap configMap = beanFactory.getBean(ConfigMap.class);
-        if (configMap != null) {
-            configMap.updateCacheNameMap(cac);
-        }
         cache = configProvider.getCacheContext().__createOrGetCache(cac, ann.area(), cacheName);
     }
 
