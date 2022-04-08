@@ -1,5 +1,6 @@
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.support.CacheMessagePublisher;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
@@ -57,7 +58,7 @@ public class ConfigProvider extends AbstractLifecycle {
     @Override
     public void doShutdown() {
         shutdownDefaultCacheMonitorInstaller();
-        cacheManager.rebuild();
+        cacheManager.close();
     }
 
     protected void shutdownDefaultCacheMonitorInstaller() {

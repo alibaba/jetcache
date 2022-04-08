@@ -3,6 +3,8 @@
  */
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;

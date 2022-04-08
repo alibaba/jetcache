@@ -1,9 +1,8 @@
 /**
  * Created on 2019/2/1.
  */
-package com.alicp.jetcache.anno.support;
+package com.alicp.jetcache;
 
-import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheConsts;
 
 /**

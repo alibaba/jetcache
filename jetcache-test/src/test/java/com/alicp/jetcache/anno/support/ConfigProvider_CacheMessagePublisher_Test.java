@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.support.CacheMessage;

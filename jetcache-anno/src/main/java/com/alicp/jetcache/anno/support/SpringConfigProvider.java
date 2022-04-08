@@ -1,5 +1,6 @@
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.anno.method.SpringCacheContext;
 import com.alicp.jetcache.support.CacheMessagePublisher;
 import com.alicp.jetcache.support.StatInfo;
