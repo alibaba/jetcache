@@ -7,13 +7,17 @@ import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.lettuce.JetCacheCodec;
 import com.alicp.jetcache.redis.lettuce.LettuceConnectionManager;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
-import io.lettuce.core.*;
+import io.lettuce.core.AbstractRedisClient;
+import io.lettuce.core.ClientOptions;
+import io.lettuce.core.ReadFrom;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.masterslave.MasterSlave;
-import io.lettuce.core.masterslave.StatefulRedisMasterSlaveConnection;
+import io.lettuce.core.masterreplica.MasterReplica;
+import io.lettuce.core.masterreplica.StatefulRedisMasterReplicaConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -71,7 +75,16 @@ public class RedisLettuceAutoConfiguration {
                         .collect(Collectors.toList());
                 if (uriList.size() == 1) {
                     RedisURI uri = uriList.get(0);
-                    if (readFrom == null) {
+                    if ("Cluster".equalsIgnoreCase(mode)) {
+                        client = RedisClusterClient.create(uri);
+                        ((RedisClusterClient) client).setOptions(ClusterClientOptions.builder().
+                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                        if (readFrom != null) {
+                            StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
+                            c.setReadFrom(readFrom);
+                            connection = c;
+                        }
+                    } else if (readFrom == null) {
                         client = RedisClient.create(uri);
                         ((RedisClient) client).setOptions(ClientOptions.builder().
                                 disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
@@ -79,17 +92,17 @@ public class RedisLettuceAutoConfiguration {
                         client = RedisClient.create();
                         ((RedisClient) client).setOptions(ClientOptions.builder().
                                 disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                        StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
+                        StatefulRedisMasterReplicaConnection c = MasterReplica.connect(
                                 (RedisClient) client, new JetCacheCodec(), uri);
                         c.setReadFrom(readFrom);
                         connection = c;
                     }
                 } else {
-                    if (mode != null && mode.equalsIgnoreCase("MasterSlave")) {
+                    if ("MasterSlave".equalsIgnoreCase(mode) || "MasterReplica".equalsIgnoreCase(mode)) {
                         client = RedisClient.create();
                         ((RedisClient) client).setOptions(ClientOptions.builder().
                                 disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                        StatefulRedisMasterSlaveConnection c = MasterSlave.connect(
+                        StatefulRedisMasterReplicaConnection c = MasterReplica.connect(
                                 (RedisClient) client, new JetCacheCodec(), uriList);
                         if (readFrom != null) {
                             c.setReadFrom(readFrom);
