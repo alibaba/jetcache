@@ -2,7 +2,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultCacheMonitorManager;
+import com.alicp.jetcache.support.DefaultMetricsManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 
 import java.util.concurrent.TimeUnit;
@@ -36,7 +36,7 @@ public class CacheMonitorWithMultiLevelCacheExample {
                 .buildCache();
 
         boolean verboseLog = true;
-        DefaultCacheMonitorManager statLogger = new DefaultCacheMonitorManager(1, TimeUnit.SECONDS, verboseLog);
+        DefaultMetricsManager statLogger = new DefaultMetricsManager(1, TimeUnit.SECONDS, verboseLog);
         statLogger.add(l1CacheMonitor, l2CacheMonitor, orderCacheMonitor);
         statLogger.start();
 

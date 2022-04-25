@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "jetcache.samples.spring")
@@ -44,7 +44,7 @@ public class JetCacheConfig {
     }
 
     @Bean
-    public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){
+    public GlobalCacheConfig config(Pool<Jedis> pool){
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
@@ -60,7 +60,6 @@ public class JetCacheConfig {
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        globalCacheConfig.setConfigProvider(configProvider);
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(1);
