@@ -1,6 +1,8 @@
 package com.alicp.jetcache.anno.method;
 
-import com.alicp.jetcache.anno.support.*;
+import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -15,7 +17,6 @@ public class SpringCacheContext extends CacheContext {
     public SpringCacheContext(SpringConfigProvider configProvider, GlobalCacheConfig globalCacheConfig, ApplicationContext applicationContext) {
         super(configProvider, globalCacheConfig);
         this.applicationContext = applicationContext;
-        init();
     }
 
     @Override
@@ -23,16 +24,4 @@ public class SpringCacheContext extends CacheContext {
         return new SpringCacheInvokeContext(applicationContext);
     }
 
-    public void init() {
-        if (applicationContext != null) {
-            ConfigMap configMap = applicationContext.getBean(ConfigMap.class);
-            cacheManager.setCacheCreator((area, cacheName) -> {
-                CachedAnnoConfig cac = configMap.getByCacheName(area, cacheName);
-                if (cac == null) {
-                    throw new IllegalArgumentException("cache definition not found: area=" + area + ",cacheName=" + cacheName);
-                }
-                return __createOrGetCache(cac, area, cacheName);
-            });
-        }
-    }
 }

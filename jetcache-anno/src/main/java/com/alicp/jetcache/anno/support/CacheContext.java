@@ -7,8 +7,8 @@ import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
-import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.RefreshCache;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
@@ -91,16 +91,16 @@ public class CacheContext {
 
     @Deprecated
     public <K, V> Cache<K, V> getCache(String area, String cacheName) {
-        Cache cache = cacheManager.getCacheWithoutCreate(area, cacheName);
+        Cache cache = cacheManager.getCache(area, cacheName);
         return cache;
     }
 
     public Cache __createOrGetCache(CachedAnnoConfig cachedAnnoConfig, String area, String cacheName) {
         String fullCacheName = area + "_" + cacheName;
-        Cache cache = cacheManager.getCacheWithoutCreate(area, cacheName);
+        Cache cache = cacheManager.getCache(area, cacheName);
         if (cache == null) {
             synchronized (this) {
-                cache = cacheManager.getCacheWithoutCreate(area, cacheName);
+                cache = cacheManager.getCache(area, cacheName);
                 if (cache == null) {
                     if (globalCacheConfig.isAreaInCacheName()) {
                         // for compatible reason, if we use default configuration, the prefix should same to that version <=2.4.3
