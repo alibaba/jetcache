@@ -1,0 +1,81 @@
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  hidePackages: com.alibaba
+  penetrationProtect: false
+
+  local:
+    default:
+      type: caffeine
+      keyConvertor: fastjson
+      limit: 200
+      defaultExpireInMillis: 10000
+    A1:
+      type: linkedhashmap
+      keyConvertor: fastjson
+      limit: 100
+      expireAfterAccess: true
+      defaultExpireInMillis: 10000
+    A2:
+      type: linkedhashmap
+      keyConvertor: fastjson
+      limit: 100
+      expireAfterAccess: true
+      defaultExpireInMillis: 10000
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson
+      poolConfig:
+        minIdle: 2
+        maxIdle: 5
+        maxTotal: 10
+      host: 127.0.0.1
+      port: 6379
+      defaultExpireInMillis: 10000
+      keyPrefix: jedisTest
+
+      readFromSlave: False
+      slaves:
+        S1:
+          poolConfig:
+            minIdle: 2
+            maxIdle: 5
+            maxTotal: 10
+          host: 127.0.0.1
+          port: 6380
+          weight: 30
+        S2:
+          poolConfig:
+            minIdle: 2
+            maxIdle: 5
+            maxTotal: 10
+          host: 127.0.0.1
+          port: 6381
+    A1:
+      type: redis
+      keyConvertor: fastjson
+      poolConfig:
+        minIdle: 2
+        maxIdle: 5
+        maxTotal: 10
+      sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
+      masterName: mymaster
+      valueEncoder: kryo?useIdentityNumber=false
+      valueDecoder: kryo?useIdentityNumber=false
+      defaultExpireInMillis: 10000
+      keyPrefix: jedisTest_A1
+    A2:
+      type: redis
+      keyConvertor: fastjson
+      poolConfig:
+        minIdle: 2
+        maxIdle: 5
+        maxTotal: 10
+      cluster:
+        - 127.0.0.1:7000
+        - 127.0.0.1:7001
+        - 127.0.0.1:7002
+      defaultExpireInMillis: 10000
+
+

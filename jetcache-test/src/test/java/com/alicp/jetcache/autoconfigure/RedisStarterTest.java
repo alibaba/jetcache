@@ -7,7 +7,7 @@ import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.RedisCacheConfig;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
@@ -21,7 +21,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.util.Pool;
 
 import javax.annotation.PostConstruct;
@@ -41,7 +43,11 @@ public class RedisStarterTest extends SpringTest {
 
     @Test
     public void tests() throws Exception {
-        System.setProperty("spring.profiles.active", "redis");
+        if (RedisLettuceCacheTest.checkOS()) {
+            System.setProperty("spring.profiles.active", "redis-cluster");
+        } else {
+            System.setProperty("spring.profiles.active", "redis");
+        }
         context = SpringApplication.run(RedisStarterTest.class);
         doTest();
         A bean = context.getBean(A.class);
@@ -49,9 +55,14 @@ public class RedisStarterTest extends SpringTest {
 
         Pool<Jedis> t1 = (Pool<Jedis>) context.getBean("defaultPool");
         Pool<Jedis> t2 = (Pool<Jedis>) context.getBean("A1Pool");
-        Assert.assertNotNull(t1);
-        Assert.assertNotNull(t2);
+        Assert.assertTrue(t1 instanceof Pool);
+        Assert.assertTrue(t2 instanceof JedisSentinelPool);
         Assert.assertNotSame(t1, t2);
+
+        if (RedisLettuceCacheTest.checkOS()) {
+            JedisCluster a2 = (JedisCluster) context.getBean("A2Jedis");
+            Assert.assertNotNull(a2);
+        }
     }
 
     @Component
@@ -101,15 +112,21 @@ public class RedisStarterTest extends SpringTest {
         }
 
         @Bean(name = "defaultPool")
-        @DependsOn("redisAutoInit")
+        @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)
         public JedisPoolFactory defaultPool() {
             return new JedisPoolFactory("remote.default", JedisPool.class);
         }
 
         @Bean(name = "A1Pool")
-        @DependsOn("redisAutoInit")
+        @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)
         public JedisPoolFactory A1Pool() {
-            return new JedisPoolFactory("remote.A1", JedisPool.class);
+            return new JedisPoolFactory("remote.A1", JedisSentinelPool.class);
+        }
+
+        @Bean(name = "A2Jedis")
+        @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)
+        public JedisFactory A2Jedis() {
+            return new JedisFactory("remote.A2", JedisCluster.class);
         }
     }
 

@@ -2,7 +2,6 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.PropertyValues;
@@ -12,18 +11,24 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
+import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.Protocol;
+import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.util.Pool;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created on 2016/11/25.
@@ -57,61 +62,92 @@ public class RedisAutoConfiguration {
 
         @Override
         protected CacheBuilder initCache(ConfigTree ct, String cacheAreaWithPrefix) {
-            Pool jedisPool = parsePool(ct);
-            Pool[] slavesPool = null;
-            int[] slavesPoolWeights = null;
+            Object jedisObj = parsePool(ct);
             boolean readFromSlave = Boolean.parseBoolean(ct.getProperty("readFromSlave", "False"));
+
+            RedisCacheBuilder.RedisCacheBuilderImpl builder = RedisCacheBuilder.createRedisCacheBuilder()
+                    .readFromSlave(readFromSlave);
+            if (jedisObj instanceof Pool) {
+                builder.jedisPool((Pool<Jedis>) jedisObj);
+            } else {
+                builder.jedis((UnifiedJedis) jedisObj);
+            }
+
             ConfigTree slaves = ct.subTree("slaves.");
             Set<String> slaveNames = slaves.directChildrenKeys();
             if (slaveNames.size() > 0) {
-                slavesPool = new Pool[slaveNames.size()];
-                slavesPoolWeights = new int[slaveNames.size()];
+                List<Object> slavesObjects = new ArrayList<>();
+                int[] slavesWeights = new int[slaveNames.size()];
                 int i = 0;
                 for (String slaveName: slaveNames) {
                     ConfigTree slaveConfig = slaves.subTree(slaveName + ".");
-                    slavesPool[i] = parsePool(slaveConfig);
-                    slavesPoolWeights[i] = Integer.parseInt(slaveConfig.getProperty("weight","100"));
+                    slavesObjects.add(parsePool(slaveConfig));
+                    slavesWeights[i] = Integer.parseInt(slaveConfig.getProperty("weight","100"));
                     i++;
+                }
+
+                builder.slaveReadWeights(slavesWeights);
+                if (slavesObjects.get(0) instanceof Pool) {
+                    builder.jedisSlavePools(slavesObjects.toArray(new Pool[0]));
+                } else {
+                    builder.slaves(slavesObjects.toArray(new UnifiedJedis[0]));
                 }
             }
 
-            ExternalCacheBuilder externalCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                    .jedisPool(jedisPool)
-                    .readFromSlave(readFromSlave)
-                    .jedisSlavePools(slavesPool)
-                    .slaveReadWeights(slavesPoolWeights);
-
-            parseGeneralConfig(externalCacheBuilder, ct);
+            parseGeneralConfig(builder, ct);
 
             // eg: "jedisPool.remote.default"
-            autoConfigureBeans.getCustomContainer().put("jedisPool." + cacheAreaWithPrefix, jedisPool);
+            autoConfigureBeans.getCustomContainer().put("jedisPool." + cacheAreaWithPrefix, jedisObj);
+            if (jedisObj instanceof UnifiedJedis) {
+                autoConfigureBeans.getCustomContainer().put("jedis." + cacheAreaWithPrefix, jedisObj);
+            }
 
-            return externalCacheBuilder;
+            return builder;
         }
 
-        private Pool<Jedis> parsePool(ConfigTree ct) {
+        private Object parsePool(ConfigTree ct) {
             GenericObjectPoolConfig poolConfig = parsePoolConfig(ct);
 
+            Map<String, Object> cluster = ct.subTree("cluster"/*there is no dot*/).getProperties();
             String host = ct.getProperty("host", (String) null);
             int port = Integer.parseInt(ct.getProperty("port", "0"));
             int timeout = Integer.parseInt(ct.getProperty("timeout", String.valueOf(Protocol.DEFAULT_TIMEOUT)));
+            int connectionTimeout = ct.getProperty("connectionTimeout", timeout);
+            int soTimeout = ct.getProperty("soTimeout", timeout);
+            String user = ct.getProperty("user", (String) null);
             String password = ct.getProperty("password", (String) null);
             int database = Integer.parseInt(ct.getProperty("database", String.valueOf(Protocol.DEFAULT_DATABASE)));
             String clientName = ct.getProperty("clientName", (String) null);
             boolean ssl = Boolean.parseBoolean(ct.getProperty("ssl", "false"));
 
-            String masterName = ct.getProperty("masterName", (String) null);
+
             String sentinels = ct.getProperty("sentinels", (String) null);//ip1:port,ip2:port
 
-            Pool<Jedis> jedisPool;
             if (sentinels == null) {
-                Objects.requireNonNull(host, "host/port or sentinels/masterName is required");
-                if (port == 0) {
-                    throw new IllegalStateException("host/port or sentinels/masterName is required");
+                if (cluster == null || cluster.size() == 0) {
+                    Objects.requireNonNull(host, "host is required");
+                    if (port == 0) {
+                        throw new IllegalStateException("port is required");
+                    }
+                    return new JedisPool(poolConfig, host, port, connectionTimeout, soTimeout, user, password,
+                            database, clientName, ssl);
+                } else {
+                    int maxAttempt = Integer.parseInt(ct.getProperty("maxAttempt", "5"));
+                    Set<HostAndPort> hostAndPortSet = cluster.values().stream()
+                            .map(uri -> uri.toString().split(":"))
+                            .map(hostAndPort -> new HostAndPort(hostAndPort[0], Integer.parseInt(hostAndPort[1])))
+                            .collect(Collectors.toSet());
+                    return new JedisCluster(hostAndPortSet, connectionTimeout, soTimeout, maxAttempt, user, password,
+                            clientName, poolConfig, ssl);
                 }
-                jedisPool = new JedisPool(poolConfig, host, port, timeout, password, database, clientName, ssl);
             } else {
-                Objects.requireNonNull(masterName, "host/port or sentinels/masterName is required");
+                String masterName = ct.getProperty("masterName", (String) null);
+                Objects.requireNonNull(masterName, "masterName is required");
+                int sentinelConnectionTimeout = ct.getProperty("sentinelConnectionTimeout", 2000);
+                int sentinelSoTimeout = ct.getProperty("sentinelSoTimeout", 2000);
+                String sentinelUser = ct.getProperty("sentinelUser", null);
+                String sentinelPassword = ct.getProperty("sentinelPassword", null);
+                String sentinelClientName = ct.getProperty("sentinelClientName", null);
                 String[] strings = sentinels.split(",");
                 HashSet<String> sentinelsSet = new HashSet<>();
                 for (String s : strings) {
@@ -119,9 +155,10 @@ public class RedisAutoConfiguration {
                         sentinelsSet.add(s.trim());
                     }
                 }
-                jedisPool = new JedisSentinelPool(masterName, sentinelsSet, poolConfig, timeout, password, database, clientName);
+                return new JedisSentinelPool(masterName, sentinelsSet, poolConfig, connectionTimeout, soTimeout,
+                        user, password, database, clientName, sentinelConnectionTimeout, sentinelSoTimeout,
+                        sentinelUser, sentinelPassword, sentinelClientName);
             }
-            return jedisPool;
         }
 
         private GenericObjectPoolConfig parsePoolConfig(ConfigTree ct) {
