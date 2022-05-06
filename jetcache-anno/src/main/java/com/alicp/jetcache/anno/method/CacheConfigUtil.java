@@ -5,7 +5,14 @@ package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.RefreshPolicy;
-import com.alicp.jetcache.anno.*;
+import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.CacheInvalidate;
+import com.alicp.jetcache.anno.CacheInvalidateContainer;
+import com.alicp.jetcache.anno.CachePenetrationProtect;
+import com.alicp.jetcache.anno.CacheRefresh;
+import com.alicp.jetcache.anno.CacheUpdate;
+import com.alicp.jetcache.anno.Cached;
+import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
@@ -30,6 +37,7 @@ public class CacheConfigUtil {
         cc.setArea(anno.area());
         cc.setName(anno.name());
         cc.setCacheType(anno.cacheType());
+        cc.setSyncLocal(anno.syncLocal());
         cc.setEnabled(anno.enabled());
         cc.setTimeUnit(anno.timeUnit());
         cc.setExpire(anno.expire());

@@ -1,6 +1,10 @@
 package com.alicp.jetcache.anno;
 
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,6 +57,13 @@ public @interface CreateCache {
      * @return the cache type
      */
     CacheType cacheType() default CacheType.REMOTE;
+
+    /**
+     * if cacheType is CacheType.BOTH and the remote cache supports broadcast (or BroadcastManager bean exists),
+     * invalidate local cache of all process after put/remove operation.
+     * @return should sync local cache
+     */
+    boolean syncLocal() default false;
 
     /**
      * Specify max elements in local memory when cacheType is CacheType.LOCAL or CacheType.BOTH.

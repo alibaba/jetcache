@@ -1,7 +1,13 @@
 package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
-import com.alicp.jetcache.event.*;
+import com.alicp.jetcache.event.CacheEvent;
+import com.alicp.jetcache.event.CacheGetAllEvent;
+import com.alicp.jetcache.event.CacheGetEvent;
+import com.alicp.jetcache.event.CachePutAllEvent;
+import com.alicp.jetcache.event.CachePutEvent;
+import com.alicp.jetcache.event.CacheRemoveAllEvent;
+import com.alicp.jetcache.event.CacheRemoveEvent;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +33,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     private static Logger logger = LoggerFactory.getLogger(AbstractCache.class);
 
     private volatile ConcurrentHashMap<Object, LoaderLock> loaderMap;
+
+    protected volatile boolean closed;
 
     ConcurrentHashMap<Object, LoaderLock> initOrGetLoaderMap() {
         if (loaderMap == null) {
@@ -348,6 +356,15 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     }
 
     protected abstract CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit);
+
+    @Override
+    public void close() {
+        this.closed = true;
+    }
+
+    public boolean isClosed() {
+        return this.closed;
+    }
 
     static class LoaderLock {
         CountDownLatch signal;

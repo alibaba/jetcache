@@ -1,8 +1,8 @@
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.SimpleCacheManager;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.method.SpringCacheContext;
-import com.alicp.jetcache.support.CacheMessagePublisher;
+import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.StatInfo;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
 
     @Autowired(required = false)
     @Override
-    public void setCacheManager(SimpleCacheManager cacheManager) {
+    public void setCacheManager(CacheManager cacheManager) {
         super.setCacheManager(cacheManager);
     }
 
@@ -78,8 +78,8 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
 
     @Autowired(required = false)
     @Override
-    public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
-        super.setCacheMessagePublisher(cacheMessagePublisher);
+    public void setBroadcastManager(BroadcastManager broadcastManager) {
+        super.setBroadcastManager(broadcastManager);
     }
 
 }

@@ -1,9 +1,11 @@
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.SimpleCacheManager;
-import com.alicp.jetcache.support.CacheMessagePublisher;
+import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.function.Consumer;
@@ -16,22 +18,24 @@ import java.util.function.Function;
  */
 public class ConfigProvider extends AbstractLifecycle {
 
+    private static final Logger logger = LoggerFactory.getLogger(ConfigProvider.class);
+
     @Resource
     protected GlobalCacheConfig globalCacheConfig;
 
-    protected SimpleCacheManager cacheManager;
+    protected CacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
     protected CacheMonitorManager cacheMonitorManager;
     private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
-    private CacheMessagePublisher cacheMessagePublisher;
+    private BroadcastManager broadcastManager;
 
-    private CacheMonitorManager defaultCacheMonitorManager = new DefaultCacheMonitorManager();
+    private final CacheMonitorManager defaultCacheMonitorManager = new DefaultCacheMonitorManager();
 
     private CacheContext cacheContext;
 
     public ConfigProvider() {
-        cacheManager = SimpleCacheManager.defaultManager;
+        cacheManager = CacheManager.defaultManager();
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
         cacheMonitorManager = defaultCacheMonitorManager;
@@ -45,25 +49,32 @@ public class ConfigProvider extends AbstractLifecycle {
 
     protected void initDefaultCacheMonitorInstaller() {
         if (cacheMonitorManager == defaultCacheMonitorManager) {
-            DefaultCacheMonitorManager installer = (DefaultCacheMonitorManager) cacheMonitorManager;
-            installer.setGlobalCacheConfig(globalCacheConfig);
-            installer.setMetricsCallback(metricsCallback);
-            if (cacheMessagePublisher != null) {
-                installer.setCacheMessagePublisher(cacheMessagePublisher);
+            DefaultCacheMonitorManager cacheMonitorManager = (DefaultCacheMonitorManager) this.cacheMonitorManager;
+            cacheMonitorManager.setGlobalCacheConfig(globalCacheConfig);
+            cacheMonitorManager.setMetricsCallback(metricsCallback);
+            cacheMonitorManager.setConfigProvider(this);
+            if (broadcastManager != null) {
+                cacheMonitorManager.setBroadcastManager(broadcastManager);
             }
-            installer.init();
+            cacheMonitorManager.init();
         }
     }
 
     @Override
     public void doShutdown() {
-        shutdownDefaultCacheMonitorInstaller();
-        cacheManager.close();
+        try {
+            shutdownDefaultCacheMonitorInstaller();
+            if (cacheManager instanceof AutoCloseable) {
+                ((AutoCloseable) cacheManager).close();
+            }
+        } catch (Exception e) {
+            logger.error("close fail", e);
+        }
     }
 
     protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager == defaultCacheMonitorManager) {
-            ((DefaultCacheMonitorManager) cacheMonitorManager).shutdown();
+        if (cacheMonitorManager instanceof AbstractLifecycle) {
+            ((AbstractLifecycle) cacheMonitorManager).shutdown();
         }
     }
 
@@ -99,11 +110,11 @@ public class ConfigProvider extends AbstractLifecycle {
         return new CacheContext(this, globalCacheConfig);
     }
 
-    public void setCacheManager(SimpleCacheManager cacheManager) {
+    public void setCacheManager(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
-    public SimpleCacheManager getCacheManager() {
+    public CacheManager getCacheManager() {
         return cacheManager;
     }
 
@@ -139,7 +150,7 @@ public class ConfigProvider extends AbstractLifecycle {
         this.metricsCallback = metricsCallback;
     }
 
-    public void setCacheMessagePublisher(CacheMessagePublisher cacheMessagePublisher) {
-        this.cacheMessagePublisher = cacheMessagePublisher;
+    public void setBroadcastManager(BroadcastManager broadcastManager) {
+        this.broadcastManager = broadcastManager;
     }
 }

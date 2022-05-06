@@ -32,7 +32,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     private static Logger logger = LoggerFactory.getLogger(RedisCache.class);
 
-    private RedisCacheConfig<K, V> config;
+    protected RedisCacheConfig<K, V> config;
 
     Function<Object, byte[]> valueEncoder;
     Function<byte[], Object> valueDecoder;
@@ -106,7 +106,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         throw new IllegalArgumentException(clazz.getName());
     }
 
-    private Object writeCommands() {
+    Object writeCommands() {
         return config.getJedis() != null ? config.getJedis() : config.getJedisPool().getResource();
     }
 
@@ -139,7 +139,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         throw new CacheException("assert false");
     }
 
-    private void closeJedis(Object maybeJedis) {
+    void closeJedis(Object maybeJedis) {
         if (maybeJedis instanceof Jedis) {
             close((Jedis) maybeJedis);
         }

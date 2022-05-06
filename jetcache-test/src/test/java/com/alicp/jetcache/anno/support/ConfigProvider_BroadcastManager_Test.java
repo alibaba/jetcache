@@ -4,11 +4,13 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.SimpleCacheManager;
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
+import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
-import com.alicp.jetcache.support.CacheMessagePublisher;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.spring.SpringTestBase;
 import org.junit.Assert;
@@ -24,6 +26,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,10 +34,10 @@ import java.util.stream.Stream;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ConfigProvider_CacheMessagePublisher_Test.class)
+@ContextConfiguration(classes = ConfigProvider_BroadcastManager_Test.class)
 @Configuration
 @EnableCreateCacheAnnotation
-public class ConfigProvider_CacheMessagePublisher_Test extends SpringTestBase {
+public class ConfigProvider_BroadcastManager_Test extends SpringTestBase {
 
     @Bean
     public SimpleCacheManager cacheManager() {
@@ -53,19 +56,24 @@ public class ConfigProvider_CacheMessagePublisher_Test extends SpringTestBase {
     }
 
     @Component
-    public static class MyCacheMessagePublisher implements CacheMessagePublisher {
+    public static class MyBroadcastManager implements BroadcastManager {
         int messageType;
         Object[] keys;
 
         @Override
-        public void publish(String area, String cacheName, CacheMessage cacheMessage) {
+        public CacheResult publish(CacheMessage cacheMessage) {
             messageType = cacheMessage.getType();
             keys = cacheMessage.getKeys();
+            return CacheResult.SUCCESS_WITHOUT_MSG;
+        }
+
+        @Override
+        public void startSubscribe(Consumer<CacheMessage> consumer) {
         }
     }
 
     public static class CountBean {
-        @CreateCache
+        @CreateCache(cacheType = CacheType.BOTH, syncLocal = true)
         Cache cache;
     }
 
@@ -77,7 +85,7 @@ public class ConfigProvider_CacheMessagePublisher_Test extends SpringTestBase {
     @Test
     public void test() {
         CountBean bean = context.getBean(CountBean.class);
-        MyCacheMessagePublisher publisher = context.getBean(MyCacheMessagePublisher.class);
+        MyBroadcastManager publisher = context.getBean(MyBroadcastManager.class);
         bean.cache.put("K1", "V1");
         Assert.assertEquals(CacheMessage.TYPE_PUT, publisher.messageType);
         Assert.assertEquals("K1", publisher.keys[0]);

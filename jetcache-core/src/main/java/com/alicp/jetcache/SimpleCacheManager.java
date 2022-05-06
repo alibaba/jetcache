@@ -17,7 +17,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
 
     private ConcurrentHashMap<String, ConcurrentHashMap<String, Cache>> caches = new ConcurrentHashMap<>();
 
-    public static SimpleCacheManager defaultManager = new SimpleCacheManager();
+    static final SimpleCacheManager defaultManager = new SimpleCacheManager();
 
     public SimpleCacheManager() {
     }
@@ -46,6 +46,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         return areaMap.get(cacheName);
     }
 
+    @Override
     public void putCache(String area, String cacheName, Cache cache) {
         ConcurrentHashMap<String, Cache> areaMap = getCachesByArea(area);
         areaMap.put(cacheName, cache);

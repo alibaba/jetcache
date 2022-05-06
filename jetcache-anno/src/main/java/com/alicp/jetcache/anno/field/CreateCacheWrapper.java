@@ -1,12 +1,17 @@
 package com.alicp.jetcache.anno.field;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.RefreshPolicy;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CachePenetrationProtect;
 import com.alicp.jetcache.anno.CacheRefresh;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.method.CacheConfigUtil;
-import com.alicp.jetcache.anno.support.*;
+import com.alicp.jetcache.anno.support.CacheNameGenerator;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
+import com.alicp.jetcache.anno.support.ConfigProvider;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.PenetrationProtectConfig;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Field;
@@ -52,6 +57,7 @@ class CreateCacheWrapper {
         cac.setExpire(ann.expire());
         cac.setLocalExpire(ann.localExpire());
         cac.setCacheType(ann.cacheType());
+        cac.setSyncLocal(ann.syncLocal());
         cac.setLocalLimit(ann.localLimit());
         cac.setSerialPolicy(ann.serialPolicy());
         cac.setKeyConvertor(ann.keyConvertor());
