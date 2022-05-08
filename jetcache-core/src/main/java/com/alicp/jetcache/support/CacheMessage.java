@@ -18,6 +18,8 @@ public class CacheMessage implements Serializable {
     public static final int TYPE_REMOVE = 3;
     public static final int TYPE_REMOVE_ALL = 4;
 
+    private String sourceId;
+
     private String area;
 
     private String cacheName;
@@ -69,5 +71,13 @@ public class CacheMessage implements Serializable {
 
     public void setCacheName(String cacheName) {
         this.cacheName = cacheName;
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public void setSourceId(String sourceId) {
+        this.sourceId = sourceId;
     }
 }

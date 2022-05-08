@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -24,6 +25,8 @@ import java.util.function.Consumer;
 public class DefaultCacheMonitorManager extends AbstractLifecycle implements CacheMonitorManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorManager.class);
+
+    private final String sourceId = UUID.randomUUID().toString();
 
     private DefaultMetricsManager defaultMetricsManager;
 
@@ -64,7 +67,7 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
         BroadcastManager bm = broadcastManagers.computeIfAbsent(area, keyNotUse -> {
             if (broadcastManager != null) {
                 if (!broadcastManagerInit) {
-                    broadcastManager.startSubscribe(new CacheMessageConsumer(configProvider.getCacheManager()));
+                    broadcastManager.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
                     broadcastManagerInit = true;
                 }
                 return broadcastManager; // first use inject BroadcastManager
@@ -74,13 +77,13 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             }
             ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
             BroadcastManager result = builderCopy.broadcastManager(builderCopy.getBroadcastChannel());
-            result.startSubscribe(new CacheMessageConsumer(configProvider.getCacheManager()));
+            result.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
             return result;
         });
         if (bm == null) {
             return;
         }
-        CacheMonitor monitor = new CacheNotifyMonitor(bm, area, cacheName, cache);
+        CacheMonitor monitor = new CacheNotifyMonitor(bm, area, cacheName, cache, sourceId);
         cache.config().getMonitors().add(monitor);
     }
 

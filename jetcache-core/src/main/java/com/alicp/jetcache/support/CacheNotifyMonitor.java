@@ -17,12 +17,15 @@ public class CacheNotifyMonitor implements CacheMonitor {
     private final String area;
     private final String cacheName;
     private final Cache cache;
+    private final String sourceId;
 
-    public CacheNotifyMonitor(BroadcastManager broadcastManager, String area, String cacheName, Cache cache) {
+    public CacheNotifyMonitor(BroadcastManager broadcastManager, String area,
+                              String cacheName, Cache cache, String sourceId) {
         this.broadcastManager = broadcastManager;
         this.area = area;
         this.cacheName = cacheName;
         this.cache = cache;
+        this.sourceId = sourceId;
     }
 
     @Override
@@ -35,6 +38,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CacheMessage m = new CacheMessage();
             m.setArea(area);
             m.setCacheName(cacheName);
+            m.setSourceId(sourceId);
             CachePutEvent e = (CachePutEvent) event;
             m.setType(CacheMessage.TYPE_PUT);
             m.setKeys(new Object[]{e.getKey()});
@@ -43,6 +47,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CacheMessage m = new CacheMessage();
             m.setArea(area);
             m.setCacheName(cacheName);
+            m.setSourceId(sourceId);
             CacheRemoveEvent e = (CacheRemoveEvent) event;
             m.setType(CacheMessage.TYPE_REMOVE);
             m.setKeys(new Object[]{e.getKey()});
@@ -51,6 +56,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CacheMessage m = new CacheMessage();
             m.setArea(area);
             m.setCacheName(cacheName);
+            m.setSourceId(sourceId);
             CachePutAllEvent e = (CachePutAllEvent) event;
             m.setType(CacheMessage.TYPE_PUT_ALL);
             if (e.getMap() != null) {
@@ -61,6 +67,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CacheMessage m = new CacheMessage();
             m.setArea(area);
             m.setCacheName(cacheName);
+            m.setSourceId(sourceId);
             CacheRemoveAllEvent e = (CacheRemoveAllEvent) event;
             m.setType(CacheMessage.TYPE_REMOVE_ALL);
             if (e.getKeys() != null) {

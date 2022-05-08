@@ -18,15 +18,20 @@ import java.util.stream.Stream;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheMessageConsumer implements Consumer<CacheMessage> {
+    private final String sourceId;
     private final CacheManager cacheManager;
 
-    public CacheMessageConsumer(CacheManager cacheManager) {
+    public CacheMessageConsumer(String sourceId, CacheManager cacheManager) {
+        this.sourceId = sourceId;
         this.cacheManager = cacheManager;
     }
 
     @Override
     public void accept(CacheMessage cacheMessage) {
         if (cacheMessage == null) {
+            return;
+        }
+        if (sourceId.equals(cacheMessage.getSourceId())) {
             return;
         }
         Cache cache = cacheManager.getCache(cacheMessage.getArea(), cacheMessage.getCacheName());
