@@ -57,7 +57,7 @@ public class TestBean {
         return count++;
     }
 
-    @Cached(cacheType = CacheType.BOTH)
+    @Cached(cacheType = CacheType.BOTH, syncLocal = true)
     public int countWithBoth(){
         return count++;
     }

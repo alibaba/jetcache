@@ -13,9 +13,12 @@ import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
+import junit.framework.AssertionFailedError;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -59,6 +62,29 @@ public class TestUtil {
         SpringConfigProvider configProvider = new SpringConfigProvider();
         configProvider.setGlobalCacheConfig(createGloableConfig());
         return configProvider;
+    }
+
+    public static void waitUtil(Object expectValue, Supplier<Object> actual) {
+        waitUtil(expectValue, actual, 1000);
+    }
+    public static void waitUtil(Object expectValue, Supplier<Object> actual, long timeoutMillis) {
+        long deadline = System.nanoTime() + timeoutMillis * 1000 * 1000;
+        Object obj = actual.get();
+        if (Objects.equals(expectValue, obj)) {
+            return;
+        }
+        while (deadline - System.nanoTime() > 0) {
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            obj = actual.get();
+            if(Objects.equals(expectValue, obj)){
+                return;
+            }
+        }
+        throw new AssertionFailedError("expect: " + expectValue + ", actual:" + obj);
     }
 
 }
