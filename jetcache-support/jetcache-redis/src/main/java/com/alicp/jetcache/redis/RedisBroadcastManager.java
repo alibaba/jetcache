@@ -1,5 +1,6 @@
 package com.alicp.jetcache.redis;
 
+import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
@@ -35,6 +36,18 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
         this.channelStr = channel;
         this.channel = channel.getBytes(StandardCharsets.UTF_8);
 
+        if (config.getValueEncoder() == null) {
+            throw new CacheConfigException("no value encoder");
+        }
+        if (config.getValueDecoder() == null) {
+            throw new CacheConfigException("no value decoder");
+        }
+    }
+
+    @Override
+    protected void checkConfig() {
+        // key prefix is not need.
+        // remove key prefix check and move other check to constructor
     }
 
     @Override
