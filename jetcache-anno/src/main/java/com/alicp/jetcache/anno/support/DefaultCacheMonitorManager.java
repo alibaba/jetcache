@@ -4,14 +4,11 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import com.alicp.jetcache.support.BroadcastManager;
-import com.alicp.jetcache.support.DefaultCacheMonitor;
-import com.alicp.jetcache.support.DefaultMetricsManager;
-import com.alicp.jetcache.support.LocalCacheUpdater;
-import com.alicp.jetcache.support.StatInfo;
+import com.alicp.jetcache.support.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +36,12 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
     @Autowired(required = false)
     private BroadcastManager broadcastManager;
 
+    private boolean broadcastManagerInit;
+
     @Resource
     private ConfigProvider configProvider;
 
     private final ConcurrentHashMap<String, BroadcastManager> broadcastManagers = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, LocalCacheUpdater> updaters = new ConcurrentHashMap<>();
 
     @Override
     public void addMonitors(String area, String cacheName, Cache cache, boolean syncLocal) {
@@ -62,31 +60,28 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
         if (cacheBuilder == null) {
             return;
         }
-        BroadcastManager bm = broadcastManager; // first use inject BroadcastManager
-        if (bm == null) {
-            if (!cacheBuilder.supportBroadcast()) {
-                return;
+
+        BroadcastManager bm = broadcastManagers.computeIfAbsent(area, keyNotUse -> {
+            if (broadcastManager != null) {
+                if (!broadcastManagerInit) {
+                    broadcastManager.startSubscribe(new CacheMessageConsumer(configProvider.getCacheManager()));
+                    broadcastManagerInit = true;
+                }
+                return broadcastManager; // first use inject BroadcastManager
             }
-            bm = broadcastManagers.computeIfAbsent(area, keyNotUse -> {
-                ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
-                return builderCopy.broadcastManager(builderCopy.getBroadcastChannel());
-            });
-        }
+            if (!cacheBuilder.supportBroadcast()) {
+                return null;
+            }
+            ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
+            BroadcastManager result = builderCopy.broadcastManager(builderCopy.getBroadcastChannel());
+            result.startSubscribe(new CacheMessageConsumer(configProvider.getCacheManager()));
+            return result;
+        });
         if (bm == null) {
             return;
         }
-        addNotifyMonitor(area, cacheName, cache, bm);
-    }
-
-    private void addNotifyMonitor(String area, String cacheName, Cache cache, BroadcastManager bm) {
-        LocalCacheUpdater updater = updaters.computeIfAbsent(area, noUseParam -> {
-            LocalCacheUpdater result = new LocalCacheUpdater(bm, configProvider.getCacheManager());
-            bm.startSubscribe(result);
-            return result;
-        });
-        if (updater != null) {
-            updater.addNotifyMonitor(area, cacheName, cache);
-        }
+        CacheMonitor monitor = new CacheNotifyMonitor(bm, area, cacheName, cache);
+        cache.config().getMonitors().add(monitor);
     }
 
     protected void addMetricsMonitor(String area, String cacheName, Cache cache) {
