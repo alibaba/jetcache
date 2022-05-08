@@ -58,7 +58,7 @@ public class MultiLevelCacheMixTest {
         pc.setMinIdle(1);
         pc.setMaxIdle(1);
         pc.setMaxTotal(2);
-        JedisPool pool = new JedisPool(pc, "localhost", 6379);
+        JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
         l2Cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
