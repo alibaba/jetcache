@@ -4,7 +4,7 @@
 
     docker run --rm -it -p 6379-6381:6379-6381 -p 26379-26381:26379-26381 areyouok/redis-sentinel
 
-    It starts 3 sentinel instances (port 16379,16380,16381) and 3 redis servers(port 6379,6380,6381) and can be connected from localhost.
+    It starts 3 sentinel instances (port 16379,16380,16381) and 3 redis servers(port 6379,6380,6381) and can be connected from 127.0.0.1
 
     Then you can run tests in IDE or command line, but all tests which need redis cluster mode will be skipped.
 

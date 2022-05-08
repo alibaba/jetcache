@@ -35,7 +35,7 @@ public class JetCacheConfig {
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
         pc.setMaxTotal(10);
-        return new JedisPool(pc, "localhost", 6379);
+        return new JedisPool(pc, "127.0.0.1", 6379);
     }
 
     @Bean
