@@ -3,7 +3,11 @@ package com.alicp.jetcache.redis;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.RefreshCacheTest;
-import com.alicp.jetcache.support.*;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
+import com.alicp.jetcache.support.KryoValueDecoder;
+import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Assert;
@@ -31,7 +35,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
         pc.setMaxTotal(10);
-        JedisPool pool = new JedisPool(pc, "localhost", 6379);
+        JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
 
         testWithPool(pool);
     }
@@ -138,9 +142,9 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         pc.setMinIdle(2);
         pc.setMaxIdle(10);
         pc.setMaxTotal(10);
-        JedisPool pool1 = new JedisPool(pc, "localhost", 6379);
-        JedisPool pool2 = new JedisPool(pc, "localhost", 6380);
-        JedisPool pool3 = new JedisPool(pc, "localhost", 6381);
+        JedisPool pool1 = new JedisPool(pc, "127.0.0.1", 6379);
+        JedisPool pool2 = new JedisPool(pc, "127.0.0.1", 6380);
+        JedisPool pool3 = new JedisPool(pc, "127.0.0.1", 6381);
 
         RedisCacheBuilder builder = RedisCacheBuilder.createRedisCacheBuilder();
         builder.setJedisPool(pool1);

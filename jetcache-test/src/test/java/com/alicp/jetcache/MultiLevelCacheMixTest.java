@@ -4,23 +4,26 @@
 package com.alicp.jetcache;
 
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
-import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import io.lettuce.core.RedisClient;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.jupiter.api.Test;
 import redis.clients.jedis.JedisPool;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -58,7 +61,7 @@ public class MultiLevelCacheMixTest {
         pc.setMinIdle(1);
         pc.setMaxIdle(1);
         pc.setMaxTotal(2);
-        JedisPool pool = new JedisPool(pc, "localhost", 6379);
+        JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
         l2Cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
