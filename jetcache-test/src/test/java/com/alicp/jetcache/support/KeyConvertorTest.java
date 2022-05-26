@@ -7,10 +7,12 @@ import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.function.Function;
+
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class FastjsonKeyConvertorTest {
+public class KeyConvertorTest {
     static class C extends DynamicQuery {
         private C mate;
 
@@ -24,8 +26,16 @@ public class FastjsonKeyConvertorTest {
     }
 
     @Test
-    public void test() {
-        FastjsonKeyConvertor g = FastjsonKeyConvertor.INSTANCE;
+    public void testFastjson() {
+        test(FastjsonKeyConvertor.INSTANCE);
+    }
+
+    @Test
+    public void testJackson() {
+        test(JacksonKeyConvertor.INSTANCE);
+    }
+
+    private void test(Function<Object, Object> g) {
         Object k1, k2, k3;
 
         k1 = g.apply(new Object[]{10, 20, 10});
@@ -47,11 +57,6 @@ public class FastjsonKeyConvertorTest {
         q1.setName("N1");
         Assert.assertNotEquals(g.apply(new Object[]{q1}), g.apply(new Object[]{q2}));
         q2.setName("N1");
-        Assert.assertEquals(g.apply(new Object[]{q1}), g.apply(new Object[]{q2}));
-
-        q1.setMate(q2);
-        Assert.assertNotEquals(g.apply(new Object[]{q1}), g.apply(new Object[]{q2}));
-        q2.setMate(q1);
         Assert.assertEquals(g.apply(new Object[]{q1}), g.apply(new Object[]{q2}));
 
         C q3 = new C();
