@@ -8,4 +8,5 @@ package com.alicp.jetcache.anno;
 public interface KeyConvertor {
     String NONE = "NONE";
     String FASTJSON = "FASTJSON";
+    String JACKSON = "JACKSON";
 }
