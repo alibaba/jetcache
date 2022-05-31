@@ -26,7 +26,7 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
     private final String channelStr;
 
     private volatile Consumer<CacheMessage> consumer;
-    private volatile CacheMessageConsumer cacheMessageConsumer;
+    private volatile CacheMessagePubSub cacheMessagePubSub;
     private volatile boolean closed;
     private volatile boolean subscribe;
     private boolean subscribeThreadStart;
@@ -56,7 +56,7 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
             throw new IllegalStateException("subscribe thread is started");
         }
         this.consumer = consumer;
-        this.cacheMessageConsumer = new CacheMessageConsumer();
+        this.cacheMessagePubSub = new CacheMessagePubSub();
         Thread subThread;
         subThread = new Thread(this::runSubThread, "Sub_" + channel);
         subThread.setDaemon(true);
@@ -76,10 +76,10 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
             jedisObj = writeCommands();
             if (jedisObj instanceof Jedis) {
                 subscribe = true;
-                ((Jedis) jedisObj).subscribe(cacheMessageConsumer, channel);
+                ((Jedis) jedisObj).subscribe(cacheMessagePubSub, channel);
             } else if (jedisObj instanceof UnifiedJedis) {
                 subscribe = true;
-                ((UnifiedJedis) jedisObj).subscribe(cacheMessageConsumer, channel);
+                ((UnifiedJedis) jedisObj).subscribe(cacheMessagePubSub, channel);
             }
         } catch (Throwable e) {
             logger.error("run jedis subscribe thread error: {}", e.toString());
@@ -123,7 +123,7 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
         this.closed = true;
         if (subscribe) {
             try {
-                this.cacheMessageConsumer.unsubscribe(channel);
+                this.cacheMessagePubSub.unsubscribe(channel);
             } catch (Exception e) {
                 logger.warn("unsubscribe {} fail", channelStr, e);
             }
@@ -131,7 +131,7 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
         super.close();
     }
 
-    class CacheMessageConsumer extends BinaryJedisPubSub {
+    class CacheMessagePubSub extends BinaryJedisPubSub {
 
         @Override
         public void onMessage(byte[] channel, byte[] message) {
