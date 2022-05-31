@@ -199,10 +199,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <spring.framework.version>5.3.18</spring.framework.version>
-        <spring.boot.version>2.6.6</spring.boot.version>
+        <spring.framework.version>5.3.20</spring.framework.version>
+        <spring.boot.version>2.7.0</spring.boot.version>
         <lettuce.version>6.1.8.RELEASE</lettuce.version>
-        <jedis.version>4.2.2</jedis.version>
+        <jedis.version>4.2.3</jedis.version>
 
         <!-- 2.6.2
         <spring.framework.version>5.2.4.RELEASE</spring.framework.version>
