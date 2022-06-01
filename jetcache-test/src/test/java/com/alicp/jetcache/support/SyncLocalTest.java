@@ -4,10 +4,8 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.SimpleCacheManager;
-import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.test.anno.TestUtil;
@@ -38,7 +36,7 @@ public class SyncLocalTest {
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
         CacheMessageConsumer consumer1 = new CacheMessageConsumer("id1", cacheManager1);
         CacheMessageConsumer consumer2 = new CacheMessageConsumer("id2", cacheManager2);
-        BroadcastManager broadcastManager = remoteBuilder.broadcastManager(SyncLocalTest.class.getName());
+        BroadcastManager broadcastManager = remoteBuilder.createBroadcastManager(SyncLocalTest.class.getName());
         broadcastManager.startSubscribe(m -> {
             consumer1.accept(m);
             consumer2.accept(m);

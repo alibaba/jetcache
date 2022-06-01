@@ -27,7 +27,7 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
         return false;
     }
 
-    public BroadcastManager broadcastManager(String channel) {
+    public BroadcastManager createBroadcastManager(String channel) {
         return null;
     }
 

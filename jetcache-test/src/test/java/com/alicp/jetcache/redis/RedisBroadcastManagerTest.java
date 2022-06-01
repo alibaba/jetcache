@@ -5,7 +5,6 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import redis.clients.jedis.HostAndPort;
@@ -24,7 +23,7 @@ public class RedisBroadcastManagerTest {
         BroadcastManager manager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)))
                 .keyPrefix(RedisBroadcastManagerTest.class.getName())
-                .broadcastManager(RedisBroadcastManagerTest.class.getName());
+                .createBroadcastManager(RedisBroadcastManagerTest.class.getName());
         CacheMessage cm = new CacheMessage();
         cm.setArea("area");
         cm.setCacheName("cacheName");

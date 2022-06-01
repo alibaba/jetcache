@@ -8,7 +8,12 @@ import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
-import com.alicp.jetcache.support.*;
+import com.alicp.jetcache.support.BroadcastManager;
+import com.alicp.jetcache.support.CacheMessageConsumer;
+import com.alicp.jetcache.support.CacheNotifyMonitor;
+import com.alicp.jetcache.support.DefaultCacheMonitor;
+import com.alicp.jetcache.support.DefaultMetricsManager;
+import com.alicp.jetcache.support.StatInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +81,7 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
                 return null;
             }
             ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
-            BroadcastManager result = builderCopy.broadcastManager(builderCopy.getBroadcastChannel());
+            BroadcastManager result = builderCopy.createBroadcastManager(builderCopy.getBroadcastChannel());
             result.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
             return result;
         });

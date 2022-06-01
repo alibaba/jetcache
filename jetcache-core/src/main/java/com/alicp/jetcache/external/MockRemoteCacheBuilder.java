@@ -34,7 +34,7 @@ public class MockRemoteCacheBuilder<T extends ExternalCacheBuilder<T>> extends E
     }
 
     @Override
-    public BroadcastManager broadcastManager(String channel) {
+    public BroadcastManager createBroadcastManager(String channel) {
         return new BroadcastManager() {
             @Override
             public CacheResult publish(CacheMessage cacheMessage) {
