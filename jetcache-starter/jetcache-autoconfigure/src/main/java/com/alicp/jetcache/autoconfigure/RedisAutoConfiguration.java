@@ -112,8 +112,8 @@ public class RedisAutoConfiguration {
             String host = ct.getProperty("host", (String) null);
             int port = Integer.parseInt(ct.getProperty("port", "0"));
             int timeout = Integer.parseInt(ct.getProperty("timeout", String.valueOf(Protocol.DEFAULT_TIMEOUT)));
-            int connectionTimeout = ct.getProperty("connectionTimeout", timeout);
-            int soTimeout = ct.getProperty("soTimeout", timeout);
+            int connectionTimeout = Integer.parseInt(ct.getProperty("connectionTimeout", String.valueOf(timeout)));
+            int soTimeout = Integer.parseInt(ct.getProperty("soTimeout", String.valueOf(timeout)));
             String user = ct.getProperty("user", (String) null);
             String password = ct.getProperty("password", (String) null);
             int database = Integer.parseInt(ct.getProperty("database", String.valueOf(Protocol.DEFAULT_DATABASE)));
@@ -143,8 +143,8 @@ public class RedisAutoConfiguration {
             } else {
                 String masterName = ct.getProperty("masterName", (String) null);
                 Objects.requireNonNull(masterName, "masterName is required");
-                int sentinelConnectionTimeout = ct.getProperty("sentinelConnectionTimeout", 2000);
-                int sentinelSoTimeout = ct.getProperty("sentinelSoTimeout", 2000);
+                int sentinelConnectionTimeout = Integer.parseInt(ct.getProperty("sentinelConnectionTimeout", String.valueOf(2000)));
+                int sentinelSoTimeout = Integer.parseInt(ct.getProperty("sentinelSoTimeout", String.valueOf(2000)));
                 String sentinelUser = ct.getProperty("sentinelUser", null);
                 String sentinelPassword = ct.getProperty("sentinelPassword", null);
                 String sentinelClientName = ct.getProperty("sentinelClientName", null);
