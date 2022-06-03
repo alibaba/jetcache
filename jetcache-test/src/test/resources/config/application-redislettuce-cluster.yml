@@ -68,6 +68,7 @@ jetcache:
     A2:
       type: redis.lettuce
       keyConvertor: fastjson
+      mode: cluster
       uri:
         - redis://127.0.0.1:7000
         - redis://127.0.0.1:7001
@@ -76,6 +77,7 @@ jetcache:
     A2_slave:
       type: redis.lettuce
       keyConvertor: fastjson
+      mode: cluster
       readFrom: slavePreferred
       uri:
         - redis://127.0.0.1:7000

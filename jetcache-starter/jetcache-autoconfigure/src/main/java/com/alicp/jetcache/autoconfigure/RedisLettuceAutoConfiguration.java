@@ -73,51 +73,26 @@ public class RedisLettuceAutoConfiguration {
             } else {
                 List<RedisURI> uriList = map.values().stream().map((k) -> RedisURI.create(URI.create(k.toString())))
                         .collect(Collectors.toList());
-                if (uriList.size() == 1) {
-                    RedisURI uri = uriList.get(0);
-                    if ("Cluster".equalsIgnoreCase(mode)) {
-                        client = RedisClusterClient.create(uri);
-                        ((RedisClusterClient) client).setOptions(ClusterClientOptions.builder().
-                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                        if (readFrom != null) {
-                            StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
-                            c.setReadFrom(readFrom);
-                            connection = c;
-                        }
-                    } else if (readFrom == null) {
-                        client = RedisClient.create(uri);
-                        ((RedisClient) client).setOptions(ClientOptions.builder().
-                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                    } else {
-                        client = RedisClient.create();
-                        ((RedisClient) client).setOptions(ClientOptions.builder().
-                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                        StatefulRedisMasterReplicaConnection c = MasterReplica.connect(
-                                (RedisClient) client, new JetCacheCodec(), uri);
+
+                if ("Cluster".equalsIgnoreCase(mode)) {
+                    client = RedisClusterClient.create(uriList);
+                    ((RedisClusterClient) client).setOptions(ClusterClientOptions.builder().
+                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                    if (readFrom != null) {
+                        StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
                         c.setReadFrom(readFrom);
                         connection = c;
                     }
                 } else {
-                    if ("MasterSlave".equalsIgnoreCase(mode) || "MasterReplica".equalsIgnoreCase(mode)) {
-                        client = RedisClient.create();
-                        ((RedisClient) client).setOptions(ClientOptions.builder().
-                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                        StatefulRedisMasterReplicaConnection c = MasterReplica.connect(
-                                (RedisClient) client, new JetCacheCodec(), uriList);
-                        if (readFrom != null) {
-                            c.setReadFrom(readFrom);
-                        }
-                        connection = c;
-                    } else {
-                        client = RedisClusterClient.create(uriList);
-                        ((RedisClusterClient) client).setOptions(ClusterClientOptions.builder().
-                                disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                        if (readFrom != null) {
-                            StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
-                            c.setReadFrom(readFrom);
-                            connection = c;
-                        }
+                    client = RedisClient.create();
+                    ((RedisClient) client).setOptions(ClientOptions.builder().
+                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
+                    StatefulRedisMasterReplicaConnection c = MasterReplica.connect(
+                            (RedisClient) client, new JetCacheCodec(), uriList);
+                    if (readFrom != null) {
+                        c.setReadFrom(readFrom);
                     }
+                    connection = c;
                 }
             }
 
