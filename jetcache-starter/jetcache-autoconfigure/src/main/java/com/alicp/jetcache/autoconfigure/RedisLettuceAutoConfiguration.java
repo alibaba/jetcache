@@ -14,6 +14,7 @@ import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.ClusterClientOptions;
+import io.lettuce.core.cluster.ClusterTopologyRefreshOptions;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
 import io.lettuce.core.masterreplica.MasterReplica;
@@ -23,6 +24,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,13 +78,7 @@ public class RedisLettuceAutoConfiguration {
 
                 if ("Cluster".equalsIgnoreCase(mode)) {
                     client = RedisClusterClient.create(uriList);
-                    ((RedisClusterClient) client).setOptions(ClusterClientOptions.builder().
-                            disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS).build());
-                    if (readFrom != null) {
-                        StatefulRedisClusterConnection c = ((RedisClusterClient) client).connect(new JetCacheCodec());
-                        c.setReadFrom(readFrom);
-                        connection = c;
-                    }
+                    connection = clusterConnection(ct, readFrom, (RedisClusterClient) client);
                 } else {
                     client = RedisClient.create();
                     ((RedisClient) client).setOptions(ClientOptions.builder().
@@ -111,6 +107,30 @@ public class RedisLettuceAutoConfiguration {
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".asyncCommands", m.asyncCommands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".reactiveCommands", m.reactiveCommands(client));
             return externalCacheBuilder;
+        }
+
+        private StatefulConnection clusterConnection(ConfigTree ct, ReadFrom readFrom, RedisClusterClient client) {
+            int enablePeriodicRefresh = Integer.parseInt(ct.getProperty("enablePeriodicRefresh", "60"));
+            boolean enableAllAdaptiveRefreshTriggers = Boolean.parseBoolean(ct.getProperty("enableAllAdaptiveRefreshTriggers", "true"));
+            ClusterTopologyRefreshOptions.Builder topologyOptionBuilder = ClusterTopologyRefreshOptions.builder();
+            if (enablePeriodicRefresh > 0) {
+                topologyOptionBuilder.enablePeriodicRefresh(Duration.ofSeconds(enablePeriodicRefresh));
+            }
+            if (enableAllAdaptiveRefreshTriggers) {
+                topologyOptionBuilder.enableAllAdaptiveRefreshTriggers();
+            }
+
+            ClusterClientOptions options = ClusterClientOptions.builder()
+                    .topologyRefreshOptions(topologyOptionBuilder.build())
+                    .disconnectedBehavior(ClientOptions.DisconnectedBehavior.REJECT_COMMANDS)
+                    .build();
+            client.setOptions(options);
+            if (readFrom != null) {
+                StatefulRedisClusterConnection c = client.connect(new JetCacheCodec());
+                c.setReadFrom(readFrom);
+                return c;
+            }
+            return null;
         }
     }
 }
