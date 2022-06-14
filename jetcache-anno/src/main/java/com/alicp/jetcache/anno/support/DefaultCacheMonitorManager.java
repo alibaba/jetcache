@@ -8,6 +8,7 @@ import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessageConsumer;
 import com.alicp.jetcache.support.CacheNotifyMonitor;
@@ -82,7 +83,10 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             }
             ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
             MultiLevelCache mc = (MultiLevelCache) CacheUtil.getAbstractCache(cache);
-            builderCopy.setKeyConvertor(mc.caches()[mc.caches().length - 1].config().getKeyConvertor());
+            ExternalCacheConfig cacheConfig = (ExternalCacheConfig) mc.caches()[mc.caches().length - 1].config();
+            // builderCopy.setKeyConvertor(cacheConfig.getKeyConvertor());
+            builderCopy.setValueEncoder(cacheConfig.getValueEncoder());
+            builderCopy.setValueDecoder(cacheConfig.getValueDecoder());
             BroadcastManager result = builderCopy.createBroadcastManager(builderCopy.getBroadcastChannel());
             result.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
             return result;
