@@ -18,12 +18,13 @@ import java.util.function.Consumer;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class RedisBroadcastManager extends RedisCache<Object, Object> implements BroadcastManager {
+public class RedisBroadcastManager implements BroadcastManager {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisBroadcastManager.class);
 
     private final byte[] channel;
     private final String channelStr;
+    private final RedisCacheConfig<Object, Object> config;
 
     private volatile Consumer<CacheMessage> consumer;
     private volatile CacheMessagePubSub cacheMessagePubSub;
@@ -31,10 +32,17 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
     private volatile boolean subscribe;
     private boolean subscribeThreadStart;
 
-    public RedisBroadcastManager(String channel, RedisCacheConfig<Object, Object> cacheConfig) {
-        super(cacheConfig);
+    public RedisBroadcastManager(String channel, RedisCacheConfig<Object, Object> config) {
         this.channelStr = channel;
         this.channel = channel.getBytes(StandardCharsets.UTF_8);
+        this.config = config;
+
+        if (config.getJedis() == null && config.getJedisPool() == null) {
+            throw new CacheConfigException("no jedis");
+        }
+        if (config.getJedis() != null && config.getJedisPool() != null) {
+            throw new CacheConfigException("'jedis' and 'jedisPool' can't set simultaneously");
+        }
 
         if (config.getValueEncoder() == null) {
             throw new CacheConfigException("no value encoder");
@@ -42,12 +50,6 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
         if (config.getValueDecoder() == null) {
             throw new CacheConfigException("no value decoder");
         }
-    }
-
-    @Override
-    protected void checkConfig() {
-        // key prefix is not need.
-        // remove key prefix check and move other check to constructor
     }
 
     @Override
@@ -90,8 +92,12 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
             }
         } finally {
             subscribe = false;
-            closeJedis(jedisObj);
+            RedisCache.closeJedis(jedisObj);
         }
+    }
+
+    Object writeCommands() {
+        return config.getJedis() != null ? config.getJedis() : config.getJedisPool().getResource();
     }
 
     @Override
@@ -107,10 +113,10 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
             }
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
-            logError("PUBLISH", "N/A", ex);
+            logger.error("jetcache publish error", ex);
             return new CacheResult(ex);
         } finally {
-            closeJedis(jedisObj);
+            RedisCache.closeJedis(jedisObj);
         }
     }
 
@@ -128,7 +134,6 @@ public class RedisBroadcastManager extends RedisCache<Object, Object> implements
                 logger.warn("unsubscribe {} fail", channelStr, e);
             }
         }
-        super.close();
     }
 
     class CacheMessagePubSub extends BinaryJedisPubSub {

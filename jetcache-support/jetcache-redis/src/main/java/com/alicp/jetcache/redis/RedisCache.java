@@ -1,6 +1,13 @@
 package com.alicp.jetcache.redis;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +25,12 @@ import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.util.Pool;
 
 import java.io.Closeable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -139,13 +151,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         throw new CacheException("assert false");
     }
 
-    void closeJedis(Object maybeJedis) {
+    static void closeJedis(Object maybeJedis) {
         if (maybeJedis instanceof Jedis) {
             close((Jedis) maybeJedis);
         }
     }
 
-    private void close(Closeable closeable) {
+    private static void close(Closeable closeable) {
         if (closeable == null) {
             return;
         }
