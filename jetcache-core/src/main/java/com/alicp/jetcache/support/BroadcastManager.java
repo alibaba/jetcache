@@ -16,4 +16,7 @@ public interface BroadcastManager extends AutoCloseable {
 
     void startSubscribe(Consumer<CacheMessage> consumer);
 
+    @Override
+    default void close() throws Exception {
+    }
 }

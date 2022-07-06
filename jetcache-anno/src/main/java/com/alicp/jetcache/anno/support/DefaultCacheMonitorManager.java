@@ -137,12 +137,10 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
     protected void doShutdown() {
         shutdownMetricsMonitor();
         for (BroadcastManager m : broadcastManagers.values()) {
-            if (m instanceof AutoCloseable) {
-                try {
-                    ((AutoCloseable) m).close();
-                } catch (Exception e) {
-                    logger.warn("BroadcastManager close fail", e);
-                }
+            try {
+                m.close();
+            } catch (Exception e) {
+                logger.warn("BroadcastManager close fail", e);
             }
         }
     }
