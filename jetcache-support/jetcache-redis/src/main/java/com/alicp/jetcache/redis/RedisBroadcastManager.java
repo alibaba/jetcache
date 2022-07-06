@@ -4,6 +4,7 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
+import com.alicp.jetcache.support.SquashedLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.BinaryJedisPubSub;
@@ -84,7 +85,7 @@ public class RedisBroadcastManager implements BroadcastManager {
                 ((UnifiedJedis) jedisObj).subscribe(cacheMessagePubSub, channel);
             }
         } catch (Throwable e) {
-            logger.error("run jedis subscribe thread error: {}", e.toString());
+            SquashedLogger.getLogger(logger).error("run jedis subscribe thread error: {}", e);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
@@ -113,7 +114,7 @@ public class RedisBroadcastManager implements BroadcastManager {
             }
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
-            logger.error("jetcache publish error", ex);
+            SquashedLogger.getLogger(logger).error("jetcache publish error", ex);
             return new CacheResult(ex);
         } finally {
             RedisCache.closeJedis(jedisObj);
@@ -151,7 +152,7 @@ public class RedisBroadcastManager implements BroadcastManager {
                     logger.error("{} the message is not instance of CacheMessage, class={}", channelStr, value.getClass());
                 }
             } catch (Throwable e) {
-                logger.error("receive cache notify error", e);
+                SquashedLogger.getLogger(logger).error("receive cache notify error", e);
             }
         }
     }

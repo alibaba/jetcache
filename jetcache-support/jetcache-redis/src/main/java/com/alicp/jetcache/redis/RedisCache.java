@@ -20,7 +20,6 @@ import redis.clients.jedis.Response;
 import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.commands.KeyBinaryCommands;
 import redis.clients.jedis.commands.StringBinaryCommands;
-import redis.clients.jedis.exceptions.JedisConnectionException;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.util.Pool;
 
@@ -401,11 +400,4 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         }
     }
 
-    @Override
-    protected boolean needLogStackTrace(Throwable e) {
-        if (e instanceof JedisConnectionException) {
-            return false;
-        }
-        return true;
-    }
 }

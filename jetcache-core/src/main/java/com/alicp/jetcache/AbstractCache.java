@@ -9,6 +9,7 @@ import com.alicp.jetcache.event.CachePutEvent;
 import com.alicp.jetcache.event.CacheRemoveAllEvent;
 import com.alicp.jetcache.event.CacheRemoveEvent;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.support.SquashedLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     }
 
     protected void logError(String oper, Object key, Throwable e) {
-        StringBuilder sb = new StringBuilder(64);
+        StringBuilder sb = new StringBuilder(256);
         sb.append("jetcache(")
                 .append(this.getClass().getSimpleName()).append(") ")
                 .append(oper)
@@ -62,30 +63,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
                 // ignore
             }
         }
-        if (needLogStackTrace(e)) {
-            logger.error(sb.toString(), e);
-        } else {
-            sb.append(' ');
-            while (e != null) {
-                sb.append(e.getClass().getName());
-                sb.append(':');
-                sb.append(e.getMessage());
-                e = e.getCause();
-                if (e != null) {
-                    sb.append("\ncause by ");
-                }
-            }
-            logger.error(sb.toString());
-        }
-
-    }
-
-    protected boolean needLogStackTrace(Throwable e) {
-//        if (e instanceof CacheEncodeException) {
-//            return true;
-//        }
-//        return false;
-        return true;
+        SquashedLogger.getLogger(logger).error(sb, e);
     }
 
     public void notify(CacheEvent e) {
