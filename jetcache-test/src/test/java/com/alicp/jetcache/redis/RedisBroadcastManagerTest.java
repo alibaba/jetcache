@@ -23,7 +23,7 @@ public class RedisBroadcastManagerTest {
         BroadcastManager manager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)))
                 .keyPrefix(RedisBroadcastManagerTest.class.getName())
-                .createBroadcastManager(RedisBroadcastManagerTest.class.getName());
+                .createBroadcastManager();
         CacheMessage cm = new CacheMessage();
         cm.setArea("area");
         cm.setCacheName("cacheName");

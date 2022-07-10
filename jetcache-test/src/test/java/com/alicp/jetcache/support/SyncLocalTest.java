@@ -36,7 +36,7 @@ public class SyncLocalTest {
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
         CacheMessageConsumer consumer1 = new CacheMessageConsumer("id1", cacheManager1);
         CacheMessageConsumer consumer2 = new CacheMessageConsumer("id2", cacheManager2);
-        BroadcastManager broadcastManager = remoteBuilder.createBroadcastManager(SyncLocalTest.class.getName());
+        BroadcastManager broadcastManager = remoteBuilder.createBroadcastManager();
         broadcastManager.startSubscribe(m -> {
             consumer1.accept(m);
             consumer2.accept(m);

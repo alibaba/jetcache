@@ -38,9 +38,9 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
     }
 
     @Override
-    public BroadcastManager createBroadcastManager(String channel) {
+    public BroadcastManager createBroadcastManager() {
         CacheConfig c = getConfig().clone();
-        return new RedisBroadcastManager(channel, (RedisCacheConfig) c);
+        return new RedisBroadcastManager((RedisCacheConfig) c);
     }
 
     public T jedisPool(Pool<Jedis> pool) {
