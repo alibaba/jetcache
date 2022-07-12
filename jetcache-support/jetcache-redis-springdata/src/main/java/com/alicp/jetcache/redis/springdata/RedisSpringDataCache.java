@@ -1,16 +1,24 @@
 package com.alicp.jetcache.redis.springdata;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStringCommands;
 import org.springframework.data.redis.core.types.Expiration;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -235,11 +243,4 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
         return config;
     }
 
-    @Override
-    protected boolean needLogStackTrace(Throwable e) {
-        if (e instanceof RedisConnectionFailureException) {
-            return false;
-        }
-        return true;
-    }
 }

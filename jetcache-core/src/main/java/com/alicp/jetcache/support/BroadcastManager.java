@@ -10,10 +10,13 @@ import java.util.function.Consumer;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public interface BroadcastManager {
+public interface BroadcastManager extends AutoCloseable {
 
     CacheResult publish(CacheMessage cacheMessage);
 
     void startSubscribe(Consumer<CacheMessage> consumer);
 
+    @Override
+    default void close() throws Exception {
+    }
 }
