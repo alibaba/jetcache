@@ -23,7 +23,8 @@ import org.springframework.context.annotation.Import;
         MockRemoteCacheAutoConfiguration.class,
         LinkedHashMapAutoConfiguration.class,
         RedisLettuceAutoConfiguration.class,
-        RedisSpringDataAutoConfiguration.class})
+        RedisSpringDataAutoConfiguration.class,
+        RedissonAutoConfiguration.class})
 public class JetCacheAutoConfiguration {
 
     public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";
@@ -46,7 +47,7 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean
-    public static BeanDependencyManager beanDependencyManager(){
+    public static BeanDependencyManager beanDependencyManager() {
         return new BeanDependencyManager();
     }
 
