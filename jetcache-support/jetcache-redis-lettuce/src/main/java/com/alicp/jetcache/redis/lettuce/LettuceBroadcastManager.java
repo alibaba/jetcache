@@ -12,6 +12,7 @@ import com.alicp.jetcache.support.CacheMessage;
 import com.alicp.jetcache.support.JetCacheExecutor;
 import com.alicp.jetcache.support.SquashedLogger;
 import io.lettuce.core.RedisFuture;
+import io.lettuce.core.api.async.BaseRedisAsyncCommands;
 import io.lettuce.core.pubsub.RedisPubSubAdapter;
 import io.lettuce.core.pubsub.api.async.RedisPubSubAsyncCommands;
 import org.slf4j.Logger;
@@ -27,10 +28,12 @@ public class LettuceBroadcastManager extends RedisPubSubAdapter<byte[], byte[]> 
 
     private final RedisLettuceCacheConfig<Object, Object> config;
     private final byte[] channel;
-    private final RedisPubSubAsyncCommands<byte[], byte[]> asyncCommands;
 
     private volatile Consumer<CacheMessage> consumer;
-    private boolean subscribeThreadStart;
+    private volatile boolean subscribeThreadStart;
+
+    private final LettuceConnectionManager lettuceConnectionManager;
+    private final BaseRedisAsyncCommands<byte[], byte[]> stringAsyncCommands;
 
     public LettuceBroadcastManager(RedisLettuceCacheConfig<Object, Object> config) {
         if (config.getBroadcastChannel() == null) {
@@ -48,14 +51,17 @@ public class LettuceBroadcastManager extends RedisPubSubAdapter<byte[], byte[]> 
 
         this.config = config;
         this.channel = config.getBroadcastChannel().getBytes(StandardCharsets.UTF_8);
-        this.asyncCommands = config.getPubSubConnection().async();
+        this.lettuceConnectionManager = config.getConnectionManager();
+        this.lettuceConnectionManager.init(config.getRedisClient(), config.getConnection());
+        this.stringAsyncCommands = (BaseRedisAsyncCommands<byte[], byte[]>) lettuceConnectionManager
+                .asyncCommands(config.getRedisClient());
     }
 
     @Override
     public CacheResult publish(CacheMessage cacheMessage) {
         try {
             byte[] value = config.getValueEncoder().apply(cacheMessage);
-            RedisFuture<Long> future = asyncCommands.publish(channel, value);
+            RedisFuture<Long> future = stringAsyncCommands.publish(channel, value);
             return new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() ->
@@ -79,6 +85,8 @@ public class LettuceBroadcastManager extends RedisPubSubAdapter<byte[], byte[]> 
         this.consumer = consumer;
 
         config.getPubSubConnection().addListener(this);
+        RedisPubSubAsyncCommands<byte[], byte[]> asyncCommands = config.getPubSubConnection().async();
+        asyncCommands.subscribe(channel);
         this.subscribeThreadStart = true;
     }
 

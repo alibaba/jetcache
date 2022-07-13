@@ -72,6 +72,15 @@ public class RedisLettuceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
         getConfig().setPubSubConnection(pubSubConnection);
     }
 
+    public T connectionManager(LettuceConnectionManager connectionManager) {
+        getConfig().setConnectionManager(connectionManager);
+        return self();
+    }
+
+    public void setConnectionManager(LettuceConnectionManager connectionManager) {
+        getConfig().setConnectionManager(connectionManager);
+    }
+
     public T asyncResultTimeoutInMillis(long asyncResultTimeoutInMillis) {
         getConfig().setAsyncResultTimeoutInMillis(asyncResultTimeoutInMillis);
         return self();

@@ -19,6 +19,8 @@ public class RedisLettuceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     private StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection;
 
+    private LettuceConnectionManager connectionManager = LettuceConnectionManager.defaultManager();
+
     private long asyncResultTimeoutInMillis = CacheConsts.ASYNC_RESULT_TIMEOUT.toMillis();
 
     public AbstractRedisClient getRedisClient() {
@@ -51,5 +53,13 @@ public class RedisLettuceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     public void setPubSubConnection(StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection) {
         this.pubSubConnection = pubSubConnection;
+    }
+
+    public LettuceConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
+    public void setConnectionManager(LettuceConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 }
