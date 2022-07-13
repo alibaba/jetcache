@@ -59,9 +59,6 @@ public class SyncLocalTest {
         Cache local2 = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .buildCache();
-        RedisCacheBuilder remoteBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyPrefix(SyncLocalTest.class.getName())
-                .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
         CacheMessageConsumer consumer1 = new CacheMessageConsumer("id1", cacheManager1);
         CacheMessageConsumer consumer2 = new CacheMessageConsumer("id2", cacheManager2);
         broadcastManager.startSubscribe(m -> {
