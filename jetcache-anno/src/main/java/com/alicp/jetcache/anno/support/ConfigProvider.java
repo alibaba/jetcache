@@ -73,7 +73,7 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager instanceof AbstractLifecycle) {
+        if (cacheMonitorManager == defaultCacheMonitorManager) {
             ((AbstractLifecycle) cacheMonitorManager).shutdown();
         }
     }

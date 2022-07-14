@@ -1,6 +1,13 @@
 package com.alicp.jetcache.redis.lettuce;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
+import com.alicp.jetcache.ResultData;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.support.JetCacheExecutor;
 import io.lettuce.core.AbstractRedisClient;
@@ -15,7 +22,12 @@ import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeUnit;
@@ -28,16 +40,16 @@ import java.util.function.Function;
  */
 public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
-    private RedisLettuceCacheConfig<K, V> config;
+    private final RedisLettuceCacheConfig<K, V> config;
 
-    private Function<Object, byte[]> valueEncoder;
-    private Function<byte[], Object> valueDecoder;
+    private final Function<Object, byte[]> valueEncoder;
+    private final Function<byte[], Object> valueDecoder;
 
     private final AbstractRedisClient client;
-    private LettuceConnectionManager lettuceConnectionManager;
-    private RedisStringCommands<byte[], byte[]> stringCommands;
-    private RedisStringAsyncCommands<byte[], byte[]> stringAsyncCommands;
-    private RedisKeyAsyncCommands<byte[], byte[]> keyAsyncCommands;
+    private final LettuceConnectionManager lettuceConnectionManager;
+    private final RedisStringCommands<byte[], byte[]> stringCommands;
+    private final RedisStringAsyncCommands<byte[], byte[]> stringAsyncCommands;
+    private final RedisKeyAsyncCommands<byte[], byte[]> keyAsyncCommands;
 
     public RedisLettuceCache(RedisLettuceCacheConfig<K, V> config) {
         super(config);
@@ -53,7 +65,7 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
 
         client = config.getRedisClient();
 
-        lettuceConnectionManager = LettuceConnectionManager.defaultManager();
+        lettuceConnectionManager = config.getConnectionManager();
         lettuceConnectionManager.init(client, config.getConnection());
         stringCommands = (RedisStringCommands<byte[], byte[]>) lettuceConnectionManager.commands(client);
         stringAsyncCommands = (RedisStringAsyncCommands<byte[], byte[]>) lettuceConnectionManager.asyncCommands(client);

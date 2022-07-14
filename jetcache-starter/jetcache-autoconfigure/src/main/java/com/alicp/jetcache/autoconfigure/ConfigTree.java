@@ -68,6 +68,30 @@ public class ConfigTree {
         }
     }
 
+    public boolean getProperty(String key, boolean defaultValue) {
+        if (containsProperty(key)) {
+            return Boolean.parseBoolean(getProperty(key));
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public int getProperty(String key, int defaultValue) {
+        if (containsProperty(key)) {
+            return Integer.parseInt(getProperty(key));
+        } else {
+            return defaultValue;
+        }
+    }
+
+    public long getProperty(String key, long defaultValue) {
+        if (containsProperty(key)) {
+            return Long.parseLong(getProperty(key));
+        } else {
+            return defaultValue;
+        }
+    }
+
     public String getPrefix() {
         return prefix;
     }

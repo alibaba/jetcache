@@ -33,9 +33,12 @@ public class RedisBroadcastManager implements BroadcastManager {
     private volatile boolean subscribe;
     private boolean subscribeThreadStart;
 
-    public RedisBroadcastManager(String channel, RedisCacheConfig<Object, Object> config) {
-        this.channelStr = channel;
-        this.channel = channel.getBytes(StandardCharsets.UTF_8);
+    public RedisBroadcastManager(RedisCacheConfig<Object, Object> config) {
+        this.channelStr = config.getBroadcastChannel();
+        if (this.channelStr == null) {
+            throw new CacheConfigException("broadcastChannel not set");
+        }
+        this.channel = channelStr.getBytes(StandardCharsets.UTF_8);
         this.config = config;
 
         if (config.getJedis() == null && config.getJedisPool() == null) {
@@ -61,7 +64,7 @@ public class RedisBroadcastManager implements BroadcastManager {
         this.consumer = consumer;
         this.cacheMessagePubSub = new CacheMessagePubSub();
         Thread subThread;
-        subThread = new Thread(this::runSubThread, "Sub_" + channel);
+        subThread = new Thread(this::runSubThread, "Sub_" + channelStr);
         subThread.setDaemon(true);
         subThread.start();
         this.subscribeThreadStart = true;
@@ -141,19 +144,7 @@ public class RedisBroadcastManager implements BroadcastManager {
 
         @Override
         public void onMessage(byte[] channel, byte[] message) {
-            try {
-                if (message == null) {
-                    return;
-                }
-                Object value = config.getValueDecoder().apply(message);
-                if (value instanceof CacheMessage) {
-                    consumer.accept((CacheMessage) value);
-                } else {
-                    logger.error("{} the message is not instance of CacheMessage, class={}", channelStr, value.getClass());
-                }
-            } catch (Throwable e) {
-                SquashedLogger.getLogger(logger).error("receive cache notify error", e);
-            }
+            consumer.accept(convert(message, config.getValueDecoder()));
         }
     }
 }

@@ -1,6 +1,11 @@
 package com.alicp.jetcache.redisson;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.redisson.api.RBatch;
 import org.redisson.api.RBucket;
@@ -73,7 +78,7 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
                 for (K k : keys) {
                     if (Objects.nonNull(k)) {
                         final String key = getCacheKey(k);
-                        if (Objects.nonNull(key) && !key.isEmpty()) {
+                        if (Objects.nonNull(key)) {
                             keyMap.put(k, key);
                         }
                     }
@@ -83,7 +88,7 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
                     final long now = System.currentTimeMillis();
                     for (K k : keys) {
                         final String key = keyMap.get(k);
-                        if (Objects.nonNull(key) && Objects.nonNull(kvMap) && !key.isEmpty()) {
+                        if (Objects.nonNull(key) && Objects.nonNull(kvMap)) {
                             final CacheValueHolder<V> holder = (CacheValueHolder<V>) kvMap.get(key);
                             if (Objects.nonNull(holder)) {
                                 final long expire = holder.getExpireTime();

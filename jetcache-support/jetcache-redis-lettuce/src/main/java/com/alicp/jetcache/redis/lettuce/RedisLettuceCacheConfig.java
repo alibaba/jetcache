@@ -4,6 +4,7 @@ import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.api.StatefulConnection;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 /**
  * Created on 2017/4/28.
@@ -14,7 +15,11 @@ public class RedisLettuceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     private AbstractRedisClient redisClient;
 
-    private StatefulConnection connection;
+    private StatefulConnection<byte[], byte[]> connection;
+
+    private StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection;
+
+    private LettuceConnectionManager connectionManager = LettuceConnectionManager.defaultManager();
 
     private long asyncResultTimeoutInMillis = CacheConsts.ASYNC_RESULT_TIMEOUT.toMillis();
 
@@ -26,11 +31,11 @@ public class RedisLettuceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
         this.redisClient = redisClient;
     }
 
-    public StatefulConnection getConnection() {
+    public StatefulConnection<byte[], byte[]> getConnection() {
         return connection;
     }
 
-    public void setConnection(StatefulConnection connection) {
+    public void setConnection(StatefulConnection<byte[], byte[]> connection) {
         this.connection = connection;
     }
 
@@ -40,5 +45,21 @@ public class RedisLettuceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     public void setAsyncResultTimeoutInMillis(long asyncResultTimeoutInMillis) {
         this.asyncResultTimeoutInMillis = asyncResultTimeoutInMillis;
+    }
+
+    public StatefulRedisPubSubConnection<byte[], byte[]> getPubSubConnection() {
+        return pubSubConnection;
+    }
+
+    public void setPubSubConnection(StatefulRedisPubSubConnection<byte[], byte[]> pubSubConnection) {
+        this.pubSubConnection = pubSubConnection;
+    }
+
+    public LettuceConnectionManager getConnectionManager() {
+        return connectionManager;
+    }
+
+    public void setConnectionManager(LettuceConnectionManager connectionManager) {
+        this.connectionManager = connectionManager;
     }
 }
