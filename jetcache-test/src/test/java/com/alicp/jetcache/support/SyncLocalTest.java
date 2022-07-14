@@ -81,9 +81,11 @@ public class SyncLocalTest {
                 .addCache(local2, remote2).buildCache();
         cacheManager1.putCache("Area", "CacheName", c1);
         cacheManager2.putCache("Area", "CacheName", c2);
+        cacheManager1.putBroadcastManager("Area", bm1);
+        cacheManager2.putBroadcastManager("Area", bm2);
 
-        c1.config().getMonitors().add(new CacheNotifyMonitor(bm1, "Area", "CacheName", c1));
-        c2.config().getMonitors().add(new CacheNotifyMonitor(bm2, "Area", "CacheName", c2));
+        c1.config().getMonitors().add(new CacheNotifyMonitor(cacheManager1, "Area", "CacheName", c1));
+        c2.config().getMonitors().add(new CacheNotifyMonitor(cacheManager2, "Area", "CacheName", c2));
 
         Thread.sleep(50);
 

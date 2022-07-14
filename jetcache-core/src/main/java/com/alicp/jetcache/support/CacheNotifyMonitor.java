@@ -5,6 +5,7 @@ package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.event.CacheEvent;
@@ -23,17 +24,24 @@ public class CacheNotifyMonitor implements CacheMonitor {
     private final Cache cache;
     private final String sourceId;
 
-    public CacheNotifyMonitor(BroadcastManager broadcastManager, String area,
+    public CacheNotifyMonitor(CacheManager cacheManager, String area,
                               String cacheName, Cache cache) {
-        this.broadcastManager = broadcastManager;
+        this.broadcastManager = cacheManager.getBroadcastManager(area);
         this.area = area;
         this.cacheName = cacheName;
         this.cache = cache;
-        this.sourceId = broadcastManager.getSourceId();
+        if (broadcastManager != null) {
+            this.sourceId = broadcastManager.getSourceId();
+        } else {
+            this.sourceId = null;
+        }
     }
 
     @Override
     public void afterOperation(CacheEvent event) {
+        if (this.broadcastManager == null) {
+            return;
+        }
         AbstractCache absCache = CacheUtil.getAbstractCache(cache);
         if (absCache.isClosed()) {
             return;

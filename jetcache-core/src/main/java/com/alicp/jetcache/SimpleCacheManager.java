@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.support.BroadcastManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,10 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleCacheManager.class);
 
-    private ConcurrentHashMap<String, ConcurrentHashMap<String, Cache>> caches = new ConcurrentHashMap<>();
+    // area -> cacheName -> Cache
+    private final ConcurrentHashMap<String, ConcurrentHashMap<String, Cache>> caches = new ConcurrentHashMap<>();
+
+    private final ConcurrentHashMap<String, BroadcastManager> broadcastManagers = new ConcurrentHashMap();
 
     static final SimpleCacheManager defaultManager = new SimpleCacheManager();
 
@@ -24,12 +28,20 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
 
     @Override
     public void close() {
+        broadcastManagers.forEach((area, bm) -> {
+            try {
+                bm.close();
+            } catch (Exception e) {
+                logger.error("error during close broadcast manager", e);
+            }
+        });
+        broadcastManagers.clear();
         caches.forEach((area, areaMap) -> {
             areaMap.forEach((cacheName, cache) -> {
                 try {
                     cache.close();
                 } catch (Exception e) {
-                    logger.error("error during close", e);
+                    logger.error("error during close Cache", e);
                 }
             });
         });
@@ -52,4 +64,13 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         areaMap.put(cacheName, cache);
     }
 
+    @Override
+    public BroadcastManager getBroadcastManager(String area) {
+        return broadcastManagers.get(area);
+    }
+
+    @Override
+    public void putBroadcastManager(String area, BroadcastManager broadcastManager) {
+        broadcastManagers.put(area, broadcastManager);
+    }
 }

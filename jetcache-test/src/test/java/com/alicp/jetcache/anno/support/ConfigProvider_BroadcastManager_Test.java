@@ -16,9 +16,9 @@ import com.alicp.jetcache.test.spring.SpringTestBase;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,8 +39,10 @@ import java.util.stream.Stream;
 public class ConfigProvider_BroadcastManager_Test extends SpringTestBase {
 
     @Bean
-    public SimpleCacheManager cacheManager() {
-        return new SimpleCacheManager();
+    public SimpleCacheManager cacheManager(@Autowired BroadcastManager broadcastManager) {
+        SimpleCacheManager cm = new SimpleCacheManager();
+        cm.putBroadcastManager(broadcastManager);
+        return cm;
     }
 
     @Bean
@@ -54,7 +56,11 @@ public class ConfigProvider_BroadcastManager_Test extends SpringTestBase {
         return pc;
     }
 
-    @Component
+    @Bean
+    public BroadcastManager broadcastManager() {
+        return new MyBroadcastManager();
+    }
+
     public static class MyBroadcastManager extends BroadcastManager {
         int messageType;
         Object[] keys;
@@ -88,30 +94,30 @@ public class ConfigProvider_BroadcastManager_Test extends SpringTestBase {
     @Test
     public void test() {
         CountBean bean = context.getBean(CountBean.class);
-        MyBroadcastManager publisher = context.getBean(MyBroadcastManager.class);
+        MyBroadcastManager broadcastManager = context.getBean(MyBroadcastManager.class);
         bean.cache.put("K1", "V1");
-        Assert.assertEquals(CacheMessage.TYPE_PUT, publisher.messageType);
-        Assert.assertEquals("K1", publisher.keys[0]);
+        Assert.assertEquals(CacheMessage.TYPE_PUT, broadcastManager.messageType);
+        Assert.assertEquals("K1", broadcastManager.keys[0]);
 
         SortedMap<String, String> kvs = new TreeMap(Stream.of(new String[]{"K1", "V1_new"},
                                                               new String[]{"K2", "V2"})
                                                    .collect(Collectors.toMap(kv -> kv[0],
                                                                              kv -> kv[1])));
         bean.cache.putAll(kvs);
-        Assert.assertEquals(CacheMessage.TYPE_PUT_ALL, publisher.messageType);
-        Assert.assertEquals("K1", publisher.keys[0]);
-        Assert.assertEquals("K2", publisher.keys[1]);
+        Assert.assertEquals(CacheMessage.TYPE_PUT_ALL, broadcastManager.messageType);
+        Assert.assertEquals("K1", broadcastManager.keys[0]);
+        Assert.assertEquals("K2", broadcastManager.keys[1]);
 
         bean.cache.remove("K3");
-        Assert.assertEquals(CacheMessage.TYPE_REMOVE, publisher.messageType);
-        Assert.assertEquals("K3", publisher.keys[0]);
+        Assert.assertEquals(CacheMessage.TYPE_REMOVE, broadcastManager.messageType);
+        Assert.assertEquals("K3", broadcastManager.keys[0]);
 
         SortedSet<String> keys = new TreeSet(Stream.of("K1", "K3")
                                             .collect(Collectors.toSet()));
         bean.cache.removeAll(keys);
-        Assert.assertEquals(CacheMessage.TYPE_REMOVE_ALL, publisher.messageType);
-        Assert.assertEquals("K1", publisher.keys[0]);
-        Assert.assertEquals("K3", publisher.keys[1]);
+        Assert.assertEquals(CacheMessage.TYPE_REMOVE_ALL, broadcastManager.messageType);
+        Assert.assertEquals("K1", broadcastManager.keys[0]);
+        Assert.assertEquals("K3", broadcastManager.keys[1]);
     }
 
 }

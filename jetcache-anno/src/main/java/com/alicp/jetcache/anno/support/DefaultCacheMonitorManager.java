@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -38,15 +37,8 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
     @Autowired(required = false)
     private Consumer<StatInfo> metricsCallback;
 
-    @Autowired(required = false)
-    private BroadcastManager broadcastManager;
-
-    private boolean broadcastManagerInit;
-
     @Resource
     private ConfigProvider configProvider;
-
-    private final ConcurrentHashMap<String, BroadcastManager> broadcastManagers = new ConcurrentHashMap<>();
 
     @Override
     public void addMonitors(String area, String cacheName, Cache cache, boolean syncLocal) {
@@ -62,34 +54,22 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             return;
         }
         final ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
-        if (cacheBuilder == null) {
+        if (cacheBuilder == null || !cacheBuilder.supportBroadcast()) {
             return;
         }
 
-        BroadcastManager bm = broadcastManagers.computeIfAbsent(area, keyNotUse -> {
-            if (broadcastManager != null) {
-                if (!broadcastManagerInit) {
-                    broadcastManager.startSubscribe();
-                    broadcastManagerInit = true;
-                }
-                return broadcastManager; // first use inject BroadcastManager
-            }
-            if (!cacheBuilder.supportBroadcast()) {
-                return null;
-            }
+        BroadcastManager bm = configProvider.getCacheManager().getBroadcastManager(area);
+        if (bm == null) {
             ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
             MultiLevelCache mc = (MultiLevelCache) CacheUtil.getAbstractCache(cache);
             ExternalCacheConfig cacheConfig = (ExternalCacheConfig) mc.caches()[mc.caches().length - 1].config();
             builderCopy.setValueEncoder(cacheConfig.getValueEncoder());
             builderCopy.setValueDecoder(cacheConfig.getValueDecoder());
-            BroadcastManager result = builderCopy.createBroadcastManager(configProvider.getCacheManager());
-            result.startSubscribe();
-            return result;
-        });
-        if (bm == null) {
-            return;
+            bm = builderCopy.createBroadcastManager(configProvider.getCacheManager());
+            bm.startSubscribe();
         }
-        CacheMonitor monitor = new CacheNotifyMonitor(bm, area, cacheName, cache);
+
+        CacheMonitor monitor = new CacheNotifyMonitor(configProvider.getCacheManager(), area, cacheName, cache);
         cache.config().getMonitors().add(monitor);
     }
 
@@ -131,13 +111,6 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
     @Override
     protected void doShutdown() {
         shutdownMetricsMonitor();
-        for (BroadcastManager m : broadcastManagers.values()) {
-            try {
-                m.close();
-            } catch (Exception e) {
-                logger.warn("BroadcastManager close fail", e);
-            }
-        }
     }
 
     protected void shutdownMetricsMonitor() {
@@ -153,10 +126,6 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
 
     public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {
         this.metricsCallback = metricsCallback;
-    }
-
-    public void setBroadcastManager(BroadcastManager broadcastManager) {
-        this.broadcastManager = broadcastManager;
     }
 
     public void setConfigProvider(ConfigProvider configProvider) {
