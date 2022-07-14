@@ -10,7 +10,6 @@ import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.support.BroadcastManager;
-import com.alicp.jetcache.support.CacheMessageConsumer;
 import com.alicp.jetcache.support.CacheNotifyMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultMetricsManager;
@@ -73,7 +72,7 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
         BroadcastManager bm = broadcastManagers.computeIfAbsent(area, keyNotUse -> {
             if (broadcastManager != null) {
                 if (!broadcastManagerInit) {
-                    broadcastManager.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
+                    broadcastManager.startSubscribe(new BroadcastManager.CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
                     broadcastManagerInit = true;
                 }
                 return broadcastManager; // first use inject BroadcastManager
@@ -87,7 +86,7 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             builderCopy.setValueEncoder(cacheConfig.getValueEncoder());
             builderCopy.setValueDecoder(cacheConfig.getValueDecoder());
             BroadcastManager result = builderCopy.createBroadcastManager();
-            result.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
+            result.startSubscribe(new BroadcastManager.CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
             return result;
         });
         if (bm == null) {

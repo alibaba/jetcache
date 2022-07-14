@@ -59,8 +59,8 @@ public class SyncLocalTest {
         Cache local2 = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .buildCache();
-        CacheMessageConsumer consumer1 = new CacheMessageConsumer("id1", cacheManager1);
-        CacheMessageConsumer consumer2 = new CacheMessageConsumer("id2", cacheManager2);
+        BroadcastManager.CacheMessageConsumer consumer1 = new BroadcastManager.CacheMessageConsumer("id1", cacheManager1);
+        BroadcastManager.CacheMessageConsumer consumer2 = new BroadcastManager.CacheMessageConsumer("id2", cacheManager2);
         broadcastManager.startSubscribe(m -> {
             consumer1.accept(m);
             consumer2.accept(m);
