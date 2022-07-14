@@ -3,7 +3,13 @@
  */
 package com.alicp.jetcache.embedded;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.AbstractCache;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -123,9 +129,12 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         Set newKeys = keys.stream().map((key) -> buildKey(key)).collect(Collectors.toSet());
         innerMap.removeAllValues(newKeys);
 
-        final HashMap resultMap = new HashMap();
-        keys.forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
         return CacheResult.SUCCESS_WITHOUT_MSG;
+    }
+
+    // internal method
+    public void __removeAll(Set<? extends K> keys) {
+        innerMap.removeAllValues(keys);
     }
 
     @Override

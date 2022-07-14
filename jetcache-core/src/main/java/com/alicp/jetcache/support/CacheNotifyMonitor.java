@@ -4,15 +4,20 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.AbstractCache;
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
+import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
 import com.alicp.jetcache.event.CacheEvent;
 import com.alicp.jetcache.event.CachePutAllEvent;
 import com.alicp.jetcache.event.CachePutEvent;
 import com.alicp.jetcache.event.CacheRemoveAllEvent;
 import com.alicp.jetcache.event.CacheRemoveEvent;
+
+import java.util.function.Function;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -38,6 +43,27 @@ public class CacheNotifyMonitor implements CacheMonitor {
         this(cacheManager, CacheConsts.DEFAULT_AREA, cacheName);
     }
 
+    private Object convertKey(Object key, AbstractEmbeddedCache localCache) {
+        Function keyConvertor = localCache.config().getKeyConvertor();
+        if (keyConvertor == null) {
+            return key;
+        } else {
+            return keyConvertor.apply(key);
+        }
+    }
+
+    private AbstractEmbeddedCache getLocalCache(AbstractCache absCache) {
+        if (!(absCache instanceof MultiLevelCache)) {
+            return null;
+        }
+        for (Cache c : ((MultiLevelCache) absCache).caches()) {
+            if (c instanceof AbstractEmbeddedCache) {
+                return (AbstractEmbeddedCache) c;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void afterOperation(CacheEvent event) {
         if (this.broadcastManager == null) {
@@ -47,6 +73,10 @@ public class CacheNotifyMonitor implements CacheMonitor {
         if (absCache.isClosed()) {
             return;
         }
+        AbstractEmbeddedCache localCache = getLocalCache(absCache);
+        if (localCache == null) {
+            return;
+        }
         if (event instanceof CachePutEvent) {
             CacheMessage m = new CacheMessage();
             m.setArea(area);
@@ -54,7 +84,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             m.setSourceId(sourceId);
             CachePutEvent e = (CachePutEvent) event;
             m.setType(CacheMessage.TYPE_PUT);
-            m.setKeys(new Object[]{e.getKey()});
+            m.setKeys(new Object[]{convertKey(e.getKey(), localCache)});
             broadcastManager.publish(m);
         } else if (event instanceof CacheRemoveEvent) {
             CacheMessage m = new CacheMessage();
@@ -63,7 +93,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             m.setSourceId(sourceId);
             CacheRemoveEvent e = (CacheRemoveEvent) event;
             m.setType(CacheMessage.TYPE_REMOVE);
-            m.setKeys(new Object[]{e.getKey()});
+            m.setKeys(new Object[]{convertKey(e.getKey(), localCache)});
             broadcastManager.publish(m);
         } else if (event instanceof CachePutAllEvent) {
             CacheMessage m = new CacheMessage();
@@ -73,7 +103,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CachePutAllEvent e = (CachePutAllEvent) event;
             m.setType(CacheMessage.TYPE_PUT_ALL);
             if (e.getMap() != null) {
-                m.setKeys(e.getMap().keySet().toArray());
+                m.setKeys(e.getMap().keySet().stream().map(k -> convertKey(k, localCache)).toArray());
             }
             broadcastManager.publish(m);
         } else if (event instanceof CacheRemoveAllEvent) {
@@ -84,7 +114,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
             CacheRemoveAllEvent e = (CacheRemoveAllEvent) event;
             m.setType(CacheMessage.TYPE_REMOVE_ALL);
             if (e.getKeys() != null) {
-                m.setKeys(e.getKeys().toArray());
+                m.setKeys(e.getKeys().stream().map(k -> convertKey(k, localCache)).toArray());
             }
             broadcastManager.publish(m);
         }

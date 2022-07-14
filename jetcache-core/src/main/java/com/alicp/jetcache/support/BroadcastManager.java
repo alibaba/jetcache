@@ -87,7 +87,7 @@ public abstract class BroadcastManager implements AutoCloseable {
         for (Cache c : caches) {
             Cache localCache = CacheUtil.getAbstractCache(c);
             if (localCache instanceof AbstractEmbeddedCache) {
-                localCache.REMOVE_ALL(keys);
+                ((AbstractEmbeddedCache) localCache).__removeAll(keys);
             } else {
                 break;
             }
