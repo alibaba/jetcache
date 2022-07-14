@@ -17,6 +17,7 @@ public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
     private Supplier<String> keyPrefixSupplier;
     private Function<Object, byte[]> valueEncoder = JavaValueEncoder.INSTANCE;
     private Function<byte[], Object> valueDecoder = DecoderMap.defaultJavaValueDecoder();
+    private String broadcastChannel = "JetCacheChannel";
 
     public String getKeyPrefix() {
         return keyPrefixSupplier == null ? null : keyPrefixSupplier.get();
@@ -48,5 +49,13 @@ public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
 
     public void setValueDecoder(Function<byte[], Object> valueDecoder) {
         this.valueDecoder = valueDecoder;
+    }
+
+    public String getBroadcastChannel() {
+        return broadcastChannel;
+    }
+
+    public void setBroadcastChannel(String broadcastChannel) {
+        this.broadcastChannel = broadcastChannel;
     }
 }

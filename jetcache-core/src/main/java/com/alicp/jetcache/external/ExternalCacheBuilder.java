@@ -13,8 +13,6 @@ import java.util.function.Supplier;
  */
 public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends AbstractCacheBuilder<T> {
 
-    private String broadcastChannel = "JetCacheChannel";
-
     @Override
     public ExternalCacheConfig getConfig() {
         if (config == null) {
@@ -27,16 +25,17 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
         return false;
     }
 
-    public BroadcastManager createBroadcastManager(String channel) {
+    public BroadcastManager createBroadcastManager() {
         return null;
     }
 
-    public String getBroadcastChannel() {
-        return broadcastChannel;
+    public T broadcastChannel(String broadcastChannel) {
+        getConfig().setBroadcastChannel(broadcastChannel);
+        return self();
     }
 
     public void setBroadcastChannel(String broadcastChannel) {
-        this.broadcastChannel = broadcastChannel;
+        getConfig().setBroadcastChannel(broadcastChannel);
     }
 
     public T keyPrefix(String keyPrefix) {

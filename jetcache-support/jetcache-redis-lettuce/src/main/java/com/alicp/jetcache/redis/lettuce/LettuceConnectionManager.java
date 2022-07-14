@@ -8,8 +8,6 @@ import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
-import io.lettuce.core.sentinel.api.StatefulRedisSentinelConnection;
-
 
 import java.util.Collections;
 import java.util.Map;
@@ -78,9 +76,7 @@ public class LettuceConnectionManager {
                 lo.commands = ((StatefulRedisConnection) lo.connection).sync();
             } else if (lo.connection instanceof StatefulRedisClusterConnection) {
                 lo.commands = ((StatefulRedisClusterConnection) lo.connection).sync();
-            } else if (lo.connection instanceof StatefulRedisSentinelConnection) {
-                lo.commands = ((StatefulRedisSentinelConnection) lo.connection).sync();
-            }else {
+            } else {
                 throw new CacheConfigException("type " + lo.connection.getClass() + " is not supported");
             }
         }
@@ -96,8 +92,6 @@ public class LettuceConnectionManager {
                 lo.asyncCommands = ((StatefulRedisConnection) lo.connection).async();
             } else if (lo.connection instanceof StatefulRedisClusterConnection) {
                 lo.asyncCommands = ((StatefulRedisClusterConnection) lo.connection).async();
-            } else if (lo.connection instanceof StatefulRedisSentinelConnection) {
-                lo.asyncCommands = ((StatefulRedisSentinelConnection) lo.connection).async();
             } else {
                 throw new CacheConfigException("type " + lo.connection.getClass() + " is not supported");
             }
@@ -113,8 +107,6 @@ public class LettuceConnectionManager {
                 lo.reactiveCommands = ((StatefulRedisConnection) lo.connection).reactive();
             } else if (lo.connection instanceof StatefulRedisClusterConnection) {
                 lo.reactiveCommands = ((StatefulRedisClusterConnection) lo.connection).reactive();
-            } else if (lo.connection instanceof StatefulRedisSentinelConnection) {
-                lo.reactiveCommands = ((StatefulRedisSentinelConnection) lo.connection).reactive();
             } else {
                 throw new CacheConfigException("type " + lo.connection.getClass() + " is not supported");
             }

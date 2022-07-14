@@ -84,10 +84,9 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
             MultiLevelCache mc = (MultiLevelCache) CacheUtil.getAbstractCache(cache);
             ExternalCacheConfig cacheConfig = (ExternalCacheConfig) mc.caches()[mc.caches().length - 1].config();
-            // builderCopy.setKeyConvertor(cacheConfig.getKeyConvertor());
             builderCopy.setValueEncoder(cacheConfig.getValueEncoder());
             builderCopy.setValueDecoder(cacheConfig.getValueDecoder());
-            BroadcastManager result = builderCopy.createBroadcastManager(builderCopy.getBroadcastChannel());
+            BroadcastManager result = builderCopy.createBroadcastManager();
             result.startSubscribe(new CacheMessageConsumer(sourceId, configProvider.getCacheManager()));
             return result;
         });
