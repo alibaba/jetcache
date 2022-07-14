@@ -1,12 +1,12 @@
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
-import com.alicp.jetcache.embedded.CaffeineCache;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
-import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+import redis.clients.jedis.JedisPool;
 
 import java.util.concurrent.TimeUnit;
 
@@ -21,10 +21,16 @@ public class MultiLevelCacheExample {
                 .limit(100)
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .buildFunc(c -> new CaffeineCache((EmbeddedCacheConfig) c))
                 .buildCache();
+
+        GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
+        pc.setMinIdle(2);
+        pc.setMaxIdle(10);
+        pc.setMaxTotal(10);
+        JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
         Cache<Object, Object> l2Cache = RedisCacheBuilder.createRedisCacheBuilder()
-                .jedisPool(/*replace with your jedis pool*/null)
+                .jedisPool(pool)
+                .keyPrefix("redisKeyPrefix")
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)

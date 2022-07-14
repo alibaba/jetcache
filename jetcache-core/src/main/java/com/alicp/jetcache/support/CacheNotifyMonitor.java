@@ -7,6 +7,7 @@ import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
+import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.event.CacheEvent;
 import com.alicp.jetcache.event.CachePutAllEvent;
 import com.alicp.jetcache.event.CachePutEvent;
@@ -22,8 +23,7 @@ public class CacheNotifyMonitor implements CacheMonitor {
     private final String cacheName;
     private final String sourceId;
 
-    public CacheNotifyMonitor(CacheManager cacheManager, String area,
-                              String cacheName) {
+    public CacheNotifyMonitor(CacheManager cacheManager, String area, String cacheName) {
         this.broadcastManager = cacheManager.getBroadcastManager(area);
         this.area = area;
         this.cacheName = cacheName;
@@ -32,6 +32,10 @@ public class CacheNotifyMonitor implements CacheMonitor {
         } else {
             this.sourceId = null;
         }
+    }
+
+    public CacheNotifyMonitor(CacheManager cacheManager, String cacheName) {
+        this(cacheManager, CacheConsts.DEFAULT_AREA, cacheName);
     }
 
     @Override
