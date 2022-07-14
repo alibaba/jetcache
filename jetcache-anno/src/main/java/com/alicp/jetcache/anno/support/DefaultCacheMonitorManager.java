@@ -14,8 +14,6 @@ import com.alicp.jetcache.support.CacheNotifyMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultMetricsManager;
 import com.alicp.jetcache.support.StatInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -26,8 +24,6 @@ import java.util.function.Consumer;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class DefaultCacheMonitorManager extends AbstractLifecycle implements CacheMonitorManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(DefaultCacheMonitorManager.class);
 
     private DefaultMetricsManager defaultMetricsManager;
 
@@ -69,7 +65,7 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             bm.startSubscribe();
         }
 
-        CacheMonitor monitor = new CacheNotifyMonitor(configProvider.getCacheManager(), area, cacheName, cache);
+        CacheMonitor monitor = new CacheNotifyMonitor(configProvider.getCacheManager(), area, cacheName);
         cache.config().getMonitors().add(monitor);
     }
 
