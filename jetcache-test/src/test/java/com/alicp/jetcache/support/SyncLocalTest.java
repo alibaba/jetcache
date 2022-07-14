@@ -4,6 +4,7 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
 import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
@@ -19,7 +20,6 @@ import redis.clients.jedis.UnifiedJedis;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Random;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -28,43 +28,52 @@ public class SyncLocalTest {
 
     @Test
     public void testJedis() throws Exception {
-        RedisCacheBuilder remoteBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyPrefix(new Random().nextInt() + "")
+        String keyPrefix = SyncLocalTest.class.getName() + "testJedis";
+        RedisCacheBuilder remoteBuilder1 = RedisCacheBuilder.createRedisCacheBuilder()
+                .keyPrefix(keyPrefix)
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
-        Cache remote1 = remoteBuilder.buildCache();
-        Cache remote2 = remoteBuilder.buildCache();
-        BroadcastManager broadcastManager = remoteBuilder.createBroadcastManager();
-        test(remote1, remote2, broadcastManager);
+        RedisCacheBuilder remoteBuilder2 = RedisCacheBuilder.createRedisCacheBuilder()
+                .keyPrefix(keyPrefix)
+                .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
+        Cache remote1 = remoteBuilder1.buildCache();
+        Cache remote2 = remoteBuilder2.buildCache();
+        BroadcastManager bm1 = remoteBuilder1.createBroadcastManager(new SimpleCacheManager());
+        BroadcastManager bm2 = remoteBuilder2.createBroadcastManager(new SimpleCacheManager());
+        test(remote1, remote2, bm1, bm2);
     }
 
     @Test
     public void testLettuce() throws Exception {
-        RedisClient client = RedisClient.create("redis://127.0.0.1");
-        RedisLettuceCacheBuilder remoteBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
-                .redisClient(client)
-                .keyPrefix(new Random().nextInt() + "")
-                .pubSubConnection(client.connectPubSub(new JetCacheCodec()));
-        Cache remote1 = remoteBuilder.buildCache();
-        Cache remote2 = remoteBuilder.buildCache();
-        BroadcastManager broadcastManager = remoteBuilder.createBroadcastManager();
-        test(remote1, remote2, broadcastManager);
+        String keyPrefix = SyncLocalTest.class.getName() + "testLettuce";
+        RedisClient client1 = RedisClient.create("redis://127.0.0.1");
+        RedisClient client2 = RedisClient.create("redis://127.0.0.1");
+        RedisLettuceCacheBuilder remoteBuilder1 = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
+                .redisClient(client1)
+                .keyPrefix(keyPrefix)
+                .pubSubConnection(client1.connectPubSub(new JetCacheCodec()));
+        RedisLettuceCacheBuilder remoteBuilder2 = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
+                .redisClient(client2)
+                .keyPrefix(keyPrefix)
+                .pubSubConnection(client2.connectPubSub(new JetCacheCodec()));
+
+        Cache remote1 = remoteBuilder1.buildCache();
+        Cache remote2 = remoteBuilder2.buildCache();
+        BroadcastManager bm1 = remoteBuilder1.createBroadcastManager(new SimpleCacheManager());
+        BroadcastManager bm2 = remoteBuilder2.createBroadcastManager(new SimpleCacheManager());
+        test(remote1, remote2, bm1, bm2);
     }
 
-    private void test(Cache remote1, Cache remote2, BroadcastManager broadcastManager) throws Exception {
-        SimpleCacheManager cacheManager1 = new SimpleCacheManager();
-        SimpleCacheManager cacheManager2 = new SimpleCacheManager();
+    private void test(Cache remote1, Cache remote2, BroadcastManager bm1, BroadcastManager bm2) throws Exception {
+        CacheManager cacheManager1 = bm1.getCacheManager();
+        CacheManager cacheManager2 = bm2.getCacheManager();
         Cache local1 = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .buildCache();
         Cache local2 = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(100)
                 .buildCache();
-        BroadcastManager.CacheMessageConsumer consumer1 = new BroadcastManager.CacheMessageConsumer("id1", cacheManager1);
-        BroadcastManager.CacheMessageConsumer consumer2 = new BroadcastManager.CacheMessageConsumer("id2", cacheManager2);
-        broadcastManager.startSubscribe(m -> {
-            consumer1.accept(m);
-            consumer2.accept(m);
-        });
+        bm1.startSubscribe();
+        bm2.startSubscribe();
 
         Cache c1 = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
                 .addCache(local1, remote1).buildCache();
@@ -73,8 +82,8 @@ public class SyncLocalTest {
         cacheManager1.putCache("Area", "CacheName", c1);
         cacheManager2.putCache("Area", "CacheName", c2);
 
-        c1.config().getMonitors().add(new CacheNotifyMonitor(broadcastManager, "Area", "CacheName", c1, "id1"));
-        c2.config().getMonitors().add(new CacheNotifyMonitor(broadcastManager, "Area", "CacheName", c2, "id2"));
+        c1.config().getMonitors().add(new CacheNotifyMonitor(bm1, "Area", "CacheName", c1));
+        c2.config().getMonitors().add(new CacheNotifyMonitor(bm2, "Area", "CacheName", c2));
 
         Thread.sleep(50);
 

@@ -26,7 +26,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,9 +55,13 @@ public class ConfigProvider_BroadcastManager_Test extends SpringTestBase {
     }
 
     @Component
-    public static class MyBroadcastManager implements BroadcastManager {
+    public static class MyBroadcastManager extends BroadcastManager {
         int messageType;
         Object[] keys;
+
+        public MyBroadcastManager() {
+            super(null);
+        }
 
         @Override
         public CacheResult publish(CacheMessage cacheMessage) {
@@ -68,7 +71,7 @@ public class ConfigProvider_BroadcastManager_Test extends SpringTestBase {
         }
 
         @Override
-        public void startSubscribe(Consumer<CacheMessage> consumer) {
+        public void startSubscribe() {
         }
     }
 

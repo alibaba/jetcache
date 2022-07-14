@@ -7,7 +7,11 @@ import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
-import com.alicp.jetcache.event.*;
+import com.alicp.jetcache.event.CacheEvent;
+import com.alicp.jetcache.event.CachePutAllEvent;
+import com.alicp.jetcache.event.CachePutEvent;
+import com.alicp.jetcache.event.CacheRemoveAllEvent;
+import com.alicp.jetcache.event.CacheRemoveEvent;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -20,12 +24,12 @@ public class CacheNotifyMonitor implements CacheMonitor {
     private final String sourceId;
 
     public CacheNotifyMonitor(BroadcastManager broadcastManager, String area,
-                              String cacheName, Cache cache, String sourceId) {
+                              String cacheName, Cache cache) {
         this.broadcastManager = broadcastManager;
         this.area = area;
         this.cacheName = cacheName;
         this.cache = cache;
-        this.sourceId = sourceId;
+        this.sourceId = broadcastManager.getSourceId();
     }
 
     @Override

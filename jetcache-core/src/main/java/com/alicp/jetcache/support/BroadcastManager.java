@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,70 +21,77 @@ import java.util.stream.Stream;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public interface BroadcastManager extends AutoCloseable {
-    Logger logger = LoggerFactory.getLogger(BroadcastManager.class);
+public abstract class BroadcastManager implements AutoCloseable {
+    private static Logger logger = LoggerFactory.getLogger(BroadcastManager.class);
 
-    CacheResult publish(CacheMessage cacheMessage);
+    private final String sourceId = UUID.randomUUID().toString();
+    private final CacheManager cacheManager;
 
-    void startSubscribe(Consumer<CacheMessage> consumer);
-
-    @Override
-    default void close() throws Exception {
+    public BroadcastManager(CacheManager cacheManager) {
+        this.cacheManager = cacheManager;
     }
 
-    default CacheMessage convert(byte[] message, Function<byte[], Object> decoder) {
+    public abstract CacheResult publish(CacheMessage cacheMessage);
+
+    public abstract void startSubscribe();
+
+    @Override
+    public void close() throws Exception {
+    }
+
+    public String getSourceId() {
+        return sourceId;
+    }
+
+    public CacheManager getCacheManager() {
+        return cacheManager;
+    }
+
+    protected void processNotification(byte[] message, Function<byte[], Object> decoder) {
         try {
             if (message == null) {
-                return null;
+                logger.error("notify message is null");
+                return;
             }
             Object value = decoder.apply(message);
+            if (value == null) {
+                logger.error("notify message is null");
+                return;
+            }
             if (value instanceof CacheMessage) {
-                return (CacheMessage) value;
+                processCacheMessage((CacheMessage) value);
             } else {
                 logger.error("the message is not instance of CacheMessage, class={}", value.getClass());
-                return null;
             }
         } catch (Throwable e) {
             SquashedLogger.getLogger(logger).error("receive cache notify error", e);
-            return null;
         }
     }
 
-    /**
-     * @author <a href="mailto:areyouok@gmail.com">huangli</a>
-     */
-    class CacheMessageConsumer implements Consumer<CacheMessage> {
-        private final String sourceId;
-        private final CacheManager cacheManager;
-
-        public CacheMessageConsumer(String sourceId, CacheManager cacheManager) {
-            this.sourceId = sourceId;
-            this.cacheManager = cacheManager;
+    private void processCacheMessage(CacheMessage cacheMessage) {
+        if (sourceId.equals(cacheMessage.getSourceId())) {
+            return;
         }
-
-        @Override
-        public void accept(CacheMessage cacheMessage) {
-            if (cacheMessage == null) {
-                return;
-            }
-            if (sourceId.equals(cacheMessage.getSourceId())) {
-                return;
-            }
-            Cache cache = cacheManager.getCache(cacheMessage.getArea(), cacheMessage.getCacheName());
-            Cache absCache = CacheUtil.getAbstractCache(cache);
-            if (!(absCache instanceof MultiLevelCache)) {
-                return;
-            }
-            Cache[] caches = ((MultiLevelCache) absCache).caches();
-            Set<Object> keys = Stream.of(cacheMessage.getKeys()).collect(Collectors.toSet());
-            for (Cache c : caches) {
-                Cache localCache = CacheUtil.getAbstractCache(c);
-                if (localCache instanceof AbstractEmbeddedCache) {
-                    localCache.REMOVE_ALL(keys);
-                } else {
-                    break;
-                }
+        Cache cache = cacheManager.getCache(cacheMessage.getArea(), cacheMessage.getCacheName());
+        if (cache == null) {
+            logger.warn("Cache instance not exists: {},{}", cacheMessage.getArea(), cacheMessage.getCacheName());
+            return;
+        }
+        Cache absCache = CacheUtil.getAbstractCache(cache);
+        if (!(absCache instanceof MultiLevelCache)) {
+            logger.warn("Cache instance is not MultiLevelCache: {},{}", cacheMessage.getArea(), cacheMessage.getCacheName());
+            return;
+        }
+        Cache[] caches = ((MultiLevelCache) absCache).caches();
+        Set<Object> keys = Stream.of(cacheMessage.getKeys()).collect(Collectors.toSet());
+        for (Cache c : caches) {
+            Cache localCache = CacheUtil.getAbstractCache(c);
+            if (localCache instanceof AbstractEmbeddedCache) {
+                localCache.REMOVE_ALL(keys);
+            } else {
+                break;
             }
         }
     }
+
 }

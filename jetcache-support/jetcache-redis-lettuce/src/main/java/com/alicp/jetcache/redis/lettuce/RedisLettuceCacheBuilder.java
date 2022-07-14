@@ -1,5 +1,6 @@
 package com.alicp.jetcache.redis.lettuce;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
 import io.lettuce.core.AbstractRedisClient;
@@ -37,12 +38,12 @@ public class RedisLettuceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
     }
 
     @Override
-    public BroadcastManager createBroadcastManager() {
+    public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
         if (getConfig().getPubSubConnection() == null) {
             return null;
         }
         RedisLettuceCacheConfig c = (RedisLettuceCacheConfig) getConfig().clone();
-        return new LettuceBroadcastManager(c);
+        return new LettuceBroadcastManager(cacheManager, c);
     }
 
     public T redisClient(AbstractRedisClient redisClient){

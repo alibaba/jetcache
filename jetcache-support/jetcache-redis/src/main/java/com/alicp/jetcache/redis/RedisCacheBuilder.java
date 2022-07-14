@@ -1,6 +1,7 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
 import redis.clients.jedis.Jedis;
@@ -38,9 +39,9 @@ public class RedisCacheBuilder<T extends ExternalCacheBuilder<T>> extends Extern
     }
 
     @Override
-    public BroadcastManager createBroadcastManager() {
+    public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
         CacheConfig c = getConfig().clone();
-        return new RedisBroadcastManager((RedisCacheConfig) c);
+        return new RedisBroadcastManager(cacheManager, (RedisCacheConfig) c);
     }
 
     public T jedisPool(Pool<Jedis> pool) {

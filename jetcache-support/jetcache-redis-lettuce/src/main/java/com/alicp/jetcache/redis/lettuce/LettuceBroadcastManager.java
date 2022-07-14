@@ -4,6 +4,7 @@
 package com.alicp.jetcache.redis.lettuce;
 
 import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.ResultData;
@@ -19,23 +20,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class LettuceBroadcastManager extends RedisPubSubAdapter<byte[], byte[]> implements BroadcastManager {
+public class LettuceBroadcastManager extends BroadcastManager {
     private static final Logger logger = LoggerFactory.getLogger(LettuceBroadcastManager.class);
 
     private final RedisLettuceCacheConfig<Object, Object> config;
     private final byte[] channel;
 
-    private volatile Consumer<CacheMessage> consumer;
     private volatile boolean subscribeThreadStart;
+    private volatile RedisPubSubAdapter<byte[], byte[]> pubSubAdapter;
 
     private final LettuceConnectionManager lettuceConnectionManager;
     private final BaseRedisAsyncCommands<byte[], byte[]> stringAsyncCommands;
 
-    public LettuceBroadcastManager(RedisLettuceCacheConfig<Object, Object> config) {
+
+    public LettuceBroadcastManager(CacheManager cacheManager, RedisLettuceCacheConfig<Object, Object> config) {
+        super(cacheManager);
         if (config.getBroadcastChannel() == null) {
             throw new CacheConfigException("BroadcastChannel not set");
         }
@@ -78,26 +80,25 @@ public class LettuceBroadcastManager extends RedisPubSubAdapter<byte[], byte[]> 
     }
 
     @Override
-    public synchronized void startSubscribe(Consumer<CacheMessage> consumer) {
+    public synchronized void startSubscribe() {
         if (subscribeThreadStart) {
             throw new IllegalStateException("startSubscribe has invoked");
         }
-        this.consumer = consumer;
-
-        config.getPubSubConnection().addListener(this);
+        this.pubSubAdapter = new RedisPubSubAdapter<byte[], byte[]>() {
+            @Override
+            public void message(byte[] channel, byte[] message) {
+                processNotification(message, config.getValueDecoder());
+            }
+        };
+        config.getPubSubConnection().addListener(this.pubSubAdapter);
         RedisPubSubAsyncCommands<byte[], byte[]> asyncCommands = config.getPubSubConnection().async();
         asyncCommands.subscribe(channel);
         this.subscribeThreadStart = true;
     }
 
     @Override
-    public void message(byte[] channel, byte[] message) {
-        consumer.accept(convert(message, config.getValueDecoder()));
-    }
-
-    @Override
     public void close() {
-        config.getPubSubConnection().removeListener(this);
+        config.getPubSubConnection().removeListener(this.pubSubAdapter);
         config.getPubSubConnection().close();
     }
 }
