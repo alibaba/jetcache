@@ -9,6 +9,7 @@ jetcache:
       keyConvertor: fastjson
       limit: 200
       defaultExpireInMillis: 10000
+      broadcastChannel: projectA
     A1:
       type: linkedhashmap
       keyConvertor: fastjson

@@ -19,6 +19,7 @@ jetcache:
     default:
       type: redis.springdata
       keyConvertor: fastjson
+      broadcastChannel: projectA
       defaultExpireInMillis: 10000
       keyPrefix: spring-data-redis
     A1:

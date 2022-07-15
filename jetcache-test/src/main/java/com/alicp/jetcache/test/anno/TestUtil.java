@@ -37,12 +37,14 @@ public class TestUtil {
         remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
+        remoteBuilder.setBroadcastChannel("mockBroadcastChannel");
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
         remoteBuilder = new MockRemoteCacheBuilder();
         remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
+        remoteBuilder.setBroadcastChannel("mockBroadcastChannel_A1");
         remoteBuilders.put("A1", remoteBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
@@ -69,7 +71,7 @@ public class TestUtil {
     }
 
     public static void waitUtil(Object expectValue, Supplier<? extends Object> actual) {
-        waitUtil(expectValue, actual, 1000);
+        waitUtil(expectValue, actual, 5000);
     }
 
     public static void waitUtil(Object expectValue, Supplier<? extends Object> actual, long timeoutMillis) {

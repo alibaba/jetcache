@@ -41,6 +41,7 @@ public class LocalCacheSyncExample {
         CacheManager cacheManager = CacheManager.defaultManager();
         BroadcastManager broadcastManager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(pool)
+                .broadcastChannel("projectA")
                 .createBroadcastManager(cacheManager);
         broadcastManager.startSubscribe();
         cacheManager.putBroadcastManager(broadcastManager);

@@ -23,6 +23,7 @@ jetcache:
       valueDecoder: bean:myDecoder
       defaultExpireInMillis: 10000
       keyPrefix: mockprefix
+      broadcastChannel: projectA
     A1:
       type: mock
       keyConvertor: fastjson

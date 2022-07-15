@@ -50,7 +50,8 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             return;
         }
         final ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) globalCacheConfig.getRemoteCacheBuilders().get(area);
-        if (cacheBuilder == null || !cacheBuilder.supportBroadcast()) {
+        if (cacheBuilder == null || !cacheBuilder.supportBroadcast()
+                || cacheBuilder.getConfig().getBroadcastChannel() == null) {
             return;
         }
 
@@ -62,7 +63,12 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             builderCopy.setValueEncoder(cacheConfig.getValueEncoder());
             builderCopy.setValueDecoder(cacheConfig.getValueDecoder());
             bm = builderCopy.createBroadcastManager(configProvider.getCacheManager());
-            bm.startSubscribe();
+            if (bm != null) {
+                bm.startSubscribe();
+            }
+        }
+        if (bm == null) {
+            return;
         }
 
         CacheMonitor monitor = new CacheNotifyMonitor(configProvider.getCacheManager(), area, cacheName);

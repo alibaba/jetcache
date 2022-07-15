@@ -31,9 +31,11 @@ public class SyncLocalTest {
         String keyPrefix = SyncLocalTest.class.getName() + "testJedis";
         RedisCacheBuilder remoteBuilder1 = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix)
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
         RedisCacheBuilder remoteBuilder2 = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix)
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)));
         Cache remote1 = remoteBuilder1.buildCache();
         Cache remote2 = remoteBuilder2.buildCache();
@@ -50,10 +52,12 @@ public class SyncLocalTest {
         RedisLettuceCacheBuilder remoteBuilder1 = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client1)
                 .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix)
                 .pubSubConnection(client1.connectPubSub(new JetCacheCodec()));
         RedisLettuceCacheBuilder remoteBuilder2 = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client2)
                 .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix)
                 .pubSubConnection(client2.connectPubSub(new JetCacheCodec()));
 
         Cache remote1 = remoteBuilder1.buildCache();
