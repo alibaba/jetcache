@@ -1,4 +1,3 @@
-[English](RedisWithJedis)
 
 redis有多种java版本的客户端，JetCache2.2以前使用jedis客户端访问redis。从JetCache2.2版本开始，增加了对luttece客户端的支持，jetcache的luttece支持提供了异步操作和redis集群支持。
 

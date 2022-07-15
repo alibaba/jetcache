@@ -1,7 +1,5 @@
-[中文版](AdvancedCacheAPI_CN)
-
 # CacheBuilder
-The ```CacheBuilder``` provide a way to construct ```Cache``` instance use your own code, See [Here](Builder).
+The ```CacheBuilder``` provide a way to construct ```Cache``` instance use your own code, See [Here](Builder.md).
 ```CacheBuilder``` are useful if you work without Spring, otherwise you may not use it directly.
 
 # asynchronous API

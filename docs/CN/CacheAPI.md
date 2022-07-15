@@ -1,4 +1,3 @@
-[English](CacheAPI)
 
 # 简介
 JetCache2.0的核心是```com.alicp.jetcache.Cache```接口（以下简写为```Cache```），它提供了部分类似于```javax.cache.Cache```（JSR107）的API操作。没有完整实现JSR107的原因包括：

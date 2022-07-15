@@ -1,4 +1,3 @@
-[中文版](CacheAPI_CN)
 
 # Introduce
 The core concept of JetCache is the ```com.alicp.jetcache.Cache```(hereinafter called  ```Cache```) interface, it provides some API similar like ```javax.cache.Cache``` in JSR107. 

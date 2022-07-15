@@ -1,7 +1,6 @@
-[English](AdvancedCacheAPI)
 
 # CacheBuilder
-CacheBuilder提供使用代码直接构造Cache实例的方式，使用说明看[这里](Builder_CN)。如果没有使用Spring，可以使用CacheBuilder，否则没有必要直接使用CacheBuilder。
+CacheBuilder提供使用代码直接构造Cache实例的方式，使用说明看[这里](Builder.md)。如果没有使用Spring，可以使用CacheBuilder，否则没有必要直接使用CacheBuilder。
 # 异步API
 从JetCache2.2版本开始，所有的大写API返回的CacheResult都支持异步。当底层的缓存实现支持异步的时候，大写API返回的结果都是异步的。当前支持异步的实现只有jetcache的redis-luttece实现，其他的缓存实现（内存中的、Tair、Jedis等），所有的异步接口都会同步堵塞，这样API仍然是兼容的。
 

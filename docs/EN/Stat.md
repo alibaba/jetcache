@@ -1,4 +1,3 @@
-[中文版](Stat_CN)
 
 A statistic monitor has installed for the ```Cache``` instance created by ```@CreateCache``` and ```@Cached``` when 
 *jetcache.statIntervalMinutes* is greater than 0. The statistic data will be printed like below:
@@ -71,7 +70,6 @@ return new StatInfoLogger(false);
 There are more verbose information if the parameter of the constructor set to *true*.
 
 With logback, you can use below configuration to output logs to a separate file:
-如果想要让jetcache的日志输出到独立的文件中，在使用logback的情况下可以这样配置：
 ```xml
 <appender name="JETCACHE_LOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>jetcache.log</file>

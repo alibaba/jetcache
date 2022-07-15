@@ -1,4 +1,3 @@
-[English](MethodCache)
 
 JetCache方法缓存和SpringCache比较类似，它原生提供了TTL支持，以保证最终一致，并且支持二级缓存。JetCache2.4以后支持基于注解的缓存更新和删除。
 
@@ -76,5 +75,5 @@ key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framewo
 当前版本实现的是单JVM内的保护，即同一个JVM中同一个key只有一个线程去加载，其它线程等待结果。
 
 
-对于以上未定义默认值的参数，如果没有指定，将使用yml中指定的全局配置，全局配置请参考[配置说明](Config_CN)。
+对于以上未定义默认值的参数，如果没有指定，将使用yml中指定的全局配置，全局配置请参考[配置说明](Config.md)。
 

@@ -1,6 +1,5 @@
-[English](Home)
 
-[[/images/logo_jetcache.png|JetCache logo]]
+![JetCache logo](../images/logo_jetcache.png)
 
 ## 简介
 JetCache是一个基于Java的缓存系统封装，提供统一的API和注解来简化缓存的使用。
@@ -21,21 +20,22 @@ JetCache提供了比SpringCache更加强大的注解，可以原生的支持TTL�
 JetCache需要JDK1.8、Spring Framework4.0.8以上版本。Spring Boot为可选，需要1.1.9以上版本。如果不使用注解（仅使用jetcache-core），Spring Framework也是可选的，此时使用方式与Guava/Caffeine cache类似。
 
 ## 文档目录
-* [快速入门](GettingStarted_CN)
-* [基本Cache API](CacheAPI_CN)
-* [通过@CreateCache注解创建```Cache```实例](CreateCache_CN)
-* [通过注解实现方法缓存](MethodCache_CN)
-* [配置详解](Config_CN)
-* [高级Cache API](AdvancedCacheAPI_CN)
-* Redis支持(两种redis客户端二选一即可)
-  * [使用jedis客户端连接redis](RedisWithJedis_CN)
-  * [使用lettuce客户端连接redis](RedisWithLettuce_CN)
-* [内存缓存```LinkedHashMapCache```和```CaffeineCache```](Embedded_CN)
-* [统计](Stat_CN)
-* [Builder](Builder_CN)：未使用Spring4（或未使用Spring）的时候，或通过Builder手工构造```Cache```
-* [开发者文档](DevNote_CN)
-* [升级和兼容性指南](Compatibility_CN)
-* [FAQ](FAQ_CN)
+* [快速入门](GettingStarted.md)
+* [基本Cache API](CacheAPI.md)
+* [通过@CreateCache注解创建```Cache```实例](CreateCache.md)
+* [通过注解实现方法缓存](MethodCache.md)
+* [配置详解](Config.md)
+* [高级Cache API](AdvancedCacheAPI.md)
+* Redis支持(redis客户端任选一即可)
+  * [使用jedis客户端连接redis](RedisWithJedis.md)
+  * [使用lettuce客户端连接redis](RedisWithLettuce.md)
+  * Spring data redis (文档待写)
+* [内存缓存```LinkedHashMapCache```和```CaffeineCache```](Embedded.md)
+* [统计](Stat.md)
+* [Builder](Builder.md)：未使用Spring4（或未使用Spring）的时候，或通过Builder手工构造```Cache```
+* [开发者文档](DevNote.md)
+* [升级和兼容性指南](Compatibility.md)
+* [FAQ](FAQ.md)
 
 ## 依赖哪个jar？
 * jetcache-anno-api：定义jetcache的注解和常量，不传递依赖。如果你想把Cached注解加到接口上，又不希望你的接口jar传递太多依赖，可以让接口jar依赖jetcache-anno-api。

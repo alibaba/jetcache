@@ -1,5 +1,3 @@
-[中文版](Builder_CN)
-
 Annotations such as ```@Cached``` and ```@CreateCache``` are based on Spring Framework 4.0 or above.
 You can use JetCache API to create, manage, monitor ```Cache``` instance.
 
