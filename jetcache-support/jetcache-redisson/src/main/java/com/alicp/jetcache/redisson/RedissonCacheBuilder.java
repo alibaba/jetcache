@@ -1,6 +1,8 @@
 package com.alicp.jetcache.redisson;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.support.BroadcastManager;
 import org.redisson.api.RedissonClient;
 
 /**
@@ -35,5 +37,16 @@ public class RedissonCacheBuilder<T extends ExternalCacheBuilder<T>> extends Ext
     public T redissonClient(final RedissonClient client) {
         this.getConfig().setRedissonClient(client);
         return self();
+    }
+
+    @Override
+    public boolean supportBroadcast() {
+        return true;
+    }
+
+    @Override
+    public BroadcastManager createBroadcastManager(final CacheManager cacheManager) {
+        final RedissonCacheConfig<?, ?> c = (RedissonCacheConfig<?, ?>) this.getConfig().clone();
+        return new RedissonBroadcastManager(cacheManager, c);
     }
 }
