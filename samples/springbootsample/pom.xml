@@ -7,6 +7,9 @@
     <groupId>com.alicp.jetcache.samples</groupId>
     <artifactId>spring-boot-sample</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <properties>
+        <jetcache.version>2.7.0-SNAPSHOT</jetcache.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -25,7 +28,7 @@
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-starter-redis</artifactId>
-            <version>2.6.5</version>
+            <version>${jetcache.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>

@@ -1,6 +1,7 @@
 package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
@@ -12,14 +13,13 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.UnifiedJedis;
 
 import java.nio.charset.StandardCharsets;
-import java.util.function.Consumer;
 
 /**
  * Created on 2022-05-03
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class RedisBroadcastManager implements BroadcastManager {
+public class RedisBroadcastManager extends BroadcastManager {
 
     private static final Logger logger = LoggerFactory.getLogger(RedisBroadcastManager.class);
 
@@ -27,15 +27,18 @@ public class RedisBroadcastManager implements BroadcastManager {
     private final String channelStr;
     private final RedisCacheConfig<Object, Object> config;
 
-    private volatile Consumer<CacheMessage> consumer;
     private volatile CacheMessagePubSub cacheMessagePubSub;
     private volatile boolean closed;
     private volatile boolean subscribe;
     private boolean subscribeThreadStart;
 
-    public RedisBroadcastManager(String channel, RedisCacheConfig<Object, Object> config) {
-        this.channelStr = channel;
-        this.channel = channel.getBytes(StandardCharsets.UTF_8);
+    public RedisBroadcastManager(CacheManager cacheManager, RedisCacheConfig<Object, Object> config) {
+        super(cacheManager);
+        this.channelStr = config.getBroadcastChannel();
+        if (this.channelStr == null) {
+            throw new CacheConfigException("broadcastChannel not set");
+        }
+        this.channel = channelStr.getBytes(StandardCharsets.UTF_8);
         this.config = config;
 
         if (config.getJedis() == null && config.getJedisPool() == null) {
@@ -54,14 +57,13 @@ public class RedisBroadcastManager implements BroadcastManager {
     }
 
     @Override
-    public synchronized void startSubscribe(Consumer<CacheMessage> consumer) {
+    public synchronized void startSubscribe() {
         if (subscribeThreadStart) {
             throw new IllegalStateException("subscribe thread is started");
         }
-        this.consumer = consumer;
         this.cacheMessagePubSub = new CacheMessagePubSub();
         Thread subThread;
-        subThread = new Thread(this::runSubThread, "Sub_" + channel);
+        subThread = new Thread(this::runSubThread, "Sub_" + channelStr);
         subThread.setDaemon(true);
         subThread.start();
         this.subscribeThreadStart = true;
@@ -141,19 +143,7 @@ public class RedisBroadcastManager implements BroadcastManager {
 
         @Override
         public void onMessage(byte[] channel, byte[] message) {
-            try {
-                if (message == null) {
-                    return;
-                }
-                Object value = config.getValueDecoder().apply(message);
-                if (value instanceof CacheMessage) {
-                    consumer.accept((CacheMessage) value);
-                } else {
-                    logger.error("{} the message is not instance of CacheMessage, class={}", channelStr, value.getClass());
-                }
-            } catch (Throwable e) {
-                SquashedLogger.getLogger(logger).error("receive cache notify error", e);
-            }
+            processNotification(message, config.getValueDecoder());
         }
     }
 }

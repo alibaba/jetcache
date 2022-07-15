@@ -1,7 +1,6 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class ConfigProvider extends AbstractLifecycle {
     protected KeyConvertorParser keyConvertorParser;
     protected CacheMonitorManager cacheMonitorManager;
     private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
-    private BroadcastManager broadcastManager;
 
     private final CacheMonitorManager defaultCacheMonitorManager = new DefaultCacheMonitorManager();
 
@@ -53,9 +51,6 @@ public class ConfigProvider extends AbstractLifecycle {
             cacheMonitorManager.setGlobalCacheConfig(globalCacheConfig);
             cacheMonitorManager.setMetricsCallback(metricsCallback);
             cacheMonitorManager.setConfigProvider(this);
-            if (broadcastManager != null) {
-                cacheMonitorManager.setBroadcastManager(broadcastManager);
-            }
             cacheMonitorManager.init();
         }
     }
@@ -73,7 +68,7 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager instanceof AbstractLifecycle) {
+        if (cacheMonitorManager == defaultCacheMonitorManager) {
             ((AbstractLifecycle) cacheMonitorManager).shutdown();
         }
     }
@@ -150,7 +145,4 @@ public class ConfigProvider extends AbstractLifecycle {
         this.metricsCallback = metricsCallback;
     }
 
-    public void setBroadcastManager(BroadcastManager broadcastManager) {
-        this.broadcastManager = broadcastManager;
-    }
 }

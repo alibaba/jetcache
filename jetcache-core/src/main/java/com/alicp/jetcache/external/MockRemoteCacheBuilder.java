@@ -1,10 +1,9 @@
 package com.alicp.jetcache.external;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
-
-import java.util.function.Consumer;
 
 /**
  * Created on 2016/10/20.
@@ -34,15 +33,15 @@ public class MockRemoteCacheBuilder<T extends ExternalCacheBuilder<T>> extends E
     }
 
     @Override
-    public BroadcastManager createBroadcastManager(String channel) {
-        return new BroadcastManager() {
+    public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
+        return new BroadcastManager(cacheManager) {
             @Override
             public CacheResult publish(CacheMessage cacheMessage) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             }
 
             @Override
-            public void startSubscribe(Consumer<CacheMessage> consumer) {
+            public void startSubscribe() {
             }
         };
     }

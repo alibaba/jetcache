@@ -1,6 +1,7 @@
 package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.AbstractCacheBuilder;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.support.BroadcastManager;
 
 import java.util.function.Function;
@@ -12,8 +13,6 @@ import java.util.function.Supplier;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> extends AbstractCacheBuilder<T> {
-
-    private String broadcastChannel = "JetCacheChannel";
 
     @Override
     public ExternalCacheConfig getConfig() {
@@ -27,16 +26,17 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
         return false;
     }
 
-    public BroadcastManager createBroadcastManager(String channel) {
+    public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
         return null;
     }
 
-    public String getBroadcastChannel() {
-        return broadcastChannel;
+    public T broadcastChannel(String broadcastChannel) {
+        getConfig().setBroadcastChannel(broadcastChannel);
+        return self();
     }
 
     public void setBroadcastChannel(String broadcastChannel) {
-        this.broadcastChannel = broadcastChannel;
+        getConfig().setBroadcastChannel(broadcastChannel);
     }
 
     public T keyPrefix(String keyPrefix) {

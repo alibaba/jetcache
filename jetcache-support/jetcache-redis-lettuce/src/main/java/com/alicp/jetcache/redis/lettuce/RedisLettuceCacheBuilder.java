@@ -1,8 +1,11 @@
 package com.alicp.jetcache.redis.lettuce;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.support.BroadcastManager;
 import io.lettuce.core.AbstractRedisClient;
 import io.lettuce.core.api.StatefulConnection;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 /**
  * Created on 2017/4/28.
@@ -29,6 +32,20 @@ public class RedisLettuceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
         return (RedisLettuceCacheConfig) config;
     }
 
+    @Override
+    public boolean supportBroadcast() {
+        return true;
+    }
+
+    @Override
+    public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
+        if (getConfig().getPubSubConnection() == null) {
+            return null;
+        }
+        RedisLettuceCacheConfig c = (RedisLettuceCacheConfig) getConfig().clone();
+        return new LettuceBroadcastManager(cacheManager, c);
+    }
+
     public T redisClient(AbstractRedisClient redisClient){
         getConfig().setRedisClient(redisClient);
         return self();
@@ -45,6 +62,24 @@ public class RedisLettuceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
 
     public void setConnection(StatefulConnection connection) {
         getConfig().setConnection(connection);
+    }
+
+    public T pubSubConnection(StatefulRedisPubSubConnection pubSubConnection) {
+        getConfig().setPubSubConnection(pubSubConnection);
+        return self();
+    }
+
+    public void setPubSubConnection(StatefulRedisPubSubConnection pubSubConnection) {
+        getConfig().setPubSubConnection(pubSubConnection);
+    }
+
+    public T connectionManager(LettuceConnectionManager connectionManager) {
+        getConfig().setConnectionManager(connectionManager);
+        return self();
+    }
+
+    public void setConnectionManager(LettuceConnectionManager connectionManager) {
+        getConfig().setConnectionManager(connectionManager);
     }
 
     public T asyncResultTimeoutInMillis(long asyncResultTimeoutInMillis) {
