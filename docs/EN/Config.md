@@ -1,4 +1,3 @@
-[中文版](Config_CN)
 
 Here is an example of yml config file in Spring Boot:
 ```

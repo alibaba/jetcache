@@ -1,4 +1,3 @@
-[中文版](CreateCache_CN)
 
 # Introduce
 
@@ -24,4 +23,4 @@ private Cache<Long, UserDO> userCache;
 
 # Default values
 There are some attributes in the above table has no default value. JetCache will use global config value when you not specify the value in annotation.
-See [Configuration details](Config) for more information about global config.
+See [Configuration details](Config.md) for more information about global config.

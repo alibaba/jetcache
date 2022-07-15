@@ -1,4 +1,3 @@
-[English](Stat)
 
 当yml中的jetcache.statIntervalMinutes大于0时，通过@CreateCache和@Cached配置出来的Cache自带监控。JetCache会按指定的时间定期通过logger输出统计信息。默认输出信息类似如下：
 ```

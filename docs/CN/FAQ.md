@@ -27,10 +27,10 @@ pom中的指定方式：
 如果你在IDE中运行程序，光在pom中指定还不够。
 
 在IntelliJ IDEA中设置：
-[[/images/faq_1.png|Set javac -parameters in IntelliJ IDEA]]
+![Set javac -parameters in IntelliJ IDEA](../images/faq_1.png)
 
 在Eclipse中设置：
-[[/images/faq_2.png|Set javac -parameters in Eclipse]]
+![Set javac -parameters in Eclipse](../images/faq_2.png)
 
 ## 如何定制自己的序列化器
 在Cached和CreateCache上的serialPolicy可以指向一个Spring Bean。

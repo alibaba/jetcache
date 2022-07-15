@@ -1,4 +1,3 @@
-[中文版](RedisWithLettuce_CN)
 
 There are various client libraries for redis. JetCache support *jedis* and *lettuce*. 
 In JetCache, the lettuce client brings asynchronous access and cluster support. 

@@ -31,7 +31,7 @@ Cache接口是核心接口，它提供统一的缓存操作API，可以查看类
 * RefreshCache：基于Decorator模式，提供自动刷新功能
 * MultiLevelCache：多级缓存，注解方式配置只支持了两级，实际上这个类支持N级
 
-[[/images/cache_classes.png|JetCache Cache classes]]
+![JetCache Cache classes](../images/cache_classes.png)
 
 jetcache-anno提供了注解支持，顺着这两个注解类看就可以了：
 * EnableCreateCacheAnnotation

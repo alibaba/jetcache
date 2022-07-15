@@ -1,6 +1,5 @@
-[中文版](Home_CN)
 
-[[/images/logo_jetcache.png|JetCache logo]]
+![JetCache logo](../images/logo_jetcache.png)
 
 ## Introduce
 JetCache is a Java cache abstraction which provides consistent use for various caching solutions. 
@@ -23,19 +22,20 @@ Full features of JetCache:
 * Spring Boot1.1.9+ (optional)
 
 ## Documents
-* [Getting Started](GettingStarted)
-* [Basic Cache API](CacheAPI)
-* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache)
-* [Enable method caching using annotation](MethodCache)
-* [Configuration details](Config)
-* [Advanced Cache API](AdvancedCacheAPI)
+* [Getting Started](GettingStarted.md)
+* [Basic Cache API](CacheAPI.md)
+* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache.md)
+* [Enable method caching using annotation](MethodCache.md)
+* [Configuration details](Config.md)
+* [Advanced Cache API](AdvancedCacheAPI.md)
 * Redis support (using either of bellows)
-  * [Using jedis client](RedisWithJedis)
-  * [Using lettuce client](RedisWithLettuce)
-* [In-memory ```Cache``` implements: LinkedHashMapCache and CaffeineCache](Embedded)
-* [Statistics](Stat)
-* [Builder API](Builder): If you do not use Spring Framework or want to construct ```Cache``` instance by hand coding
-* [Compatibility notes](Compatibility) 
+  * [Using jedis client](RedisWithJedis.md)
+  * [Using lettuce client](RedisWithLettuce.md)
+  * Spring data redis (document needed)
+* [In-memory ```Cache``` implements: LinkedHashMapCache and CaffeineCache](Embedded.md)
+* [Statistics](Stat.md)
+* [Builder API](Builder.md): If you do not use Spring Framework or want to construct ```Cache``` instance by hand coding
+* [Compatibility notes](Compatibility.md) 
 
 ## which artifact should I use?
 * jetcache-anno-api: define annotation and constants, no transitive dependencies. If you want to add JetCache annotation to your API artifact without introduce a lot of dependencies, you use jetcache-anno-api. 

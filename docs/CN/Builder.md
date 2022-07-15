@@ -1,4 +1,3 @@
-[English](Builder)
 
 JetCache2版本的@Cached和@CreateCache等注解都是基于Spring4.X版本实现的，在没有Spring支持的情况下，注解将不能使用。但是可以直接使用JetCache的API来创建、管理、监控Cache，多级缓存也可以使用。
 
@@ -59,7 +58,7 @@ DefaultCacheMonitorManager cacheMonitorManager = new DefaultCacheMonitorManager(
 cacheMonitorManager.add(orderCacheMonitor);
 cacheMonitorManager.start();
 ```
-首先创建一个CacheMonitor，每个DefaultCacheMonitor只能用于一个Cache。当DefaultCacheMonitorManager启动以后，会使用slf4j按指定的时间定期输出统计信息到日志中（简版输出格式参见[统计](Stat_CN)），DefaultCacheMonitor构造时指定的名字会作为输出时cache的名字。
+首先创建一个CacheMonitor，每个DefaultCacheMonitor只能用于一个Cache。当DefaultCacheMonitorManager启动以后，会使用slf4j按指定的时间定期输出统计信息到日志中（简版输出格式参见[统计](Stat.md)），DefaultCacheMonitor构造时指定的名字会作为输出时cache的名字。
 
 在组装多级缓存的过程中，可以给每个缓存安装一个Monitor，这样可以监控每一级的命中情况。
 

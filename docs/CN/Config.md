@@ -1,5 +1,3 @@
-[English](Config)
-
 # 配置说明
 yml配置文件案例（如果没使用springboot，直接配置GlobalCacheConfig是类似的，参考快速入门教程）：
 ```

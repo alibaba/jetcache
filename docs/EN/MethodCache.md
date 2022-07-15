@@ -1,4 +1,3 @@
-[中文版](MethodCache_CN)
 
 The method caching in JetCache is similar like Spring Cache. JetCache provide naitve TTL support and two level cache support. 
 
@@ -73,4 +72,4 @@ Currently it only take effect only in each single JVM, that is, in one JVM there
 other threads wait for the result. 
 
 There are some attributes in the above table has no default value. JetCache will use global config when you not specify the value in annotation.
-See [Configuration details](Config) for more information about global config.
+See [Configuration details](Config.md) for more information about global config.

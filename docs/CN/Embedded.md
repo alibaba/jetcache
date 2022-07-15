@@ -1,4 +1,3 @@
-[English](Embedded)
 
 本地缓存当前有两个实现。如果自己用jetcache-core的Cache API，可以不指定keyConvertor，此时本地缓存使用equals方法来比较key。
 如果使用jetcache-anno中的@Cached、@CreateCache等注解，必须指定keyConvertor。

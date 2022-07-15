@@ -1,4 +1,3 @@
-[中文版](Embedded_CN)
 
 The *keyConvertor* is optional if you are using Cache API in jetcache-core,
 the local cache uses ```equals``` to identity the key. 

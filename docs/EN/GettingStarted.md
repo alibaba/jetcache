@@ -1,4 +1,3 @@
-[中文版](GettingStarted_CN)
 
 # Create Cache instance
 Create a ```Cache``` instance using @CreateCache annotation with default TTL 100 seconds.
@@ -34,7 +33,7 @@ public interface UserService {
 ```
 
 # Basic configuration (using Spring Boot)
-This example using jedis to accessing redis(or you can consider using [lettuce](RedisWithLettuce) client for more capabilities): 
+This example using jedis to accessing redis(or you can consider using [lettuce](RedisWithLettuce.md) client): 
 # POM
 ```xml
 <dependency>
@@ -176,7 +175,7 @@ public class JetCacheConfig {
 ```
 
 # read more
-* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache)
-* [Basic Cache API](CacheAPI)
-* [Method cache using annotation(@Cached, @CacheUpdate, @CacheInvalidate)](MethodCache)
-* [Configuration details](Config)
+* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache.md)
+* [Basic Cache API](CacheAPI.md)
+* [Method cache using annotation(@Cached, @CacheUpdate, @CacheInvalidate)](MethodCache.md)
+* [Configuration details](Config.md)

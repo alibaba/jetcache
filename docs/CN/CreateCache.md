@@ -1,4 +1,3 @@
-[English](CreateCache)
 
 # 简介
 
@@ -23,4 +22,4 @@ private Cache<Long, UserDO> userCache;
 
 # 默认值
 
-对于以上未定义默认值的参数，如果没有指定，将使用yml中指定的全局配置，请参考[配置说明](Config_CN)。
+对于以上未定义默认值的参数，如果没有指定，将使用yml中指定的全局配置，请参考[配置说明](Config.md)。

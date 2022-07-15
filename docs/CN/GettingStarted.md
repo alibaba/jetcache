@@ -1,4 +1,3 @@
-[English](GettingStarted)
 
 # 创建缓存实例
 通过@CreateCache注解创建一个缓存实例，默认超时时间是100秒
@@ -31,7 +30,7 @@ public interface UserService {
 
 # 基本配置（使用Spring Boot）
 
-如果使用Spring Boot，可以按如下的方式配置（这里使用了jedis客户端连接redis，如果需要集群、读写分离、异步等特性支持请使用[lettuce](RedisWithLettuce_CN)客户端）。
+如果使用Spring Boot，可以按如下的方式配置（这里使用了jedis客户端连接redis，也可以使用lettuce[lettuce](RedisWithLettuce.md)客户端）。
 # POM
 ```xml
 <dependency>
@@ -171,7 +170,7 @@ public class JetCacheConfig {
 ```
 
 # 进一步阅读
-* CreateCache的详细使用说明可以看[这里](CreateCache_CN)
-* 使用@CacheCache创建的Cache接口实例，它的API使用可以看[这里](CacheAPI_CN)
-* 关于方法缓存(@Cached, @CacheUpdate, @CacheInvalidate)的详细使用看[这里](MethodCache_CN)
-* 详细的配置说明看[这里](Config_CN)。
+* CreateCache的详细使用说明可以看[这里](CreateCache.md)
+* 使用@CacheCache创建的Cache接口实例，它的API使用可以看[这里](CacheAPI.md)
+* 关于方法缓存(@Cached, @CacheUpdate, @CacheInvalidate)的详细使用看[这里](MethodCache.md)
+* 详细的配置说明看[这里](Config.md)。
