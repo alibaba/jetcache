@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.redis;
 
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.support.BroadcastManager;
 import org.junit.jupiter.api.Test;
 import redis.clients.jedis.HostAndPort;
@@ -17,7 +18,7 @@ public class RedisBroadcastManagerTest extends AbstractBroadcastManagerTest {
         BroadcastManager manager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)))
                 .keyPrefix(RedisBroadcastManagerTest.class.getName())
-                .createBroadcastManager();
+                .createBroadcastManager(new SimpleCacheManager());
         testBroadcastManager(manager);
     }
 }

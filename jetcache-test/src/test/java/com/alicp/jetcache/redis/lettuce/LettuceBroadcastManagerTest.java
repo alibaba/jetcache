@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.redis.lettuce;
 
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.redis.AbstractBroadcastManagerTest;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
@@ -34,7 +35,7 @@ public class LettuceBroadcastManagerTest extends AbstractBroadcastManagerTest {
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
                 .pubSubConnection(pubSubConnection)
-                .createBroadcastManager();
+                .createBroadcastManager(new SimpleCacheManager());
         testBroadcastManager(bm);
     }
 

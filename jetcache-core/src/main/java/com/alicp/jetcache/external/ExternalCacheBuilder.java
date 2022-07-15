@@ -1,6 +1,7 @@
 package com.alicp.jetcache.external;
 
 import com.alicp.jetcache.AbstractCacheBuilder;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.support.BroadcastManager;
 
 import java.util.function.Function;
@@ -25,7 +26,7 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
         return false;
     }
 
-    public BroadcastManager createBroadcastManager() {
+    public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
         return null;
     }
 

@@ -3,14 +3,15 @@
  */
 package com.alicp.jetcache.redis;
 
+import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.MultiLevelCacheBuilder;
+import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
+import com.alicp.jetcache.test.anno.TestUtil;
 import org.junit.jupiter.api.Assertions;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -20,23 +21,24 @@ public class AbstractBroadcastManagerTest {
         CacheMessage cm = new CacheMessage();
         cm.setArea("area");
         cm.setCacheName("cacheName");
-        cm.setKeys(new String[]{"1"});
-        cm.setValues(new String[]{"2"});
+        cm.setKeys(new String[]{"K"});
+        cm.setValues(new String[]{"V1"});
         cm.setType(100);
-        AtomicReference<CacheMessage> ar = new AtomicReference<>();
-        CountDownLatch cl = new CountDownLatch(1);
-        manager.startSubscribe(m -> {
-            ar.set(m);
-            cl.countDown();
-        });
+
+        Cache c1 = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder().buildCache();
+        Cache c2 = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder().buildCache();
+        MultiLevelCache mc = (MultiLevelCache) MultiLevelCacheBuilder
+                .createMultiLevelCacheBuilder()
+                .addCache(c1, c2)
+                .buildCache();
+        mc.put("K", "V1");
+        Assertions.assertEquals("V1", c1.get("K"));
+        manager.getCacheManager().putCache("area", "cacheName", mc);
+
+        manager.startSubscribe();
         CacheResult result = manager.publish(cm);
-        cl.await(1, TimeUnit.SECONDS);
         Assertions.assertTrue(result.isSuccess());
-        Assertions.assertNotNull(ar.get());
-        Assertions.assertEquals(cm.getArea(), ar.get().getArea());
-        Assertions.assertEquals(cm.getCacheName(), ar.get().getCacheName());
-        Assertions.assertArrayEquals(cm.getKeys(), ar.get().getKeys());
-        Assertions.assertArrayEquals(cm.getValues(), ar.get().getValues());
-        Assertions.assertEquals(cm.getType(), ar.get().getType());
+
+        TestUtil.waitUtil(() -> c1.get("K") == null);
     }
 }
