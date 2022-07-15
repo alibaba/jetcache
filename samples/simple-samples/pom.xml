@@ -21,6 +21,11 @@
             <artifactId>jetcache-redis</artifactId>
             <version>${jetcache.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-redis-springdata</artifactId>
+            <version>${jetcache.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

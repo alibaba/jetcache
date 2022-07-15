@@ -36,6 +36,7 @@ public class AbstractBroadcastManagerTest {
         manager.getCacheManager().putCache("area", "cacheName", mc);
 
         manager.startSubscribe();
+        Thread.sleep(50);
         CacheResult result = manager.publish(cm);
         Assertions.assertTrue(result.isSuccess());
 
