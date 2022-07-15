@@ -1,5 +1,6 @@
 package com.alicp.jetcache.redisson;
 
+import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.support.BroadcastManager;
@@ -25,6 +26,9 @@ public class RedissonBroadcastManager extends BroadcastManager {
 
     public RedissonBroadcastManager(final CacheManager cacheManager, final RedissonCacheConfig<?, ?> config) {
         super(cacheManager);
+        if (config.getBroadcastChannel() == null) {
+            throw new CacheConfigException("BroadcastChannel not set");
+        }
         this.config = config;
         this.channel = config.getBroadcastChannel();
         this.client = config.getRedissonClient();
