@@ -63,7 +63,7 @@ public class RedisLettuceAutoConfiguration {
             String readFromStr = ct.getProperty("readFrom");
             String mode = ct.getProperty("mode");
             long asyncResultTimeoutInMillis = ct.getProperty("asyncResultTimeoutInMillis", CacheConsts.ASYNC_RESULT_TIMEOUT.toMillis());
-            boolean enablePubSub = ct.getProperty("enablePubSub", true);
+            boolean enablePubSub = parseBroadcastChannel(ct) != null;
             ReadFrom readFrom = null;
             if (readFromStr != null) {
                 readFrom = ReadFrom.valueOf(readFromStr.trim());

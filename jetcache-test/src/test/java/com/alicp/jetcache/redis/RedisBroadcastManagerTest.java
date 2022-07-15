@@ -18,6 +18,7 @@ public class RedisBroadcastManagerTest extends AbstractBroadcastManagerTest {
         BroadcastManager manager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedis(new UnifiedJedis(new HostAndPort("127.0.0.1", 6379)))
                 .keyPrefix(RedisBroadcastManagerTest.class.getName())
+                .broadcastChannel(RedisBroadcastManagerTest.class.getName())
                 .createBroadcastManager(new SimpleCacheManager());
         testBroadcastManager(manager);
     }

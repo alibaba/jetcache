@@ -29,6 +29,7 @@ jetcache:
     default:
       type: redis.lettuce
       keyConvertor: fastjson
+      broadcastChannel: projectA
       uri: redis://127.0.0.1:6379/
       defaultExpireInMillis: 20000
       keyPrefix: lettuceTest1

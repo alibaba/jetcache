@@ -26,6 +26,7 @@ jetcache:
     default:
       type: redis
       keyConvertor: fastjson
+      broadcastChannel: projectA
       poolConfig:
         minIdle: 2
         maxIdle: 5

@@ -19,6 +19,7 @@ jetcache:
   remote:
     default:
       type: redis
+      broadcastChannel: projectA
       keyConvertor: fastjson
       poolConfig:
         minIdle: 2

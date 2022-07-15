@@ -34,6 +34,7 @@ public class LettuceBroadcastManagerTest extends AbstractBroadcastManagerTest {
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")
+                .broadcastChannel(LettuceBroadcastManagerTest.class.getSimpleName())
                 .pubSubConnection(pubSubConnection)
                 .createBroadcastManager(new SimpleCacheManager());
         testBroadcastManager(bm);
