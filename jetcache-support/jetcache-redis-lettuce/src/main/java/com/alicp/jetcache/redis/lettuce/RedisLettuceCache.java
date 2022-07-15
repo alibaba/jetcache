@@ -150,20 +150,25 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             byte[] newKey = buildKey(key);
             RedisFuture<byte[]> future = stringAsyncCommands.get(newKey);
-            CacheGetResult result = new CacheGetResult(future.handle((valueBytes, ex) -> {
+            CacheGetResult<V> result = new CacheGetResult<>(future.handle((valueBytes, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("GET", key, ex));
                     return new ResultData(ex);
                 } else {
-                    if (valueBytes != null) {
-                        CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueBytes);
-                        if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                            return new ResultData(CacheResultCode.EXPIRED, null, null);
+                    try {
+                        if (valueBytes != null) {
+                            CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply(valueBytes);
+                            if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                                return new ResultData(CacheResultCode.EXPIRED, null, null);
+                            } else {
+                                return new ResultData(CacheResultCode.SUCCESS, null, holder);
+                            }
                         } else {
-                            return new ResultData(CacheResultCode.SUCCESS, null, holder);
+                            return new ResultData(CacheResultCode.NOT_EXISTS, null, null);
                         }
-                    } else {
-                        return new ResultData(CacheResultCode.NOT_EXISTS, null, null);
+                    } catch (Exception exception) {
+                        logError("GET", key, ex);
+                        return new ResultData(ex);
                     }
                 }
             }));
@@ -186,27 +191,32 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                 return new MultiGetResult<K, V>(CacheResultCode.SUCCESS, null, resultMap);
             }
             RedisFuture<List<KeyValue<byte[],byte[]>>> mgetResults = stringAsyncCommands.mget(newKeys);
-            MultiGetResult result = new MultiGetResult<K, V>(mgetResults.handle((list, ex) -> {
+            MultiGetResult<K, V> result = new MultiGetResult<>(mgetResults.handle((list, ex) -> {
                 if (ex != null) {
                     JetCacheExecutor.defaultExecutor().execute(() -> logError("GET_ALL", "keys(" + keys.size() + ")", ex));
                     return new ResultData(ex);
                 } else {
-                    for (int i = 0; i < list.size(); i++) {
-                        KeyValue kv = list.get(i);
-                        K key = keyList.get(i);
-                        if (kv != null && kv.hasValue()) {
-                            CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) kv.getValue());
-                            if (System.currentTimeMillis() >= holder.getExpireTime()) {
-                                resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
+                    try {
+                        for (int i = 0; i < list.size(); i++) {
+                            KeyValue kv = list.get(i);
+                            K key = keyList.get(i);
+                            if (kv != null && kv.hasValue()) {
+                                CacheValueHolder<V> holder = (CacheValueHolder<V>) valueDecoder.apply((byte[]) kv.getValue());
+                                if (System.currentTimeMillis() >= holder.getExpireTime()) {
+                                    resultMap.put(key, CacheGetResult.EXPIRED_WITHOUT_MSG);
+                                } else {
+                                    CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
+                                    resultMap.put(key, r);
+                                }
                             } else {
-                                CacheGetResult<V> r = new CacheGetResult<V>(CacheResultCode.SUCCESS, null, holder);
-                                resultMap.put(key, r);
+                                resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
                             }
-                        } else {
-                            resultMap.put(key, CacheGetResult.NOT_EXISTS_WITHOUT_MSG);
                         }
+                        return new ResultData(CacheResultCode.SUCCESS, null, resultMap);
+                    } catch (Exception exception) {
+                        logError("GET_ALL", "keys(" + keys.size() + ")", ex);
+                        return new ResultData(ex);
                     }
-                    return new ResultData(CacheResultCode.SUCCESS, null, resultMap);
                 }
             }));
             setTimeout(result);
