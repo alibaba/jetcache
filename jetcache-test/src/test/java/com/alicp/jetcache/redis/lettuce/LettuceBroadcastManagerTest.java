@@ -27,7 +27,7 @@ import static com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest.checkOS;
  */
 public class LettuceBroadcastManagerTest extends AbstractBroadcastManagerTest {
 
-    private void doTest(AbstractRedisClient client, StatefulRedisPubSubConnection pubSubConnection) throws InterruptedException {
+    private void doTest(AbstractRedisClient client, StatefulRedisPubSubConnection pubSubConnection) throws Exception {
         BroadcastManager bm = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
