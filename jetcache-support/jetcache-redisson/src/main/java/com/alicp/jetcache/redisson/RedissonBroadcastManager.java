@@ -5,7 +5,6 @@ import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheMessage;
 import com.alicp.jetcache.support.SquashedLogger;
-import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,6 @@ public class RedissonBroadcastManager extends BroadcastManager {
     private final RedissonCacheConfig<?, ?> config;
     private final String channel;
     private final RedissonClient client;
-    private volatile RTopic topic;
     private volatile int subscribeId;
 
     public RedissonBroadcastManager(final CacheManager cacheManager, final RedissonCacheConfig<?, ?> config) {
@@ -34,22 +32,20 @@ public class RedissonBroadcastManager extends BroadcastManager {
 
     @Override
     public synchronized void startSubscribe() {
-        if (Objects.isNull(topic) && Objects.nonNull(this.channel) && !this.channel.isEmpty()) {
-            this.topic = this.client.getTopic(this.channel);
-            this.subscribeId = this.topic.addListener(CacheManager.class, (channel, msg) -> {
-                final byte[] message = this.config.getValueEncoder().apply(msg);
-                processNotification(message, this.config.getValueDecoder());
-            });
+        if (this.subscribeId == 0 && Objects.nonNull(this.channel) && !this.channel.isEmpty()) {
+            this.subscribeId = this.client.getTopic(this.channel)
+                    .addListener(byte[].class, (channel, msg) -> processNotification(msg, this.config.getValueDecoder()));
         }
     }
+
 
     @Override
     public synchronized void close() {
         final int id;
-        if ((id = this.subscribeId) > 0 && Objects.nonNull(this.topic)) {
+        if ((id = this.subscribeId) > 0 && Objects.nonNull(this.channel)) {
             this.subscribeId = 0;
             try {
-                this.topic.removeListener(id);
+                this.client.getTopic(this.channel).removeListener(id);
             } catch (Throwable e) {
                 logger.warn("unsubscribe {} fail", this.channel, e);
             }
@@ -59,8 +55,9 @@ public class RedissonBroadcastManager extends BroadcastManager {
     @Override
     public CacheResult publish(final CacheMessage cacheMessage) {
         try {
-            if (Objects.nonNull(this.topic)) {
-                this.topic.publish(cacheMessage);
+            if (Objects.nonNull(this.channel) && Objects.nonNull(cacheMessage)) {
+                final byte[] msg = this.config.getValueEncoder().apply(cacheMessage);
+                this.client.getTopic(this.channel).publish(msg);
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             }
             return CacheResult.FAIL_WITHOUT_MSG;
