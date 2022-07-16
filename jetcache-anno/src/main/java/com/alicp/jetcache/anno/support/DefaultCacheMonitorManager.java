@@ -4,12 +4,12 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
-import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheNotifyMonitor;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultMetricsManager;
@@ -55,23 +55,17 @@ public class DefaultCacheMonitorManager extends AbstractLifecycle implements Cac
             return;
         }
 
-        BroadcastManager bm = configProvider.getCacheManager().getBroadcastManager(area);
-        if (bm == null) {
+        CacheManager cacheManager = configProvider.getCacheManager();
+        if (cacheManager.getBroadcastManager(area) == null) {
             ExternalCacheBuilder builderCopy = (ExternalCacheBuilder) cacheBuilder.clone();
             MultiLevelCache mc = (MultiLevelCache) CacheUtil.getAbstractCache(cache);
             ExternalCacheConfig cacheConfig = (ExternalCacheConfig) mc.caches()[mc.caches().length - 1].config();
             builderCopy.setValueEncoder(cacheConfig.getValueEncoder());
             builderCopy.setValueDecoder(cacheConfig.getValueDecoder());
-            bm = builderCopy.createBroadcastManager(configProvider.getCacheManager());
-            if (bm != null) {
-                bm.startSubscribe();
-            }
-        }
-        if (bm == null) {
-            return;
+            cacheManager.putBroadcastManager(area, builderCopy.createBroadcastManager(cacheManager));
         }
 
-        CacheMonitor monitor = new CacheNotifyMonitor(configProvider.getCacheManager(), area, cacheName);
+        CacheMonitor monitor = new CacheNotifyMonitor(cacheManager, area, cacheName);
         cache.config().getMonitors().add(monitor);
     }
 

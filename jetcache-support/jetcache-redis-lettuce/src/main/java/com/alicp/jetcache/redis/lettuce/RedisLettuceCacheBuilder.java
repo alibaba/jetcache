@@ -39,9 +39,6 @@ public class RedisLettuceCacheBuilder<T extends ExternalCacheBuilder<T>> extends
 
     @Override
     public BroadcastManager createBroadcastManager(CacheManager cacheManager) {
-        if (getConfig().getPubSubConnection() == null) {
-            return null;
-        }
         RedisLettuceCacheConfig c = (RedisLettuceCacheConfig) getConfig().clone();
         return new LettuceBroadcastManager(cacheManager, c);
     }
