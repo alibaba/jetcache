@@ -8,8 +8,7 @@
         <artifactId>samples</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-
-    <artifactId>simple-samples</artifactId>
+    <artifactId>spring-sample</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>

@@ -5,8 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.alicp.jetcache.samples</groupId>
-    <artifactId>spring-sample</artifactId>
+    <artifactId>samples</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <properties>
         <jetcache.version>2.7.0-SNAPSHOT</jetcache.version>
     </properties>
@@ -24,17 +25,12 @@
             </plugin>
         </plugins>
     </build>
+    <modules>
+        <module>simple-samples</module>
+        <module>spring-sample</module>
+        <module>spring-boot-sample</module>
+    </modules>
     <dependencies>
-        <dependency>
-            <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-anno</artifactId>
-            <version>${jetcache.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-redis</artifactId>
-            <version>2.6.5</version>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
