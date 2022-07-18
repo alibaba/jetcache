@@ -23,6 +23,11 @@
         </dependency>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
+            <artifactId>jetcache-redis-lettuce</artifactId>
+            <version>${jetcache.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-redis-springdata</artifactId>
             <version>${jetcache.version}</version>
         </dependency>
