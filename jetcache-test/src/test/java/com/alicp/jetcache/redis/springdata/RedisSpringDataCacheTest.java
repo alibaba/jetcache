@@ -2,7 +2,11 @@ package com.alicp.jetcache.redis.springdata;
 
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.RefreshCacheTest;
-import com.alicp.jetcache.support.*;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
+import com.alicp.jetcache.support.KryoValueDecoder;
+import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,10 +23,10 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-@Ignore
 public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
 
     @Test
+    @Ignore("need jedis 3.x")
     public void jedisTest() throws Exception {
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
         connectionFactory.afterPropertiesSet();
