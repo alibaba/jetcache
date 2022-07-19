@@ -32,6 +32,7 @@ jetcache:
     default:
       type: redis.lettuce
       keyConvertor: fastjson
+      mode: cluster
       #readFrom: slavePreferred
       uri:
         - redis://127.0.0.1:7000
