@@ -49,7 +49,7 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 
             try {
                 if (useIdentityNumber) {
-                    output.writeInt(IDENTITY_NUMBER);
+                    writeInt(output, IDENTITY_NUMBER);
                 }
                 kryo.writeClassAndObject(output, value);
                 return output.toBytes();
@@ -65,6 +65,14 @@ public class KryoValueEncoder extends AbstractValueEncoder {
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
         }
+    }
+
+    private void writeInt(Output output, int value) {
+        // kryo5 change writeInt to little endian, so we write int manually
+        output.writeByte(value >>> 24);
+        output.writeByte(value >>> 16);
+        output.writeByte(value >>> 8);
+        output.writeByte(value);
     }
 
 }
