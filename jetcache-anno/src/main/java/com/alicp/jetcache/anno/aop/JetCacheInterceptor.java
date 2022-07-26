@@ -39,6 +39,9 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
         if (configProvider == null) {
+            if (applicationContext.getBeanProvider(ConfigProvider.class).getIfAvailable() == null) {
+                return invocation.proceed();
+            }
             configProvider = applicationContext.getBean(ConfigProvider.class);
         }
         if (configProvider != null && globalCacheConfig == null) {
