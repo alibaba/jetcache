@@ -1,9 +1,9 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.anno.SerialPolicy;
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Output;
-import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
+import com.esotericsoftware.kryo.kryo5.Kryo;
+import com.esotericsoftware.kryo.kryo5.io.Output;
+import com.esotericsoftware.kryo.kryo5.serializers.CompatibleFieldSerializer;
 
 import java.lang.ref.WeakReference;
 
@@ -12,25 +12,24 @@ import java.lang.ref.WeakReference;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class KryoValueEncoder extends AbstractValueEncoder {
+public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
-    public static final KryoValueEncoder INSTANCE = new KryoValueEncoder(true);
+    public static final Kryo5ValueEncoder INSTANCE = new Kryo5ValueEncoder(true);
 
     private static int INIT_BUFFER_SIZE = 256;
 
     static ThreadLocal<Object[]> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-//        kryo.setInstantiatorStrategy(new StdInstantiatorStrategy());
-//        kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new StdInstantiatorStrategy()));
+        kryo.setRegistrationRequired(false);
 
-        byte[] buffer = new byte[INIT_BUFFER_SIZE];
+        Output output = new Output(INIT_BUFFER_SIZE, -1);
 
-        WeakReference<byte[]> ref = new WeakReference<>(buffer);
+        WeakReference<Output> ref = new WeakReference<>(output);
         return new Object[]{kryo, ref};
     });
 
-    public KryoValueEncoder(boolean useIdentityNumber) {
+    public Kryo5ValueEncoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
     }
 
@@ -39,23 +38,24 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         try {
             Object[] kryoAndBuffer = kryoThreadLocal.get();
             Kryo kryo = (Kryo) kryoAndBuffer[0];
-            WeakReference<byte[]> ref = (WeakReference<byte[]>) kryoAndBuffer[1];
-            byte[] buffer = ref.get();
-            if (buffer == null) {
-                buffer = new byte[INIT_BUFFER_SIZE];
+            WeakReference<Output> ref = (WeakReference<Output>) kryoAndBuffer[1];
+            Output output = ref.get();
+            if (output == null) {
+                output = new Output(INIT_BUFFER_SIZE, -1);
             }
-            Output output = new Output(buffer, -1);
 
             try {
                 if (useIdentityNumber) {
-                    writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO4);
+                    writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO5);
                 }
+                kryo.reset();
                 kryo.writeClassAndObject(output, value);
                 return output.toBytes();
             } finally {
                 //reuse buffer if possible
-                if (ref.get() == null || buffer != output.getBuffer()) {
-                    ref = new WeakReference<>(output.getBuffer());
+                output.reset();
+                if (ref.get() == null) {
+                    ref = new WeakReference<>(output);
                     kryoAndBuffer[1] = ref;
                 }
             }

@@ -26,10 +26,6 @@
             <artifactId>mvel2</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.esotericsoftware</groupId>
-            <artifactId>kryo</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>

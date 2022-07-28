@@ -7,6 +7,8 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
+import com.alicp.jetcache.support.Kryo5ValueDecoder;
+import com.alicp.jetcache.support.Kryo5ValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
 
@@ -47,18 +49,25 @@ public class DefaultEncoderParser implements EncoderParser {
         valueEncoder = valueEncoder.trim();
         URI uri = URI.create(valueEncoder);
         valueEncoder = uri.getPath();
+        boolean useIdentityNumber = isUseIdentityNumber(uri);
+        if (SerialPolicy.KRYO.equalsIgnoreCase(valueEncoder)) {
+            return new KryoValueEncoder(useIdentityNumber);
+        } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueEncoder)) {
+            return new JavaValueEncoder(useIdentityNumber);
+        } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueEncoder)) {
+            return new Kryo5ValueEncoder(useIdentityNumber);
+        } else {
+            throw new CacheConfigException("not supported:" + valueEncoder);
+        }
+    }
+
+    private boolean isUseIdentityNumber(URI uri) {
         Map<String, String> params = parseQueryParameters(uri.getQuery());
         boolean useIdentityNumber = true;
         if ("false".equalsIgnoreCase(params.get("useIdentityNumber"))) {
             useIdentityNumber = false;
         }
-        if (SerialPolicy.KRYO.equalsIgnoreCase(valueEncoder)) {
-            return new KryoValueEncoder(useIdentityNumber);
-        } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueEncoder)) {
-            return new JavaValueEncoder(useIdentityNumber);
-        } else {
-            throw new CacheConfigException("not supported:" + valueEncoder);
-        }
+        return useIdentityNumber;
     }
 
     @Override
@@ -69,15 +78,13 @@ public class DefaultEncoderParser implements EncoderParser {
         valueDecoder = valueDecoder.trim();
         URI uri = URI.create(valueDecoder);
         valueDecoder = uri.getPath();
-        Map<String, String> params = parseQueryParameters(uri.getQuery());
-        boolean useIdentityNumber = true;
-        if ("false".equalsIgnoreCase(params.get("useIdentityNumber"))) {
-            useIdentityNumber = false;
-        }
+        boolean useIdentityNumber = isUseIdentityNumber(uri);
         if (SerialPolicy.KRYO.equalsIgnoreCase(valueDecoder)) {
             return new KryoValueDecoder(useIdentityNumber);
         } else if (SerialPolicy.JAVA.equalsIgnoreCase(valueDecoder)) {
             return javaValueDecoder(useIdentityNumber);
+        } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueDecoder)) {
+            return new Kryo5ValueDecoder(useIdentityNumber);
         } else {
             throw new CacheConfigException("not supported:" + valueDecoder);
         }

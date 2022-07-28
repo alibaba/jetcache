@@ -13,6 +13,41 @@ public interface SerialPolicy {
 
     String KRYO = "KRYO";
 
+    /**
+     * @since 2.7
+     */
+    String FASTJSON2 = "FASTJSON2";
+
+    /**
+     * @since 2.7
+     */
+    String KRYO5 = "KRYO5";
+
+    /**
+     * @since 2.7
+     */
+    String JACKSON = "JACKSON";
+
+
+    int IDENTITY_NUMBER_JAVA = 0x4A953A80;
+    // int IDENTITY_NUMBER_FASTJSON = 0x4A953A81; not used since 2.5+
+    int IDENTITY_NUMBER_KRYO4 = 0x4A953A82;
+
+    /**
+     * @since 2.7
+     */
+    int IDENTITY_NUMBER_FASTJSON2 = 0xF6E0A5C0;
+
+    /**
+     * @since 2.7
+     */
+    int IDENTITY_NUMBER_KRYO5 = 0xF6E0A5C1;
+
+    /**
+     * @since 2.7
+     */
+    int IDENTITY_NUMBER_JACKSON = 0xF6E0A5C2;
+
     Function<Object, byte[]> encoder();
 
     Function<byte[], Object> decoder();
