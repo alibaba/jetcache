@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created on 2016/11/29.
@@ -70,7 +73,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
 
     protected void parseGeneralConfig(CacheBuilder builder, ConfigTree ct) {
         AbstractCacheBuilder acb = (AbstractCacheBuilder) builder;
-        acb.keyConvertor(new ParserFunction<>(ct.getProperty("keyConvertor", KeyConvertor.FASTJSON)));
+        acb.keyConvertor(new ParserFunction<>(ct.getProperty("keyConvertor", KeyConvertor.FASTJSON2)));
 
         String expireAfterWriteInMillis = ct.getProperty("expireAfterWriteInMillis");
         if (expireAfterWriteInMillis == null) {
