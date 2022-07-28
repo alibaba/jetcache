@@ -4,6 +4,7 @@
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.JedisPool;
 
@@ -19,6 +20,7 @@ public class JedisExample {
         JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
         Cache<String, String> cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(pool)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .keyPrefix("myCachePrefix")
                 .buildCache();
         cache.put("K1", "V1");
