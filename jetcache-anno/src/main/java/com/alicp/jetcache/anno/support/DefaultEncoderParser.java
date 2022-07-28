@@ -56,7 +56,9 @@ public class DefaultEncoderParser implements EncoderParser {
             return new JavaValueEncoder(useIdentityNumber);
         } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueEncoder)) {
             return new Kryo5ValueEncoder(useIdentityNumber);
-        } else {
+        }/* else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueEncoder)) {
+            return new Fastjson2ValueEncoder(useIdentityNumber);
+        }*/ else {
             throw new CacheConfigException("not supported:" + valueEncoder);
         }
     }
@@ -85,7 +87,9 @@ public class DefaultEncoderParser implements EncoderParser {
             return javaValueDecoder(useIdentityNumber);
         } else if (SerialPolicy.KRYO5.equalsIgnoreCase(valueDecoder)) {
             return new Kryo5ValueDecoder(useIdentityNumber);
-        } else {
+        }/* else if (SerialPolicy.FASTJSON2.equalsIgnoreCase(valueDecoder)) {
+            return new Kryo5ValueDecoder(useIdentityNumber);
+        }*/ else {
             throw new CacheConfigException("not supported:" + valueDecoder);
         }
     }
