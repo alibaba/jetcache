@@ -10,7 +10,7 @@ import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
 import junit.framework.AssertionFailedError;
@@ -27,21 +27,21 @@ public class TestUtil {
     public static GlobalCacheConfig createGloableConfig() {
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder();
-        localBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        localBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
         localBuilders.put("A1", localBuilder);
 
         Map remoteBuilders = new HashMap();
 
         MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
-        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
         remoteBuilder.setBroadcastChannel("mockBroadcastChannel");
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
         remoteBuilder = new MockRemoteCacheBuilder();
-        remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
         remoteBuilder.setBroadcastChannel("mockBroadcastChannel_A1");

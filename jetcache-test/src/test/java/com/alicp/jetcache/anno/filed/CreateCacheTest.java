@@ -1,7 +1,18 @@
 package com.alicp.jetcache.anno.filed;
 
-import com.alicp.jetcache.*;
-import com.alicp.jetcache.anno.*;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.LoadingCacheTest;
+import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.MultiLevelCacheConfig;
+import com.alicp.jetcache.ProxyCache;
+import com.alicp.jetcache.RefreshCacheTest;
+import com.alicp.jetcache.anno.CachePenetrationProtect;
+import com.alicp.jetcache.anno.CacheRefresh;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
+import com.alicp.jetcache.anno.KeyConvertor;
+import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.support.ConfigProvider;
@@ -11,7 +22,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCache;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.external.MockRemoteCache;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.test.AbstractCacheTest;
@@ -145,7 +156,7 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertNull(cache1.get("SameKey"));
 
                 Assert.assertTrue(getTarget(cache1) instanceof MockRemoteCache);
-                Assert.assertSame(FastjsonKeyConvertor.INSTANCE, cache1.config().getKeyConvertor());
+                Assert.assertSame(Fastjson2KeyConvertor.INSTANCE, cache1.config().getKeyConvertor());
 
                 Assert.assertTrue(getTarget(cacheWithConfig) instanceof MultiLevelCache);
                 Assert.assertEquals(50, cacheWithConfig.config().getExpireAfterWriteInMillis());

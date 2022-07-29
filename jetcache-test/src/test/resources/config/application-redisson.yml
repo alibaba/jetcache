@@ -6,25 +6,25 @@ jetcache:
   local:
     default:
       type: caffeine
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       limit: 200
       defaultExpireInMillis: 10000
       broadcastChannel: projectA
     A1:
       type: linkedhashmap
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       limit: 100
       expireAfterAccess: true
       defaultExpireInMillis: 10000
   remote:
     default:
       type: redisson
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       defaultExpireInMillis: 10000
       keyPrefix: spring-data-redis
     A1:
       type: redisson
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       defaultExpireInMillis: 10000
       keyPrefix: spring-data-redis-A1
 
