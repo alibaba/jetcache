@@ -14,7 +14,13 @@ public class GlobalCacheConfig {
 
     private String[] hiddenPackages;
     protected int statIntervalMinutes;
-    private boolean areaInCacheName = true;
+    /**
+     * change default value to false since 2.7.
+     *
+     * remove in future.
+     */
+    @Deprecated
+    private boolean areaInCacheName = false;
     private boolean penetrationProtect = false;
     private boolean enableMethodCache = true;
 
@@ -56,10 +62,22 @@ public class GlobalCacheConfig {
         this.statIntervalMinutes = statIntervalMinutes;
     }
 
+    /**
+     * change default value to false since 2.7.
+     *
+     * remove in future.
+     */
+    @Deprecated
     public boolean isAreaInCacheName() {
         return areaInCacheName;
     }
 
+    /**
+     * change default value to false since 2.7.
+     *
+     * remove in future.
+     */
+    @Deprecated
     public void setAreaInCacheName(boolean areaInCacheName) {
         this.areaInCacheName = areaInCacheName;
     }
