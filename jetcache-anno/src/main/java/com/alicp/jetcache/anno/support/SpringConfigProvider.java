@@ -30,7 +30,7 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     }
 
     @Override
-    public void doInit() {
+    protected void doInit() {
         if (encoderParser instanceof ApplicationContextAware) {
             ((ApplicationContextAware) encoderParser).setApplicationContext(applicationContext);
         }

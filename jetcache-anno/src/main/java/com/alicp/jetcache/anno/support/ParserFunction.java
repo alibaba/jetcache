@@ -7,7 +7,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class ParserFunction<T, R> implements Function<T, R> {
+public class ParserFunction implements Function {
 
     private final String value;
 
@@ -20,7 +20,7 @@ public class ParserFunction<T, R> implements Function<T, R> {
     }
 
     @Override
-    public R apply(T t) {
+    public Object apply(Object t) {
         throw new UnsupportedOperationException();
     }
 }

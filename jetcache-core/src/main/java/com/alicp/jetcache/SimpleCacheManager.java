@@ -3,16 +3,26 @@
  */
 package com.alicp.jetcache;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
+import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
+import com.alicp.jetcache.template.CacheBuilderTemplate;
+import com.alicp.jetcache.template.QuickConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class SimpleCacheManager implements CacheManager, AutoCloseable {
+
+    private static final boolean DEFAULT_CACHE_NULL_VALUE = false;
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleCacheManager.class);
 
@@ -22,6 +32,8 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
     private final ConcurrentHashMap<String, BroadcastManager> broadcastManagers = new ConcurrentHashMap();
 
     static final SimpleCacheManager defaultManager = new SimpleCacheManager();
+
+    private CacheBuilderTemplate cacheBuilderTemplate;
 
     public SimpleCacheManager() {
     }
@@ -72,5 +84,129 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
     @Override
     public void putBroadcastManager(String area, BroadcastManager broadcastManager) {
         broadcastManagers.put(area, broadcastManager);
+    }
+
+    @Override
+    public CacheBuilderTemplate getCacheBuilderTemplate() {
+        return cacheBuilderTemplate;
+    }
+
+    @Override
+    public void setCacheBuilderTemplate(CacheBuilderTemplate cacheBuilderTemplate) {
+        this.cacheBuilderTemplate = cacheBuilderTemplate;
+    }
+
+    @Override
+    public <K, V> Cache<K, V> getOrCreateCache(QuickConfig config) {
+        if (cacheBuilderTemplate == null) {
+            throw new IllegalStateException("cacheBuilderTemplate not set");
+        }
+        Objects.requireNonNull(config.getArea());
+        Objects.requireNonNull(config.getName());
+        ConcurrentHashMap<String, Cache> m = getCachesByArea(config.getArea());
+        Cache c = m.get(config.getName());
+        if (c != null) {
+            return c;
+        }
+        return m.computeIfAbsent(config.getName(), n -> create(config));
+    }
+
+    private Cache create(QuickConfig config) {
+        Cache cache;
+        if (config.getCacheType() == null || config.getCacheType() == CacheType.REMOTE) {
+            cache = buildRemote(config);
+        } else if (config.getCacheType() == CacheType.LOCAL) {
+            cache = buildLocal(config);
+        } else {
+            Cache local = buildLocal(config);
+            Cache remote = buildRemote(config);
+
+
+            boolean useExpireOfSubCache = config.getLocalExpire() != null;
+            cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
+                    .expireAfterWrite(remote.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
+                    .addCache(local, remote)
+                    .useExpireOfSubCache(useExpireOfSubCache)
+                    .cacheNullValue(config.getCacheNullValue() != null ?
+                            config.getCacheNullValue() : DEFAULT_CACHE_NULL_VALUE)
+                    .buildCache();
+        }
+        cache.config().setRefreshPolicy(config.getRefreshPolicy());
+        cache = new RefreshCache(cache);
+
+        boolean protect = config.getPenetrationProtect() != null ? config.getPenetrationProtect()
+                : cacheBuilderTemplate.isPenetrationProtect();
+        cache.config().setCachePenetrationProtect(protect);
+        cache.config().setPenetrationProtectTimeout(config.getPenetrationProtectTimeout());
+
+        // TODO install cache monitor
+//        if (configProvider.getCacheMonitorManager() != null) {
+//            configProvider.getCacheMonitorManager().addMonitors(area, cacheName, cache, cachedAnnoConfig.isSyncLocal());
+//        }
+        return cache;
+    }
+
+    protected Cache buildRemote(QuickConfig config) {
+        ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) cacheBuilderTemplate
+                .getCacheBuilder(1, config.getArea());
+        if (cacheBuilder == null) {
+            throw new CacheConfigException("no remote cache builder: " + config.getArea());
+        }
+        cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
+
+        if (config.getExpire() != null && config.getExpire().toMillis() > 0) {
+            cacheBuilder.expireAfterWrite(config.getExpire().toMillis(), TimeUnit.MILLISECONDS);
+        }
+
+        String prefix;
+        if (config.getUseAreaInPrefix() != null && config.getUseAreaInPrefix()) {
+            prefix = config.getArea() + "_" + config.getName();
+        } else {
+            prefix = config.getName();
+        }
+        if (cacheBuilder.getConfig().getKeyPrefixSupplier() != null) {
+            Supplier<String> supplier = cacheBuilder.getConfig().getKeyPrefixSupplier();
+            cacheBuilder.setKeyPrefixSupplier(() -> supplier.get() + prefix);
+        } else {
+            cacheBuilder.setKeyPrefix(prefix);
+        }
+
+        if (config.getKeyConvertor() != null) {
+            cacheBuilder.getConfig().setKeyConvertor(config.getKeyConvertor());
+        }
+        if (config.getValueEncoder() != null) {
+            cacheBuilder.getConfig().setValueEncoder(config.getValueEncoder());
+        }
+        if (config.getValueDecoder() != null) {
+            cacheBuilder.getConfig().setValueDecoder(config.getValueDecoder());
+        }
+
+        cacheBuilder.setCacheNullValue(config.getCacheNullValue() != null ?
+                config.getCacheNullValue() : DEFAULT_CACHE_NULL_VALUE);
+        return cacheBuilder.buildCache();
+    }
+
+    protected Cache buildLocal(QuickConfig config) {
+        EmbeddedCacheBuilder cacheBuilder = (EmbeddedCacheBuilder) cacheBuilderTemplate.getCacheBuilder(0, config.getArea());
+        if (cacheBuilder == null) {
+            throw new CacheConfigException("no local cache builder: " + config.getArea());
+        }
+        cacheBuilder = (EmbeddedCacheBuilder) cacheBuilder.clone();
+
+        if (config.getLocalLimit() != null && config.getLocalLimit() > 0) {
+            cacheBuilder.setLimit(config.getLocalLimit());
+        }
+        if (config.getCacheType() == CacheType.BOTH &&
+                config.getLocalExpire() != null && config.getLocalExpire().toMillis() > 0) {
+            cacheBuilder.expireAfterWrite(config.getLocalExpire().toMillis(), TimeUnit.MILLISECONDS);
+        } else if (config.getExpire() != null && config.getExpire().toMillis() > 0) {
+            cacheBuilder.expireAfterWrite(config.getExpire().toMillis(), TimeUnit.MILLISECONDS);
+        }
+        if (config.getKeyConvertor() != null) {
+            cacheBuilder.getConfig().setKeyConvertor(config.getKeyConvertor());
+        }
+        cacheBuilder.setCacheNullValue(config.getCacheNullValue() != null ?
+                config.getCacheNullValue() : DEFAULT_CACHE_NULL_VALUE);
+        return cacheBuilder.buildCache();
     }
 }

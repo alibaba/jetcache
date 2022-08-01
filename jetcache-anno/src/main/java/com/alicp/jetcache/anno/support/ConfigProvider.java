@@ -1,8 +1,12 @@
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
+import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
+import com.alicp.jetcache.template.CacheBuilderTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +44,34 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     @Override
-    public void doInit() {
+    protected void doInit() {
         initDefaultCacheMonitorInstaller();
         cacheContext = newContext();
+        CacheBuilderTemplate t = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
+            EmbeddedCacheBuilder eb = (EmbeddedCacheBuilder) builder;
+            if (eb.getConfig().getKeyConvertor() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getKeyConvertor();
+                eb.setKeyConvertor(parseKeyConvertor(f.getValue()));
+            }
+        }
+        for (CacheBuilder builder : globalCacheConfig.getRemoteCacheBuilders().values()) {
+            ExternalCacheBuilder eb = (ExternalCacheBuilder) builder;
+            if (eb.getConfig().getKeyConvertor() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getKeyConvertor();
+                eb.setKeyConvertor(parseKeyConvertor(f.getValue()));
+            }
+            if (eb.getConfig().getValueEncoder() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getValueEncoder();
+                eb.setValueEncoder(parseValueEncoder(f.getValue()));
+            }
+            if (eb.getConfig().getValueDecoder() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getValueDecoder();
+                eb.setValueDecoder(parseValueDecoder(f.getValue()));
+            }
+        }
+        cacheManager.setCacheBuilderTemplate(t);
     }
 
     protected void initDefaultCacheMonitorInstaller() {
