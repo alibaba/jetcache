@@ -3,8 +3,11 @@
  */
 package com.alicp.jetcache.template;
 
+import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.CacheBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,6 +16,7 @@ import java.util.Map;
 public class CacheBuilderTemplate {
     private final boolean penetrationProtect;
     private final Map<String, CacheBuilder>[] cacheBuilders;
+    private final List<CacheMonitorInstaller> cacheMonitorInstallers = new ArrayList<>();
 
     @SafeVarargs
     public CacheBuilderTemplate(boolean penetrationProtect, Map<String, CacheBuilder>... cacheBuilders) {
@@ -25,7 +29,15 @@ public class CacheBuilderTemplate {
     }
 
     public CacheBuilder getCacheBuilder(int level, String area) {
-        return cacheBuilders[level].get(area);
+        CacheBuilder cb = cacheBuilders[level].get(area);
+        if (cb instanceof AbstractCacheBuilder) {
+            return (CacheBuilder) ((AbstractCacheBuilder<?>) cb).clone();
+        } else {
+            return cb;
+        }
     }
 
+    public List<CacheMonitorInstaller> getCacheMonitorInstallers() {
+        return cacheMonitorInstallers;
+    }
 }

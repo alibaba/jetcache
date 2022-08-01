@@ -1,7 +1,7 @@
 /**
  * Created on 2019/6/8.
  */
-package com.alicp.jetcache.anno.support;
+package com.alicp.jetcache.support;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -9,7 +9,7 @@ import javax.annotation.PreDestroy;
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-class AbstractLifecycle {
+public class AbstractLifecycle {
     private boolean inited;
 
     @PostConstruct

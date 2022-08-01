@@ -8,6 +8,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.template.CacheBuilderTemplate;
+import com.alicp.jetcache.template.CacheMonitorInstaller;
 import com.alicp.jetcache.template.QuickConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,10 +140,9 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         cache.config().setCachePenetrationProtect(protect);
         cache.config().setPenetrationProtectTimeout(config.getPenetrationProtectTimeout());
 
-        // TODO install cache monitor
-//        if (configProvider.getCacheMonitorManager() != null) {
-//            configProvider.getCacheMonitorManager().addMonitors(area, cacheName, cache, cachedAnnoConfig.isSyncLocal());
-//        }
+        for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
+            i.addMonitors(cache, config);
+        }
         return cache;
     }
 

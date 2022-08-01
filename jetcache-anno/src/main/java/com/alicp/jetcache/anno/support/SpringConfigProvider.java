@@ -65,12 +65,6 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
 
     @Autowired(required = false)
     @Override
-    public void setCacheMonitorManager(CacheMonitorManager cacheMonitorManager) {
-        super.setCacheMonitorManager(cacheMonitorManager);
-    }
-
-    @Autowired(required = false)
-    @Override
     public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {
         super.setMetricsCallback(metricsCallback);
     }

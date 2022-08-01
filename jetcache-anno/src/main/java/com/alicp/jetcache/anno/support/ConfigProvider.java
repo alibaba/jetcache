@@ -4,13 +4,18 @@ import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.support.AbstractLifecycle;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
 import com.alicp.jetcache.template.CacheBuilderTemplate;
+import com.alicp.jetcache.template.CacheMonitorInstaller;
+import com.alicp.jetcache.template.MetricsMonitorInstaller;
+import com.alicp.jetcache.template.NotifyMonitorInstaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -29,10 +34,7 @@ public class ConfigProvider extends AbstractLifecycle {
     protected CacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
-    protected CacheMonitorManager cacheMonitorManager;
     private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
-
-    private final CacheMonitorManager defaultCacheMonitorManager = new DefaultCacheMonitorManager();
 
     private CacheContext cacheContext;
 
@@ -40,13 +42,15 @@ public class ConfigProvider extends AbstractLifecycle {
         cacheManager = CacheManager.defaultManager();
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
-        cacheMonitorManager = defaultCacheMonitorManager;
     }
 
     @Override
     protected void doInit() {
-        initDefaultCacheMonitorInstaller();
         cacheContext = newContext();
+        initCacheBuilderTemplate();
+    }
+
+    protected void initCacheBuilderTemplate() {
         CacheBuilderTemplate t = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
                 globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
         for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
@@ -71,34 +75,41 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
+        t.getCacheMonitorInstallers().add(metricsMonitorInstaller());
+        t.getCacheMonitorInstallers().add(notifyMonitorInstaller());
+        for (CacheMonitorInstaller i : t.getCacheMonitorInstallers()) {
+            if (i instanceof AbstractLifecycle) {
+                ((AbstractLifecycle) i).init();
+            }
+        }
         cacheManager.setCacheBuilderTemplate(t);
     }
 
-    protected void initDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager == defaultCacheMonitorManager) {
-            DefaultCacheMonitorManager cacheMonitorManager = (DefaultCacheMonitorManager) this.cacheMonitorManager;
-            cacheMonitorManager.setGlobalCacheConfig(globalCacheConfig);
-            cacheMonitorManager.setMetricsCallback(metricsCallback);
-            cacheMonitorManager.setConfigProvider(this);
-            cacheMonitorManager.init();
+    protected CacheMonitorInstaller metricsMonitorInstaller() {
+        Duration interval = null;
+        if (globalCacheConfig.getStatIntervalMinutes() > 0) {
+            interval = Duration.ofMinutes(globalCacheConfig.getStatIntervalMinutes());
         }
+        return new MetricsMonitorInstaller(metricsCallback, interval);
+    }
+
+    protected CacheMonitorInstaller notifyMonitorInstaller() {
+        return new NotifyMonitorInstaller(cacheManager, area -> globalCacheConfig.getRemoteCacheBuilders().get(area));
     }
 
     @Override
     public void doShutdown() {
         try {
-            shutdownDefaultCacheMonitorInstaller();
+            for (CacheMonitorInstaller i : cacheManager.getCacheBuilderTemplate().getCacheMonitorInstallers()) {
+                if (i instanceof AbstractLifecycle) {
+                    ((AbstractLifecycle) i).shutdown();
+                }
+            }
             if (cacheManager instanceof AutoCloseable) {
                 ((AutoCloseable) cacheManager).close();
             }
         } catch (Exception e) {
             logger.error("close fail", e);
-        }
-    }
-
-    protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager == defaultCacheMonitorManager) {
-            ((AbstractLifecycle) cacheMonitorManager).shutdown();
         }
     }
 
@@ -148,14 +159,6 @@ public class ConfigProvider extends AbstractLifecycle {
 
     public void setKeyConvertorParser(KeyConvertorParser keyConvertorParser) {
         this.keyConvertorParser = keyConvertorParser;
-    }
-
-    public CacheMonitorManager getCacheMonitorManager() {
-        return cacheMonitorManager;
-    }
-
-    public void setCacheMonitorManager(CacheMonitorManager cacheMonitorManager) {
-        this.cacheMonitorManager = cacheMonitorManager;
     }
 
     public GlobalCacheConfig getGlobalCacheConfig() {

@@ -27,7 +27,7 @@ public class DefaultKeyConvertorParser implements KeyConvertorParser {
         } else if (KeyConvertor.JACKSON.equalsIgnoreCase(convertor)) {
             return JacksonKeyConvertor.INSTANCE;
         } else if (KeyConvertor.NONE.equalsIgnoreCase(convertor)) {
-            return null;
+            return KeyConvertor.NONE_INSTANCE;
         }
         throw new CacheConfigException("not supported:" + convertor);
     }

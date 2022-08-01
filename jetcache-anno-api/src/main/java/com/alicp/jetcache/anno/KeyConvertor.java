@@ -1,5 +1,7 @@
 package com.alicp.jetcache.anno;
 
+import java.util.function.Function;
+
 /**
  * Created on 2016/12/12.
  *
@@ -18,4 +20,6 @@ public interface KeyConvertor {
      * @since 2.7
      */
     String FASTJSON2 = "FASTJSON2";
+
+    Function<Object, Object> NONE_INSTANCE = k -> k;
 }
