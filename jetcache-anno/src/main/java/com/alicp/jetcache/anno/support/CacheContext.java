@@ -94,37 +94,35 @@ public class CacheContext {
     }
 
     public Cache __createOrGetCache(CachedAnnoConfig cac, String area, String cacheName) {
-        QuickConfig c = new QuickConfig();
-        c.setArea(area);
-        c.setName(cacheName);
+        QuickConfig.Builder b = QuickConfig.newBuilder(area, cacheName);
         TimeUnit timeUnit = cac.getTimeUnit();
         if (cac.getExpire() > 0) {
-            c.setExpire(Duration.ofMillis(timeUnit.toMillis(cac.getExpire())));
+            b.expire(Duration.ofMillis(timeUnit.toMillis(cac.getExpire())));
         }
         if (cac.getLocalExpire() > 0) {
-            c.setLocalExpire(Duration.ofMillis(timeUnit.toMillis(cac.getLocalExpire())));
+            b.localExpire(Duration.ofMillis(timeUnit.toMillis(cac.getLocalExpire())));
         }
         if (cac.getLocalLimit() > 0) {
-            c.setLocalLimit(cac.getLocalLimit());
+            b.localLimit(cac.getLocalLimit());
         }
-        c.setCacheType(cac.getCacheType());
-        c.setSyncLocal(cac.isSyncLocal());
+        b.cacheType(cac.getCacheType());
+        b.syncLocal(cac.isSyncLocal());
         if (!CacheConsts.isUndefined(cac.getKeyConvertor())) {
-            c.setKeyConvertor(configProvider.parseKeyConvertor(cac.getKeyConvertor()));
+            b.keyConvertor(configProvider.parseKeyConvertor(cac.getKeyConvertor()));
         }
         if (!CacheConsts.isUndefined(cac.getSerialPolicy())) {
-            c.setValueEncoder(configProvider.parseValueEncoder(cac.getSerialPolicy()));
-            c.setValueDecoder(configProvider.parseValueDecoder(cac.getSerialPolicy()));
+            b.valueEncoder(configProvider.parseValueEncoder(cac.getSerialPolicy()));
+            b.valueDecoder(configProvider.parseValueDecoder(cac.getSerialPolicy()));
         }
-        c.setCacheNullValue(cac.isCacheNullValue());
-        c.setUseAreaInPrefix(globalCacheConfig.isAreaInCacheName());
+        b.cacheNullValue(cac.isCacheNullValue());
+        b.useAreaInPrefix(globalCacheConfig.isAreaInCacheName());
         PenetrationProtectConfig ppc = cac.getPenetrationProtectConfig();
         if (ppc != null) {
-            c.setPenetrationProtect(ppc.isPenetrationProtect());
-            c.setPenetrationProtectTimeout(ppc.getPenetrationProtectTimeout());
+            b.penetrationProtect(ppc.isPenetrationProtect());
+            b.penetrationProtectTimeout(ppc.getPenetrationProtectTimeout());
         }
-        c.setRefreshPolicy(cac.getRefreshPolicy());
-        return cacheManager.getOrCreateCache(c);
+        b.refreshPolicy(cac.getRefreshPolicy());
+        return cacheManager.getOrCreateCache(b.build());
     }
 
     protected CacheInvokeContext newCacheInvokeContext() {
