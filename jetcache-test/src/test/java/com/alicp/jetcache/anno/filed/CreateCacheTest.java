@@ -113,7 +113,15 @@ public class CreateCacheTest extends SpringTest {
 
             @CreateCache
             @CacheRefresh(timeUnit = TimeUnit.MILLISECONDS, refresh = 100)
-            private Cache cacheWithRefresh;
+            private Cache cacheWithRefresh1;
+
+            @CreateCache
+            @CacheRefresh(timeUnit = TimeUnit.MILLISECONDS, refresh = 100)
+            private Cache cacheWithRefresh2;
+
+            @CreateCache
+            @CacheRefresh(timeUnit = TimeUnit.MILLISECONDS, refresh = 100)
+            private Cache cacheWithRefresh3;
 
             @CreateCache
             @CachePenetrationProtect(timeout = 1)
@@ -197,9 +205,6 @@ public class CreateCacheTest extends SpringTest {
             private void runGeneralTest() throws Exception {
                 super.cache = this.cache1;
                 super.baseTest();
-                LoadingCacheTest.loadingCacheTest(cache1, 0);
-                RefreshCacheTest.refreshCacheTest(cache1, 200, 100);
-                RefreshCacheTest.computeIfAbsentTest(cache1);
             }
 
             private void cacheWithoutConvertorTest() {
@@ -232,12 +237,19 @@ public class CreateCacheTest extends SpringTest {
 
             private int refreshCount;
             private void refreshTest() throws Exception {
-                cacheWithRefresh.config().setLoader((k) -> refreshCount++);
-                cacheWithRefresh.put("K1", "V1");
-                Assert.assertEquals("V1", cacheWithRefresh.get("K1"));
-                Thread.sleep((long) (cacheWithRefresh.config().getRefreshPolicy().getRefreshMillis() * 1.5));
-                Assert.assertEquals(0, cacheWithRefresh.get("K1"));
-                cacheWithRefresh.close();
+                LoadingCacheTest.loadingCacheTest(cacheWithRefresh1, 0);
+                RefreshCacheTest.refreshCacheTest(cacheWithRefresh2, 200, 100);
+                RefreshCacheTest.computeIfAbsentTest(cacheWithRefresh2);
+
+                cacheWithRefresh3.config().setLoader((k) -> refreshCount++);
+                cacheWithRefresh3.put("K1", "V1");
+                Assert.assertEquals("V1", cacheWithRefresh3.get("K1"));
+                Thread.sleep((long) (cacheWithRefresh3.config().getRefreshPolicy().getRefreshMillis() * 1.5));
+                Assert.assertEquals(0, cacheWithRefresh3.get("K1"));
+
+                cacheWithRefresh1.close();
+                cacheWithRefresh2.close();
+                cacheWithRefresh3.close();
             }
         }
     }

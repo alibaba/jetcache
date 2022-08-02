@@ -132,8 +132,10 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
                             config.getCacheNullValue() : DEFAULT_CACHE_NULL_VALUE)
                     .buildCache();
         }
-        cache.config().setRefreshPolicy(config.getRefreshPolicy());
-        cache = new RefreshCache(cache);
+        if (config.getRefreshPolicy() != null) {
+            cache.config().setRefreshPolicy(config.getRefreshPolicy());
+            cache = new RefreshCache(cache);
+        }
 
         boolean protect = config.getPenetrationProtect() != null ? config.getPenetrationProtect()
                 : cacheBuilderTemplate.isPenetrationProtect();
@@ -146,7 +148,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         return cache;
     }
 
-    protected Cache buildRemote(QuickConfig config) {
+    private Cache buildRemote(QuickConfig config) {
         ExternalCacheBuilder cacheBuilder = (ExternalCacheBuilder) cacheBuilderTemplate
                 .getCacheBuilder(1, config.getArea());
         if (cacheBuilder == null) {
@@ -186,7 +188,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         return cacheBuilder.buildCache();
     }
 
-    protected Cache buildLocal(QuickConfig config) {
+    private Cache buildLocal(QuickConfig config) {
         EmbeddedCacheBuilder cacheBuilder = (EmbeddedCacheBuilder) cacheBuilderTemplate.getCacheBuilder(0, config.getArea());
         if (cacheBuilder == null) {
             throw new CacheConfigException("no local cache builder: " + config.getArea());
