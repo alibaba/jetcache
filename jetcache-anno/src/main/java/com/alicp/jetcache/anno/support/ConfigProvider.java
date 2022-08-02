@@ -90,7 +90,10 @@ public class ConfigProvider extends AbstractLifecycle {
         if (globalCacheConfig.getStatIntervalMinutes() > 0) {
             interval = Duration.ofMinutes(globalCacheConfig.getStatIntervalMinutes());
         }
-        return new MetricsMonitorInstaller(metricsCallback, interval);
+
+        MetricsMonitorInstaller i = new MetricsMonitorInstaller(metricsCallback, interval);
+        i.init();
+        return i;
     }
 
     protected CacheMonitorInstaller notifyMonitorInstaller() {

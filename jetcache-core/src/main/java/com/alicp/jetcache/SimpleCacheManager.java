@@ -154,7 +154,6 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         if (cacheBuilder == null) {
             throw new CacheConfigException("no remote cache builder: " + config.getArea());
         }
-        cacheBuilder = (ExternalCacheBuilder) cacheBuilder.clone();
 
         if (config.getExpire() != null && config.getExpire().toMillis() > 0) {
             cacheBuilder.expireAfterWrite(config.getExpire().toMillis(), TimeUnit.MILLISECONDS);
@@ -193,7 +192,6 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         if (cacheBuilder == null) {
             throw new CacheConfigException("no local cache builder: " + config.getArea());
         }
-        cacheBuilder = (EmbeddedCacheBuilder) cacheBuilder.clone();
 
         if (config.getLocalLimit() != null && config.getLocalLimit() > 0) {
             cacheBuilder.setLimit(config.getLocalLimit());

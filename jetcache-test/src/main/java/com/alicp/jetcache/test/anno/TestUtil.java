@@ -33,14 +33,14 @@ public class TestUtil {
 
         Map remoteBuilders = new HashMap();
 
-        MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
+        MockRemoteCacheBuilder remoteBuilder = MockRemoteCacheBuilder.createMockRemoteCacheBuilder();
         remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
         remoteBuilder.setBroadcastChannel("mockBroadcastChannel");
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
-        remoteBuilder = new MockRemoteCacheBuilder();
+        remoteBuilder = MockRemoteCacheBuilder.createMockRemoteCacheBuilder();
         remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
         remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
