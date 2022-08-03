@@ -4,6 +4,7 @@
 package com.alicp.jetcache.template;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.support.AbstractLifecycle;
@@ -49,7 +50,7 @@ public class MetricsMonitorInstaller extends AbstractLifecycle implements CacheM
     }
 
     @Override
-    public void addMonitors(Cache cache, QuickConfig quickConfig) {
+    public void addMonitors(CacheManager cacheManager, Cache cache, QuickConfig quickConfig) {
         if (metricsManager == null) {
             return;
         }

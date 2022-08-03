@@ -4,10 +4,11 @@
 package com.alicp.jetcache.template;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public interface CacheMonitorInstaller {
-    void addMonitors(Cache cache, QuickConfig quickConfig);
+    void addMonitors(CacheManager cacheManager, Cache cache, QuickConfig quickConfig);
 }

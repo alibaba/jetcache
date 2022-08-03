@@ -85,12 +85,10 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         broadcastManagers.put(area, broadcastManager);
     }
 
-    @Override
     public CacheBuilderTemplate getCacheBuilderTemplate() {
         return cacheBuilderTemplate;
     }
 
-    @Override
     public void setCacheBuilderTemplate(CacheBuilderTemplate cacheBuilderTemplate) {
         this.cacheBuilderTemplate = cacheBuilderTemplate;
     }
@@ -141,7 +139,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         cache.config().setPenetrationProtectTimeout(config.getPenetrationProtectTimeout());
 
         for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
-            i.addMonitors(cache, config);
+            i.addMonitors(this, cache, config);
         }
         return cache;
     }

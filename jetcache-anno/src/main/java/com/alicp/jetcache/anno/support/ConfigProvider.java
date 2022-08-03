@@ -37,6 +37,8 @@ public class ConfigProvider extends AbstractLifecycle {
     protected KeyConvertorParser keyConvertorParser;
     private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
 
+    private CacheBuilderTemplate cacheBuilderTemplate;
+
     private CacheContext cacheContext;
 
     public ConfigProvider() {
@@ -49,10 +51,13 @@ public class ConfigProvider extends AbstractLifecycle {
     protected void doInit() {
         cacheContext = newContext();
         initCacheBuilderTemplate();
+        if (cacheManager instanceof SimpleCacheManager) {
+            ((SimpleCacheManager) cacheManager).setCacheBuilderTemplate(cacheBuilderTemplate);
+        }
     }
 
     protected void initCacheBuilderTemplate() {
-        CacheBuilderTemplate t = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
+        cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
                 globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
         for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
             EmbeddedCacheBuilder eb = (EmbeddedCacheBuilder) builder;
@@ -76,14 +81,13 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
-        t.getCacheMonitorInstallers().add(metricsMonitorInstaller());
-        t.getCacheMonitorInstallers().add(notifyMonitorInstaller());
-        for (CacheMonitorInstaller i : t.getCacheMonitorInstallers()) {
+        cacheBuilderTemplate.getCacheMonitorInstallers().add(metricsMonitorInstaller());
+        cacheBuilderTemplate.getCacheMonitorInstallers().add(notifyMonitorInstaller());
+        for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
             if (i instanceof AbstractLifecycle) {
                 ((AbstractLifecycle) i).init();
             }
         }
-        cacheManager.setCacheBuilderTemplate(t);
     }
 
     protected CacheMonitorInstaller metricsMonitorInstaller() {
@@ -98,13 +102,13 @@ public class ConfigProvider extends AbstractLifecycle {
     }
 
     protected CacheMonitorInstaller notifyMonitorInstaller() {
-        return new NotifyMonitorInstaller(cacheManager, area -> globalCacheConfig.getRemoteCacheBuilders().get(area));
+        return new NotifyMonitorInstaller(area -> globalCacheConfig.getRemoteCacheBuilders().get(area));
     }
 
     @Override
     public void doShutdown() {
         try {
-            for (CacheMonitorInstaller i : cacheManager.getCacheBuilderTemplate().getCacheMonitorInstallers()) {
+            for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
                 if (i instanceof AbstractLifecycle) {
                     ((AbstractLifecycle) i).shutdown();
                 }

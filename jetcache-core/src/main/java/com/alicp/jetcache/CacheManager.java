@@ -5,7 +5,6 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.support.BroadcastManager;
-import com.alicp.jetcache.template.CacheBuilderTemplate;
 import com.alicp.jetcache.template.QuickConfig;
 
 /**
@@ -31,10 +30,6 @@ public interface CacheManager {
     default BroadcastManager getBroadcastManager(){
         return getBroadcastManager(CacheConsts.DEFAULT_AREA);
     }
-
-    CacheBuilderTemplate getCacheBuilderTemplate();
-
-    void setCacheBuilderTemplate(CacheBuilderTemplate cacheBuilderTemplate);
 
     <K, V> Cache<K, V> getOrCreateCache(QuickConfig config);
 

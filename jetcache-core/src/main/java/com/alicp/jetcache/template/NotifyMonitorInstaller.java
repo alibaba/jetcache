@@ -21,15 +21,13 @@ import java.util.function.Function;
 public class NotifyMonitorInstaller implements CacheMonitorInstaller {
 
     private final Function<String, CacheBuilder> remoteBuilderTemplate;
-    private final CacheManager cacheManager;
 
-    public NotifyMonitorInstaller(CacheManager cacheManager, Function<String, CacheBuilder> remoteBuilderTemplate) {
+    public NotifyMonitorInstaller(Function<String, CacheBuilder> remoteBuilderTemplate) {
         this.remoteBuilderTemplate = remoteBuilderTemplate;
-        this.cacheManager = cacheManager;
     }
 
     @Override
-    public void addMonitors(Cache cache, QuickConfig quickConfig) {
+    public void addMonitors(CacheManager cacheManager, Cache cache, QuickConfig quickConfig) {
         if (quickConfig.getSyncLocal() == null || !quickConfig.getSyncLocal()) {
             return;
         }
