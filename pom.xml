@@ -207,32 +207,6 @@
         <jedis.version>3.1.0</jedis.version>
         -->
 
-        <!--
-        <spring.framework.version>5.1.6.RELEASE</spring.framework.version>
-        <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
-        <lettuce.version>5.1.6.RELEASE</lettuce.version>
-        <jedis.version>2.9.3</jedis.version>
-        -->
-
-        <!--
-        <lettuce.version>5.1.6.RELEASE</lettuce.version>
-        <jedis.version>2.9.3</jedis.version>
-        -->
-
-        <!--
-        <spring.framework.version>5.1.1.RELEASE</spring.framework.version>
-        <spring.boot.version>2.0.5.RELEASE</spring.boot.version>
-        -->
-
-        <!--
-        <spring.framework.version>4.3.16.RELEASE</spring.framework.version>
-        <spring.boot.version>1.5.12.RELEASE</spring.boot.version>
-        -->
-
-        <!--
-        <spring.framework.version>4.0.8.RELEASE</spring.framework.version>
-        <spring.boot.version>1.1.9.RELEASE</spring.boot.version>
-        -->
     </properties>
 
     <dependencyManagement>
