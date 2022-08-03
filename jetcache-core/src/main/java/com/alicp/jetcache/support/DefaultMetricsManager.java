@@ -91,14 +91,12 @@ public class DefaultMetricsManager {
         future = null;
     }
 
-    public DefaultMetricsManager add(DefaultCacheMonitor... monitors) {
+    public void add(DefaultCacheMonitor... monitors) {
         monitorList.addAll(Arrays.asList(monitors));
-        return this;
     }
 
-    public DefaultMetricsManager remove(DefaultCacheMonitor... monitor) {
-        monitorList.remove(monitor);
-        return this;
+    public void clear() {
+        monitorList.clear();
     }
 
     protected static long firstDelay(int resetTime, TimeUnit resetTimeUnit) {

@@ -43,6 +43,7 @@ public class MetricsMonitorInstaller extends AbstractLifecycle implements CacheM
     protected void doShutdown() {
         if (metricsManager != null) {
             metricsManager.stop();
+            metricsManager.clear();
             metricsManager = null;
         }
     }

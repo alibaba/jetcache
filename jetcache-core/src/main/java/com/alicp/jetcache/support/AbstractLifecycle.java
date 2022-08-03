@@ -10,13 +10,14 @@ import javax.annotation.PreDestroy;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class AbstractLifecycle {
-    private boolean inited;
+    private boolean init;
+    private boolean shutdown;
 
     @PostConstruct
     public final synchronized void init() {
-        if (!inited) {
+        if (!init) {
             doInit();
-            inited = true;
+            init = true;
         }
     }
 
@@ -25,9 +26,10 @@ public class AbstractLifecycle {
 
     @PreDestroy
     public final synchronized void shutdown() {
-        if (inited) {
+        if (init && !shutdown) {
             doShutdown();
-            inited = false;
+            init = false;
+            shutdown = true;
         }
     }
 
