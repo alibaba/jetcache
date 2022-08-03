@@ -2,6 +2,7 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.AbstractLifecycle;
@@ -39,7 +40,7 @@ public class ConfigProvider extends AbstractLifecycle {
     private CacheContext cacheContext;
 
     public ConfigProvider() {
-        cacheManager = CacheManager.defaultManager();
+        cacheManager = new SimpleCacheManager();
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
     }

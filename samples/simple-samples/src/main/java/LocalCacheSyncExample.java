@@ -1,6 +1,7 @@
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
@@ -38,7 +39,7 @@ public class LocalCacheSyncExample {
                 .buildCache();
 
         // each cache area has only one BroadcastManager instance
-        CacheManager cacheManager = CacheManager.defaultManager();
+        CacheManager cacheManager = new SimpleCacheManager();
         BroadcastManager broadcastManager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(pool)
                 .broadcastChannel("projectA")

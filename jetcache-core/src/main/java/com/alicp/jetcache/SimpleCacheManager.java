@@ -32,8 +32,6 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
 
     private final ConcurrentHashMap<String, BroadcastManager> broadcastManagers = new ConcurrentHashMap();
 
-    static final SimpleCacheManager defaultManager = new SimpleCacheManager();
-
     private CacheBuilderTemplate cacheBuilderTemplate;
 
     public SimpleCacheManager() {

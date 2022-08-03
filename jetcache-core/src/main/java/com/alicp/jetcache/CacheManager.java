@@ -42,7 +42,4 @@ public interface CacheManager {
         putBroadcastManager(CacheConsts.DEFAULT_AREA, broadcastManager);
     }
 
-    static CacheManager defaultManager() {
-        return SimpleCacheManager.defaultManager;
-    }
 }
