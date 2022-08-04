@@ -27,10 +27,10 @@ public interface CacheManager {
         putCache(CacheConsts.DEFAULT_AREA, cacheName, cache);
     }
 
-    default BroadcastManager getBroadcastManager(){
-        return getBroadcastManager(CacheConsts.DEFAULT_AREA);
-    }
-
+    /**
+     * create or get Cache instance.
+     * @see QuickConfig#newBuilder(String)
+     */
     <K, V> Cache<K, V> getOrCreateCache(QuickConfig config);
 
     default void putBroadcastManager(BroadcastManager broadcastManager){
