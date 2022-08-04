@@ -45,10 +45,6 @@ public class ConfigProvider extends AbstractLifecycle {
 
     @Override
     protected void doInit() {
-        initCacheBuilderTemplate();
-    }
-
-    protected void initCacheBuilderTemplate() {
         cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
                 globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
         for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
@@ -73,6 +69,10 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
+        initCacheMonitorInstallers();
+    }
+
+    protected void initCacheMonitorInstallers() {
         cacheBuilderTemplate.getCacheMonitorInstallers().add(metricsMonitorInstaller());
         cacheBuilderTemplate.getCacheMonitorInstallers().add(notifyMonitorInstaller());
         for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {

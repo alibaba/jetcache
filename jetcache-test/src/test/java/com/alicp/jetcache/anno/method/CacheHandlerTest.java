@@ -16,6 +16,7 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.testsupport.CountClass;
 import org.junit.jupiter.api.AfterEach;
@@ -47,12 +48,8 @@ public class CacheHandlerTest {
 
     @BeforeEach
     public void setup() {
-        GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        configProvider = new ConfigProvider(){
-            @Override
-            protected void initCacheBuilderTemplate() {
-            }
-        };
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        configProvider = new ConfigProvider();
         configProvider.setGlobalCacheConfig(globalCacheConfig);
         configProvider.init();
         cacheManager = new JetCacheBaseBeans().cacheManager(configProvider);
