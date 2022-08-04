@@ -34,7 +34,7 @@ public class LocalCacheSyncExample {
         Cache<Object, Object> l2Cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(pool)
                 .expireAfterWrite(1000, TimeUnit.SECONDS)
-                .keyPrefix("redisKeyPrefix")
+                .keyPrefix("projectC")
                 .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
 

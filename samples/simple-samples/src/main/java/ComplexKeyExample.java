@@ -20,7 +20,8 @@ public class ComplexKeyExample {
         DynamicQuery key = new DynamicQuery();
         key.setName("AAA");
         key.setEmail("BBB");
-        cache.get(key);
+        cache.put(key, "value");
+        System.out.println(cache.get(key));
     }
 
 

@@ -14,7 +14,7 @@ public class LettuceExample {
     public static void main(String[] args) {
         Cache<String, String> cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(RedisClient.create("redis://127.0.0.1"))
-                .keyPrefix("myCachePrefix")
+                .keyPrefix("projectB")
                 .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
         cache.put("K1", "V1");

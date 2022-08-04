@@ -123,6 +123,7 @@ import redis.clients.util.Pool;
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
 @EnableCreateCacheAnnotation
+@Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
     @Bean
@@ -134,14 +135,14 @@ public class JetCacheConfig {
         return new JedisPool(pc, "localhost", 6379);
     }
 
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
+    //@Bean for jetcache <=2.6 
+    //public SpringConfigProvider springConfigProvider() {
+    //    return new SpringConfigProvider();
+    //}
 
     @Bean
     public GlobalCacheConfig config(Pool<Jedis> pool){
-    // public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){ // for jetcache 2.5 
+    // public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){ // for jetcache <=2.5 
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
@@ -157,11 +158,11 @@ public class JetCacheConfig {
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        // globalCacheConfig.setConfigProvider(configProvider); // for jetcache 2.5
+        // globalCacheConfig.setConfigProvider(configProvider); // for jetcache <= 2.5
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);
-        globalCacheConfig.setAreaInCacheName(false);
+        //globalCacheConfig.setAreaInCacheName(false); for jetcache <=2.6 
 
         return globalCacheConfig;
     }

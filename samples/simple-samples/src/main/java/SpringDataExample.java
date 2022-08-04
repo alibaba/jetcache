@@ -23,7 +23,7 @@ public class SpringDataExample {
         Cache<String, String> cache = RedisSpringDataCacheBuilder.createBuilder()
                 .connectionFactory(factory)
                 .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
-                .keyPrefix("myCachePrefix")
+                .keyPrefix("projectE")
                 .buildCache();
         cache.put("K1", "V1");
         System.out.println(cache.get("K1"));

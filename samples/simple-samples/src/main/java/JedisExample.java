@@ -21,7 +21,7 @@ public class JedisExample {
         Cache<String, String> cache = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(pool)
                 .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
-                .keyPrefix("myCachePrefix")
+                .keyPrefix("projectA")
                 .buildCache();
         cache.put("K1", "V1");
         System.out.println(cache.get("K1"));
