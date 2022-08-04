@@ -39,7 +39,11 @@ public class CacheHandlerInvalidateTest {
     @BeforeEach
     public void setup() throws Exception {
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        configProvider = new ConfigProvider();
+        configProvider = new ConfigProvider(){
+            @Override
+            protected void initCacheBuilderTemplate() {
+            }
+        };
         configProvider.setGlobalCacheConfig(globalCacheConfig);
         configProvider.init();
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()

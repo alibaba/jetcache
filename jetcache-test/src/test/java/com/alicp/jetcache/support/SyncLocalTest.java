@@ -11,12 +11,19 @@ import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.redis.lettuce.JetCacheCodec;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheBuilder;
+import com.alicp.jetcache.redis.springdata.RedisSpringDataCacheBuilder;
+import com.alicp.jetcache.redisson.RedissonCacheBuilder;
 import com.alicp.jetcache.test.anno.TestUtil;
 import io.lettuce.core.RedisClient;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.UnifiedJedis;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,7 +35,7 @@ public class SyncLocalTest {
 
     @Test
     public void testJedis() throws Exception {
-        String keyPrefix = SyncLocalTest.class.getName() + "testJedis";
+        String keyPrefix = getClass().getSimpleName() + "testJedis";
         RedisCacheBuilder remoteBuilder1 = RedisCacheBuilder.createRedisCacheBuilder()
                 .keyPrefix(keyPrefix)
                 .broadcastChannel(keyPrefix)
@@ -46,7 +53,7 @@ public class SyncLocalTest {
 
     @Test
     public void testLettuce() throws Exception {
-        String keyPrefix = SyncLocalTest.class.getName() + "testLettuce";
+        String keyPrefix = getClass().getSimpleName() + "testLettuce";
         RedisClient client1 = RedisClient.create("redis://127.0.0.1");
         RedisClient client2 = RedisClient.create("redis://127.0.0.1");
         RedisLettuceCacheBuilder remoteBuilder1 = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
@@ -65,6 +72,46 @@ public class SyncLocalTest {
         BroadcastManager bm1 = remoteBuilder1.createBroadcastManager(new SimpleCacheManager());
         BroadcastManager bm2 = remoteBuilder2.createBroadcastManager(new SimpleCacheManager());
         test(remote1, remote2, bm1, bm2);
+    }
+
+    @Test
+    public void testRedisson() throws Exception {
+        final String keyPrefix = getClass().getSimpleName() + "testRedisson";
+        final Config config = new Config();
+        config.useSingleServer().setAddress("redis://127.0.0.1:6379").setDatabase(0);
+        RedissonClient client1 = Redisson.create(config);
+        RedissonClient client2 = Redisson.create(config);
+        RedissonCacheBuilder b1 = RedissonCacheBuilder.createBuilder()
+                .redissonClient(client1)
+                .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix);
+        RedissonCacheBuilder b2 = RedissonCacheBuilder.createBuilder()
+                .redissonClient(client2)
+                .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix);
+        test(b1.buildCache(), b2.buildCache(),
+                b1.createBroadcastManager(new SimpleCacheManager()),
+                b2.createBroadcastManager(new SimpleCacheManager()));
+    }
+
+    @Test
+    public void testSpringData() throws Exception {
+        final String keyPrefix = getClass().getSimpleName() + "testSpringData";
+        LettuceConnectionFactory f1 = new LettuceConnectionFactory(new RedisStandaloneConfiguration("127.0.0.1", 6379));
+        f1.afterPropertiesSet();
+        LettuceConnectionFactory f2 = new LettuceConnectionFactory(new RedisStandaloneConfiguration("127.0.0.1", 6379));
+        f2.afterPropertiesSet();
+        RedisSpringDataCacheBuilder b1 = RedisSpringDataCacheBuilder.createBuilder()
+                .connectionFactory(f1)
+                .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix);
+        RedisSpringDataCacheBuilder b2 = RedisSpringDataCacheBuilder.createBuilder()
+                .connectionFactory(f1)
+                .keyPrefix(keyPrefix)
+                .broadcastChannel(keyPrefix);
+        test(b1.buildCache(), b2.buildCache(),
+                b1.createBroadcastManager(new SimpleCacheManager()),
+                b2.createBroadcastManager(new SimpleCacheManager()));
     }
 
     private void test(Cache remote1, Cache remote2, BroadcastManager bm1, BroadcastManager bm2) throws Exception {
@@ -128,5 +175,10 @@ public class SyncLocalTest {
         c2.removeAll(s);
         TestUtil.waitUtil(null, () -> local1.get("K1"));
         TestUtil.waitUtil(null, () -> local1.get("K2"));
+
+        c1.close();
+        c2.close();
+        bm1.close();
+        bm2.close();
     }
 }

@@ -4,7 +4,6 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
@@ -62,14 +61,16 @@ public class ConfigProvider_DefaultCacheManager_Test extends SpringTestBase {
         CountBean bean = context.getBean(CountBean.class);
         String value = (bean.count("K1"));
         Assert.assertEquals(value, bean.count("K1"));
-        CacheManager.defaultManager().getCache("C1").remove("K1");
+        ConfigProvider cp = context.getBean(ConfigProvider.class);
+        cp.getCacheManager().getCache("C1").remove("K1");
         Assert.assertNotEquals(value, bean.count("K1"));
     }
 
     @Test
     public void test2() {
-        Assert.assertNotNull(CacheManager.defaultManager().getCache("C1"));
-        Assert.assertNotNull(CacheManager.defaultManager().getCache("C2"));
+        ConfigProvider cp = context.getBean(ConfigProvider.class);
+        Assert.assertNotNull(cp.getCacheManager().getCache("C1"));
+        Assert.assertNotNull(cp.getCacheManager().getCache("C2"));
     }
 
 }

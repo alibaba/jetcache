@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assertions;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class AbstractBroadcastManagerTest {
-    protected void testBroadcastManager(BroadcastManager manager) throws InterruptedException {
+    protected void testBroadcastManager(BroadcastManager manager) throws Exception {
         CacheMessage cm = new CacheMessage();
         cm.setArea("area");
         cm.setCacheName("cacheName");
@@ -36,9 +36,12 @@ public class AbstractBroadcastManagerTest {
         manager.getCacheManager().putCache("area", "cacheName", mc);
 
         manager.startSubscribe();
+        Thread.sleep(50);
         CacheResult result = manager.publish(cm);
         Assertions.assertTrue(result.isSuccess());
 
         TestUtil.waitUtil(() -> c1.get("K") == null);
+
+        manager.close();
     }
 }

@@ -1,12 +1,22 @@
 package com.alicp.jetcache.anno.support;
 
+import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.SimpleCacheManager;
+import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
+import com.alicp.jetcache.external.ExternalCacheBuilder;
+import com.alicp.jetcache.support.AbstractLifecycle;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
+import com.alicp.jetcache.template.CacheBuilderTemplate;
+import com.alicp.jetcache.template.CacheMonitorInstaller;
+import com.alicp.jetcache.template.MetricsMonitorInstaller;
+import com.alicp.jetcache.template.NotifyMonitorInstaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -25,51 +35,89 @@ public class ConfigProvider extends AbstractLifecycle {
     protected CacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
-    protected CacheMonitorManager cacheMonitorManager;
     private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
 
-    private final CacheMonitorManager defaultCacheMonitorManager = new DefaultCacheMonitorManager();
+    private CacheBuilderTemplate cacheBuilderTemplate;
 
     private CacheContext cacheContext;
 
     public ConfigProvider() {
-        cacheManager = CacheManager.defaultManager();
+        cacheManager = new SimpleCacheManager();
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
-        cacheMonitorManager = defaultCacheMonitorManager;
     }
 
     @Override
-    public void doInit() {
-        initDefaultCacheMonitorInstaller();
+    protected void doInit() {
         cacheContext = newContext();
+        initCacheBuilderTemplate();
+        if (cacheManager instanceof SimpleCacheManager) {
+            ((SimpleCacheManager) cacheManager).setCacheBuilderTemplate(cacheBuilderTemplate);
+        }
     }
 
-    protected void initDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager == defaultCacheMonitorManager) {
-            DefaultCacheMonitorManager cacheMonitorManager = (DefaultCacheMonitorManager) this.cacheMonitorManager;
-            cacheMonitorManager.setGlobalCacheConfig(globalCacheConfig);
-            cacheMonitorManager.setMetricsCallback(metricsCallback);
-            cacheMonitorManager.setConfigProvider(this);
-            cacheMonitorManager.init();
+    protected void initCacheBuilderTemplate() {
+        cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
+            EmbeddedCacheBuilder eb = (EmbeddedCacheBuilder) builder;
+            if (eb.getConfig().getKeyConvertor() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getKeyConvertor();
+                eb.setKeyConvertor(parseKeyConvertor(f.getValue()));
+            }
         }
+        for (CacheBuilder builder : globalCacheConfig.getRemoteCacheBuilders().values()) {
+            ExternalCacheBuilder eb = (ExternalCacheBuilder) builder;
+            if (eb.getConfig().getKeyConvertor() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getKeyConvertor();
+                eb.setKeyConvertor(parseKeyConvertor(f.getValue()));
+            }
+            if (eb.getConfig().getValueEncoder() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getValueEncoder();
+                eb.setValueEncoder(parseValueEncoder(f.getValue()));
+            }
+            if (eb.getConfig().getValueDecoder() instanceof ParserFunction) {
+                ParserFunction f = (ParserFunction) eb.getConfig().getValueDecoder();
+                eb.setValueDecoder(parseValueDecoder(f.getValue()));
+            }
+        }
+        cacheBuilderTemplate.getCacheMonitorInstallers().add(metricsMonitorInstaller());
+        cacheBuilderTemplate.getCacheMonitorInstallers().add(notifyMonitorInstaller());
+        for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
+            if (i instanceof AbstractLifecycle) {
+                ((AbstractLifecycle) i).init();
+            }
+        }
+    }
+
+    protected CacheMonitorInstaller metricsMonitorInstaller() {
+        Duration interval = null;
+        if (globalCacheConfig.getStatIntervalMinutes() > 0) {
+            interval = Duration.ofMinutes(globalCacheConfig.getStatIntervalMinutes());
+        }
+
+        MetricsMonitorInstaller i = new MetricsMonitorInstaller(metricsCallback, interval);
+        i.init();
+        return i;
+    }
+
+    protected CacheMonitorInstaller notifyMonitorInstaller() {
+        return new NotifyMonitorInstaller(area -> globalCacheConfig.getRemoteCacheBuilders().get(area));
     }
 
     @Override
     public void doShutdown() {
         try {
-            shutdownDefaultCacheMonitorInstaller();
+            for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
+                if (i instanceof AbstractLifecycle) {
+                    ((AbstractLifecycle) i).shutdown();
+                }
+            }
             if (cacheManager instanceof AutoCloseable) {
                 ((AutoCloseable) cacheManager).close();
             }
         } catch (Exception e) {
             logger.error("close fail", e);
-        }
-    }
-
-    protected void shutdownDefaultCacheMonitorInstaller() {
-        if (cacheMonitorManager == defaultCacheMonitorManager) {
-            ((AbstractLifecycle) cacheMonitorManager).shutdown();
         }
     }
 
@@ -119,14 +167,6 @@ public class ConfigProvider extends AbstractLifecycle {
 
     public void setKeyConvertorParser(KeyConvertorParser keyConvertorParser) {
         this.keyConvertorParser = keyConvertorParser;
-    }
-
-    public CacheMonitorManager getCacheMonitorManager() {
-        return cacheMonitorManager;
-    }
-
-    public void setCacheMonitorManager(CacheMonitorManager cacheMonitorManager) {
-        this.cacheMonitorManager = cacheMonitorManager;
     }
 
     public GlobalCacheConfig getGlobalCacheConfig() {

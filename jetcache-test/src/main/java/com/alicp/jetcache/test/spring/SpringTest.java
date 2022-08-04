@@ -1,14 +1,17 @@
 package com.alicp.jetcache.test.spring;
 
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.support.ConfigProvider;
+import com.alicp.jetcache.template.QuickConfig;
 import com.alicp.jetcache.test.beans.FactoryBeanTarget;
 import com.alicp.jetcache.test.beans.Service;
 import com.alicp.jetcache.test.beans.TestBean;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
 import org.junit.Assert;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+
+import java.util.UUID;
 
 /**
  * Created on 2016/11/23.
@@ -25,6 +28,7 @@ public class SpringTest extends SpringTestBase {
 
         FactoryBeanTarget target = (FactoryBeanTarget) context.getBean("factoryBeanTarget");
         Assert.assertEquals(target.count(), target.count());
+        testCacheManager();
     }
 
     private void testService(Service service, TestBean bean) throws Exception {
@@ -141,6 +145,14 @@ public class SpringTest extends SpringTestBase {
 
         Assert.assertEquals(bean.count("K1"), bean.count("K1"));
         Assert.assertNotEquals(bean.count("K1"), bean.count("K2"));
+    }
+
+    private void testCacheManager() {
+        String cacheName = UUID.randomUUID().toString();
+        ConfigProvider cp = context.getBean(ConfigProvider.class);
+        Cache c = cp.getCacheManager().getOrCreateCache(QuickConfig.newBuilder(cacheName).build());
+        Cache c2 = cp.getCacheManager().getCache(CacheConsts.DEFAULT_AREA, cacheName);
+        Assert.assertSame(c, c2);
     }
 
 }

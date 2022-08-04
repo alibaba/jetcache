@@ -5,6 +5,7 @@ package com.alicp.jetcache;
 
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.support.BroadcastManager;
+import com.alicp.jetcache.template.QuickConfig;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -30,11 +31,10 @@ public interface CacheManager {
         return getBroadcastManager(CacheConsts.DEFAULT_AREA);
     }
 
+    <K, V> Cache<K, V> getOrCreateCache(QuickConfig config);
+
     default void putBroadcastManager(BroadcastManager broadcastManager){
         putBroadcastManager(CacheConsts.DEFAULT_AREA, broadcastManager);
     }
 
-    static CacheManager defaultManager() {
-        return SimpleCacheManager.defaultManager;
-    }
 }

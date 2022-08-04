@@ -1,11 +1,12 @@
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.MultiLevelCacheBuilder;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import com.alicp.jetcache.support.BroadcastManager;
 import com.alicp.jetcache.support.CacheNotifyMonitor;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import redis.clients.jedis.JedisPool;
 
@@ -22,7 +23,7 @@ public class LocalCacheSyncExample {
     private static Cache<Object, Object> createMultiLevelCache() {
         Cache<Object, Object> l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .expireAfterWrite(1000, TimeUnit.SECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
 
         GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
@@ -34,11 +35,11 @@ public class LocalCacheSyncExample {
                 .jedisPool(pool)
                 .expireAfterWrite(1000, TimeUnit.SECONDS)
                 .keyPrefix("redisKeyPrefix")
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
 
         // each cache area has only one BroadcastManager instance
-        CacheManager cacheManager = CacheManager.defaultManager();
+        CacheManager cacheManager = new SimpleCacheManager();
         BroadcastManager broadcastManager = RedisCacheBuilder.createRedisCacheBuilder()
                 .jedisPool(pool)
                 .broadcastChannel("projectA")

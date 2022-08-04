@@ -7,12 +7,12 @@ jetcache:
   local:
     default:
       type: caffeine
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       limit: 200
       defaultExpireInMillis: 10000
     A1:
       type: linkedhashmap
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       limit: 100
       expireAfterAccess: true
       defaultExpireInMillis: 10000
@@ -20,7 +20,7 @@ jetcache:
     default:
       type: redis
       broadcastChannel: projectA
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       poolConfig:
         minIdle: 2
         maxIdle: 5
@@ -49,7 +49,7 @@ jetcache:
           port: 6381
     A1:
       type: redis
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
       poolConfig:
         minIdle: 2
         maxIdle: 5

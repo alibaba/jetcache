@@ -7,7 +7,11 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.KeyConvertor;
-import com.alicp.jetcache.anno.support.*;
+import com.alicp.jetcache.anno.support.CacheContext;
+import com.alicp.jetcache.anno.support.CachedAnnoConfig;
+import com.alicp.jetcache.anno.support.ConfigMap;
+import com.alicp.jetcache.anno.support.ConfigProvider;
+import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.support.DynamicQuery;
@@ -19,7 +23,12 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -36,7 +45,11 @@ public class CacheHandlerTest {
     @BeforeEach
     public void setup() {
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        configProvider = new ConfigProvider();
+        configProvider = new ConfigProvider(){
+            @Override
+            protected void initCacheBuilderTemplate() {
+            }
+        };
         configProvider.setGlobalCacheConfig(globalCacheConfig);
         configProvider.init();
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()

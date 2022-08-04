@@ -23,7 +23,7 @@ requirements:
 * Spring Framework4.0.8+ (optional, with annotation support)
 * Spring Boot1.1.9+ (optional)
 
-Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more details.
+Visit [docs](docs/EN/Readme.md) for more details.
 
 # Getting started
 
@@ -174,4 +174,4 @@ jetcache:
 ```
 
 ## More docs
-Visit [wiki](https://github.com/alibaba/jetcache/wiki) for more details.
+Visit [docs](docs/EN/Readme.md) for more details.

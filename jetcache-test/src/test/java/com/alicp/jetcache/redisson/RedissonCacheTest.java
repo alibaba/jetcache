@@ -2,9 +2,12 @@ package com.alicp.jetcache.redisson;
 
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.RefreshCacheTest;
-import com.alicp.jetcache.support.*;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
+import com.alicp.jetcache.support.KryoValueDecoder;
+import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -18,7 +21,6 @@ import java.util.concurrent.TimeUnit;
  *
  * @author <a href="mailto:jeason1914@qq.com">yangyong</a>
  */
-@Ignore
 public class RedissonCacheTest extends AbstractExternalCacheTest {
 
     @Test

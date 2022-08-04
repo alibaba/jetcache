@@ -14,7 +14,16 @@ public class GlobalCacheConfig {
 
     private String[] hiddenPackages;
     protected int statIntervalMinutes;
-    private boolean areaInCacheName = true;
+    /**
+     * for compatible reason. This property controls whether add area as remote cache key prefix.
+     * version<=2.4.3: add cache area in prefix, no config.
+     * version>2.4.3 && version <2.7: default value is true, keep same as 2.4.3 if not set.
+     * version>=2.7.0.RC: default value is false.
+     *
+     * remove in the future.
+     */
+    @Deprecated
+    private boolean areaInCacheName = false;
     private boolean penetrationProtect = false;
     private boolean enableMethodCache = true;
 
@@ -56,10 +65,28 @@ public class GlobalCacheConfig {
         this.statIntervalMinutes = statIntervalMinutes;
     }
 
+    /**
+     * for compatible reason. This property controls whether add area as remote cache key prefix.
+     * version<=2.4.3: add cache area in prefix, no config.
+     * version>2.4.3 && version <2.7: default value is true, keep same as 2.4.3 if not set.
+     * version>=2.7.0.RC: default value is false.
+     *
+     * remove in the future.
+     */
+    @Deprecated
     public boolean isAreaInCacheName() {
         return areaInCacheName;
     }
 
+    /**
+     * for compatible reason. This property controls whether add area as remote cache key prefix.
+     * version<=2.4.3: add cache area in prefix, no config.
+     * version>2.4.3 && version <2.7: default value is true, keep same as 2.4.3 if not set.
+     * version>=2.7.0.RC: default value is false.
+     *
+     * remove in the future.
+     */
+    @Deprecated
     public void setAreaInCacheName(boolean areaInCacheName) {
         this.areaInCacheName = areaInCacheName;
     }

@@ -21,8 +21,8 @@ public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
         ExternalCacheBuilder ecb = (ExternalCacheBuilder) builder;
         ecb.setKeyPrefix(ct.getProperty("keyPrefix"));
         ecb.setBroadcastChannel(parseBroadcastChannel(ct));
-        ecb.setValueEncoder(new ParserFunction<>(ct.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
-        ecb.setValueDecoder(new ParserFunction<>(ct.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
+        ecb.setValueEncoder(new ParserFunction(ct.getProperty("valueEncoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
+        ecb.setValueDecoder(new ParserFunction(ct.getProperty("valueDecoder", CacheConsts.DEFAULT_SERIAL_POLICY)));
     }
 
     protected String parseBroadcastChannel(ConfigTree ct) {
