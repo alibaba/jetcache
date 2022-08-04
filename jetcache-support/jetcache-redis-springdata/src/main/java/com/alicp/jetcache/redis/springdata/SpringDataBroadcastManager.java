@@ -46,13 +46,23 @@ public class SpringDataBroadcastManager extends BroadcastManager {
 
     @Override
     public CacheResult publish(CacheMessage cacheMessage) {
-        try (RedisConnection con = config.getConnectionFactory().getConnection()) {
+        RedisConnection con = null;
+        try {
+            con = config.getConnectionFactory().getConnection();
             byte[] body = (byte[]) config.getValueEncoder().apply(cacheMessage);
             con.publish(channel, body);
             return CacheResult.SUCCESS_WITHOUT_MSG;
         } catch (Exception ex) {
             SquashedLogger.getLogger(logger).error("jetcache publish error", ex);
             return new CacheResult(ex);
+        } finally {
+            if (con != null) {
+                try {
+                    con.close();
+                } catch (Exception e) {
+                    SquashedLogger.getLogger(logger).error("RedisConnection close fail", e);
+                }
+            }
         }
     }
 
