@@ -201,11 +201,9 @@
         <jedis.version>4.2.3</jedis.version>
         <redisson.version>3.17.3</redisson.version>
 
-        <!-- 2.6.2
+        <!--
         <spring.framework.version>5.2.4.RELEASE</spring.framework.version>
         <spring.boot.version>2.2.5.RELEASE</spring.boot.version>
-        <lettuce.version>5.2.2.RELEASE</lettuce.version>
-        <jedis.version>3.1.0</jedis.version>
         -->
 
         <jackson.version>2.13.3</jackson.version>
