@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.KeyConvertor;
@@ -12,6 +13,7 @@ import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import com.alicp.jetcache.test.support.DynamicQuery;
@@ -36,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class CacheHandlerTest {
 
     private ConfigProvider configProvider;
+    private CacheManager cacheManager;
     private CachedAnnoConfig cachedAnnoConfig;
     private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
@@ -52,6 +55,7 @@ public class CacheHandlerTest {
         };
         configProvider.setGlobalCacheConfig(globalCacheConfig);
         configProvider.init();
+        cacheManager = new JetCacheBaseBeans().cacheManager(configProvider);
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -87,7 +91,7 @@ public class CacheHandlerTest {
 
 
     private CacheInvokeContext createCachedInvokeContext(Invoker invoker, Method method, Object[] args) {
-        CacheInvokeContext c = configProvider.getCacheContext().createCacheInvokeContext(configMap);
+        CacheInvokeContext c = configProvider.newContext(cacheManager).createCacheInvokeContext(configMap);
         c.setCacheInvokeConfig(cacheInvokeConfig);
         cacheInvokeConfig.setCachedAnnoConfig(cachedAnnoConfig);
         c.setInvoker(invoker);

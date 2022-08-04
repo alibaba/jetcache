@@ -33,13 +33,12 @@ public class CacheContext {
 
     private ConfigProvider configProvider;
     private GlobalCacheConfig globalCacheConfig;
+    private CacheManager cacheManager;
 
-    protected CacheManager cacheManager;
-
-    public CacheContext(ConfigProvider configProvider, GlobalCacheConfig globalCacheConfig) {
+    public CacheContext(CacheManager cacheManager, ConfigProvider configProvider, GlobalCacheConfig globalCacheConfig) {
+        this.cacheManager = cacheManager;
         this.globalCacheConfig = globalCacheConfig;
         this.configProvider = configProvider;
-        cacheManager = configProvider.getCacheManager();
     }
 
     public CacheInvokeContext createCacheInvokeContext(ConfigMap configMap) {
@@ -79,17 +78,6 @@ public class CacheContext {
                     .generateCacheName(invokeContext.getMethod(), invokeContext.getTargetObject());
         }
         Cache cache = __createOrGetCache(ac, area, cacheName);
-        return cache;
-    }
-
-    @Deprecated
-    public <K, V> Cache<K, V> getCache(String cacheName) {
-        return getCache(CacheConsts.DEFAULT_AREA, cacheName);
-    }
-
-    @Deprecated
-    public <K, V> Cache<K, V> getCache(String area, String cacheName) {
-        Cache cache = cacheManager.getCache(area, cacheName);
         return cache;
     }
 

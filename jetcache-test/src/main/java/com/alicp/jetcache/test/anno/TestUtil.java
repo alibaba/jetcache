@@ -4,8 +4,8 @@
 package com.alicp.jetcache.test.anno;
 
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
@@ -54,15 +54,11 @@ public class TestUtil {
         return globalCacheConfig;
     }
 
-    public static ConfigProvider createConfigProvider() {
-        ConfigProvider configProvider = new ConfigProvider();
-        configProvider.setGlobalCacheConfig(createGloableConfig());
-        return configProvider;
-    }
-
-    public static SpringConfigProvider createSpringConfigProvider() {
-        SpringConfigProvider configProvider = new SpringConfigProvider();
-        configProvider.setGlobalCacheConfig(createGloableConfig());
+    public static SpringConfigProvider createConfigProvider() {
+        JetCacheBaseBeans baseBeans = new JetCacheBaseBeans();
+        SpringConfigProvider configProvider = baseBeans.springConfigProvider(
+                null, createGloableConfig(), null, null, null);
+        baseBeans.cacheManager(configProvider);
         return configProvider;
     }
 

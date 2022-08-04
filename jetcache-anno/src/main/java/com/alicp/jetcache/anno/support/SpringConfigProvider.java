@@ -19,9 +19,6 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     private ApplicationContext applicationContext;
 
     public SpringConfigProvider() {
-        super();
-        encoderParser = new DefaultSpringEncoderParser();
-        keyConvertorParser = new DefaultSpringKeyConvertorParser();
     }
 
     @Override
@@ -30,25 +27,8 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     }
 
     @Override
-    protected void doInit() {
-        if (encoderParser instanceof ApplicationContextAware) {
-            ((ApplicationContextAware) encoderParser).setApplicationContext(applicationContext);
-        }
-        if (keyConvertorParser instanceof ApplicationContextAware) {
-            ((ApplicationContextAware) keyConvertorParser).setApplicationContext(applicationContext);
-        }
-        super.doInit();
-    }
-
-    @Override
-    protected CacheContext newContext() {
-        return new SpringCacheContext(this, globalCacheConfig, applicationContext);
-    }
-
-    @Autowired(required = false)
-    @Override
-    public void setCacheManager(CacheManager cacheManager) {
-        super.setCacheManager(cacheManager);
+    public CacheContext newContext(CacheManager cacheManager) {
+        return new SpringCacheContext(cacheManager, this, globalCacheConfig, applicationContext);
     }
 
     @Autowired(required = false)

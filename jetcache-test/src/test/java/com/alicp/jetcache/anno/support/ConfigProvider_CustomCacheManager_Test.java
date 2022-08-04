@@ -4,7 +4,6 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;
@@ -14,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -24,16 +24,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = ConfigProvider_CustomCacheManager_Test.class)
 @Configuration
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.anno.support.ConfigProvider_CustomCacheManager_Test"})
+@Import(JetCacheBaseBeans.class)
 public class ConfigProvider_CustomCacheManager_Test extends SpringTestBase {
-    @Bean
-    public SimpleCacheManager cacheManager() {
-        return new SimpleCacheManager();
-    }
-
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
 
     @Bean
     public GlobalCacheConfig config() {

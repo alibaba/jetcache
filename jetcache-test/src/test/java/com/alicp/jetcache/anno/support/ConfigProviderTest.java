@@ -34,9 +34,8 @@ public class ConfigProviderTest {
         configProvider.setMetricsCallback(i -> {
         });
         configProvider.setGlobalCacheConfig(globalCacheConfig);
-        cacheManager = new SimpleCacheManager();
-        configProvider.setCacheManager(cacheManager);
         configProvider.init();
+        cacheManager = new JetCacheBaseBeans().cacheManager(configProvider);
     }
 
     @AfterEach

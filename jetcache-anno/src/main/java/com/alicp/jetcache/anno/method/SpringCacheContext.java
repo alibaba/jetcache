@@ -1,5 +1,6 @@
 package com.alicp.jetcache.anno.method;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.SpringConfigProvider;
@@ -14,8 +15,9 @@ public class SpringCacheContext extends CacheContext {
 
     private ApplicationContext applicationContext;
 
-    public SpringCacheContext(SpringConfigProvider configProvider, GlobalCacheConfig globalCacheConfig, ApplicationContext applicationContext) {
-        super(configProvider, globalCacheConfig);
+    public SpringCacheContext(CacheManager cacheManager, SpringConfigProvider configProvider,
+                              GlobalCacheConfig globalCacheConfig, ApplicationContext applicationContext) {
+        super(cacheManager, configProvider, globalCacheConfig);
         this.applicationContext = applicationContext;
     }
 
