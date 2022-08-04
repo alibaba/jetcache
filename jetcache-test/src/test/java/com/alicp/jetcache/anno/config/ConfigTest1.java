@@ -41,8 +41,8 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ConfigTest.A.class)
-public class ConfigTest implements ApplicationContextAware {
+@ContextConfiguration(classes = ConfigTest1.A.class)
+public class ConfigTest1 implements ApplicationContextAware {
 
     private ApplicationContext context;
 
@@ -96,7 +96,7 @@ public class ConfigTest implements ApplicationContextAware {
 
 
     @Configuration
-    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config")
+    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config.ConfigTest1")
     @EnableCreateCacheAnnotation
     @Import(JetCacheBaseBeans.class)
     public static class A {
