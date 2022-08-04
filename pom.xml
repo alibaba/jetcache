@@ -198,7 +198,7 @@
         <lettuce.version>5.2.2.RELEASE</lettuce.version>
         <jedis.version>3.1.0</jedis.version>
 
-        <!-- need jedis 2.9.3
+        <!-- spring-data jedis need jedis 2.9.3, jetcache-redis need 3.1.0, can't use together
         <spring.framework.version>5.1.6.RELEASE</spring.framework.version>
         <spring.boot.version>2.1.4.RELEASE</spring.boot.version>
         -->
