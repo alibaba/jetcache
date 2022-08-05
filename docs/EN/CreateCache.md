@@ -1,5 +1,27 @@
 
-# Introduce
+# CacheManager
+use CacheManager to create *Cache* instance, it returns same *Cache* instance with @Cached if *area* and *name* equals.
+
+*notice: in jetcache 2.7 CreateCache annotation is deprecated, use CacheManager.getOrCreateCache(QuickConfig) instead*
+
+example:
+```java
+@Autowired
+private CacheManager cacheManager;
+private Cache<String, UserDO> userCache;
+
+@PostConstruct
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache")
+        .expire(Duration.ofSeconds(100))
+        .cacheType(CacheType.BOTH) // two level cache
+        .syncLocal(true) // invalidate local cache in all jvm process after update
+        .build();
+    userCache = cacheManager.getOrCreateCache(qc);
+}
+```
+
+# CreateCache annotation
 
 You can use ```@CreateCache``` annotation to create and configure a ```Cache``` instance in a Spring Bean.
 For Example:

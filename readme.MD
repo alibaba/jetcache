@@ -11,17 +11,18 @@ Currently, there are four implementations: ```RedisCache```, ```TairCache```(not
 Full features of JetCache:
 * Manipulate cache through uniform Cache API. 
 * Declarative method caching using annotations with TTL(Time To Live) and two level caching support
-* Create & configure ```Cache``` instance with annotations
+* Create & configure ```Cache``` instance with cache manager
 * Automatically collect access statistics for ```Cache``` instance and method level cache
 * The strategy of key generation and value serialization can be customized
 * Distributed cache auto refresh and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
+* Invalidate local caches (in all JVM process) after updates (2.7+)
 * Spring Boot support
 
 requirements:
 * JDK1.8
-* Spring Framework4.0.8+ (optional, with annotation support)
-* Spring Boot1.1.9+ (optional)
+* Spring Framework4.0.8+ (optional, with annotation support)，jetcache 2.7 need 5.2.4.RELEASE+
+* Spring Boot1.1.9+ (optional), jetcache 2.7 need 2.2.5.RELEASE+
 
 Visit [docs](docs/EN/Readme.md) for more details.
 
@@ -66,9 +67,21 @@ CachePenetrationProtect annotation indicates that the cache will be loaded synch
 
 ## Cache API
 Create a ```Cache``` instance with ```@CreateCache``` annotation:
+
 ```java
-@CreateCache(expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
-private Cache<Long, UserDO> userCache;
+@Autowired
+private CacheManager cacheManager;
+private Cache<String, UserDO> userCache;
+
+@PostConstruct
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache")
+        .expire(Duration.ofSeconds(100))
+        .cacheType(CacheType.BOTH) // two level cache
+        .syncLocal(true) // invalidate local cache in all jvm process after update
+        .build();
+    userCache = cacheManager.getOrCreateCache(qc);
+}
 ```
 The code above create a ```Cache``` instance. ```cacheType = CacheType.BOTH``` define a two level cache (a local in-memory-cache and a remote cache system) with local elements limited upper to 50(LRU based evict). You can use it like a map: 
 ```java
