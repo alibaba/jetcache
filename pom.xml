@@ -195,9 +195,9 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <spring.framework.version>5.3.20</spring.framework.version>
-        <spring.boot.version>2.7.0</spring.boot.version>
-        <lettuce.version>6.1.8.RELEASE</lettuce.version>
+        <spring.framework.version>5.3.22</spring.framework.version>
+        <spring.boot.version>2.7.2</spring.boot.version>
+        <lettuce.version>6.1.9.RELEASE</lettuce.version>
         <jedis.version>4.2.3</jedis.version>
         <redisson.version>3.17.3</redisson.version>
 
