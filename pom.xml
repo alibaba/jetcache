@@ -66,8 +66,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
+                    <release>8</release>
                     <compilerArgument>-parameters</compilerArgument>
                 </configuration>
             </plugin>
@@ -284,6 +285,7 @@
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
                 <version>2.9.3</version>
+                <!--3.0+ need java 11-->
             </dependency>
 
             <dependency>
