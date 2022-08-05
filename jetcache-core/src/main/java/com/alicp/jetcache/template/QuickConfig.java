@@ -30,6 +30,7 @@ public class QuickConfig {
     private Boolean penetrationProtect;
     private Duration penetrationProtectTimeout;
     private RefreshPolicy refreshPolicy;
+    private Function<? extends Object, ? extends Object> loader;
 
     private QuickConfig() {
     }
@@ -58,6 +59,7 @@ public class QuickConfig {
         private Boolean penetrationProtect;
         private Duration penetrationProtectTimeout;
         private RefreshPolicy refreshPolicy;
+        private Function<? extends Object, ? extends Object> loader;
 
         Builder(String name) {
             Objects.requireNonNull(name);
@@ -88,6 +90,7 @@ public class QuickConfig {
             c.penetrationProtect = penetrationProtect;
             c.penetrationProtectTimeout = penetrationProtectTimeout;
             c.refreshPolicy = refreshPolicy;
+            c.loader = loader;
             return c;
         }
 
@@ -155,6 +158,11 @@ public class QuickConfig {
             this.refreshPolicy = refreshPolicy;
             return this;
         }
+
+        public <K, V> Builder loader(Function<K, V> loader) {
+            this.loader = loader;
+            return this;
+        }
     }
 
     public String getArea() {
@@ -217,4 +225,7 @@ public class QuickConfig {
         return refreshPolicy;
     }
 
+    public <K, V> Function<K, V> getLoader() {
+        return (Function<K, V>) loader;
+    }
 }

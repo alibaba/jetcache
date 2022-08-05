@@ -131,9 +131,12 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
                     .buildCache();
         }
         if (config.getRefreshPolicy() != null) {
-            cache.config().setRefreshPolicy(config.getRefreshPolicy());
             cache = new RefreshCache(cache);
+        } else if (config.getLoader() != null) {
+            cache = new LoadingCache(cache);
         }
+        cache.config().setRefreshPolicy(config.getRefreshPolicy());
+
 
         boolean protect = config.getPenetrationProtect() != null ? config.getPenetrationProtect()
                 : cacheBuilderTemplate.isPenetrationProtect();

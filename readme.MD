@@ -66,7 +66,7 @@ public interface SummaryService{
 CachePenetrationProtect annotation indicates that the cache will be loaded synchronously in multi-thread environment.
 
 ## Cache API
-Create a ```Cache``` instance with ```@CreateCache``` annotation:
+Create a ```Cache``` instance with ```CacheManager```:
 
 ```java
 @Autowired
@@ -78,6 +78,7 @@ public void init() {
     QuickConfig qc = QuickConfig.newBuilder("userCache")
         .expire(Duration.ofSeconds(100))
         .cacheType(CacheType.BOTH) // two level cache
+        .localLimit(50)
         .syncLocal(true) // invalidate local cache in all jvm process after update
         .build();
     userCache = cacheManager.getOrCreateCache(qc);
@@ -90,23 +91,6 @@ userCache.put(12345L, loadUserFromDataBase(12345L));
 userCache.remove(12345L);
 
 userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
-```
-
-Or you can create ```Cache``` instance manually (RedisCache in this example) :
-```java
-GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
-pc.setMinIdle(2);
-pc.setMaxIdle(10);
-pc.setMaxTotal(10);
-JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
-Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .valueEncoder(JavaValueEncoder.INSTANCE)
-                .valueDecoder(JavaValueDecoder.INSTANCE)
-                .jedisPool(pool)
-                .keyPrefix("userCache-")
-                .expireAfterWrite(200, TimeUnit.SECONDS)
-                .buildCache();
 ```
 
 ## Advanced API
@@ -128,14 +112,19 @@ cache.tryLockAndRun("key", 60, TimeUnit.SECONDS, () -> heavyDatabaseOperation())
 
 Read through and auto refresh:
 ```java
-@CreateCache
-@CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60, stopRefreshAfterLastAccess = 100)
-@CachePenetrationProtect
+@Autowired
+private CacheManager cacheManager;
 private Cache<String, Long> orderSumCache;
 
 @PostConstruct
-public void init(){
-    orderSumCache.config().setLoader(this::loadOrderSumFromDatabase);
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache")
+        .expire(Duration.ofSeconds(3600))
+        .loader(this::loadOrderSumFromDatabase)
+        .refreshPolicy(RefreshPolicy.newPolicy(60, TimeUnit.SECONDS).stopRefreshAfterLastAccess(100, TimeUnit.SECONDS))
+        .penetrationProtect(true)
+        .build();
+    orderSumCache = cacheManager.getOrCreateCache(qc);
 }
 ```
 
