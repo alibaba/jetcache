@@ -31,4 +31,4 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report -DrepoToken=YE7bNXa10ZaQnAdJkttSoa5nrdS4sepd9
+      run: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report -DrepoToken=${{ secrets.COV_TOKEN }}
