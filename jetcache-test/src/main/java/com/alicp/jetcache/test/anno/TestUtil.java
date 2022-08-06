@@ -77,19 +77,21 @@ public class TestUtil {
         if (Objects.equals(expectValue, obj)) {
             return;
         }
+        int waitCount = 0;
         while (deadline - System.nanoTime() > 0) {
             try {
                 Thread.sleep(5);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            waitCount++;
             obj = actual.get();
             if(Objects.equals(expectValue, obj)){
                 return;
             }
         }
         throw new AssertionFailedError("expect: " + expectValue + ", actual:" + obj + ", timeout="
-                + timeoutMillis + "ms, cost=" + (System.nanoTime() - start) / 1000 / 1000 + "ms");
+                + timeoutMillis + "ms, cost=" + (System.nanoTime() - start) / 1000 / 1000 + "ms, waitCount=" + waitCount);
     }
 
 }
