@@ -78,7 +78,7 @@ public class TestUtil {
         }
         while (deadline - System.nanoTime() > 0) {
             try {
-                Thread.sleep(3);
+                Thread.sleep(5);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
