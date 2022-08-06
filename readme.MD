@@ -143,7 +143,7 @@ App class:
 ```java
 @SpringBootApplication
 @EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
+@EnableCreateCacheAnnotation // deprecated in jetcache 2.7, can be removed if @CreateCache is not used
 public class MySpringBootApp {
     public static void main(String[] args) {
         SpringApplication.run(MySpringBootApp.class);

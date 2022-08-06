@@ -22,7 +22,7 @@ JetCache需要JDK1.8、Spring Framework4.0.8以上版本。Spring Boot为可选�
 ## 文档目录
 * [快速入门](GettingStarted.md)
 * [基本Cache API](CacheAPI.md)
-* [通过@CreateCache注解创建```Cache```实例](CreateCache.md)
+* [通过CacheManager注解创建```Cache```实例](CreateCache.md)
 * [通过注解实现方法缓存](MethodCache.md)
 * [配置详解](Config.md)
 * [高级Cache API](AdvancedCacheAPI.md)

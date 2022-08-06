@@ -40,8 +40,8 @@ default_TopicManager.getTopicList_remote             |      0.02|100.00%|       
     @Bean
     public Consumer<StatInfo> metricsCallback() {
         public Consumer<StatInfo> statCallback() {
-            // return new StatInfoLogger(false);
-            ... // 实现自己的logger
+            return new StatInfoLogger(false);
+            // ... 或实现自己的Consumer<StatInfo>
         }
     }
 

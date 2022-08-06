@@ -24,7 +24,7 @@ Full features of JetCache:
 ## Documents
 * [Getting Started](GettingStarted.md)
 * [Basic Cache API](CacheAPI.md)
-* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache.md)
+* [Initiate ```Cache``` instance using CacheManager](CreateCache.md)
 * [Enable method caching using annotation](MethodCache.md)
 * [Configuration details](Config.md)
 * [Advanced Cache API](AdvancedCacheAPI.md)

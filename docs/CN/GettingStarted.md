@@ -123,7 +123,7 @@ import redis.clients.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
+@EnableCreateCacheAnnotation // deprecated in jetcache 2.7, 如果不用@CreateCache注解可以删除
 @Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
@@ -173,7 +173,7 @@ public class JetCacheConfig {
 ```
 
 # 进一步阅读
-* CreateCache的详细使用说明可以看[这里](CreateCache.md)
-* 使用@CacheCache创建的Cache接口实例，它的API使用可以看[这里](CacheAPI.md)
+* 创建Cache实例的详细使用说明可以看[这里](CreateCache.md)
+* Cache接口API使用可以看[这里](CacheAPI.md)
 * 关于方法缓存(@Cached, @CacheUpdate, @CacheInvalidate)的详细使用看[这里](MethodCache.md)
 * 详细的配置说明看[这里](Config.md)。

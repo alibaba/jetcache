@@ -128,7 +128,7 @@ import redis.clients.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
+@EnableCreateCacheAnnotation // deprecated in jetcache 2.7, can be removed if @CreateCache is not used
 @Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
@@ -178,7 +178,7 @@ public class JetCacheConfig {
 ```
 
 # read more
-* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache.md)
+* [Initiate ```Cache``` instance using CacheManager](CreateCache.md)
 * [Basic Cache API](CacheAPI.md)
 * [Method cache using annotation(@Cached, @CacheUpdate, @CacheInvalidate)](MethodCache.md)
 * [Configuration details](Config.md)
