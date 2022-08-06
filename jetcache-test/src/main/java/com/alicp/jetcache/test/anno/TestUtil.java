@@ -71,7 +71,8 @@ public class TestUtil {
     }
 
     public static void waitUtil(Object expectValue, Supplier<? extends Object> actual, long timeoutMillis) {
-        long deadline = System.nanoTime() + timeoutMillis * 1000 * 1000;
+        long start = System.nanoTime();
+        long deadline = start + timeoutMillis * 1000 * 1000;
         Object obj = actual.get();
         if (Objects.equals(expectValue, obj)) {
             return;
@@ -87,7 +88,8 @@ public class TestUtil {
                 return;
             }
         }
-        throw new AssertionFailedError("expect: " + expectValue + ", actual:" + obj);
+        throw new AssertionFailedError("expect: " + expectValue + ", actual:" + obj + ", timeout="
+                + timeoutMillis + "ms, cost=" + (System.nanoTime() - start) / 1000 / 1000 + "ms");
     }
 
 }
