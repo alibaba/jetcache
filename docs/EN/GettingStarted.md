@@ -54,7 +54,8 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
       poolConfig:
@@ -115,7 +116,7 @@ import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -156,9 +157,10 @@ public class JetCacheConfig {
 
         Map remoteBuilders = new HashMap();
         RedisCacheBuilder remoteCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
+                .broadcastChannel("projectA")
                 .jedisPool(pool);
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 

@@ -14,7 +14,8 @@ jetcache:
   remote:
     default:
       type: redis.lettuce
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       uri: redis://127.0.0.1:6379/
       #uri: redis-sentinel://127.0.0.1:26379,127.0.0.1:26380,127.0.0.1:26381/?sentinelMasterId=mymaster
       #readFrom: slavePreferred
@@ -31,7 +32,8 @@ jetcache:
   remote:
     default:
       type: redis.lettuce
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       mode: cluster
       #readFrom: slavePreferred
       uri:
@@ -62,6 +64,7 @@ See code of RedisLettuceCache.unwrap for more detail.
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
 @EnableCreateCacheAnnotation
+@Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
     @Bean
@@ -73,29 +76,29 @@ public class JetCacheConfig {
         return client;
     }
 
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
+    //@Bean for jetcache <=2.6 
+    //public SpringConfigProvider springConfigProvider() {
+    //    return new SpringConfigProvider();
+    //}
 
     @Bean
-    public GlobalCacheConfig config(SpringConfigProvider configProvider,RedisClient redisClient){
+    public GlobalCacheConfig config(RedisClient redisClient){
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE);
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
 
         Map remoteBuilders = new HashMap();
         RedisLettuceCacheBuilder remoteCacheBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
+                .broadcastChannel("projectA")
                 .redisClient(redisClient);
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        // globalCacheConfig.setConfigProvider(configProvider);//for jetcache <=2.5
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);

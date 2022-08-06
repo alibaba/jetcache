@@ -164,7 +164,8 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
       poolConfig:

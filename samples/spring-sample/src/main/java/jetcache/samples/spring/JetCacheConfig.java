@@ -4,7 +4,6 @@
 package jetcache.samples.spring;
 
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
@@ -27,7 +26,6 @@ import java.util.Map;
 
 @Configuration
 @EnableMethodCache(basePackages = "jetcache.samples.spring")
-@EnableCreateCacheAnnotation
 @Import(JetCacheBaseBeans.class)
 public class JetCacheConfig {
 

@@ -9,6 +9,7 @@ jetcache:
     default:
       type: redis
       keyConvertor: fastjson2
+      broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
       poolConfig:

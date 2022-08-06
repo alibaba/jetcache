@@ -46,19 +46,7 @@ default_TopicManager.getTopicList_remote             |      0.02|100.00%|       
     }
 
 ```
-```java
-    // for 2.5
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider(){
-            public Consumer<StatInfo> statCallback() {
-                // return new StatInfoLogger(false);
-                ... // 实现自己的logger
-            }
-        };
-    }
 
-```
 JetCache按statIntervalMinutes指定的周期，定期调用statCallback返回着这个Consumer，传入的StatInfo是已经统计好的数据。这个方法默认的实现是：
 ```java
 return new StatInfoLogger(false);

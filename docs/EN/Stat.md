@@ -50,19 +50,6 @@ The output of statistics can be customized:
     }
 
 ```
-```java
-    // for 2.5
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider(){
-            public Consumer<StatInfo> statCallback() {
-                // return new StatInfoLogger(false);
-                ... // 实现自己的logger
-            }
-        };
-    }
-
-```
 JetCache call ```statCallback``` method every *statIntervalMinutes* minutes. The default implementation is:
 ```java
 return new StatInfoLogger(false);
