@@ -37,13 +37,6 @@ Cache multiLevelCache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
 ```
 实际上，使用MultiLevelCache可以创建多级缓存，它的构造函数接收的是一个Cache数组（可变参数）。
 
-如果是2.2之前的版本：
-```java
-Cache memoryCache = ...
-Cache redisCache = ...
-Cache multiLevelCache = new MultiLevelCache(memoryCache, redisCache);
-```
-
 
 # 监控统计
 如果要对Cache进行监控统计：

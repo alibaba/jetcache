@@ -36,35 +36,16 @@ pom中的指定方式：
 在Cached和CreateCache上的serialPolicy可以指向一个Spring Bean。
 做一个类实现SerialPolicy接口，在Spring Context中创建该类的实例（假设名字为myBean），在Cached和CreateCache注解上设置serialPolicy="bean:myBean"即可。
 
-更进一步，如果想把自定义的序列化器设置为默认的，可以声明一个SpringConfigProvider，然后覆盖其parseValueEncoder和parseValueDecoder方法：
-```java
-@Bean
-public SpringConfigProvider springConfigProvider() {
-    return new SpringConfigProvider() {
-        @Override
-        public Function<Object, byte[]> parseValueEncoder(String valueEncoder) {
-              if(valueEncoder.equals("xxx")){
-                   return MyEncoder();
-              }else{
-                   return super.parseValueEncoder(valueEncoder);
-              }
-        };
-        @Override
-        public Function<byte[], Object> parseValueDecoder(String valueDecoder) {
-               .........
-        }
-}
-```
+更进一步，如果想把自定义的序列化器设置为默认的，实现一个EncoderParser（继承DefaultSpringEncoderParser修改即可），然后做成一个bean放到 spring context中。
 
 ## 我想要JSON序列化器
-jetcache老版本中是有三个序列化器的：java、kryo、fastjson。
-但是fastjson做序列化兼容性不是特别好，并且某次升级以后单元测试就无法通过了，怕大家用了以后觉得有坑，就把它废弃了。
+jetcache老版本中是有两个序列化器的：java、kryo。jetcache2.7增加了kryo5、fastjson2、jackson。
 现在默认的序列化器是性能最差，但是兼容性最好，大家也最熟悉的java序列化器。
 
-需要JSON序列化器的，自己动手吧，可以参考这里，还是挺简单的：
+json不是一个专门的java序列化库，更多的时候是用来和前端进行数据交互，前端传入的
+不受信任的json字符串如果随便就反序列化，会造成极其严重的安全问题，为了避免这些问题各个json类库都变得极为保守，
+只要反射无法识别类型（比如字段类型是Object实际上是XxxBean），就会反序列化为JSONObject，这样反序列化的兼容性就变得很差。
 
-https://github.com/alibaba/jetcache/blob/master/samples/simple-samples/src/main/java/FastjsonValueEncoder.java
+因此fastjson2和jackson这两个json序列化器默认是没有注册的，如果要使用请自行做好相关的配置和改动。
+如果你不知道该怎么注册，建议不要用json序列化器，因为json反序列化出了问题你也搞不定的。
 
-https://github.com/alibaba/jetcache/blob/master/samples/simple-samples/src/main/java/FastjsonValueDecoder.java
-
-useIdentityNumber属性用于修改serialPolicy以后的值兼容（比如serialPolicy改成新的了，redis里面还是旧的）。

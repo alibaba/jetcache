@@ -21,8 +21,8 @@ Full features of JetCache:
 
 requirements:
 * JDK1.8
-* Spring Framework4.0.8+ (optional, with annotation support)，jetcache 2.7 need 5.2.4.RELEASE+
-* Spring Boot1.1.9+ (optional), jetcache 2.7 need 2.2.5.RELEASE+
+* Spring Framework4.0.8+ (optional, with annotation support)，jetcache 2.7 need 5.2.4+
+* Spring Boot1.1.9+ (optional), jetcache 2.7 need 2.2.5+
 
 Visit [docs](docs/EN/Readme.md) for more details.
 
