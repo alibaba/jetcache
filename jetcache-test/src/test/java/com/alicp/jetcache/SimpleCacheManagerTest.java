@@ -143,6 +143,6 @@ public class SimpleCacheManagerTest {
                 .refreshPolicy(RefreshPolicy.newPolicy(30, TimeUnit.MILLISECONDS))
                 .build());
         assertEquals("K10", cache.get("K1"));
-        TestUtil.waitUtil("K11", () -> cache.get("K1"), 20);
+        TestUtil.waitUtil("K11", () -> cache.get("K1"), 100);
     }
 }
