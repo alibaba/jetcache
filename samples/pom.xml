@@ -9,7 +9,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
-        <jetcache.version>2.7.0.RC2</jetcache.version>
+        <jetcache.version>2.7.0.RC3</jetcache.version>
     </properties>
     <build>
         <plugins>
