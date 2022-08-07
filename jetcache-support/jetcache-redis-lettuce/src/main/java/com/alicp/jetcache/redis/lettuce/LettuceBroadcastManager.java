@@ -44,12 +44,6 @@ public class LettuceBroadcastManager extends BroadcastManager {
         if (config.getPubSubConnection() == null) {
             throw new CacheConfigException("PubSubConnection not set");
         }
-        if (config.getValueEncoder() == null) {
-            throw new CacheConfigException("no value encoder");
-        }
-        if (config.getValueDecoder() == null) {
-            throw new CacheConfigException("no value decoder");
-        }
 
         this.config = config;
         this.channel = config.getBroadcastChannel().getBytes(StandardCharsets.UTF_8);

@@ -47,13 +47,6 @@ public class RedisBroadcastManager extends BroadcastManager {
         if (config.getJedis() != null && config.getJedisPool() != null) {
             throw new CacheConfigException("'jedis' and 'jedisPool' can't set simultaneously");
         }
-
-        if (config.getValueEncoder() == null) {
-            throw new CacheConfigException("no value encoder");
-        }
-        if (config.getValueDecoder() == null) {
-            throw new CacheConfigException("no value decoder");
-        }
     }
 
     @Override
