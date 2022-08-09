@@ -16,6 +16,7 @@ jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部
   * 要注意com.esotericsoftware:kryo的版本号也可以改为5.x.x
 * lettuce连接redis cluster需要在yml里面指定mode=cluster
 * 默认的key convertor改成了"fastjson2"，fastjson2和fastjson可以并存，fastjson（非fastjson2）/kryo/kryo5/mvel在maven中都改为optional，如果使用了需要用户手工声明依赖
+* 如果没有使用spring boot，应该增加```@Import(JetCacheBaseBeans.class)```，同时删除原来定义的configProvider bean，具体例子可以看最新文档
 * GlobalCacheConfig.areaInCacheName默认值改为false，以前所有的代码案例都显式的写了areaInCacheName=false，不会有人没加这一行吧
 
 ## 2.6.0
