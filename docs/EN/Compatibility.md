@@ -16,6 +16,7 @@ jetcache tested with below spring/spring-boot versions
     * notice that version of com.esotericsoftware:kryo can be set to 5.x.x
 * use lettuce to connect redis cluster need specify "mode=cluster" in yml
 * default key convertor change to "fastjson2", fastjson2 and fastjson can be used together, fastjson(not fastjson2)/kryo/kryo5/mvel is now optional in maven
+* if not use spring boot, add ```@Import(JetCacheBaseBeans.class)```, and remove old configProvider bean definition. see docs for detail example.
 * change GlobalCacheConfig.areaInCacheName default value to false
 
 ## 2.6.0
