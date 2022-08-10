@@ -19,7 +19,8 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    env:
+      cov_token: ${{ secrets.COV_TOKEN }}
     steps:
     - uses: actions/checkout@v3
     - name: setup redis
@@ -30,5 +31,8 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
+    - name: Build with maven
+    - if: ${{ env.cov_token != '' }}
       run: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report -DrepoToken=${{ secrets.COV_TOKEN }}
+    - if: ${{ env.cov_token == '' }}
+      run: mvn -B clean test
