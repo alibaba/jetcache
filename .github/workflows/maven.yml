@@ -31,8 +31,9 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-    - name: Build with maven
-    - if: ${{ env.cov_token != '' }}
+    - name: Build with coveralls report
+      if: ${{ env.cov_token != '' }}
       run: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report -DrepoToken=${{ secrets.COV_TOKEN }}
-    - if: ${{ env.cov_token == '' }}
+    - name: Build without coveralls report
+      if: ${{ env.cov_token == '' }}
       run: mvn -B clean test
