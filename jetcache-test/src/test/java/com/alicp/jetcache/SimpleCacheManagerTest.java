@@ -140,9 +140,9 @@ public class SimpleCacheManagerTest {
         AtomicInteger count = new AtomicInteger();
         Cache<String, String> cache = cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName)
                 .loader(k -> String.valueOf(k) + count.getAndIncrement())
-                .refreshPolicy(RefreshPolicy.newPolicy(30, TimeUnit.MILLISECONDS))
+                .refreshPolicy(RefreshPolicy.newPolicy(10, TimeUnit.MILLISECONDS))
                 .build());
         assertEquals("K10", cache.get("K1"));
-        TestUtil.waitUtil("K11", () -> cache.get("K1"), 100);
+        TestUtil.waitUtil(() -> !"K10".equals(cache.get("K1")));
     }
 }
