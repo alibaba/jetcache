@@ -35,11 +35,9 @@ public class SpringDataBroadcastManager extends BroadcastManager {
     public SpringDataBroadcastManager(CacheManager cacheManager, RedisSpringDataCacheConfig config) {
         super(cacheManager);
         this.config = config;
+        checkConfig(config);
         if (config.getConnectionFactory() == null) {
             throw new CacheConfigException("connectionFactory is required");
-        }
-        if (config.getBroadcastChannel() == null) {
-            throw new CacheConfigException("broadcastChannel is required");
         }
         this.channel = config.getBroadcastChannel().getBytes(StandardCharsets.UTF_8);
     }
