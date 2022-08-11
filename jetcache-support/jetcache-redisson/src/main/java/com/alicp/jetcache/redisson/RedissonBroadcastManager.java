@@ -26,9 +26,7 @@ public class RedissonBroadcastManager extends BroadcastManager {
 
     public RedissonBroadcastManager(final CacheManager cacheManager, final RedissonCacheConfig<?, ?> config) {
         super(cacheManager);
-        if (config.getBroadcastChannel() == null) {
-            throw new CacheConfigException("BroadcastChannel not set");
-        }
+        checkConfig(config);
         this.config = config;
         this.channel = config.getBroadcastChannel();
         this.client = config.getRedissonClient();

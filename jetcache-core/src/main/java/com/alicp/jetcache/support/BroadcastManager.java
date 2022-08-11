@@ -9,6 +9,8 @@ import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.CacheUtil;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
+import com.alicp.jetcache.external.ExternalCacheConfig;
+import com.alicp.jetcache.CacheConfigException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,18 @@ public abstract class BroadcastManager implements AutoCloseable {
 
     public BroadcastManager(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
+    }
+
+    protected void checkConfig(ExternalCacheConfig config) {
+        if (config.getBroadcastChannel() == null) {
+            throw new CacheConfigException("BroadcastChannel not set");
+        }
+        if (config.getValueEncoder() == null) {
+            throw new CacheConfigException("no value encoder");
+        }
+        if (config.getValueDecoder() == null) {
+            throw new CacheConfigException("no value decoder");
+        }
     }
 
     public abstract CacheResult publish(CacheMessage cacheMessage);

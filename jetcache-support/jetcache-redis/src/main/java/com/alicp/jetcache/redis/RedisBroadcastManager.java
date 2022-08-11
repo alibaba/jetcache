@@ -35,12 +35,10 @@ public class RedisBroadcastManager extends BroadcastManager {
     public RedisBroadcastManager(CacheManager cacheManager, RedisCacheConfig<Object, Object> config) {
         super(cacheManager);
         this.channelStr = config.getBroadcastChannel();
-        if (this.channelStr == null) {
-            throw new CacheConfigException("broadcastChannel not set");
-        }
         this.channel = channelStr.getBytes(StandardCharsets.UTF_8);
         this.config = config;
 
+        checkConfig(config);
         if (config.getJedis() == null && config.getJedisPool() == null) {
             throw new CacheConfigException("no jedis");
         }

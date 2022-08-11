@@ -38,9 +38,7 @@ public class LettuceBroadcastManager extends BroadcastManager {
 
     public LettuceBroadcastManager(CacheManager cacheManager, RedisLettuceCacheConfig<Object, Object> config) {
         super(cacheManager);
-        if (config.getBroadcastChannel() == null) {
-            throw new CacheConfigException("BroadcastChannel not set");
-        }
+        checkConfig(config);
         if (config.getPubSubConnection() == null) {
             throw new CacheConfigException("PubSubConnection not set");
         }
