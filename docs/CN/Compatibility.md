@@ -1,11 +1,11 @@
 # spring兼容性
 jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部分功能或者能自己调整依赖的的话，适用范围还可以更大一些。
 
-| jetcache版本 | spring版本                    | spring boot版本               | 说明                                                             |
-|------------|-----------------------------|-----------------------------|----------------------------------------------------------------|
+| jetcache版本 | spring版本                    | spring boot版本               | 说明                                                                            |
+|------------|-----------------------------|-----------------------------|-------------------------------------------------------------------------------|
 | 2.5        | 4.0.8.RELEASE~5.1.1.RELEASE | 1.1.9.RELEASE~2.0.5.RELEASE ||
-| 2.6        | 5.0.4.RELEASE~5.2.4.RELEASE | 2.0.0.RELEASE~2.2.5.RELEASE | jetcache-redis依赖jedis3.1.0，springdata(jedis)依赖jedis2.9.3，不能同时用 |
-| 2.7        | 5.2.4.RELEASE~5.3.22        | 2.2.5.RELEASE~2.7.2         | jetcahe-redis依赖jedis4，springdata(jedis)依赖jedis3，不能同时用          |
+| 2.6        | 5.0.4.RELEASE~5.2.4.RELEASE | 2.0.0.RELEASE~2.2.5.RELEASE | jetcache-redis依赖jedis3.1.0，spring-data(jedis，boot版本<=2.1.X)依赖jedis2.9.3，不能同时用 |
+| 2.7        | 5.2.4.RELEASE~5.3.22        | 2.2.5.RELEASE~2.7.2         | jetcahe-redis依赖jedis4，spring-data(jedis)依赖jedis3，不能同时用                        |
 
 # 兼容性改动说明
 ## 2.7.0
