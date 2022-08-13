@@ -106,7 +106,7 @@ public class SyncLocalTest {
                 .keyPrefix(keyPrefix)
                 .broadcastChannel(keyPrefix);
         RedisSpringDataCacheBuilder b2 = RedisSpringDataCacheBuilder.createBuilder()
-                .connectionFactory(f1)
+                .connectionFactory(f2)
                 .keyPrefix(keyPrefix)
                 .broadcastChannel(keyPrefix);
         test(b1.buildCache(), b2.buildCache(),
