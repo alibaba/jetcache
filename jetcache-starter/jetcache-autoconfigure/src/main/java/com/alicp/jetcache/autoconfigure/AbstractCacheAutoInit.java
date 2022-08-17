@@ -33,7 +33,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
 
     protected String[] typeNames;
 
-    private boolean inited = false;
+    private volatile boolean inited = false;
 
     public AbstractCacheAutoInit(String... cacheTypes) {
         Objects.requireNonNull(cacheTypes,"cacheTypes can't be null");

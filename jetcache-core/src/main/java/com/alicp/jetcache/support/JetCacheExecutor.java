@@ -1,6 +1,9 @@
 package com.alicp.jetcache.support;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created on 2017/5/3.
@@ -8,8 +11,8 @@ import java.util.concurrent.*;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class JetCacheExecutor {
-    protected static ScheduledExecutorService defaultExecutor;
-    protected static ScheduledExecutorService heavyIOExecutor;
+    protected volatile static ScheduledExecutorService defaultExecutor;
+    protected volatile static ScheduledExecutorService heavyIOExecutor;
 
     private static int threadCount;
 

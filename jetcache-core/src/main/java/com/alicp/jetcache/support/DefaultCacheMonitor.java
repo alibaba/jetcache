@@ -4,7 +4,15 @@ import com.alicp.jetcache.CacheGetResult;
 import com.alicp.jetcache.CacheMonitor;
 import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.MultiGetResult;
-import com.alicp.jetcache.event.*;
+import com.alicp.jetcache.event.CacheEvent;
+import com.alicp.jetcache.event.CacheGetAllEvent;
+import com.alicp.jetcache.event.CacheGetEvent;
+import com.alicp.jetcache.event.CacheLoadAllEvent;
+import com.alicp.jetcache.event.CacheLoadEvent;
+import com.alicp.jetcache.event.CachePutAllEvent;
+import com.alicp.jetcache.event.CachePutEvent;
+import com.alicp.jetcache.event.CacheRemoveAllEvent;
+import com.alicp.jetcache.event.CacheRemoveEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +43,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
         return cacheName;
     }
 
-    public void resetStat() {
+    public synchronized void resetStat() {
         cacheStat = new CacheStat();
         cacheStat.setStatStartTime(System.currentTimeMillis());
         cacheStat.setCacheName(cacheName);
