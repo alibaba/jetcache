@@ -4,6 +4,7 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheManager;
+import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.anno.Cached;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.test.anno.TestUtil;
@@ -11,9 +12,10 @@ import com.alicp.jetcache.test.spring.SpringTestBase;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -24,13 +26,26 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(classes = ConfigProvider_CustomCacheManager_Test.class)
 @Configuration
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.anno.support.ConfigProvider_CustomCacheManager_Test"})
-@Import(JetCacheBaseBeans.class)
 public class ConfigProvider_CustomCacheManager_Test extends SpringTestBase {
 
     @Bean
     public GlobalCacheConfig config() {
         GlobalCacheConfig pc = TestUtil.createGloableConfig();
         return pc;
+    }
+
+    @Bean
+    public SpringConfigProvider springConfigProvider(
+            @Autowired ApplicationContext context,
+            @Autowired GlobalCacheConfig config) {
+        return new JetCacheBaseBeans().springConfigProvider(context, config, null, null, null);
+    }
+
+    @Bean
+    public SimpleCacheManager cacheManager(@Autowired ConfigProvider configProvider) {
+        SimpleCacheManager cacheManager = new SimpleCacheManager();
+        cacheManager.setCacheBuilderTemplate(configProvider.getCacheBuilderTemplate());
+        return cacheManager;
     }
 
     public static class CountBean {
