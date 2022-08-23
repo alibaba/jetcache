@@ -51,7 +51,7 @@ public class JetCacheAutoConfiguration {
                 encoderParser, keyConvertorParser, metricsCallback);
     }
 
-    @Bean
+    @Bean(name = "jcCacheManager")
     @ConditionalOnMissingBean
     public CacheManager cacheManager(@Autowired SpringConfigProvider springConfigProvider) {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
