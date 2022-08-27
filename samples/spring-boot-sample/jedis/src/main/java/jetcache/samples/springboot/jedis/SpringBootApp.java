@@ -1,7 +1,7 @@
 /**
  * Created on 2018/8/11.
  */
-package jetcache.samples.springboot;
+package jetcache.samples.springboot.jedis;
 
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import org.springframework.boot.SpringApplication;

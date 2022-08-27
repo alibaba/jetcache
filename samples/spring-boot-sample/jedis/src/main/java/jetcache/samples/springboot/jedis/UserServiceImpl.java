@@ -1,7 +1,7 @@
 /**
  * Created on 2018/8/11.
  */
-package jetcache.samples.springboot;
+package jetcache.samples.springboot.jedis;
 
 import org.springframework.stereotype.Repository;
 
