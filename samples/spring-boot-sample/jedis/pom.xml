@@ -9,7 +9,7 @@
         <artifactId>samples</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>spring-boot-sample</artifactId>
+    <artifactId>spring-boot-jedis-sample</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>

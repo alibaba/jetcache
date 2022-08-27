@@ -28,7 +28,7 @@
     <modules>
         <module>simple-samples</module>
         <module>spring-sample</module>
-        <module>spring-boot-sample</module>
+        <module>spring-boot-sample/jedis</module>
     </modules>
     <dependencies>
         <dependency>
