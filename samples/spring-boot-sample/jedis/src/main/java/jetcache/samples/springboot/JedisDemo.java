@@ -1,7 +1,7 @@
 /**
  * Created on 2018/8/11.
  */
-package jetcache.samples.springboot.jedis;
+package jetcache.samples.springboot;
 
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import org.springframework.boot.SpringApplication;
@@ -13,10 +13,10 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @SpringBootApplication
 @EnableMethodCache(basePackages = "jetcache")
-public class SpringBootApp {
+public class JedisDemo {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(SpringBootApp.class);
+        ConfigurableApplicationContext context = SpringApplication.run(JedisDemo.class);
         MyService myService = context.getBean(MyService.class);
         myService.createCacheDemo();
         myService.cachedDemo();

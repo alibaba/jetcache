@@ -28,7 +28,9 @@
     <modules>
         <module>simple-samples</module>
         <module>spring-sample</module>
+        <module>spring-boot-sample/spring-boot-sample-codes</module>
         <module>spring-boot-sample/jedis</module>
+        <module>spring-boot-sample/lettuce</module>
     </modules>
     <dependencies>
         <dependency>

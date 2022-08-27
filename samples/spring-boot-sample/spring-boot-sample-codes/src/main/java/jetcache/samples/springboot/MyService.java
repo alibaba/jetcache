@@ -1,7 +1,7 @@
 /**
  * Created on 2018/8/11.
  */
-package jetcache.samples.springboot.jedis;
+package jetcache.samples.springboot;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
