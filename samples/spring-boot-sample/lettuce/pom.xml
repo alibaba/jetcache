@@ -9,7 +9,7 @@
         <artifactId>samples</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>spring-boot-lettuce-sample</artifactId>
+    <artifactId>spring-boot-lettuce-demo</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>

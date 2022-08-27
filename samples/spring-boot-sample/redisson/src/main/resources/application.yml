@@ -7,16 +7,15 @@ jetcache:
       keyConvertor: fastjson2
   remote:
     default:
-      type: redis
+      type: redisson
       keyConvertor: fastjson2
       broadcastChannel: projectA
       keyPrefix: projectA
       valueEncoder: java
       valueDecoder: java
-      poolConfig:
-        minIdle: 5
-        maxIdle: 20
-        maxTotal: 50
-      host: 127.0.0.1
-      port: 6379
       defaultExpireInMillis: 5000
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    timeout: 1000

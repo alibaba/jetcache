@@ -31,6 +31,8 @@
         <module>spring-boot-sample/spring-boot-sample-codes</module>
         <module>spring-boot-sample/jedis</module>
         <module>spring-boot-sample/lettuce</module>
+        <module>spring-boot-sample/springdata</module>
+        <module>spring-boot-sample/redisson</module>
     </modules>
     <dependencies>
         <dependency>
