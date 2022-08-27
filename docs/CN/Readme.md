@@ -19,6 +19,9 @@ JetCache提供了比SpringCache更加强大的注解，可以原生的支持TTL�
 ## 要求
 JetCache需要JDK1.8、Spring Framework4.0.8以上版本。Spring Boot为可选，需要1.1.9以上版本。如果不使用注解（仅使用jetcache-core），Spring Framework也是可选的，此时使用方式与Guava/Caffeine cache类似。
 
+## 例子
+参考工程samples目录
+
 ## 文档目录
 * [快速入门](GettingStarted.md)
 * [基本Cache API](CacheAPI.md)

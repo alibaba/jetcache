@@ -38,22 +38,6 @@ jetcache:
         - redis://127.0.0.1:7002
 ```
 
-如果需要直接使用lettuce的RedisClient：
-```java
-@Bean(name = "defaultClient")
-@DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
-public LettuceFactory defaultClient() {
-    return new LettuceFactory("remote.default", RedisClient.class);
-}
-```
-然后可以直接使用
-```java
-@Autowired
-private RedisClient defaultClient;
-```
-
-也可以用```Cache```接口上的```<T> T unwrap(Class<T> clazz)```方法来获取```RedisClient```和```RedisCommands```等。
-参考RedisLettuceCache.unwrap源代码。
 
 # 不使用spring boot
 ```java

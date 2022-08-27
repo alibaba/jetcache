@@ -42,22 +42,6 @@ jetcache:
         - redis://127.0.0.1:7002
 ```
 
-```LettuceFactory``` used to get ```RedisClient``` as a Spring bean: 
-```java
-@Bean(name = "defaultClient")
-@DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
-public LettuceFactory defaultClient() {
-    return new LettuceFactory("remote.default", RedisClient.class);
-}
-```
-Then you can inject an ```RedisClient``` to you bean using ```@Autowired```: 
-```java
-@Autowired
-private RedisClient defaultClient;
-```
-
-The ```<T> T unwrap(Class<T> clazz)``` method of ```Cache``` can used to get ```RedisClient``` and ```RedisCommands```.
-See code of RedisLettuceCache.unwrap for more detail.
 
 # without Spring Boot
 ```java
