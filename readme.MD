@@ -158,16 +158,16 @@ jetcache:
   areaInCacheName: false
   local:
     default:
-      type: linkedhashmap
-      keyConvertor: fastjson
+      type: linkedhashmap #other choose：caffeine
+      keyConvertor: fastjson #other choose：fastjson/jackson
       limit: 100
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #other choose：fastjson/jackson
       broadcastChannel: projectA
-      valueEncoder: java
-      valueDecoder: java
+      valueEncoder: java #other choose：fastjson2/jackson/kryo/kryo5
+      valueDecoder: java #other choose：fastjson2/jackson/kryo/kryo5
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -175,6 +175,6 @@ jetcache:
       host: ${redis.host}
       port: ${redis.port}
 ```
-
+> Visit [detail configuration](docs/EN/Config.md) for more instructions
 ## More docs
 Visit [docs](docs/EN/Readme.md) for more details.
