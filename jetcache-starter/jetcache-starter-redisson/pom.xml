@@ -27,5 +27,10 @@
             <version>${project.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>${redisson.version}</version>
+        </dependency>
     </dependencies>
 </project>

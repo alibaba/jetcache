@@ -60,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
-            <artifactId>jetcache-redisson</artifactId>
+            <artifactId>jetcache-starter-redisson</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
