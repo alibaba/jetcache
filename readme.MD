@@ -14,6 +14,7 @@ Full features of JetCache:
 * Create & configure ```Cache``` instance with cache manager
 * Automatically collect access statistics for ```Cache``` instance and method level cache
 * The strategy of key generation and value serialization can be customized
+* Cache key convertor supported: ```fastjson```/```fastjson2```/```jackson```; Value convertor supported: ```java```/```kryo```/```kryo5```
 * Distributed cache auto refresh and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
 * Invalidate local caches (in all JVM process) after updates (2.7+)
@@ -158,16 +159,16 @@ jetcache:
   areaInCacheName: false
   local:
     default:
-      type: linkedhashmap
-      keyConvertor: fastjson
+      type: linkedhashmap #other choose：caffeine
+      keyConvertor: fastjson #other choose：fastjson/jackson
       limit: 100
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #other choose：fastjson/jackson
       broadcastChannel: projectA
-      valueEncoder: java
-      valueDecoder: java
+      valueEncoder: java #other choose：kryo/kryo5
+      valueDecoder: java #other choose：kryo/kryo5
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -175,6 +176,6 @@ jetcache:
       host: ${redis.host}
       port: ${redis.port}
 ```
-
+> Visit [detail configuration](docs/EN/Config.md) for more instructions
 ## More docs
 Visit [docs](docs/EN/Readme.md) for more details.
