@@ -160,7 +160,7 @@ jetcache:
   local:
     default:
       type: linkedhashmap #other choose：caffeine
-      keyConvertor: fastjson #other choose：fastjson/jackson
+      keyConvertor: fastjson2 #other choose：fastjson/jackson
       limit: 100
   remote:
     default:
