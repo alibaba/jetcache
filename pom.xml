@@ -204,18 +204,18 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <spring.framework.version>5.3.22</spring.framework.version>
-        <spring.boot.version>2.7.2</spring.boot.version>
-        <lettuce.version>6.1.9.RELEASE</lettuce.version>
-        <jedis.version>4.2.3</jedis.version>
-        <redisson.version>3.17.3</redisson.version>
+        <spring.framework.version>5.3.23</spring.framework.version>
+        <spring.boot.version>2.7.5</spring.boot.version>
+        <lettuce.version>6.1.10.RELEASE</lettuce.version>
+        <jedis.version>4.3.1</jedis.version>
+        <redisson.version>3.18.0</redisson.version>
 
         <!--
         <spring.framework.version>5.2.4.RELEASE</spring.framework.version>
         <spring.boot.version>2.2.5.RELEASE</spring.boot.version>
         -->
 
-        <jackson.version>2.14.0-rc1</jackson.version>
+        <jackson.version>2.14.0</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -267,7 +267,7 @@
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
-                <version>2.0.12</version>
+                <version>2.0.18</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
