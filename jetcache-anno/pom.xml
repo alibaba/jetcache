@@ -13,7 +13,6 @@
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
