@@ -2,8 +2,21 @@
 # Create Cache instance
 Create a ```Cache``` instance using @CreateCache annotation with default TTL 100 seconds.
 ```java
-@CreateCache(expire = 100)
+@Autowired
+private CacheManager cacheManager;
+
 private Cache<Long, UserDO> userCache;
+
+@PostConstruct
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache") // name used in statistical information
+        .expire(Duration.ofSeconds(100))
+        //.cacheType(CacheType.BOTH) // create two level cache
+        //.localLimit(100) // limit for local cache elements, only used for CacheType.LOCAL and CacheType.BOTH
+        //.syncLocal(true) // invalidate local cache in other JVM after updates, only used for CacheType.BOTH, need set broadcastChannel in configuration. 
+        .build();
+    userCache = cacheManager.getOrCreateCache(qc);
+}
 ```
 Then use ```Cache``` instance like a map:
 ```java
@@ -11,15 +24,6 @@ UserDO user = userCache.get(123L);
 userCache.put(123L, user);
 userCache.remove(123L);
 ```
-
-Create Two level (local + remote, since cacheType = CacheType.BOTH) ```Cache``` instance, the limit of elements in local memory cache is 50: 
-```java
-@CreateCache(name = "UserService.userCache", expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
-private Cache<Long, UserDO> userCache;
-```
-Although name attribute is optional, it's good practice to naming each ```Cache``` instance. 
-Statistics display will use the name for output, or auto generate one when name is absent. 
-If two @CreateCache annotation with same name and cache area, they will point to same ```Cache``` instance.
 
 # Create method cache
 @Cached can be used to add method cache for a method. 
