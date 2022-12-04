@@ -1,6 +1,15 @@
 package com.alicp.jetcache.test;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.AutoReleaseLock;
+import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheLoader;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.LoadingCache;
+import com.alicp.jetcache.MultiGetResult;
+import com.alicp.jetcache.MultiLevelCache;
+import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
@@ -11,7 +20,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -369,7 +384,7 @@ public abstract class AbstractCacheTest {
     }
 
 
-    static class A implements Serializable {
+    public static class A implements Serializable {
         private static final long serialVersionUID = 1692575072446353143L;
 
         public A() {
