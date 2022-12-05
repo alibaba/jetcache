@@ -7,8 +7,6 @@ import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
 import org.redisson.client.codec.ByteArrayCodec;
 import org.redisson.client.codec.Codec;
-import org.redisson.codec.KryoCodec;
-import org.redisson.codec.SnappyCodecV2;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
