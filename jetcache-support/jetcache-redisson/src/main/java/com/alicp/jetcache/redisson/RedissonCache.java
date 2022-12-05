@@ -2,6 +2,9 @@ package com.alicp.jetcache.redisson;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.support.CacheEncodeException;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import org.redisson.api.RBatch;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
@@ -65,14 +68,35 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
     @SuppressWarnings({"unchecked"})
     private CacheValueHolder<V> decoder(final K key, final byte[] data) {
         CacheValueHolder<V> holder = null;
-        if (data != null && data.length > 0) {
+        if (Objects.nonNull(data) && data.length > 0) {
             try {
                 holder = (CacheValueHolder<V>) valueDecoder.apply(data);
+            } catch (CacheEncodeException e) {
+                holder = compatibleOldVal(key, data);
             } catch (Throwable e) {
                 logError("decoder", key, e);
             }
         }
         return holder;
+    }
+
+    private CacheValueHolder<V> compatibleOldVal(final K key, final byte[] data) {
+        if (Objects.nonNull(key) && Objects.nonNull(data) && data.length > 0) {
+            try {
+                final Codec codec = this.client.getConfig().getCodec();
+                if (Objects.nonNull(codec)) {
+                    final Class<?> cls = ByteArrayCodec.class;
+                    if (codec.getClass() != cls) {
+                        final ByteBuf in = ByteBufAllocator.DEFAULT.buffer().writeBytes(data);
+                        final byte[] out = (byte[]) codec.getValueDecoder().decode(in, null);
+                        return decoder(key, out);
+                    }
+                }
+            } catch (Throwable e) {
+                logError("compatibleOldVal", key, e);
+            }
+        }
+        return null;
     }
 
     @Override
