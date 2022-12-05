@@ -11,7 +11,7 @@ import com.alicp.jetcache.template.QuickConfig;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public interface CacheManager {
-    Cache getCache(String area, String cacheName);
+    <K, V> Cache<K, V> getCache(String area, String cacheName);
 
     void putCache(String area, String cacheName, Cache cache);
 
@@ -19,7 +19,7 @@ public interface CacheManager {
 
     void putBroadcastManager(String area, BroadcastManager broadcastManager);
 
-    default Cache getCache(String cacheName) {
+    default <K, V> Cache<K, V> getCache(String cacheName) {
         return getCache(CacheConsts.DEFAULT_AREA, cacheName);
     }
 
@@ -27,10 +27,10 @@ public interface CacheManager {
         putCache(CacheConsts.DEFAULT_AREA, cacheName, cache);
     }
 
-    default BroadcastManager getBroadcastManager(){
-        return getBroadcastManager(CacheConsts.DEFAULT_AREA);
-    }
-
+    /**
+     * create or get Cache instance.
+     * @see QuickConfig#newBuilder(String)
+     */
     <K, V> Cache<K, V> getOrCreateCache(QuickConfig config);
 
     default void putBroadcastManager(BroadcastManager broadcastManager){

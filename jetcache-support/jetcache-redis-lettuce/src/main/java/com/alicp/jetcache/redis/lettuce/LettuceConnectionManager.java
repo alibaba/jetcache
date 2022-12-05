@@ -29,7 +29,7 @@ public class LettuceConnectionManager {
 
     private static final LettuceConnectionManager defaultManager = new LettuceConnectionManager();
 
-    private Map<AbstractRedisClient, LettuceObjects> map = Collections.synchronizedMap(new WeakHashMap());
+    private final Map<AbstractRedisClient, LettuceObjects> map = Collections.synchronizedMap(new WeakHashMap());
 
     private LettuceConnectionManager() {
     }

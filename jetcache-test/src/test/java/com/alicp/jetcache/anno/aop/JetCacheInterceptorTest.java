@@ -8,16 +8,21 @@ import com.alicp.jetcache.anno.support.CacheContext;
 import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.test.anno.TestUtil;
 import org.aopalliance.intercept.MethodInvocation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -39,7 +44,7 @@ public class JetCacheInterceptorTest {
         interceptor = new JetCacheInterceptor();
         interceptor.setCacheConfigMap(map);
         interceptor.configProvider = configProvider;
-
+        interceptor.cacheManager = new JetCacheBaseBeans().cacheManager(configProvider);
     }
 
     @AfterEach

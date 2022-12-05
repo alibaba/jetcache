@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.anno.method;
 
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 
@@ -15,12 +16,12 @@ import java.lang.reflect.Proxy;
  */
 public class ProxyUtil {
 
-    public static <T> T getProxyByAnnotation(T target, ConfigProvider configProvider) {
+    public static <T> T getProxyByAnnotation(T target, ConfigProvider configProvider, CacheManager cacheManager) {
         final ConfigMap configMap = new ConfigMap();
         processType(configMap, target.getClass());
         Class<?>[] its = ClassUtil.getAllInterfaces(target);
         CacheHandler h = new CacheHandler(target, configMap,
-                () -> configProvider.getCacheContext().createCacheInvokeContext(configMap),
+                () -> configProvider.newContext(cacheManager).createCacheInvokeContext(configMap),
                 configProvider.getGlobalCacheConfig().getHiddenPackages());
         Object o = Proxy.newProxyInstance(target.getClass().getClassLoader(), its, h);
         return (T) o;

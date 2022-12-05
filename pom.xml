@@ -6,7 +6,7 @@
     <groupId>com.alicp.jetcache</groupId>
     <artifactId>jetcache-parent</artifactId>
     <packaging>pom</packaging>
-    <version>2.7.0-SNAPSHOT</version>
+    <version>2.7.2-SNAPSHOT</version>
 
     <name>jetcache</name>
     <description>a Java cache abstraction which provides consistent use for various caching solutions</description>
@@ -66,8 +66,9 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
+                    <release>8</release>
                     <compilerArgument>-parameters</compilerArgument>
                 </configuration>
             </plugin>
@@ -146,6 +147,8 @@
                     <charset>UTF-8</charset>
                     <encoding>UTF-8</encoding>
                     <docencoding>UTF-8</docencoding>
+                    <source>8</source>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
                     <links>
                         <link>https://docs.oracle.com/javase/8/docs/api</link>
                     </links>
@@ -168,6 +171,13 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -194,19 +204,18 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <spring.framework.version>5.3.20</spring.framework.version>
-        <spring.boot.version>2.7.0</spring.boot.version>
-        <lettuce.version>6.1.8.RELEASE</lettuce.version>
-        <jedis.version>4.2.3</jedis.version>
-        <redisson.version>3.17.3</redisson.version>
+        <spring.framework.version>5.3.23</spring.framework.version>
+        <spring.boot.version>2.7.5</spring.boot.version>
+        <lettuce.version>6.1.10.RELEASE</lettuce.version>
+        <jedis.version>4.3.1</jedis.version>
+        <redisson.version>3.18.0</redisson.version>
 
-        <!-- 2.6.2
+        <!--
         <spring.framework.version>5.2.4.RELEASE</spring.framework.version>
         <spring.boot.version>2.2.5.RELEASE</spring.boot.version>
-        <lettuce.version>5.2.2.RELEASE</lettuce.version>
-        <jedis.version>3.1.0</jedis.version>
         -->
 
+        <jackson.version>2.14.0</jackson.version>
     </properties>
 
     <dependencyManagement>
@@ -220,6 +229,11 @@
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
+                <version>1.2.11</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
                 <version>1.2.11</version>
             </dependency>
 
@@ -258,12 +272,12 @@
             <dependency>
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
-                <version>2.0.10</version>
+                <version>2.0.18</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.13.3</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mvel</groupId>
@@ -284,6 +298,7 @@
                 <groupId>com.github.ben-manes.caffeine</groupId>
                 <artifactId>caffeine</artifactId>
                 <version>2.9.3</version>
+                <!--3.0+ need java 11-->
             </dependency>
 
             <dependency>

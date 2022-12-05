@@ -113,7 +113,7 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
     protected CacheResult do_PUT(final K key, final V value, final long expireAfterWrite, final TimeUnit timeUnit) {
         try {
             final CacheValueHolder<V> holder = new CacheValueHolder<>(value, timeUnit.toMillis(expireAfterWrite));
-            this.client.getBucket(getCacheKey(key)).set(holder);
+            this.client.getBucket(getCacheKey(key)).set(holder, expireAfterWrite, timeUnit);
             return CacheGetResult.SUCCESS_WITHOUT_MSG;
         } catch (Throwable e) {
             logError("PUT", key, e);
@@ -129,7 +129,7 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
                 final RBatch batch = this.client.createBatch();
                 map.forEach((k, v) -> {
                     final CacheValueHolder<V> holder = new CacheValueHolder<>(v, expire);
-                    batch.getBucket(getCacheKey(k)).setAsync(holder);
+                    batch.getBucket(getCacheKey(k)).setAsync(holder, expireAfterWrite, timeUnit);
                 });
                 batch.execute();
             }

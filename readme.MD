@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/alibaba/jetcache.svg?branch=master)](https://travis-ci.org/alibaba/jetcache)
-[![Coverage Status](https://coveralls.io/repos/github/alibaba/jetcache/badge.svg?branch=master)](https://coveralls.io/github/alibaba/jetcache?branch=master) 
+[![Java CI with Maven](https://github.com/alibaba/jetcache/actions/workflows/maven.yml/badge.svg)](https://github.com/alibaba/jetcache/actions/workflows/maven.yml)
+[![Coverage Status](https://coveralls.io/repos/github/alibaba/jetcache/badge.svg?branch=master)](https://coveralls.io/github/alibaba/jetcache?branch=master)
 [![GitHub release](https://img.shields.io/github/release/alibaba/jetcache.svg)](https://github.com/alibaba/jetcache/releases)
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
@@ -11,17 +11,19 @@ Currently, there are four implementations: ```RedisCache```, ```TairCache```(not
 Full features of JetCache:
 * Manipulate cache through uniform Cache API. 
 * Declarative method caching using annotations with TTL(Time To Live) and two level caching support
-* Create & configure ```Cache``` instance with annotations
+* Create & configure ```Cache``` instance with cache manager
 * Automatically collect access statistics for ```Cache``` instance and method level cache
 * The strategy of key generation and value serialization can be customized
+* Cache key convertor supported: ```fastjson```/```fastjson2```/```jackson```; Value convertor supported: ```java```/```kryo```/```kryo5```
 * Distributed cache auto refresh and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
+* Invalidate local caches (in all JVM process) after updates (2.7+)
 * Spring Boot support
 
 requirements:
 * JDK1.8
-* Spring Framework4.0.8+ (optional, with annotation support)
-* Spring Boot1.1.9+ (optional)
+* Spring Framework4.0.8+ (optional, with annotation support)，jetcache 2.7 need 5.2.4+
+* Spring Boot1.1.9+ (optional), jetcache 2.7 need 2.2.5+
 
 Visit [docs](docs/EN/Readme.md) for more details.
 
@@ -65,10 +67,23 @@ public interface SummaryService{
 CachePenetrationProtect annotation indicates that the cache will be loaded synchronously in multi-thread environment.
 
 ## Cache API
-Create a ```Cache``` instance with ```@CreateCache``` annotation:
+Create a ```Cache``` instance with ```CacheManager```:
+
 ```java
-@CreateCache(expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
-private Cache<Long, UserDO> userCache;
+@Autowired
+private CacheManager cacheManager;
+private Cache<String, UserDO> userCache;
+
+@PostConstruct
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache")
+        .expire(Duration.ofSeconds(100))
+        .cacheType(CacheType.BOTH) // two level cache
+        .localLimit(50)
+        .syncLocal(true) // invalidate local cache in all jvm process after update
+        .build();
+    userCache = cacheManager.getOrCreateCache(qc);
+}
 ```
 The code above create a ```Cache``` instance. ```cacheType = CacheType.BOTH``` define a two level cache (a local in-memory-cache and a remote cache system) with local elements limited upper to 50(LRU based evict). You can use it like a map: 
 ```java
@@ -77,23 +92,6 @@ userCache.put(12345L, loadUserFromDataBase(12345L));
 userCache.remove(12345L);
 
 userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
-```
-
-Or you can create ```Cache``` instance manually (RedisCache in this example) :
-```java
-GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
-pc.setMinIdle(2);
-pc.setMaxIdle(10);
-pc.setMaxTotal(10);
-JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
-Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
-                .valueEncoder(JavaValueEncoder.INSTANCE)
-                .valueDecoder(JavaValueDecoder.INSTANCE)
-                .jedisPool(pool)
-                .keyPrefix("userCache-")
-                .expireAfterWrite(200, TimeUnit.SECONDS)
-                .buildCache();
 ```
 
 ## Advanced API
@@ -115,14 +113,19 @@ cache.tryLockAndRun("key", 60, TimeUnit.SECONDS, () -> heavyDatabaseOperation())
 
 Read through and auto refresh:
 ```java
-@CreateCache
-@CacheRefresh(timeUnit = TimeUnit.MINUTES, refresh = 60, stopRefreshAfterLastAccess = 100)
-@CachePenetrationProtect
+@Autowired
+private CacheManager cacheManager;
 private Cache<String, Long> orderSumCache;
 
 @PostConstruct
-public void init(){
-    orderSumCache.config().setLoader(this::loadOrderSumFromDatabase);
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache")
+        .expire(Duration.ofSeconds(3600))
+        .loader(this::loadOrderSumFromDatabase)
+        .refreshPolicy(RefreshPolicy.newPolicy(60, TimeUnit.SECONDS).stopRefreshAfterLastAccess(100, TimeUnit.SECONDS))
+        .penetrationProtect(true)
+        .build();
+    orderSumCache = cacheManager.getOrCreateCache(qc);
 }
 ```
 
@@ -141,7 +144,7 @@ App class:
 ```java
 @SpringBootApplication
 @EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
+@EnableCreateCacheAnnotation // deprecated in jetcache 2.7, can be removed if @CreateCache is not used
 public class MySpringBootApp {
     public static void main(String[] args) {
         SpringApplication.run(MySpringBootApp.class);
@@ -156,15 +159,16 @@ jetcache:
   areaInCacheName: false
   local:
     default:
-      type: linkedhashmap
-      keyConvertor: fastjson
+      type: linkedhashmap #other choose：caffeine
+      keyConvertor: fastjson2 #other choose：fastjson/jackson
       limit: 100
   remote:
     default:
       type: redis
-      keyConvertor: fastjson
-      valueEncoder: java
-      valueDecoder: java
+      keyConvertor: fastjson2 #other choose：fastjson/jackson
+      broadcastChannel: projectA
+      valueEncoder: java #other choose：kryo/kryo5
+      valueDecoder: java #other choose：kryo/kryo5
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -172,6 +176,6 @@ jetcache:
       host: ${redis.host}
       port: ${redis.port}
 ```
-
+> Visit [detail configuration](docs/EN/Config.md) for more instructions
 ## More docs
 Visit [docs](docs/EN/Readme.md) for more details.

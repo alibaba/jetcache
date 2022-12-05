@@ -17,7 +17,7 @@ public class GlobalCacheConfig {
     /**
      * for compatible reason. This property controls whether add area as remote cache key prefix.
      * version<=2.4.3: add cache area in prefix, no config.
-     * version>2.4.3 && version <2.7: default value is true, keep same as 2.4.3 if not set.
+     * version>2.4.3 and version <2.7: default value is true, keep same as 2.4.3 if not set.
      * version>=2.7.0.RC: default value is false.
      *
      * remove in the future.
@@ -68,7 +68,7 @@ public class GlobalCacheConfig {
     /**
      * for compatible reason. This property controls whether add area as remote cache key prefix.
      * version<=2.4.3: add cache area in prefix, no config.
-     * version>2.4.3 && version <2.7: default value is true, keep same as 2.4.3 if not set.
+     * version>2.4.3 and version <2.7: default value is true, keep same as 2.4.3 if not set.
      * version>=2.7.0.RC: default value is false.
      *
      * remove in the future.
@@ -81,7 +81,7 @@ public class GlobalCacheConfig {
     /**
      * for compatible reason. This property controls whether add area as remote cache key prefix.
      * version<=2.4.3: add cache area in prefix, no config.
-     * version>2.4.3 && version <2.7: default value is true, keep same as 2.4.3 if not set.
+     * version>2.4.3 and version <2.7: default value is true, keep same as 2.4.3 if not set.
      * version>=2.7.0.RC: default value is false.
      *
      * remove in the future.

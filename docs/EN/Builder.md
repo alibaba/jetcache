@@ -18,7 +18,7 @@ GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMaxTotal(10);
         JedisPool pool = new JedisPool(pc, "localhost", 6379);
 Cache<Long, OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)

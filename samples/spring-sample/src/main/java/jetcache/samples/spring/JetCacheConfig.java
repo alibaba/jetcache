@@ -4,10 +4,9 @@
 package jetcache.samples.spring;
 
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.anno.support.SpringConfigProvider;
+import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
@@ -17,6 +16,7 @@ import com.alicp.jetcache.support.JavaValueEncoder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.util.Pool;
@@ -26,7 +26,7 @@ import java.util.Map;
 
 @Configuration
 @EnableMethodCache(basePackages = "jetcache.samples.spring")
-@EnableCreateCacheAnnotation
+@Import(JetCacheBaseBeans.class)
 public class JetCacheConfig {
 
     @Bean
@@ -36,11 +36,6 @@ public class JetCacheConfig {
         pc.setMaxIdle(10);
         pc.setMaxTotal(10);
         return new JedisPool(pc, "127.0.0.1", 6379);
-    }
-
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
     }
 
     @Bean
@@ -63,7 +58,6 @@ public class JetCacheConfig {
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(1);
-        globalCacheConfig.setAreaInCacheName(false);
 
         return globalCacheConfig;
     }

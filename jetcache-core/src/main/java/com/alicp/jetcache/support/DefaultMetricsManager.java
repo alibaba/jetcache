@@ -23,13 +23,13 @@ import java.util.stream.Collectors;
 public class DefaultMetricsManager {
     private static final Logger logger = LoggerFactory.getLogger(DefaultMetricsManager.class);
 
-    protected CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
+    protected final CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
 
     private ScheduledFuture<?> future;
 
-    private int resetTime;
-    private TimeUnit resetTimeUnit;
-    private Consumer<StatInfo> metricsCallback;
+    private final int resetTime;
+    private final TimeUnit resetTimeUnit;
+    private final Consumer<StatInfo> metricsCallback;
 
     public DefaultMetricsManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> metricsCallback) {
         this.resetTime = resetTime;
@@ -47,7 +47,7 @@ public class DefaultMetricsManager {
         this.metricsCallback = new StatInfoLogger(verboseLog);
     }
 
-    Runnable cmd = new Runnable() {
+    final Runnable cmd = new Runnable() {
         private long time = System.currentTimeMillis();
 
         @Override

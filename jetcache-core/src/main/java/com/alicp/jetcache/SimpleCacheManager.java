@@ -13,6 +13,7 @@ import com.alicp.jetcache.template.QuickConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PreDestroy;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
     public SimpleCacheManager() {
     }
 
+    @PreDestroy
     @Override
     public void close() {
         broadcastManagers.forEach((area, bm) -> {
@@ -129,9 +131,13 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
                     .buildCache();
         }
         if (config.getRefreshPolicy() != null) {
-            cache.config().setRefreshPolicy(config.getRefreshPolicy());
             cache = new RefreshCache(cache);
+        } else if (config.getLoader() != null) {
+            cache = new LoadingCache(cache);
         }
+        cache.config().setRefreshPolicy(config.getRefreshPolicy());
+        cache.config().setLoader(config.getLoader());
+
 
         boolean protect = config.getPenetrationProtect() != null ? config.getPenetrationProtect()
                 : cacheBuilderTemplate.isPenetrationProtect();

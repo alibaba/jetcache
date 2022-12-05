@@ -2,7 +2,6 @@ package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheManager;
-import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.AbstractLifecycle;
@@ -32,31 +31,20 @@ public class ConfigProvider extends AbstractLifecycle {
     @Resource
     protected GlobalCacheConfig globalCacheConfig;
 
-    protected CacheManager cacheManager;
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
-    private Consumer<StatInfo> metricsCallback = new StatInfoLogger(false);
+    private Consumer<StatInfo> metricsCallback;
 
     private CacheBuilderTemplate cacheBuilderTemplate;
 
-    private CacheContext cacheContext;
-
     public ConfigProvider() {
-        cacheManager = new SimpleCacheManager();
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
+        metricsCallback = new StatInfoLogger(false);
     }
 
     @Override
     protected void doInit() {
-        cacheContext = newContext();
-        initCacheBuilderTemplate();
-        if (cacheManager instanceof SimpleCacheManager) {
-            ((SimpleCacheManager) cacheManager).setCacheBuilderTemplate(cacheBuilderTemplate);
-        }
-    }
-
-    protected void initCacheBuilderTemplate() {
         cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
                 globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
         for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
@@ -81,6 +69,10 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
+        initCacheMonitorInstallers();
+    }
+
+    protected void initCacheMonitorInstallers() {
         cacheBuilderTemplate.getCacheMonitorInstallers().add(metricsMonitorInstaller());
         cacheBuilderTemplate.getCacheMonitorInstallers().add(notifyMonitorInstaller());
         for (CacheMonitorInstaller i : cacheBuilderTemplate.getCacheMonitorInstallers()) {
@@ -105,6 +97,10 @@ public class ConfigProvider extends AbstractLifecycle {
         return new NotifyMonitorInstaller(area -> globalCacheConfig.getRemoteCacheBuilders().get(area));
     }
 
+    public CacheBuilderTemplate getCacheBuilderTemplate() {
+        return cacheBuilderTemplate;
+    }
+
     @Override
     public void doShutdown() {
         try {
@@ -112,9 +108,6 @@ public class ConfigProvider extends AbstractLifecycle {
                 if (i instanceof AbstractLifecycle) {
                     ((AbstractLifecycle) i).shutdown();
                 }
-            }
-            if (cacheManager instanceof AutoCloseable) {
-                ((AutoCloseable) cacheManager).close();
             }
         } catch (Exception e) {
             logger.error("close fail", e);
@@ -149,16 +142,8 @@ public class ConfigProvider extends AbstractLifecycle {
         return new DefaultCacheNameGenerator(hiddenPackages);
     }
 
-    protected CacheContext newContext() {
-        return new CacheContext(this, globalCacheConfig);
-    }
-
-    public void setCacheManager(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
-    }
-
-    public CacheManager getCacheManager() {
-        return cacheManager;
+    public CacheContext newContext(CacheManager cacheManager) {
+        return new CacheContext(cacheManager, this, globalCacheConfig);
     }
 
     public void setEncoderParser(EncoderParser encoderParser) {
@@ -175,10 +160,6 @@ public class ConfigProvider extends AbstractLifecycle {
 
     public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
-    }
-
-    public CacheContext getCacheContext() {
-        return cacheContext;
     }
 
     public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {

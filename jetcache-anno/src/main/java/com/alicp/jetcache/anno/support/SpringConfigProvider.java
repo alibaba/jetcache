@@ -41,14 +41,8 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
     }
 
     @Override
-    protected CacheContext newContext() {
-        return new SpringCacheContext(this, globalCacheConfig, applicationContext);
-    }
-
-    @Autowired(required = false)
-    @Override
-    public void setCacheManager(CacheManager cacheManager) {
-        super.setCacheManager(cacheManager);
+    public CacheContext newContext(CacheManager cacheManager) {
+        return new SpringCacheContext(cacheManager, this, globalCacheConfig, applicationContext);
     }
 
     @Autowired(required = false)

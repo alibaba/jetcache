@@ -18,7 +18,7 @@ GenericObjectPoolConfig pc = new GenericObjectPoolConfig();
         pc.setMaxTotal(10);
         JedisPool pool = new JedisPool(pc, "localhost", 6379);
 Cache<Long, OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
@@ -36,13 +36,6 @@ Cache multiLevelCache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
       .buildCache();
 ```
 实际上，使用MultiLevelCache可以创建多级缓存，它的构造函数接收的是一个Cache数组（可变参数）。
-
-如果是2.2之前的版本：
-```java
-Cache memoryCache = ...
-Cache redisCache = ...
-Cache multiLevelCache = new MultiLevelCache(memoryCache, redisCache);
-```
 
 
 # 监控统计

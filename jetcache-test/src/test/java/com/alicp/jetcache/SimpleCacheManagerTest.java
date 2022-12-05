@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -123,5 +125,24 @@ public class SimpleCacheManagerTest {
         cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName).cacheType(CacheType.LOCAL).build());
         Cache c = cacheManager.getCache(cacheName);
         assertTrue(c instanceof AbstractEmbeddedCache);
+    }
+
+    @Test
+    public void testLoader() {
+        String cacheName = UUID.randomUUID().toString();
+        Cache<String, String> cache = cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName).loader(k -> k + "V").build());
+        assertEquals("K1V", cache.get("K1"));
+    }
+
+    @Test
+    public void testRefresh() {
+        String cacheName = UUID.randomUUID().toString();
+        AtomicInteger count = new AtomicInteger();
+        Cache<String, String> cache = cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName)
+                .loader(k -> String.valueOf(k) + count.getAndIncrement())
+                .refreshPolicy(RefreshPolicy.newPolicy(10, TimeUnit.MILLISECONDS))
+                .build());
+        assertEquals("K10", cache.get("K1"));
+        TestUtil.waitUtil(() -> !"K10".equals(cache.get("K1")));
     }
 }

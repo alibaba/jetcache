@@ -16,7 +16,7 @@
 
     <bean id="factoryBeanTarget" class="com.alicp.jetcache.test.beans.MyFactoryBean"/>
 
-    <bean class="com.alicp.jetcache.anno.support.SpringConfigProvider"/>
+    <bean id="springConfigProvider" class="com.alicp.jetcache.anno.support.SpringConfigProvider"/>
     <bean id="globalCacheConfig" class="com.alicp.jetcache.anno.support.GlobalCacheConfig">
         <property name="localCacheBuilders">
             <map>
@@ -29,6 +29,10 @@
                 <entry key="default" value-ref="remoteCacheBuilder"/>
                 <entry key="A1" value-ref="remoteCacheBuilder2"/>
             </map>
+        </property>
+    </bean>
+    <bean class="com.alicp.jetcache.SimpleCacheManager">
+        <property name="cacheBuilderTemplate" value="#{springConfigProvider.cacheBuilderTemplate}">
         </property>
     </bean>
     <bean id="fastjsonKeyConvertor" class="com.alicp.jetcache.support.FastjsonKeyConvertor"/>

@@ -2,22 +2,30 @@
 # 创建缓存实例
 通过@CreateCache注解创建一个缓存实例，默认超时时间是100秒
 ```java
-@CreateCache(expire = 100)
+@Autowired
+private CacheManager cacheManager;
+
 private Cache<Long, UserDO> userCache;
+
+@PostConstruct
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache") // name用于统计信息展示名字
+        .expire(Duration.ofSeconds(100))
+        //.cacheType(CacheType.BOTH) // 创建一个两级缓存
+        //.localLimit(100) // 本地缓存元素个数限制，只对CacheType.LOCAL和CacheType.BOTH有效
+        //.syncLocal(true) // 两级缓存的情况下，缓存更新时发消息让其它JVM实例中的缓存失效，需要配置broadcastChannel才生效。
+        .build();
+    userCache = cacheManager.getOrCreateCache(qc);
+}
 ```
-用起来就像map一样
+
+用起来就像map一样：
+
 ```java
 UserDO user = userCache.get(123L);
 userCache.put(123L, user);
 userCache.remove(123L);
 ```
-
-创建一个两级（内存+远程）的缓存，内存中的元素个数限制在50个。
-```java
-@CreateCache(name = "UserService.userCache", expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
-private Cache<Long, UserDO> userCache;
-```
-name属性不是必须的，但是起个名字是个好习惯，展示统计数据的使用，会使用这个名字。如果同一个area两个@CreateCache的name配置一样，它们生成的Cache将指向同一个实例。
 
 # 创建方法缓存
 使用@Cached方法可以为一个方法添加上缓存。JetCache通过Spring AOP生成代理，来支持缓存功能。注解可以加在接口方法上也可以加在类方法上，但需要保证是个Spring bean。
@@ -51,7 +59,8 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
       poolConfig:
@@ -110,7 +119,7 @@ import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -122,7 +131,8 @@ import redis.clients.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
+@EnableCreateCacheAnnotation // deprecated in jetcache 2.7, 如果不用@CreateCache注解可以删除
+@Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
     @Bean
@@ -134,14 +144,14 @@ public class JetCacheConfig {
         return new JedisPool(pc, "localhost", 6379);
     }
 
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
+    //@Bean for jetcache <=2.6 
+    //public SpringConfigProvider springConfigProvider() {
+    //    return new SpringConfigProvider();
+    //}
 
     @Bean
     public GlobalCacheConfig config(Pool<Jedis> pool){
-    // public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){ // for jetcache 2.5 
+    // public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){ // for jetcache <=2.5 
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
@@ -150,18 +160,19 @@ public class JetCacheConfig {
 
         Map remoteBuilders = new HashMap();
         RedisCacheBuilder remoteCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
+                .broadcastChannel("projectA")
                 .jedisPool(pool);
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        // globalCacheConfig.setConfigProvider(configProvider); // for jetcache 2.5
+        // globalCacheConfig.setConfigProvider(configProvider); // for jetcache <= 2.5
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);
-        globalCacheConfig.setAreaInCacheName(false);
+        //globalCacheConfig.setAreaInCacheName(false); for jetcache <=2.6 
 
         return globalCacheConfig;
     }
@@ -170,7 +181,7 @@ public class JetCacheConfig {
 ```
 
 # 进一步阅读
-* CreateCache的详细使用说明可以看[这里](CreateCache.md)
-* 使用@CacheCache创建的Cache接口实例，它的API使用可以看[这里](CacheAPI.md)
+* 创建Cache实例的详细使用说明可以看[这里](CreateCache.md)
+* Cache接口API使用可以看[这里](CacheAPI.md)
 * 关于方法缓存(@Cached, @CacheUpdate, @CacheInvalidate)的详细使用看[这里](MethodCache.md)
 * 详细的配置说明看[这里](Config.md)。

@@ -4,13 +4,16 @@
 package com.alicp.jetcache.anno.method;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigMap;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
+import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.testsupport.CountClass;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class CacheHandlerUpdateTest {
     private ConfigProvider configProvider;
+    private CacheManager cacheManager;
     private CacheInvokeConfig cacheInvokeConfig;
     private CountClass count;
     private Cache cache;
@@ -34,14 +38,11 @@ public class CacheHandlerUpdateTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        configProvider = new ConfigProvider(){
-            @Override
-            protected void initCacheBuilderTemplate() {
-            }
-        };
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        configProvider = new ConfigProvider();
         configProvider.setGlobalCacheConfig(globalCacheConfig);
         configProvider.init();
+        cacheManager = new JetCacheBaseBeans().cacheManager(configProvider);
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .buildCache();
@@ -54,7 +55,7 @@ public class CacheHandlerUpdateTest {
         count = new CountClass();
 
         Method method = CountClass.class.getMethod("update", String.class, int.class);
-        cacheInvokeContext = configProvider.getCacheContext().createCacheInvokeContext(configMap);
+        cacheInvokeContext = configProvider.newContext(cacheManager).createCacheInvokeContext(configMap);
         cacheInvokeContext.setCacheInvokeConfig(cacheInvokeConfig);
         updateAnnoConfig = new CacheUpdateAnnoConfig();
         updateAnnoConfig.setCondition(CacheConsts.UNDEFINED_STRING);

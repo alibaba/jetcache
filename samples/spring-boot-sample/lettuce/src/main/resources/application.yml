@@ -1,0 +1,17 @@
+jetcache:
+  statIntervalMinutes: 1
+  areaInCacheName: false
+  local:
+    default:
+      type: linkedhashmap
+      keyConvertor: fastjson2
+  remote:
+    default:
+      type: redis.lettuce
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
+      keyPrefix: projectA
+      valueEncoder: java
+      valueDecoder: java
+      uri: redis://127.0.0.1:6379/
+      defaultExpireInMillis: 5000

@@ -44,22 +44,9 @@ The output of statistics can be customized:
     @Bean
     public Consumer<StatInfo> metricsCallback() {
         public Consumer<StatInfo> statCallback() {
-            // return new StatInfoLogger(false);
-            ... // 实现自己的logger
+            return new StatInfoLogger(false);
+            // or implements another Consumer<StatInfo>
         }
-    }
-
-```
-```java
-    // for 2.5
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider(){
-            public Consumer<StatInfo> statCallback() {
-                // return new StatInfoLogger(false);
-                ... // 实现自己的logger
-            }
-        };
     }
 
 ```

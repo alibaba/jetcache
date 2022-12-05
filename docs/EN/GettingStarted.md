@@ -2,8 +2,21 @@
 # Create Cache instance
 Create a ```Cache``` instance using @CreateCache annotation with default TTL 100 seconds.
 ```java
-@CreateCache(expire = 100)
+@Autowired
+private CacheManager cacheManager;
+
 private Cache<Long, UserDO> userCache;
+
+@PostConstruct
+public void init() {
+    QuickConfig qc = QuickConfig.newBuilder("userCache") // name used in statistical information
+        .expire(Duration.ofSeconds(100))
+        //.cacheType(CacheType.BOTH) // create two level cache
+        //.localLimit(100) // limit for local cache elements, only used for CacheType.LOCAL and CacheType.BOTH
+        //.syncLocal(true) // invalidate local cache in other JVM after updates, only used for CacheType.BOTH, need set broadcastChannel in configuration. 
+        .build();
+    userCache = cacheManager.getOrCreateCache(qc);
+}
 ```
 Then use ```Cache``` instance like a map:
 ```java
@@ -11,15 +24,6 @@ UserDO user = userCache.get(123L);
 userCache.put(123L, user);
 userCache.remove(123L);
 ```
-
-Create Two level (local + remote, since cacheType = CacheType.BOTH) ```Cache``` instance, the limit of elements in local memory cache is 50: 
-```java
-@CreateCache(name = "UserService.userCache", expire = 100, cacheType = CacheType.BOTH, localLimit = 50)
-private Cache<Long, UserDO> userCache;
-```
-Although name attribute is optional, it's good practice to naming each ```Cache``` instance. 
-Statistics display will use the name for output, or auto generate one when name is absent. 
-If two @CreateCache annotation with same name and cache area, they will point to same ```Cache``` instance.
 
 # Create method cache
 @Cached can be used to add method cache for a method. 
@@ -54,7 +58,8 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
       poolConfig:
@@ -115,7 +120,7 @@ import com.alicp.jetcache.anno.support.SpringConfigProvider;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
@@ -127,7 +132,8 @@ import redis.clients.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
-@EnableCreateCacheAnnotation
+@EnableCreateCacheAnnotation // deprecated in jetcache 2.7, can be removed if @CreateCache is not used
+@Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
     @Bean
@@ -139,14 +145,14 @@ public class JetCacheConfig {
         return new JedisPool(pc, "localhost", 6379);
     }
 
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
+    //@Bean for jetcache <=2.6 
+    //public SpringConfigProvider springConfigProvider() {
+    //    return new SpringConfigProvider();
+    //}
 
     @Bean
     public GlobalCacheConfig config(Pool<Jedis> pool){
-    // public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){ // for jetcache 2.5 
+        // public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){ // for jetcache <=2.5 
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
@@ -155,18 +161,19 @@ public class JetCacheConfig {
 
         Map remoteBuilders = new HashMap();
         RedisCacheBuilder remoteCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
+                .broadcastChannel("projectA")
                 .jedisPool(pool);
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        // globalCacheConfig.setConfigProvider(configProvider); // for jetcache 2.5
+        // globalCacheConfig.setConfigProvider(configProvider); // for jetcache <= 2.5
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);
-        globalCacheConfig.setAreaInCacheName(false);
+        //globalCacheConfig.setAreaInCacheName(false); for jetcache <=2.6 
 
         return globalCacheConfig;
     }
@@ -175,7 +182,7 @@ public class JetCacheConfig {
 ```
 
 # read more
-* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache.md)
+* [Initiate ```Cache``` instance using CacheManager](CreateCache.md)
 * [Basic Cache API](CacheAPI.md)
 * [Method cache using annotation(@Cached, @CacheUpdate, @CacheInvalidate)](MethodCache.md)
 * [Configuration details](Config.md)

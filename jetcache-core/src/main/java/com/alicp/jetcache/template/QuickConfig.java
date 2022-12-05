@@ -3,6 +3,7 @@
  */
 package com.alicp.jetcache.template;
 
+import com.alicp.jetcache.CacheLoader;
 import com.alicp.jetcache.RefreshPolicy;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
@@ -30,6 +31,7 @@ public class QuickConfig {
     private Boolean penetrationProtect;
     private Duration penetrationProtectTimeout;
     private RefreshPolicy refreshPolicy;
+    private CacheLoader<? extends Object, ? extends Object> loader;
 
     private QuickConfig() {
     }
@@ -58,6 +60,7 @@ public class QuickConfig {
         private Boolean penetrationProtect;
         private Duration penetrationProtectTimeout;
         private RefreshPolicy refreshPolicy;
+        private CacheLoader<? extends Object, ? extends Object> loader;
 
         Builder(String name) {
             Objects.requireNonNull(name);
@@ -88,6 +91,7 @@ public class QuickConfig {
             c.penetrationProtect = penetrationProtect;
             c.penetrationProtectTimeout = penetrationProtectTimeout;
             c.refreshPolicy = refreshPolicy;
+            c.loader = loader;
             return c;
         }
 
@@ -155,6 +159,11 @@ public class QuickConfig {
             this.refreshPolicy = refreshPolicy;
             return this;
         }
+
+        public <K, V> Builder loader(CacheLoader<K, V> loader) {
+            this.loader = loader;
+            return this;
+        }
     }
 
     public String getArea() {
@@ -217,4 +226,7 @@ public class QuickConfig {
         return refreshPolicy;
     }
 
+    public <K, V> CacheLoader<K, V> getLoader() {
+        return (CacheLoader<K, V>) loader;
+    }
 }

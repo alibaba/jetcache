@@ -1,8 +1,8 @@
 package com.alicp.jetcache.test.spring;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
-import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.template.QuickConfig;
 import com.alicp.jetcache.test.beans.FactoryBeanTarget;
 import com.alicp.jetcache.test.beans.Service;
@@ -149,9 +149,9 @@ public class SpringTest extends SpringTestBase {
 
     private void testCacheManager() {
         String cacheName = UUID.randomUUID().toString();
-        ConfigProvider cp = context.getBean(ConfigProvider.class);
-        Cache c = cp.getCacheManager().getOrCreateCache(QuickConfig.newBuilder(cacheName).build());
-        Cache c2 = cp.getCacheManager().getCache(CacheConsts.DEFAULT_AREA, cacheName);
+        CacheManager cm = context.getBean(CacheManager.class);
+        Cache c = cm.getOrCreateCache(QuickConfig.newBuilder(cacheName).build());
+        Cache c2 = cm.getCache(CacheConsts.DEFAULT_AREA, cacheName);
         Assert.assertSame(c, c2);
     }
 

@@ -10,11 +10,15 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/12/9.
  *
+ * @deprecated replaced by CacheManager.getOrCreateCache(QuickConfig), the CacheManager instance
+ *             can be injected use annotation such as @Autowired.
+ *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
+@Deprecated
 public @interface CreateCache {
     /**
      * If you want to use multi backend cache system, you can setup multi "cache area" in configuration,

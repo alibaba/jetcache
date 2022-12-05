@@ -3,10 +3,6 @@ redis有多种java版本的客户端，JetCache2.2以前使用jedis客户端访�
 
 使用lettuce访问redis，对应的maven artifact是jetcache-redis-lettuce和jetcache-starter-redis-lettuce。lettuce使用Netty建立单个连接连redis，所以不需要配置连接池。
 
-> 注意：新发布的lettuce5更换了groupId和包名，2.3版本的JetCache同时支持lettuce4和5，jetcache-redis-lettuce，jetcache-starter-redis-lettuce提供lettuce5支持，jetcache-redis-lettuce4和jetcache-starter-redis-lettuce4提供lettuce4支持。
-
-> 注意：JetCache2.2版本中，lettuce单词存在错误的拼写，错写为“luttece”，该错误存在于包名、类名和配置中，2.3已经改正。
-
 # spring boot环境下的lettuce支持
 application.yml文件如下（这里省去了local相关的配置）：
 ```
@@ -15,7 +11,8 @@ jetcache:
   remote:
     default:
       type: redis.lettuce
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       uri: redis://127.0.0.1:6379/
       #uri: redis-sentinel://127.0.0.1:26379,127.0.0.1:26380,127.0.0.1:26381/?sentinelMasterId=mymaster
       #readFrom: slavePreferred
@@ -31,7 +28,8 @@ jetcache:
   remote:
     default:
       type: redis.lettuce
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       mode: cluster
       #readFrom: slavePreferred
       uri:
@@ -40,28 +38,13 @@ jetcache:
         - redis://127.0.0.1:7002
 ```
 
-如果需要直接使用lettuce的RedisClient：
-```java
-@Bean(name = "defaultClient")
-@DependsOn(RedisLettuceAutoConfiguration.AUTO_INIT_BEAN_NAME)
-public LettuceFactory defaultClient() {
-    return new LettuceFactory("remote.default", RedisClient.class);
-}
-```
-然后可以直接使用
-```java
-@Autowired
-private RedisClient defaultClient;
-```
-
-也可以用```Cache```接口上的```<T> T unwrap(Class<T> clazz)```方法来获取```RedisClient```和```RedisCommands```等。
-参考RedisLettuceCache.unwrap源代码。
 
 # 不使用spring boot
 ```java
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
 @EnableCreateCacheAnnotation
+@Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
     @Bean
@@ -73,29 +56,29 @@ public class JetCacheConfig {
         return client;
     }
 
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
+    //@Bean for jetcache <=2.6 
+    //public SpringConfigProvider springConfigProvider() {
+    //    return new SpringConfigProvider();
+    //}
 
     @Bean
-    public GlobalCacheConfig config(SpringConfigProvider configProvider,RedisClient redisClient){
+    public GlobalCacheConfig config(RedisClient redisClient){
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE);
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
 
         Map remoteBuilders = new HashMap();
         RedisLettuceCacheBuilder remoteCacheBuilder = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
+                .broadcastChannel("projectA")
                 .redisClient(redisClient);
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        //globalCacheConfig.setConfigProvider(configProvider);//for jetcache <=2.5
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);

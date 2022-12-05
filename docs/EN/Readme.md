@@ -21,10 +21,13 @@ Full features of JetCache:
 * Spring Framework4.0.8+ (optional, with annotation support)
 * Spring Boot1.1.9+ (optional)
 
+## samples
+see *samples* directory of the repository.
+
 ## Documents
 * [Getting Started](GettingStarted.md)
 * [Basic Cache API](CacheAPI.md)
-* [Initiate ```Cache``` instance using @CreateCache annotation](CreateCache.md)
+* [Initiate ```Cache``` instance using CacheManager](CreateCache.md)
 * [Enable method caching using annotation](MethodCache.md)
 * [Configuration details](Config.md)
 * [Advanced Cache API](AdvancedCacheAPI.md)

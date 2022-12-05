@@ -1,15 +1,23 @@
 package com.alicp.jetcache.anno.config;
 
 import com.alicp.jetcache.Cache;
-import com.alicp.jetcache.anno.*;
+import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.CreateCache;
+import com.alicp.jetcache.anno.KeyConvertor;
+import com.alicp.jetcache.anno.SerialPolicy;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
-import com.alicp.jetcache.anno.support.SpringConfigProvider;
+import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
-import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
+import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.JavaValueDecoder;
+import com.alicp.jetcache.support.JavaValueEncoder;
+import com.alicp.jetcache.support.KryoValueDecoder;
+import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import org.junit.Assert;
 import org.junit.Test;
@@ -19,6 +27,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -32,8 +41,8 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ConfigTest.A.class)
-public class ConfigTest implements ApplicationContextAware {
+@ContextConfiguration(classes = ConfigTest1.A.class)
+public class ConfigTest1 implements ApplicationContextAware {
 
     private ApplicationContext context;
 
@@ -87,17 +96,13 @@ public class ConfigTest implements ApplicationContextAware {
 
 
     @Configuration
-    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config")
+    @EnableMethodCache(basePackages = "com.alicp.jetcache.anno.config.ConfigTest1")
     @EnableCreateCacheAnnotation
+    @Import(JetCacheBaseBeans.class)
     public static class A {
         @Bean
         public ConfigTestBean configTestBean() {
             return new ConfigTestBean();
-        }
-
-        @Bean
-        public SpringConfigProvider springConfigProvider() {
-            return new SpringConfigProvider();
         }
 
         @Bean(name = "factoryBeanTarget")

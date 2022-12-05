@@ -10,7 +10,8 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -44,6 +45,7 @@ private Pool<Jedis> defaultPool;
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
 @EnableCreateCacheAnnotation
+@Import(JetCacheBaseBeans.class) //need since jetcache 2.7+
 public class JetCacheConfig {
 
     @Bean
@@ -51,29 +53,29 @@ public class JetCacheConfig {
         // build jedis pool ...
     }
 
-    @Bean
-    public SpringConfigProvider springConfigProvider() {
-        return new SpringConfigProvider();
-    }
+    //@Bean for jetcache <=2.6 
+    //public SpringConfigProvider springConfigProvider() {
+    //    return new SpringConfigProvider();
+    //}
 
     @Bean
-    public GlobalCacheConfig config(SpringConfigProvider configProvider, Pool<Jedis> pool){
+    public GlobalCacheConfig config(Pool<Jedis> pool){
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE);
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
 
         Map remoteBuilders = new HashMap();
         RedisCacheBuilder remoteCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(FastjsonKey2Convertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
+                .broadcastChannel("projectA")
                 .jedisPool(pool);
         remoteBuilders.put(CacheConsts.DEFAULT_AREA, remoteCacheBuilder);
 
         GlobalCacheConfig globalCacheConfig = new GlobalCacheConfig();
-        // globalCacheConfig.setConfigProvider(configProvider);//for jetcache <=2.5
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);

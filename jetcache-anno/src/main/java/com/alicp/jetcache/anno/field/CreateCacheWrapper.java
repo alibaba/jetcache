@@ -1,6 +1,7 @@
 package com.alicp.jetcache.anno.field;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.RefreshPolicy;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CachePenetrationProtect;
@@ -12,6 +13,8 @@ import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.PenetrationProtectConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 import java.lang.reflect.Field;
@@ -22,6 +25,8 @@ import java.lang.reflect.Field;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 class CreateCacheWrapper {
+
+    private static final Logger logger = LoggerFactory.getLogger(CreateCacheWrapper.class);
 
     private Cache cache;
 
@@ -49,6 +54,10 @@ class CreateCacheWrapper {
     private void init() {
         GlobalCacheConfig globalCacheConfig = beanFactory.getBean(GlobalCacheConfig.class);
         ConfigProvider configProvider = beanFactory.getBean(ConfigProvider.class);
+        CacheManager cacheManager = beanFactory.getBean(CacheManager.class);
+        if (cacheManager == null) {
+            logger.error("There is no cache manager instance in spring context");
+        }
 
         CachedAnnoConfig cac = new CachedAnnoConfig();
         cac.setArea(ann.area());
@@ -71,7 +80,7 @@ class CreateCacheWrapper {
             CacheNameGenerator g = configProvider.createCacheNameGenerator(hiddenPackages);
             cacheName = g.generateCacheName(field);
         }
-        cache = configProvider.getCacheContext().__createOrGetCache(cac, ann.area(), cacheName);
+        cache = configProvider.newContext(cacheManager).__createOrGetCache(cac, ann.area(), cacheName);
     }
 
     public Cache getCache() {
