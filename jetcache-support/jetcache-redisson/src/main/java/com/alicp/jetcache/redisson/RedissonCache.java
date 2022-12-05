@@ -73,6 +73,9 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
                 holder = (CacheValueHolder<V>) valueDecoder.apply(data);
             } catch (CacheEncodeException e) {
                 holder = compatibleOldVal(key, data, counter + 1);
+                if(Objects.isNull(holder)){
+                    logError("decoder", key, e);
+                }
             } catch (Throwable e) {
                 logError("decoder", key, e);
             }
