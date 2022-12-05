@@ -66,13 +66,13 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
     }
 
     @SuppressWarnings({"unchecked"})
-    private CacheValueHolder<V> decoder(final K key, final byte[] data) {
+    private CacheValueHolder<V> decoder(final K key, final byte[] data, final int counter) {
         CacheValueHolder<V> holder = null;
         if (Objects.nonNull(data) && data.length > 0) {
             try {
                 holder = (CacheValueHolder<V>) valueDecoder.apply(data);
             } catch (CacheEncodeException e) {
-                holder = compatibleOldVal(key, data);
+                holder = compatibleOldVal(key, data, counter + 1);
             } catch (Throwable e) {
                 logError("decoder", key, e);
             }
@@ -80,8 +80,12 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
         return holder;
     }
 
-    private CacheValueHolder<V> compatibleOldVal(final K key, final byte[] data) {
-        if (Objects.nonNull(key) && Objects.nonNull(data) && data.length > 0) {
+    private CacheValueHolder<V> decoder(final K key, final byte[] data) {
+        return decoder(key, data, 0);
+    }
+
+    private CacheValueHolder<V> compatibleOldVal(final K key, final byte[] data, final int counter) {
+        if (Objects.nonNull(key) && Objects.nonNull(data) && data.length > 0 && counter <= 1) {
             try {
                 final Codec codec = this.client.getConfig().getCodec();
                 if (Objects.nonNull(codec)) {
@@ -89,7 +93,7 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
                     if (codec.getClass() != cls) {
                         final ByteBuf in = ByteBufAllocator.DEFAULT.buffer().writeBytes(data);
                         final byte[] out = (byte[]) codec.getValueDecoder().decode(in, null);
-                        return decoder(key, out);
+                        return decoder(key, out, counter);
                     }
                 }
             } catch (Throwable e) {
