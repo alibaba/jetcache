@@ -25,8 +25,8 @@ import java.util.function.Function;
 public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
     private final RedissonClient client;
     private final RedissonCacheConfig<K, V> config;
-    private Function<Object, byte[]> valueEncoder;
-    private Function<byte[], Object> valueDecoder;
+    private final Function<Object, byte[]> valueEncoder;
+    private final Function<byte[], Object> valueDecoder;
 
     public RedissonCache(final RedissonCacheConfig<K, V> config) {
         super(config);
