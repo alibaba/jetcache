@@ -207,6 +207,11 @@
         <spring.framework.version>5.3.23</spring.framework.version>
         <spring.boot.version>2.7.5</spring.boot.version>
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
+        <!--
+        <spring.framework.version>6.0.2</spring.framework.version>
+        <spring.boot.version>3.0.0</spring.boot.version>
+        <lettuce.version>6.2.1.RELEASE</lettuce.version>
+        -->
         <jedis.version>4.3.1</jedis.version>
         <redisson.version>3.18.0</redisson.version>
 
@@ -225,16 +230,19 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>1.7.36</version>
+                <!--<version>2.0.5</version>-->
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>1.2.11</version>
+                <!--<version>1.4.5</version>-->
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>1.2.11</version>
+                <!--<version>1.4.5</version>-->
             </dependency>
 
             <dependency>

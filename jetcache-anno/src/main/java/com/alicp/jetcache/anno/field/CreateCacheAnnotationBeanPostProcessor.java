@@ -49,7 +49,8 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
         this.beanFactory = (ConfigurableListableBeanFactory) beanFactory;
     }
 
-    @Override
+    // removed in spring 6
+    //@Override
     public PropertyValues postProcessPropertyValues(
             PropertyValues pvs, PropertyDescriptor[] pds, Object bean, String beanName) throws BeanCreationException {
         return postProcessProperties(pvs, bean, beanName);
