@@ -8,6 +8,9 @@ jetcache tested with below spring/spring-boot versions
 | 2.7      | 5.2.4.RELEASE~5.3.23        | 2.2.5.RELEASE~2.7.5         | jetcache-redis depends on jedis4, spring-data(jedis) depends on jedis3, can't used together                              |
 
 # compatible change notes
+## 2.7.2
+* update encoder/decoder of redisson, not compatible with 2.7.1
+
 ## 2.7.0
 * jetcache-redis depends on jedis4，springdata(jedis) depends on jedis3, can't use together
 * encoder/decoder now support kryo4 and kryo5, in yml "kryo" is kryo4，"kryo5" is kryo5. the kryo4 and kryo5 is not compatible.

@@ -8,6 +8,9 @@ jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部
 | 2.7        | 5.2.4.RELEASE~5.3.23        | 2.2.5.RELEASE~2.7.5         | jetcahe-redis依赖jedis4，spring-data(jedis)依赖jedis3，不能同时用                        |
 
 # 兼容性改动说明
+## 2.7.2
+* 更新了redisson的编码方式，和2.7.1不兼容
+
 ## 2.7.0
 * jetcahe-redis依赖jedis4，如果你使用spring data并且使用jedis的话（spring-data默认用lettuce），它需要3，所以你需要自己把版本改回去，并且不能再使用jetcahe-redis了（改用jetcache-redis-springdata）
 * encoder/decoder现在同时支持kryo4和kryo5，在yml中"kryo"仍然代表kryo4，"kryo5"代表kryo5。kryo4和kryo5的序列化内容完全不兼容。
