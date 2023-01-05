@@ -3,6 +3,7 @@ package com.alicp.jetcache.external;
 import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.anno.KeyConvertor;
 
 import java.io.IOException;
 
@@ -35,13 +36,17 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
     public byte[] buildKey(K key) {
         try {
             Object newKey = key;
-            if (key instanceof byte[]) {
-                newKey = key;
-            } else if(key instanceof String){
-                newKey = key;
-            } else {
-                if (config.getKeyConvertor() != null) {
+            if (config.getKeyConvertor() != null) {
+                if (config.getKeyConvertor() instanceof KeyConvertor) {
                     newKey = config.getKeyConvertor().apply(key);
+                } else {
+                    if (key instanceof byte[]) {
+                        newKey = key;
+                    } else if (key instanceof String) {
+                        newKey = key;
+                    } else {
+                        newKey = config.getKeyConvertor().apply(key);
+                    }
                 }
             }
             return ExternalKeyUtil.buildKeyAfterConvert(newKey, config.getKeyPrefix());

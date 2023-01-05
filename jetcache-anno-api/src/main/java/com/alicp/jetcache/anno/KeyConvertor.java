@@ -7,7 +7,7 @@ import java.util.function.Function;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public interface KeyConvertor {
+public interface KeyConvertor extends Function<Object, Object> {
     String NONE = "NONE";
     String FASTJSON = "FASTJSON";
 
