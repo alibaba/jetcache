@@ -38,8 +38,11 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
             Object newKey = key;
             if (config.getKeyConvertor() != null) {
                 if (config.getKeyConvertor() instanceof KeyConvertor) {
+                    // since 2.7.3 KeyConvertor extends Function<Object, Object>
                     newKey = config.getKeyConvertor().apply(key);
                 } else {
+                    // before 2.7.3, KeyConvertor is interface only place some constants.
+                    // "key convertor" is Function<Object, Object> and can't process byte[] and String
                     if (key instanceof byte[]) {
                         newKey = key;
                     } else if (key instanceof String) {
