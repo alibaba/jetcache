@@ -7,7 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +25,9 @@ import java.util.function.Function;
 public class RefreshCache<K, V> extends LoadingCache<K, V> {
 
     private static final Logger logger = LoggerFactory.getLogger(RefreshCache.class);
+
+    public static final byte[] LOCK_KEY_SUFFIX = "_#RL#".getBytes();
+    public static final byte[] TIMESTAMP_KEY_SUFFIX = "_#TS#".getBytes();
 
     private ConcurrentHashMap<Object, RefreshTask> taskMap = new ConcurrentHashMap<>();
 
@@ -174,10 +181,10 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
         private void externalLoad(final Cache concreteCache, final long currentTime)
                 throws Throwable {
             byte[] newKey = ((AbstractExternalCache) concreteCache).buildKey(key);
-            byte[] lockKey = combine(newKey, "_#RL#".getBytes());
+            byte[] lockKey = combine(newKey, LOCK_KEY_SUFFIX);
             long loadTimeOut = RefreshCache.this.config.getRefreshPolicy().getRefreshLockTimeoutMillis();
             long refreshMillis = config.getRefreshPolicy().getRefreshMillis();
-            byte[] timestampKey = combine(newKey, "_#TS#".getBytes());
+            byte[] timestampKey = combine(newKey, TIMESTAMP_KEY_SUFFIX);
 
             // AbstractExternalCache buildKey method will not convert byte[]
             CacheGetResult refreshTimeResult = concreteCache.GET(timestampKey);
