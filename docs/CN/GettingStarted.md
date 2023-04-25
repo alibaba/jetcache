@@ -38,7 +38,7 @@ public interface UserService {
 
 # 基本配置（使用Spring Boot）
 
-如果使用Spring Boot，可以按如下的方式配置（这里使用了jedis客户端连接redis，也可以使用lettuce[lettuce](RedisWithLettuce.md)客户端）。
+如果使用Spring Boot，可以按如下的方式配置（这里使用了jedis客户端连接redis，也可以使用[lettuce](RedisWithLettuce.md)客户端）。
 # POM
 ```xml
 <dependency>
