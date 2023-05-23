@@ -60,6 +60,7 @@ public class JetCacheAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean
     public AutoConfigureBeans autoConfigureBeans() {
         return new AutoConfigureBeans();
     }
