@@ -179,8 +179,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                             return new ResultData(CacheResultCode.NOT_EXISTS, null, null);
                         }
                     } catch (Exception exception) {
-                        logError("GET", key, ex);
-                        return new ResultData(ex);
+                        logError("GET", key, exception);
+                        return new ResultData(exception);
                     }
                 }
             }));
@@ -226,8 +226,8 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
                         }
                         return new ResultData(CacheResultCode.SUCCESS, null, resultMap);
                     } catch (Exception exception) {
-                        logError("GET_ALL", "keys(" + keys.size() + ")", ex);
-                        return new ResultData(ex);
+                        logError("GET_ALL", "keys(" + keys.size() + ")", exception);
+                        return new ResultData(exception);
                     }
                 }
             }));

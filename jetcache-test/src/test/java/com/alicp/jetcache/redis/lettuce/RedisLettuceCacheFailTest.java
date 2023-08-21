@@ -4,6 +4,8 @@
 package com.alicp.jetcache.redis.lettuce;
 
 import com.alicp.jetcache.*;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
+import io.lettuce.core.KeyValue;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -13,15 +15,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 /**
@@ -32,6 +37,7 @@ public class RedisLettuceCacheFailTest {
     private RedisClient client;
     private RedisAsyncCommands asyncCommands;
     private Cache cache;
+    private Function<byte[], Object> valueDecoder;
 
     @BeforeEach
     public void setup() {
@@ -42,8 +48,12 @@ public class RedisLettuceCacheFailTest {
         when(connection.sync()).thenReturn(null);
         when(connection.async()).thenReturn(asyncCommands);
 
+        valueDecoder = mock(Function.class);
+
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)
+                .valueDecoder(valueDecoder)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE) // logout the readable Key or Keys in error message
                 .keyPrefix("fail_test")
                 .buildCache();
     }
@@ -77,6 +87,20 @@ public class RedisLettuceCacheFailTest {
     }
 
     @Test
+    public void test_GET_DecodeValueFailed() {
+        String exceptionMessage = "decodeValueFailed";
+        when(valueDecoder.apply(any())).thenThrow(new RuntimeException(exceptionMessage));
+
+        RedisFuture rf = mockFuture(new byte[]{0x01, 0x02}, null);
+        when(asyncCommands.get(any())).thenReturn(rf);
+
+        CacheGetResult cr = cache.GET("K");
+        assertEquals(CacheResultCode.FAIL, cr.getResultCode());
+        assertNull(cr.getValue());
+        assertTrue(cr.getMessage().contains(exceptionMessage));
+    }
+
+    @Test
     public void test_GET_ALL() {
         when(asyncCommands.mget(any())).thenThrow(new RuntimeException("err"))
                 .thenReturn(mockFuture(null, new RuntimeException()));
@@ -90,6 +114,24 @@ public class RedisLettuceCacheFailTest {
         cr = cache.GET_ALL(s);
         assertEquals(CacheResultCode.FAIL, cr.getResultCode());
         assertNull(cr.getValues());
+    }
+
+    @Test
+    public void test_GET_ALL_DecodeValueFailed() {
+        String exceptionMessage = "decodeValueFailed";
+        when(valueDecoder.apply(any())).thenThrow(new RuntimeException(exceptionMessage));
+
+        KeyValue<byte[],byte[]> kv = KeyValue.just(new byte[]{0x01}, new byte[]{0x01});
+        RedisFuture rf = mockFuture(Arrays.asList(kv), null);
+        when(asyncCommands.mget(any())).thenReturn(rf);
+
+        HashSet s = new HashSet();
+        s.add("K");
+
+        MultiGetResult cr = cache.GET_ALL(s);
+        assertEquals(CacheResultCode.FAIL, cr.getResultCode());
+        assertNull(cr.getValues());
+        assertTrue(cr.getMessage().contains(exceptionMessage));
     }
 
     @Test
