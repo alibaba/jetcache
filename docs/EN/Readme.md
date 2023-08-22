@@ -38,7 +38,8 @@ see *samples* directory of the repository.
 * [In-memory ```Cache``` implements: LinkedHashMapCache and CaffeineCache](Embedded.md)
 * [Statistics](Stat.md)
 * [Builder API](Builder.md): If you do not use Spring Framework or want to construct ```Cache``` instance by hand coding
-* [Compatibility notes](Compatibility.md) 
+* [Compatibility notes](Compatibility.md)
+* [Repository Map](https://sourcespy.com/github/alibabajetcache/): a visual introduciton to the repository
 
 ## which artifact should I use?
 * jetcache-anno-api: define annotation and constants, no transitive dependencies. If you want to add JetCache annotation to your API artifact without introduce a lot of dependencies, you use jetcache-anno-api. 
