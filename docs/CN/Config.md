@@ -7,6 +7,7 @@ jetcache:
   hidePackages: com.alibaba
   local:
     default:
+      keyPrefix: xxx
       type: caffeine
       limit: 100
       keyConvertor: fastjson2 #其他可选：fastjson/jackson
@@ -18,6 +19,7 @@ jetcache:
       expireAfterWriteInMillis: 100000
   remote:
     default:
+      keyPrefix: xxx
       type: redis
       keyConvertor: fastjson2 #其他可选：fastjson/jackson
       broadcastChannel: projectA
