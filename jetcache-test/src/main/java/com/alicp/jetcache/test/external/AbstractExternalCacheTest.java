@@ -38,7 +38,7 @@ public class AbstractExternalCacheTest extends AbstractCacheTest {
             d2.setName("HL2");
 
             cache.put(d1, "V2");
-            Assert.assertNull("V2", cache.get(d2));
+            Assert.assertEquals("V2", cache.get(d2));
             Assert.assertNull(cache.get(d3));
         }
     }
