@@ -4,6 +4,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created on 2017/5/3.
@@ -14,7 +15,7 @@ public class JetCacheExecutor {
     protected volatile static ScheduledExecutorService defaultExecutor;
     protected volatile static ScheduledExecutorService heavyIOExecutor;
 
-    private static int threadCount;
+    private static AtomicInteger threadCount = new AtomicInteger(0);
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -55,7 +56,7 @@ public class JetCacheExecutor {
         synchronized (JetCacheExecutor.class) {
             if (heavyIOExecutor == null) {
                 ThreadFactory tf = r -> {
-                    Thread t = new Thread(r, "JetCacheHeavyIOExecutor" + threadCount++);
+                    Thread t = new Thread(r, "JetCacheHeavyIOExecutor" + threadCount.getAndIncrement());
                     t.setDaemon(true);
                     return t;
                 };
