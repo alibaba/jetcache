@@ -60,6 +60,11 @@
             <artifactId>javax.annotation-api</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <optional>true</optional>
+        </dependency>
 
     </dependencies>
 </project>

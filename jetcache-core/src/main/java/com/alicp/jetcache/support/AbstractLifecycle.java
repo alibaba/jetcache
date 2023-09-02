@@ -3,36 +3,59 @@
  */
 package com.alicp.jetcache.support;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+
+
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class AbstractLifecycle {
+public class AbstractLifecycle implements InitializingBean, DisposableBean {
     private boolean init;
     private boolean shutdown;
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
-    @PostConstruct
-    public final synchronized void init() {
-        if (!init) {
-            doInit();
-            init = true;
+    public final void init() {
+        reentrantLock.lock();
+        try {
+            if (!init) {
+                doInit();
+                init = true;
+            }
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
     protected void doInit() {
     }
 
-    @PreDestroy
-    public final synchronized void shutdown() {
-        if (init && !shutdown) {
-            doShutdown();
-            init = false;
-            shutdown = true;
+
+    public final void shutdown() {
+        reentrantLock.lock();
+        try {
+            if (init && !shutdown) {
+                doShutdown();
+                init = false;
+                shutdown = true;
+            }
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
     protected void doShutdown() {
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.init();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        this.destroy();
     }
 }

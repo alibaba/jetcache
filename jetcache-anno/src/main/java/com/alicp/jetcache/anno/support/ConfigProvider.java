@@ -13,8 +13,8 @@ import com.alicp.jetcache.template.MetricsMonitorInstaller;
 import com.alicp.jetcache.template.NotifyMonitorInstaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -28,7 +28,6 @@ public class ConfigProvider extends AbstractLifecycle {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigProvider.class);
 
-    @Resource
     protected GlobalCacheConfig globalCacheConfig;
 
     protected EncoderParser encoderParser;
@@ -158,6 +157,7 @@ public class ConfigProvider extends AbstractLifecycle {
         return globalCacheConfig;
     }
 
+    @Autowired
     public void setGlobalCacheConfig(GlobalCacheConfig globalCacheConfig) {
         this.globalCacheConfig = globalCacheConfig;
     }

@@ -2,9 +2,9 @@ package com.alicp.jetcache.support;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Arrays;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
  *
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
-public class DefaultMetricsManager {
+public class DefaultMetricsManager implements InitializingBean, DisposableBean {
     private static final Logger logger = LoggerFactory.getLogger(DefaultMetricsManager.class);
 
     protected final CopyOnWriteArrayList<DefaultCacheMonitor> monitorList = new CopyOnWriteArrayList();
@@ -30,6 +31,7 @@ public class DefaultMetricsManager {
     private final int resetTime;
     private final TimeUnit resetTimeUnit;
     private final Consumer<StatInfo> metricsCallback;
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
     public DefaultMetricsManager(int resetTime, TimeUnit resetTimeUnit, Consumer<StatInfo> metricsCallback) {
         this.resetTime = resetTime;
@@ -73,22 +75,31 @@ public class DefaultMetricsManager {
         }
     };
 
-    @PostConstruct
-    public synchronized void start() {
-        if (future != null) {
-            return;
+    public void start() {
+        reentrantLock.lock();
+        try {
+            if (future != null) {
+                return;
+            }
+            long delay = firstDelay(resetTime, resetTimeUnit);
+            future = JetCacheExecutor.defaultExecutor().scheduleAtFixedRate(
+                    cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
+            logger.info("cache stat period at " + resetTime + " " + resetTimeUnit);
+        }finally {
+            reentrantLock.unlock();
         }
-        long delay = firstDelay(resetTime, resetTimeUnit);
-        future = JetCacheExecutor.defaultExecutor().scheduleAtFixedRate(
-                cmd, delay, resetTimeUnit.toMillis(resetTime), TimeUnit.MILLISECONDS);
-        logger.info("cache stat period at " + resetTime + " " + resetTimeUnit);
+
     }
 
-    @PreDestroy
-    public synchronized void stop() {
-        future.cancel(false);
-        logger.info("cache stat canceled");
-        future = null;
+    public void stop() {
+        reentrantLock.lock();
+        try {
+            future.cancel(false);
+            logger.info("cache stat canceled");
+            future = null;
+        }finally {
+            reentrantLock.unlock();
+        }
     }
 
     public void add(DefaultCacheMonitor... monitors) {
@@ -142,4 +153,13 @@ public class DefaultMetricsManager {
     }
 
 
+    @Override
+    public void destroy() throws Exception {
+        this.stop();
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        this.start();
+    }
 }
