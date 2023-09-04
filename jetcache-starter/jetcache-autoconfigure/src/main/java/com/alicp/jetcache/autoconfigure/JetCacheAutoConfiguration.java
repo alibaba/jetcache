@@ -39,7 +39,7 @@ public class JetCacheAutoConfiguration {
 
     public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";
 
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     @ConditionalOnMissingBean
     public SpringConfigProvider springConfigProvider(
             @Autowired ApplicationContext applicationContext,

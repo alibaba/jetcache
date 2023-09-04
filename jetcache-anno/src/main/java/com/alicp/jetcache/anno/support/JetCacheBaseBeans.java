@@ -48,7 +48,7 @@ public class JetCacheBaseBeans {
         return cp;
     }
 
-    @Bean(name = "jcCacheManager")
+    @Bean(name = "jcCacheManager",destroyMethod = "close")
     public SimpleCacheManager cacheManager(@Autowired ConfigProvider configProvider) {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCacheBuilderTemplate(configProvider.getCacheBuilderTemplate());
