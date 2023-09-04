@@ -22,7 +22,7 @@ public class JetCacheBaseBeans {
         return new SpringConfigProvider();
     }
 
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     public SpringConfigProvider springConfigProvider(
             @Autowired ApplicationContext applicationContext,
             @Autowired GlobalCacheConfig globalCacheConfig,
