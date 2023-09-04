@@ -22,7 +22,7 @@ public class JetCacheBaseBeans {
         return new SpringConfigProvider();
     }
 
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     public SpringConfigProvider springConfigProvider(
             @Autowired ApplicationContext applicationContext,
             @Autowired GlobalCacheConfig globalCacheConfig,
@@ -48,7 +48,7 @@ public class JetCacheBaseBeans {
         return cp;
     }
 
-    @Bean(name = "jcCacheManager")
+    @Bean(name = "jcCacheManager",destroyMethod = "close")
     public SimpleCacheManager cacheManager(@Autowired ConfigProvider configProvider) {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCacheBuilderTemplate(configProvider.getCacheBuilderTemplate());

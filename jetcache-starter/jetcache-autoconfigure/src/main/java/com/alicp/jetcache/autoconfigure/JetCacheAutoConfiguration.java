@@ -39,7 +39,7 @@ public class JetCacheAutoConfiguration {
 
     public static final String GLOBAL_CACHE_CONFIG_NAME = "globalCacheConfig";
 
-    @Bean
+    @Bean(destroyMethod = "shutdown")
     @ConditionalOnMissingBean
     public SpringConfigProvider springConfigProvider(
             @Autowired ApplicationContext applicationContext,
@@ -51,9 +51,9 @@ public class JetCacheAutoConfiguration {
                 encoderParser, keyConvertorParser, metricsCallback);
     }
 
-    @Bean(name = "jcCacheManager")
+    @Bean(name = "jcCacheManager",destroyMethod = "close")
     @ConditionalOnMissingBean
-    public CacheManager cacheManager(@Autowired SpringConfigProvider springConfigProvider) {
+    public SimpleCacheManager cacheManager(@Autowired SpringConfigProvider springConfigProvider) {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCacheBuilderTemplate(springConfigProvider.getCacheBuilderTemplate());
         return cacheManager;
