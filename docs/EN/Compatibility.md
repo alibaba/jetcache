@@ -11,6 +11,7 @@ jetcache tested with below spring/spring-boot versions
 # compatible change notes
 ## 2.7.4
 * use spring-boot 3.1.3, spring-framework 6.0.11, slf4j-api 2.x as default
+* remove javax.annotation:javax.annotation-api, if you use @PostConstruct, you may need to add this dependency by yourself
 
 ## 2.7.2
 * update encoder/decoder of redisson, not compatible with 2.7.1

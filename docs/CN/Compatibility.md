@@ -11,6 +11,7 @@ jetcache在以下spring/spring-boot版本下通过了测试，如果你只用部
 # 兼容性改动说明
 ## 2.7.4
 * 默认传递依赖spring-boot 3.1.3，spring-framework 6.0.11，slf4j-api 2.x
+* 移除了javax.annotation:javax.annotation-api这个依赖，如果你用了@PostConstruct等注解，可能需要自己加上这个依赖
 
 ## 2.7.2
 * 更新了redisson的编码方式，和2.7.1不兼容
