@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisSpringDataCacheTest extends AbstractExternalCacheTest {
 
     @Test
-    @Ignore("need jedis 3.x")
+    // @Ignore("boot2.x need jedis 3.x")
     public void jedisTest() throws Exception {
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
         connectionFactory.afterPropertiesSet();
