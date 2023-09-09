@@ -180,3 +180,5 @@ jetcache:
 > Visit [detail configuration](docs/EN/Config.md) for more instructions
 ## More docs
 Visit [docs](docs/EN/Readme.md) for more details.
+
+For upgrade see [changelog](https://github.com/alibaba/jetcache/wiki/Changelog) and [compatibility notes](docs/EN/Compatibility.md).

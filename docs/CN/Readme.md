@@ -37,7 +37,7 @@ JetCache需要JDK1.8、Spring Framework4.0.8以上版本。Spring Boot为可选�
 * [统计](Stat.md)
 * [Builder](Builder.md)：未使用Spring4（或未使用Spring）的时候，或通过Builder手工构造```Cache```
 * [开发者文档](DevNote.md)
-* [升级和兼容性指南](Compatibility.md)
+* 升级参考 [变更记录](https://github.com/alibaba/jetcache/wiki/Changelog) 和 [版本兼容性说明](Compatibility.md)
 * [FAQ](FAQ.md)
 
 ## 依赖哪个jar？
