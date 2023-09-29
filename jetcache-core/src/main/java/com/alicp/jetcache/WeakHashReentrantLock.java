@@ -18,7 +18,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class WeakHashReentrantLock {
 
     protected final Map<Object,WeakReference<?>> weakReentrantLockMap = new ConcurrentHashMap<>();
-    protected final ReferenceQueue queue = new ReferenceQueue<>();
+    protected final Map<Object,WeakReference<?>> weakRWLockMap = new ConcurrentHashMap<>();
+    protected final ReferenceQueue<ReentrantLock> queue = new ReferenceQueue<>();
+    protected final ReferenceQueue<ReentrantReadWriteLock> rwQueue = new ReferenceQueue<>();
 
     protected final int MAX_SIZE = 4096;
     public WeakHashReentrantLock(){
@@ -36,7 +38,7 @@ public class WeakHashReentrantLock {
         return getLock(lockObj,LOCK_TYPE.WRITE);
     }
 
-    protected Lock getLock(Object lockObj,LOCK_TYPE lockType){
+    protected Lock getLock(final Object lockObj,final LOCK_TYPE lockType){
         if(weakReentrantLockMap.size() > MAX_SIZE)
             clearRef();
         Lock lock = null;
@@ -45,8 +47,8 @@ public class WeakHashReentrantLock {
                 lock = (Lock) weakReentrantLockMap.computeIfAbsent(lockObj,
                         item -> new WeakReentrantLock(lockObj, new ReentrantLock(), queue)).get();
             }else {
-                WeakReadWriteReentrantLock wk = (WeakReadWriteReentrantLock) weakReentrantLockMap.computeIfAbsent(lockObj,
-                        item -> new WeakReadWriteReentrantLock(lockObj, new ReentrantReadWriteLock(), queue)
+                WeakReadWriteReentrantLock wk = (WeakReadWriteReentrantLock) weakRWLockMap.computeIfAbsent(lockObj,
+                        item -> new WeakReadWriteReentrantLock(lockObj, new ReentrantReadWriteLock(), rwQueue)
                 );
                 ReentrantReadWriteLock rk = wk.get();
                 if(rk != null) {
@@ -55,9 +57,11 @@ public class WeakHashReentrantLock {
                     } else {
                         lock = rk.writeLock() ;
                     }
+                }else{
+                    lock = (Lock) weakReentrantLockMap.computeIfAbsent(lockObj,
+                            item -> new WeakReentrantLock(lockObj, new ReentrantLock(), queue)).get();
                 }
             }
-
             if(lock == null)
                 clearRef();
         }
@@ -65,11 +69,17 @@ public class WeakHashReentrantLock {
     }
 
     protected void clearRef(){
-        Reference<?> ref;
+        Object ref;
         while ((ref = queue.poll()) != null){
-            if(ref instanceof  LockObject) {
-                LockObject lockObj = (LockObject) ref;
+            if(ref instanceof WeakReentrantLock) {
+                WeakReentrantLock lockObj = (WeakReentrantLock) ref;
                 weakReentrantLockMap.remove(lockObj.getObj());
+            }
+        }
+        while ((ref = rwQueue.poll()) != null){
+            if(ref instanceof WeakReadWriteReentrantLock) {
+                WeakReadWriteReentrantLock lockObj = (WeakReadWriteReentrantLock) ref;
+                weakRWLockMap.remove(lockObj.getObj());
             }
         }
     }

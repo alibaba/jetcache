@@ -50,7 +50,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
     final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
-        private Object lockObj;
+        private final Object lockObj;
         private final WeakHashReentrantLock weakLock = new WeakHashReentrantLock();
 
         public LRUMap(int max, Object lockObj) {
@@ -105,9 +105,9 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public Map getAllValues(Collection keys) {
-            Map values = new HashMap();
             Lock lock = weakLock.readLock(lockObj);
             lock.lock();
+            Map values = new HashMap();
 //            synchronized (lock)
             try{
                 for (Object key : keys) {
