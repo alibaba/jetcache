@@ -19,19 +19,27 @@ import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class CacheAnnotationParser implements BeanDefinitionParser {
 
+    private final ReentrantLock reentrantLock = new ReentrantLock();
+
     @Override
     public BeanDefinition parse(Element element, ParserContext parserContext) {
-        doParse(element, parserContext);
+        reentrantLock.lock();
+        try {
+            doParse(element, parserContext);
+        }finally {
+            reentrantLock.unlock();
+        }
         return null;
     }
 
-    private synchronized void doParse(Element element, ParserContext parserContext) {
+    private void doParse(Element element, ParserContext parserContext) {
         String[] basePackages = StringUtils.tokenizeToStringArray(element.getAttribute("base-package"), ",; \t\n");
         AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
         if (!parserContext.getRegistry().containsBeanDefinition(CacheAdvisor.CACHE_ADVISOR_BEAN_NAME)) {

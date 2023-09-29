@@ -5,6 +5,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created on 2017/5/3.
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class JetCacheExecutor {
     protected volatile static ScheduledExecutorService defaultExecutor;
     protected volatile static ScheduledExecutorService heavyIOExecutor;
+    protected static final ReentrantLock reentrantLock = new ReentrantLock();
 
     private static AtomicInteger threadCount = new AtomicInteger(0);
 
@@ -35,7 +37,9 @@ public class JetCacheExecutor {
         if (defaultExecutor != null) {
             return defaultExecutor;
         }
-        synchronized (JetCacheExecutor.class) {
+//        synchronized (JetCacheExecutor.class)
+        reentrantLock.lock();
+        try{
             if (defaultExecutor == null) {
                 ThreadFactory tf = r -> {
                     Thread t = new Thread(r, "JetCacheDefaultExecutor");
@@ -45,6 +49,8 @@ public class JetCacheExecutor {
                 defaultExecutor = new ScheduledThreadPoolExecutor(
                         1, tf, new ThreadPoolExecutor.DiscardPolicy());
             }
+        }finally {
+            reentrantLock.unlock();
         }
         return defaultExecutor;
     }
@@ -53,7 +59,8 @@ public class JetCacheExecutor {
         if (heavyIOExecutor != null) {
             return heavyIOExecutor;
         }
-        synchronized (JetCacheExecutor.class) {
+        reentrantLock.lock();
+        try {
             if (heavyIOExecutor == null) {
                 ThreadFactory tf = r -> {
                     Thread t = new Thread(r, "JetCacheHeavyIOExecutor" + threadCount.getAndIncrement());
@@ -63,6 +70,8 @@ public class JetCacheExecutor {
                 heavyIOExecutor = new ScheduledThreadPoolExecutor(
                         10, tf, new ThreadPoolExecutor.DiscardPolicy());
             }
+        }finally {
+            reentrantLock.unlock();
         }
         return heavyIOExecutor;
     }

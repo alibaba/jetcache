@@ -6,6 +6,7 @@ package com.alicp.jetcache.support;
 import com.alicp.jetcache.anno.SerialPolicy;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -14,6 +15,7 @@ public class DecoderMap {
 
     private final ConcurrentHashMap<Integer, AbstractValueDecoder> decoderMap = new ConcurrentHashMap<>();
     private volatile boolean inited = false;
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
     private static final DecoderMap instance = new DecoderMap();
 
@@ -42,7 +44,8 @@ public class DecoderMap {
         if (inited) {
             return;
         }
-        synchronized (this) {
+        reentrantLock.lock();
+        try {
             if (inited) {
                 return;
             }
@@ -51,6 +54,8 @@ public class DecoderMap {
             register(SerialPolicy.IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
             // register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
             inited = true;
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
