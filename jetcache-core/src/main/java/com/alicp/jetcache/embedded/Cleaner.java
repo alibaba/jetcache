@@ -25,7 +25,6 @@ class Cleaner {
     }
 
     static void add(LinkedHashMapCache cache) {
-//        synchronized (linkedHashMapCaches)
         reentrantLock.lock();
         try{
             linkedHashMapCaches.add(new WeakReference<>(cache));
@@ -35,7 +34,6 @@ class Cleaner {
     }
 
     static void run() {
-//        synchronized (linkedHashMapCaches)
         reentrantLock.lock();
         try{
             Iterator<WeakReference<LinkedHashMapCache>> it = linkedHashMapCaches.iterator();

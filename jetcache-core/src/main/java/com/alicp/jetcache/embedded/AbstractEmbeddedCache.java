@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,7 +23,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
 
     protected abstract InnerMap createAreaCache();
 
-    protected final WeakHashReentrantLock weakLock = new WeakHashReentrantLock();
+    protected final ReentrantLock lock = new ReentrantLock();
 
     public AbstractEmbeddedCache(EmbeddedCacheConfig<K, V> config) {
         this.config = config;
@@ -58,8 +58,6 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         } else if (now >= holder.getExpireTime()) {
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
-//            synchronized (holder)
-            Lock lock = weakLock.reentrantLock(holder);
             lock.lock();
             try{
                 long accessTime = holder.getAccessTime();

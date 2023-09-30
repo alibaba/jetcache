@@ -5,7 +5,6 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.CacheValueHolder;
-import com.alicp.jetcache.WeakHashReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +50,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         private final int max;
         private final Object lockObj;
-        private final WeakHashReentrantLock weakLock = new WeakHashReentrantLock();
+        private final ReentrantLock lock = new ReentrantLock();
 
         public LRUMap(int max, Object lockObj) {
             super((int) (max * 1.4f), 0.75f, true);
@@ -65,9 +64,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         }
 
         void cleanExpiredEntry() {
-            Lock lock = weakLock.writeLock(lockObj);
             lock.lock();
-//            synchronized (lock)
             try{
                 for (Iterator it = entrySet().iterator(); it.hasNext();) {
                     Map.Entry en = (Map.Entry) it.next();
@@ -93,8 +90,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public Object getValue(Object key) {
-//            synchronized (lock)
-            Lock lock = weakLock.readLock(lockObj);
             lock.lock();
             try{
                 return get(key);
@@ -105,10 +100,8 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public Map getAllValues(Collection keys) {
-            Lock lock = weakLock.readLock(lockObj);
             lock.lock();
             Map values = new HashMap();
-//            synchronized (lock)
             try{
                 for (Object key : keys) {
                     Object v = get(key);
@@ -124,8 +117,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void putValue(Object key, Object value) {
-            //synchronized (lock)
-            Lock lock = weakLock.writeLock(lockObj);
             lock.lock();
             try{
                 put(key, value);
@@ -136,8 +127,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void putAllValues(Map map) {
-//            synchronized (lock)
-            Lock lock = weakLock.writeLock(lockObj);
             lock.lock();
             try{
                 Set<Map.Entry> set = map.entrySet();
@@ -151,8 +140,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public boolean removeValue(Object key) {
-//            synchronized (lock)
-            Lock lock = weakLock.writeLock(lockObj);
             lock.lock();
             try{
                 return remove(key) != null;
@@ -163,8 +150,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void removeAllValues(Collection keys) {
-//            synchronized (lock)
-            Lock lock = weakLock.writeLock(lockObj);
             lock.lock();
             try{
                 for (Object k : keys) {
@@ -178,8 +163,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         @Override
         @SuppressWarnings("unchecked")
         public boolean putIfAbsentValue(Object key, Object value) {
-//            synchronized (lock)
-            Lock lock = weakLock.writeLock(lockObj);
             lock.lock();
             try{
                 CacheValueHolder h = (CacheValueHolder) get(key);

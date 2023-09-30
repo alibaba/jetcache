@@ -79,7 +79,6 @@ public class CreateCacheAnnotationBeanPostProcessor extends AutowiredAnnotationB
         // Quick check on the concurrent map first, with minimal locking.
         InjectionMetadata metadata = this.injectionMetadataCache.get(cacheKey);
         if (InjectionMetadata.needsRefresh(metadata, clazz)) {
-//            synchronized (this.injectionMetadataCache)
             reentrantLock.lock();
             try{
                 metadata = this.injectionMetadataCache.get(cacheKey);

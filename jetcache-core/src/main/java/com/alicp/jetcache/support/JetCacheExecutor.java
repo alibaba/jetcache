@@ -37,7 +37,6 @@ public class JetCacheExecutor {
         if (defaultExecutor != null) {
             return defaultExecutor;
         }
-//        synchronized (JetCacheExecutor.class)
         reentrantLock.lock();
         try{
             if (defaultExecutor == null) {

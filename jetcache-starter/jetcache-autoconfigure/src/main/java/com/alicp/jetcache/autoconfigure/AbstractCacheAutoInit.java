@@ -32,7 +32,7 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
     @Autowired
     protected AutoConfigureBeans autoConfigureBeans;
 
-    private final static ReentrantLock reentrantLock = new ReentrantLock();
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
     protected String[] typeNames;
 
@@ -47,7 +47,6 @@ public abstract class AbstractCacheAutoInit implements InitializingBean {
     @Override
     public void afterPropertiesSet() {
         if (!inited) {
-//            synchronized (this)
             reentrantLock.lock();
             try{
                 if (!inited) {

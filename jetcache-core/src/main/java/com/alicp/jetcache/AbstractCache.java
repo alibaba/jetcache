@@ -37,7 +37,7 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     private volatile ConcurrentHashMap<Object, LoaderLock> loaderMap;
 
     protected volatile boolean closed;
-    protected final ReentrantLock reentrantLock = new ReentrantLock();
+    protected static final ReentrantLock reentrantLock = new ReentrantLock();
 
     ConcurrentHashMap<Object, LoaderLock> initOrGetLoaderMap() {
         if (loaderMap == null) {
