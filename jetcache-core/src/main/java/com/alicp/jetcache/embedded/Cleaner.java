@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created on 2017/2/28.
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 class Cleaner {
 
     static LinkedList<WeakReference<LinkedHashMapCache>> linkedHashMapCaches = new LinkedList<>();
+    private static final ReentrantLock reentrantLock = new  ReentrantLock();
 
     static {
         ScheduledExecutorService executorService = JetCacheExecutor.defaultExecutor();
@@ -23,13 +25,17 @@ class Cleaner {
     }
 
     static void add(LinkedHashMapCache cache) {
-        synchronized (linkedHashMapCaches) {
+        reentrantLock.lock();
+        try{
             linkedHashMapCaches.add(new WeakReference<>(cache));
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
     static void run() {
-        synchronized (linkedHashMapCaches) {
+        reentrantLock.lock();
+        try{
             Iterator<WeakReference<LinkedHashMapCache>> it = linkedHashMapCaches.iterator();
             while (it.hasNext()) {
                 WeakReference<LinkedHashMapCache> ref = it.next();
@@ -40,6 +46,8 @@ class Cleaner {
                     c.cleanExpiredEntry();
                 }
             }
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
