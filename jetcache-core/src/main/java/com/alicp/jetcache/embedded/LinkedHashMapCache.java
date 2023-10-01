@@ -30,7 +30,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
     @Override
     protected InnerMap createAreaCache() {
-        return new LRUMap(config.getLimit(), this);
+        return new LRUMap(config.getLimit());
     }
 
     @Override
@@ -48,13 +48,13 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
     final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
-        private final Object lockObj;
+//        private final Object lockObj;
         private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
 
-        public LRUMap(int max, Object lockObj) {
+        public LRUMap(int max) {
             super((int) (max * 1.4f), 0.75f, true);
             this.max = max;
-            this.lockObj = lockObj;
+//            this.lockObj = lockObj;
         }
 
         @Override

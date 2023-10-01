@@ -23,7 +23,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
 
     protected abstract InnerMap createAreaCache();
 
-    protected final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public AbstractEmbeddedCache(EmbeddedCacheConfig<K, V> config) {
         this.config = config;

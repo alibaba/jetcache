@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class JetCacheExecutor {
     protected volatile static ScheduledExecutorService defaultExecutor;
     protected volatile static ScheduledExecutorService heavyIOExecutor;
-    protected static final ReentrantLock reentrantLock = new ReentrantLock();
+    private static final ReentrantLock reentrantLock = new ReentrantLock();
 
     private static AtomicInteger threadCount = new AtomicInteger(0);
 

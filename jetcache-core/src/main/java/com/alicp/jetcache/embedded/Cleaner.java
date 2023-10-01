@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
 class Cleaner {
 
     static LinkedList<WeakReference<LinkedHashMapCache>> linkedHashMapCaches = new LinkedList<>();
-    static final ReentrantLock reentrantLock = new  ReentrantLock();
+    private static final ReentrantLock reentrantLock = new  ReentrantLock();
 
     static {
         ScheduledExecutorService executorService = JetCacheExecutor.defaultExecutor();
