@@ -1,7 +1,12 @@
 package com.alicp.jetcache.support;
 
+import com.alicp.jetcache.VirtualThreadUtil;
 import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -11,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class Kryo5EncoderTest extends AbstractEncoderTest {
+
     @Test
     public void test() {
         encoder = Kryo5ValueEncoder.INSTANCE;
@@ -65,5 +71,49 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
         decoder = Kryo5ValueDecoder.INSTANCE;
         super.gcTest();
     }
+
+
+    @Test
+    public void testVirtualThreadTL() throws InterruptedException {
+        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
+        if(executorService == null) return;
+        for (int i = 0; i < 1000; i++) {
+            executorService.submit(this::test);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testVirtualThreadGC() throws InterruptedException {
+        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
+        if(executorService == null) return;
+        for (int i = 0; i < 1000; i++) {
+            executorService.submit(this::gcTest);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testFixThreadTL() throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        for (int i = 0; i < 10; i++) {
+            executorService.submit(this::test);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testFixThreadGC() throws InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        for (int i = 0; i < 10; i++) {
+            executorService.submit(this::gcTest);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+    }
+
 
 }

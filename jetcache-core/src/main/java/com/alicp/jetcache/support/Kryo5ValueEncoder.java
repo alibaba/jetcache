@@ -18,16 +18,31 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     private static int INIT_BUFFER_SIZE = 256;
 
-    static ThreadLocal<Object[]> kryoThreadLocal = ThreadLocal.withInitial(() -> {
-        Kryo kryo = new Kryo();
-        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-        kryo.setRegistrationRequired(false);
-
-        Output output = new Output(INIT_BUFFER_SIZE, -1);
-
-        WeakReference<Output> ref = new WeakReference<>(output);
-        return new Object[]{kryo, ref};
+    static ThreadLocal<WeakReference<KryoCache>> kryoThreadLocal = ThreadLocal.withInitial(() -> {
+        KryoCache kryo = new KryoCache();
+        WeakReference<KryoCache> ref = new WeakReference<>(kryo);
+        return ref;
     });
+
+    static class KryoCache{
+        final Output output;
+        final Kryo kryo;
+        public KryoCache(){
+            kryo = new Kryo();
+            kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+            kryo.setRegistrationRequired(false);
+            output = new Output(INIT_BUFFER_SIZE, -1);
+        }
+
+        public Output getOutput(){
+            return output;
+        }
+
+        public Kryo getKryo(){
+            return kryo;
+        }
+
+    }
 
     public Kryo5ValueEncoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
@@ -35,28 +50,27 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     @Override
     public byte[] apply(Object value) {
+        KryoCache kryoCache = null;
         try {
-            Object[] kryoAndBuffer = kryoThreadLocal.get();
-            Kryo kryo = (Kryo) kryoAndBuffer[0];
-            WeakReference<Output> ref = (WeakReference<Output>) kryoAndBuffer[1];
-            Output output = ref.get();
-            if (output == null) {
-                output = new Output(INIT_BUFFER_SIZE, -1);
+            WeakReference<KryoCache> weakRef = kryoThreadLocal.get();
+            if(weakRef == null || weakRef.get() == null){
+                kryoCache = new KryoCache();
+                weakRef = new WeakReference<>(kryoCache);
+                kryoThreadLocal.set(weakRef);
+            }else{
+                kryoCache = weakRef.get();
             }
-
             try {
                 if (useIdentityNumber) {
-                    writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO5);
+                    writeInt(kryoCache.getOutput(), SerialPolicy.IDENTITY_NUMBER_KRYO5);
                 }
-                kryo.reset();
-                kryo.writeClassAndObject(output, value);
-                return output.toBytes();
+                kryoCache.getKryo().reset();
+                kryoCache.getKryo().writeClassAndObject(kryoCache.getOutput(), value);
+                return kryoCache.getOutput().toBytes();
             } finally {
                 //reuse buffer if possible
-                output.reset();
-                if (ref.get() == null) {
-                    ref = new WeakReference<>(output);
-                    kryoAndBuffer[1] = ref;
+                if(kryoCache != null) {
+                    kryoCache.getOutput().reset();
                 }
             }
         } catch (Exception e) {
