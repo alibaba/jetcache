@@ -12,9 +12,7 @@ import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.template.QuickConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cglib.core.ReflectUtils;
 
-import java.lang.reflect.Method;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -136,8 +134,6 @@ public class CacheContext {
             return callback.get();
         } finally {
             var.setEnabledCount(var.getEnabledCount() - 1);
-            if(var.getEnabledCount() <= 0)
-                clear();
         }
     }
 
@@ -149,51 +145,10 @@ public class CacheContext {
     protected static void disable() {
         CacheThreadLocal var = cacheThreadLocal.get();
         var.setEnabledCount(var.getEnabledCount() - 1);
-        if(var.getEnabledCount() <= 0)
-            clear();
-    }
-
-    /**
-     * copy snippet from com.alibaba.fastjson2.util.JDKUtils
-     */
-    private static int jdkVersion(){
-        try {
-            String javaSpecVer = System.getProperty("java.specification.version");
-            if (javaSpecVer.startsWith("1.")) {
-                javaSpecVer = javaSpecVer.substring(2);
-            }
-            if (javaSpecVer.indexOf('.') == -1) {
-                return Integer.parseInt(javaSpecVer);
-            }
-        } catch (Throwable ignored) {
-            return 8;
-        }
-        return 8;
-    }
-
-    /**
-     * when jdkVersion >= 19 and current Thread is virtual , we need to clear the cacheThreadLocal
-     */
-    protected static void clear(){
-        try {
-            if(jdkVersion() >= 19) {
-                Thread current = Thread.currentThread();
-                Method method = ReflectUtils.findDeclaredMethod(Thread.class, "isVirtual", new Class[0]);
-                Boolean isVirtual = (Boolean) method.invoke(current);
-                if (isVirtual) {
-                    cacheThreadLocal.remove();
-                }
-            }
-        } catch (Exception ignored) {
-
-        }
     }
 
     protected static boolean isEnabled() {
-        if(cacheThreadLocal.get() != null)
-            return cacheThreadLocal.get().getEnabledCount() > 0;
-        else
-            return false;
+        return cacheThreadLocal.get().getEnabledCount() > 0;
     }
 
 }

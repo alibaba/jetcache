@@ -74,7 +74,7 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
 
 
     @Test
-    public void testVirtualThreadTL() throws InterruptedException {
+    public void testVirtualThreadPool() throws InterruptedException {
         ExecutorService executorService = VirtualThreadUtil.createExecuteor();
         if(executorService == null) return;
         for (int i = 0; i < 1000; i++) {
@@ -96,7 +96,7 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
     }
 
     @Test
-    public void testFixThreadTL() throws InterruptedException {
+    public void testFixThreadPool() throws InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         for (int i = 0; i < 10; i++) {
             executorService.submit(this::test);
