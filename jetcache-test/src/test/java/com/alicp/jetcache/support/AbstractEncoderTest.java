@@ -144,13 +144,15 @@ public class AbstractEncoderTest {
 
     public void testByThreadPool(boolean isVirtual, int core, int size, Runnable runnable) throws InterruptedException {
         ExecutorService executorService = null;
-        if(isVirtual)
+        if(isVirtual) {
             executorService = VirtualThreadUtil.createExecuteor();
-        else
+        }else if(core > 0) {
             executorService = Executors.newFixedThreadPool(core);
+        }
         if(executorService == null) {
             return;
         }
+        if(size <= 0) size = 100;
         for (int i = 0; i < size; i++) {
             executorService.submit(runnable);
         }

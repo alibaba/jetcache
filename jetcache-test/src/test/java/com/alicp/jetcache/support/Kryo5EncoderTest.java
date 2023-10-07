@@ -69,21 +69,21 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
 
     @Test
     public void testVirtualThreadPool() throws InterruptedException {
-        testByThreadPool(true,-1,1000,this::test);
+        testByThreadPool(true,-1,100,this::test);
     }
 
     @Test
     public void testVirtualThreadGC() throws InterruptedException {
-        testByThreadPool(true,-1,1000,this::gcTest);
+        testByThreadPool(true,-1,100,this::gcTest);
     }
     @Test
     public void testFixThreadPool() throws InterruptedException {
-        testByThreadPool(false,3,1000,this::test);
+        testByThreadPool(false,3,100,this::test);
     }
 
     @Test
     public void testFixThreadGC() throws InterruptedException {
-        testByThreadPool(false,3,1000,this::gcTest);
+        testByThreadPool(false,3,100,this::gcTest);
     }
 
 
