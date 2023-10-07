@@ -25,6 +25,7 @@ public class VirtualThreadUtil {
                 executorService = (ExecutorService) method.invoke(null);
             }
         }catch (Exception e){
+            logger.warn("JDK version may < 19, The Test will be skip...");
             return null;
         }
         return executorService;

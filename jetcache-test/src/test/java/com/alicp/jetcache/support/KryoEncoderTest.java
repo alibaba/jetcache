@@ -71,27 +71,24 @@ public class KryoEncoderTest extends AbstractEncoderTest {
     }
 
 
-
     @Test
     public void testVirtualThreadPool() throws InterruptedException {
-        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
-        if(executorService == null) return;
-        for (int i = 0; i < 1000; i++) {
-            executorService.submit(this::test);
-        }
-        executorService.shutdown();
-        executorService.awaitTermination(3, TimeUnit.SECONDS);
+        testByThreadPool(true,-1,1000,this::test);
     }
 
     @Test
     public void testVirtualThreadGC() throws InterruptedException {
-        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
-        if(executorService == null) return;
-        for (int i = 0; i < 1000; i++) {
-            executorService.submit(this::gcTest);
-        }
-        executorService.shutdown();
-        executorService.awaitTermination(3, TimeUnit.SECONDS);
+        testByThreadPool(true,-1,1000,this::gcTest);
+    }
+
+    @Test
+    public void testFixThreadPool() throws InterruptedException {
+        testByThreadPool(false,3,1000,this::test);
+    }
+
+    @Test
+    public void testFixThreadGC() throws InterruptedException {
+        testByThreadPool(false,3,1000,this::gcTest);
     }
 
 }

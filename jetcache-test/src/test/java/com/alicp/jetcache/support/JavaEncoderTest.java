@@ -1,11 +1,7 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.VirtualThreadUtil;
 import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -73,25 +69,22 @@ public class JavaEncoderTest extends AbstractEncoderTest {
 
     @Test
     public void testVirtualThreadPool() throws InterruptedException {
-        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
-        if(executorService == null) return;
-        for (int i = 0; i < 1000; i++) {
-            executorService.submit(this::test);
-        }
-        executorService.shutdown();
-        executorService.awaitTermination(3, TimeUnit.SECONDS);
+       testByThreadPool(true,-1,1000,this::test);
     }
 
     @Test
     public void testVirtualThreadGC() throws InterruptedException {
-        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
-        if(executorService == null) return;
-        for (int i = 0; i < 1000; i++) {
-            executorService.submit(this::gcTest);
-        }
-        executorService.shutdown();
-        executorService.awaitTermination(3, TimeUnit.SECONDS);
+        testByThreadPool(true,-1,1000,this::gcTest);
     }
 
+    @Test
+    public void testFixThreadPool() throws InterruptedException {
+        testByThreadPool(false,3,1000,this::test);
+    }
+
+    @Test
+    public void testFixThreadGC() throws InterruptedException {
+        testByThreadPool(false,3,1000,this::gcTest);
+    }
 
 }
