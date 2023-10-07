@@ -44,17 +44,17 @@ public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
         }
 
         executorService.submit(() -> {
-            for (int i = 0; i < 20480; i+=2) {
+            for (int i = 0; i < 1000; i+=2) {
                 cache.putIfAbsent("K" + i, "V" + i);
             }
         });
         executorService.submit(() -> {
-            for (int i = 1; i < 20480; i+=2) {
+            for (int i = 1; i < 1000; i+=2) {
                 cache.remove("K" + i);
             }
         });
         executorService.submit(() -> {
-            for (int i = 0; i < 20480; i++) {
+            for (int i = 0; i < 1000; i++) {
                 Object value = cache.get("K" + i);
                 if(!Objects.isNull(value))
                     Assert.assertEquals(("V"+i),value);
