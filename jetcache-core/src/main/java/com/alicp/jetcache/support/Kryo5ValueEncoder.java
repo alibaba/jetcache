@@ -17,8 +17,8 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     private static final int INIT_BUFFER_SIZE = 256;
 
-    //Default size = 1M
-    static ObjectPool<Kryo5Cache> kryoCacheObjectPool = new ObjectPool<>(1024*1024/INIT_BUFFER_SIZE, new ObjectPool.ObjectFactory<Kryo5Cache>() {
+    //Default size = 256K
+    static ObjectPool<Kryo5Cache> kryoCacheObjectPool = new ObjectPool<>(1024*256/INIT_BUFFER_SIZE, new ObjectPool.ObjectFactory<Kryo5Cache>() {
         @Override
         public Kryo5Cache create() {
             return new Kryo5Cache();
