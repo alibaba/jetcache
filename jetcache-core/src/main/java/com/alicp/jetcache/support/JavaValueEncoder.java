@@ -16,7 +16,7 @@ public class JavaValueEncoder extends AbstractValueEncoder {
 
     public static final JavaValueEncoder INSTANCE = new JavaValueEncoder(true);
 
-    private static final int INIT_BUF_SIZE = 256;
+    private static final int INIT_BUF_SIZE = 2048;
 
     public JavaValueEncoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
