@@ -66,4 +66,25 @@ public class JavaEncoderTest extends AbstractEncoderTest {
         super.gcTest();
     }
 
+
+    @Test
+    public void testVirtualThreadPool() throws InterruptedException {
+       testByThreadPool(true,-1,100,this::test);
+    }
+
+    @Test
+    public void testVirtualThreadGC() throws InterruptedException {
+        testByThreadPool(true,-1,100,this::gcTest);
+    }
+
+    @Test
+    public void testFixThreadPool() throws InterruptedException {
+        testByThreadPool(false,3,100,this::test);
+    }
+
+    @Test
+    public void testFixThreadGC() throws InterruptedException {
+        testByThreadPool(false,3,100,this::gcTest);
+    }
+
 }

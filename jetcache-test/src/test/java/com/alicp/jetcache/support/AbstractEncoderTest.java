@@ -1,6 +1,7 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.VirtualThreadUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -136,4 +140,24 @@ public class AbstractEncoderTest {
         buf[2] = (byte) (header >> 8 & 0xFF);
         buf[3] = (byte) (header & 0xFF);
     }
+
+
+    public void testByThreadPool(boolean isVirtual, int core, int size, Runnable runnable) throws InterruptedException {
+        ExecutorService executorService = null;
+        if(isVirtual) {
+            executorService = VirtualThreadUtil.createExecuteor();
+        }else if(core > 0) {
+            executorService = Executors.newFixedThreadPool(core);
+        }
+        if(executorService == null) {
+            return;
+        }
+        if(size <= 0) size = 100;
+        for (int i = 0; i < size; i++) {
+            executorService.submit(runnable);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(5, TimeUnit.SECONDS);
+    }
+
 }

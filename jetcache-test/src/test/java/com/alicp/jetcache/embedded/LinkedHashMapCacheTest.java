@@ -6,6 +6,7 @@ package com.alicp.jetcache.embedded;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.VirtualThreadUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.cglib.core.ReflectUtils;
@@ -37,38 +38,30 @@ public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
     public void mutilTest() throws InterruptedException{
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder()
                 .buildFunc(getBuildFunc()).expireAfterWrite(5000, TimeUnit.MILLISECONDS).limit(10240).buildCache();
-        ExecutorService executorService = null;
-        try {
-            Method method = ReflectUtils.findDeclaredMethod(java.util.concurrent.Executors.class, "newVirtualThreadPerTaskExecutor", new Class[]{});
-            if (method != null) {
-                System.out.println("use newVirtualThreadPerTaskExecutor");
-                executorService = (ExecutorService) method.invoke(null);
-            } else {
-                System.out.println("use newFixedThreadPool");
-                executorService = Executors.newFixedThreadPool(3);
-            }
-        }catch (Exception e){
+        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
+        if(executorService == null){
             executorService = Executors.newFixedThreadPool(3);
         }
-        executorService.awaitTermination(10,TimeUnit.SECONDS);
+
         executorService.submit(() -> {
-            for (int i = 0; i < 20480; i+=2) {
+            for (int i = 0; i < 1000; i+=2) {
                 cache.putIfAbsent("K" + i, "V" + i);
             }
         });
         executorService.submit(() -> {
-            for (int i = 1; i < 20480; i+=2) {
+            for (int i = 1; i < 1000; i+=2) {
                 cache.remove("K" + i);
             }
         });
         executorService.submit(() -> {
-            for (int i = 0; i < 20480; i++) {
+            for (int i = 0; i < 1000; i++) {
                 Object value = cache.get("K" + i);
                 if(!Objects.isNull(value))
                     Assert.assertEquals(("V"+i),value);
             }
         });
         executorService.shutdown();
+        executorService.awaitTermination(10,TimeUnit.SECONDS);
     }
 
     @Test

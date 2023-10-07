@@ -1,7 +1,11 @@
 package com.alicp.jetcache.support;
 
+import com.alicp.jetcache.VirtualThreadUtil;
 import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -64,6 +68,27 @@ public class KryoEncoderTest extends AbstractEncoderTest {
         encoder = KryoValueEncoder.INSTANCE;
         decoder = KryoValueDecoder.INSTANCE;
         super.gcTest();
+    }
+
+
+    @Test
+    public void testVirtualThreadPool() throws InterruptedException {
+        testByThreadPool(true,-1,100,this::test);
+    }
+
+    @Test
+    public void testVirtualThreadGC() throws InterruptedException {
+        testByThreadPool(true,-1,100,this::gcTest);
+    }
+
+    @Test
+    public void testFixThreadPool() throws InterruptedException {
+        testByThreadPool(false,3,100,this::test);
+    }
+
+    @Test
+    public void testFixThreadGC() throws InterruptedException {
+        testByThreadPool(false,3,100,this::gcTest);
     }
 
 }

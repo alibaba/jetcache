@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
 public class Kryo5EncoderTest extends AbstractEncoderTest {
+
     @Test
     public void test() {
         encoder = Kryo5ValueEncoder.INSTANCE;
@@ -65,5 +66,25 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
         decoder = Kryo5ValueDecoder.INSTANCE;
         super.gcTest();
     }
+
+    @Test
+    public void testVirtualThreadPool() throws InterruptedException {
+        testByThreadPool(true,-1,100,this::test);
+    }
+
+    @Test
+    public void testVirtualThreadGC() throws InterruptedException {
+        testByThreadPool(true,-1,100,this::gcTest);
+    }
+    @Test
+    public void testFixThreadPool() throws InterruptedException {
+        testByThreadPool(false,3,100,this::test);
+    }
+
+    @Test
+    public void testFixThreadGC() throws InterruptedException {
+        testByThreadPool(false,3,100,this::gcTest);
+    }
+
 
 }

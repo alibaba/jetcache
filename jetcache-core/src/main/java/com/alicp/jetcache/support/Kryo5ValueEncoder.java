@@ -5,8 +5,6 @@ import com.esotericsoftware.kryo.kryo5.Kryo;
 import com.esotericsoftware.kryo.kryo5.io.Output;
 import com.esotericsoftware.kryo.kryo5.serializers.CompatibleFieldSerializer;
 
-import java.lang.ref.WeakReference;
-
 /**
  * Created on 2016/10/4.
  *
@@ -16,18 +14,41 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     public static final Kryo5ValueEncoder INSTANCE = new Kryo5ValueEncoder(true);
 
-    private static int INIT_BUFFER_SIZE = 256;
+    private static final int INIT_BUFFER_SIZE = 2048;
 
-    static ThreadLocal<Object[]> kryoThreadLocal = ThreadLocal.withInitial(() -> {
-        Kryo kryo = new Kryo();
-        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-        kryo.setRegistrationRequired(false);
+    //Default size = 32K
+    static ObjectPool<Kryo5Cache> kryoCacheObjectPool = new ObjectPool<>(16, new ObjectPool.ObjectFactory<Kryo5Cache>() {
+        @Override
+        public Kryo5Cache create() {
+            return new Kryo5Cache();
+        }
 
-        Output output = new Output(INIT_BUFFER_SIZE, -1);
-
-        WeakReference<Output> ref = new WeakReference<>(output);
-        return new Object[]{kryo, ref};
+        @Override
+        public void reset(Kryo5Cache obj) {
+            obj.getKryo().reset();
+            obj.getOutput().reset();
+        }
     });
+
+    public static class Kryo5Cache {
+        final Output output;
+        final Kryo kryo;
+        public Kryo5Cache(){
+            kryo = new Kryo();
+            kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+            kryo.setRegistrationRequired(false);
+            output = new Output(INIT_BUFFER_SIZE, -1);
+        }
+
+        public Output getOutput(){
+            return output;
+        }
+
+        public Kryo getKryo(){
+            return kryo;
+        }
+
+    }
 
     public Kryo5ValueEncoder(boolean useIdentityNumber) {
         super(useIdentityNumber);
@@ -35,34 +56,21 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     @Override
     public byte[] apply(Object value) {
+        Kryo5Cache kryoCache = null;
         try {
-            Object[] kryoAndBuffer = kryoThreadLocal.get();
-            Kryo kryo = (Kryo) kryoAndBuffer[0];
-            WeakReference<Output> ref = (WeakReference<Output>) kryoAndBuffer[1];
-            Output output = ref.get();
-            if (output == null) {
-                output = new Output(INIT_BUFFER_SIZE, -1);
+            kryoCache = kryoCacheObjectPool.borrowObject();
+            if (useIdentityNumber) {
+                writeInt(kryoCache.getOutput(), SerialPolicy.IDENTITY_NUMBER_KRYO5);
             }
-
-            try {
-                if (useIdentityNumber) {
-                    writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO5);
-                }
-                kryo.reset();
-                kryo.writeClassAndObject(output, value);
-                return output.toBytes();
-            } finally {
-                //reuse buffer if possible
-                output.reset();
-                if (ref.get() == null) {
-                    ref = new WeakReference<>(output);
-                    kryoAndBuffer[1] = ref;
-                }
-            }
+            kryoCache.getKryo().writeClassAndObject(kryoCache.getOutput(), value);
+            return kryoCache.getOutput().toBytes();
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Kryo Encode error. ");
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
+        }finally {
+            if(kryoCache != null)
+                kryoCacheObjectPool.returnObject(kryoCache);
         }
     }
 

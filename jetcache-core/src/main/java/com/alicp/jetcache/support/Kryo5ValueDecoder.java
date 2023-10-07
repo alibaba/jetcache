@@ -27,16 +27,24 @@ public class Kryo5ValueDecoder extends AbstractValueDecoder {
             in = new ByteArrayInputStream(buffer);
         }
         Input input = new Input(in);
-        Kryo kryo = (Kryo) Kryo5ValueEncoder.kryoThreadLocal.get()[0];
-        ClassLoader classLoader = Kryo5ValueDecoder.class.getClassLoader();
-        Thread t = Thread.currentThread();
-        if (t != null) {
-            ClassLoader ctxClassLoader = t.getContextClassLoader();
-            if (ctxClassLoader != null) {
-                classLoader = ctxClassLoader;
+        Kryo5ValueEncoder.Kryo5Cache kryoCache = null;
+        try {
+            kryoCache = Kryo5ValueEncoder.kryoCacheObjectPool.borrowObject();
+            Kryo kryo = kryoCache.getKryo();
+            ClassLoader classLoader = Kryo5ValueDecoder.class.getClassLoader();
+            Thread t = Thread.currentThread();
+            if (t != null) {
+                ClassLoader ctxClassLoader = t.getContextClassLoader();
+                if (ctxClassLoader != null) {
+                    classLoader = ctxClassLoader;
+                }
+            }
+            kryo.setClassLoader(classLoader);
+            return kryo.readClassAndObject(input);
+        }finally {
+            if(kryoCache != null){
+                Kryo5ValueEncoder.kryoCacheObjectPool.returnObject(kryoCache);
             }
         }
-        kryo.setClassLoader(classLoader);
-        return kryo.readClassAndObject(input);
     }
 }
