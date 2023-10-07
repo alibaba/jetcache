@@ -1,12 +1,10 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.ObjectPool;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 
-import java.lang.ref.WeakReference;
 import java.util.Arrays;
 
 /**
@@ -18,10 +16,10 @@ public class KryoValueEncoder extends AbstractValueEncoder {
 
     public static final KryoValueEncoder INSTANCE = new KryoValueEncoder(true);
 
-    private static final int INIT_BUFFER_SIZE = 256;
+    private static final int INIT_BUFFER_SIZE = 2048;
 
-    //Default size = 256K
-    static ObjectPool<KryoCache> kryoCacheObjectPool = new ObjectPool<>(1024*256/INIT_BUFFER_SIZE, new ObjectPool.ObjectFactory<KryoCache>() {
+    //Default size = 32K
+    static ObjectPool<KryoCache> kryoCacheObjectPool = new ObjectPool<>(16, new ObjectPool.ObjectFactory<KryoCache>() {
         @Override
         public KryoCache create() {
             return new KryoCache();
@@ -30,20 +28,22 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         @Override
         public void reset(KryoCache obj) {
             obj.getKryo().reset();
-            Arrays.fill(obj.buffer, (byte) 0);
+            obj.getOutput().clear();
         }
     });
 
     public static class KryoCache {
-        final byte[] buffer;
+        final Output output;
         final Kryo kryo;
         public KryoCache(){
             kryo = new Kryo();
             kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
-            buffer = new byte[INIT_BUFFER_SIZE];
+            byte[] buffer = new byte[INIT_BUFFER_SIZE];
+            output = new Output(buffer, -1);
         }
-        public byte[] getBuffer(){
-            return buffer;
+
+        public Output getOutput(){
+            return output;
         }
         public Kryo getKryo(){
             return kryo;
@@ -59,7 +59,9 @@ public class KryoValueEncoder extends AbstractValueEncoder {
         KryoCache kryoCache = null;
         try {
             kryoCache = kryoCacheObjectPool.borrowObject();
-            Output output = new Output(kryoCache.getBuffer(), -1);
+//            Output output = new Output(kryoCache.getBuffer(), -1);
+//            output.clear();
+            Output output = kryoCache.getOutput();
             if (useIdentityNumber) {
                 writeInt(output, SerialPolicy.IDENTITY_NUMBER_KRYO4);
             }

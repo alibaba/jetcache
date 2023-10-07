@@ -1,6 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.ObjectPool;
 import com.alicp.jetcache.anno.SerialPolicy;
 import com.esotericsoftware.kryo.kryo5.Kryo;
 import com.esotericsoftware.kryo.kryo5.io.Output;
@@ -15,10 +14,10 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
 
     public static final Kryo5ValueEncoder INSTANCE = new Kryo5ValueEncoder(true);
 
-    private static final int INIT_BUFFER_SIZE = 256;
+    private static final int INIT_BUFFER_SIZE = 2048;
 
-    //Default size = 256K
-    static ObjectPool<Kryo5Cache> kryoCacheObjectPool = new ObjectPool<>(1024*256/INIT_BUFFER_SIZE, new ObjectPool.ObjectFactory<Kryo5Cache>() {
+    //Default size = 32K
+    static ObjectPool<Kryo5Cache> kryoCacheObjectPool = new ObjectPool<>(16, new ObjectPool.ObjectFactory<Kryo5Cache>() {
         @Override
         public Kryo5Cache create() {
             return new Kryo5Cache();
