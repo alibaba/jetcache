@@ -1,7 +1,11 @@
 package com.alicp.jetcache.support;
 
+import com.alicp.jetcache.VirtualThreadUtil;
 import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -65,5 +69,29 @@ public class JavaEncoderTest extends AbstractEncoderTest {
         decoder = JavaValueDecoder.INSTANCE;
         super.gcTest();
     }
+
+
+    @Test
+    public void testVirtualThreadPool() throws InterruptedException {
+        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
+        if(executorService == null) return;
+        for (int i = 0; i < 1000; i++) {
+            executorService.submit(this::test);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void testVirtualThreadGC() throws InterruptedException {
+        ExecutorService executorService = VirtualThreadUtil.createExecuteor();
+        if(executorService == null) return;
+        for (int i = 0; i < 1000; i++) {
+            executorService.submit(this::gcTest);
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(3, TimeUnit.SECONDS);
+    }
+
 
 }
