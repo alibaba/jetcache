@@ -19,6 +19,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
@@ -31,6 +32,8 @@ public class SpringDataBroadcastManager extends BroadcastManager {
     private final MessageListener listener = this::onMessage;
     private final byte[] channel;
     private volatile RedisMessageListenerContainer listenerContainer;
+
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
     public SpringDataBroadcastManager(CacheManager cacheManager, RedisSpringDataCacheConfig config) {
         super(cacheManager);
@@ -65,23 +68,28 @@ public class SpringDataBroadcastManager extends BroadcastManager {
     }
 
     @Override
-    public synchronized void startSubscribe() {
-        if (this.listenerContainer != null) {
-            throw new IllegalStateException("subscribe thread is started");
+    public void startSubscribe() {
+        reentrantLock.lock();
+        try {
+            if (this.listenerContainer != null) {
+                throw new IllegalStateException("subscribe thread is started");
+            }
+            Topic topic = new ChannelTopic(config.getBroadcastChannel());
+            if (config.getListenerContainer() == null) {
+                RedisMessageListenerContainer c = new RedisMessageListenerContainer();
+                c.setConnectionFactory(config.getConnectionFactory());
+                c.afterPropertiesSet();
+                c.start();
+                this.listenerContainer = c;
+                logger.info("create RedisMessageListenerContainer instance");
+            } else {
+                this.listenerContainer = config.getListenerContainer();
+            }
+            this.listenerContainer.addMessageListener(listener, topic);
+            logger.info("subscribe jetcache invalidate notification. channel={}", config.getBroadcastChannel());
+        }finally {
+            reentrantLock.unlock();
         }
-        Topic topic = new ChannelTopic(config.getBroadcastChannel());
-        if (config.getListenerContainer() == null) {
-            RedisMessageListenerContainer c = new RedisMessageListenerContainer();
-            c.setConnectionFactory(config.getConnectionFactory());
-            c.afterPropertiesSet();
-            c.start();
-            this.listenerContainer = c;
-            logger.info("create RedisMessageListenerContainer instance");
-        } else {
-            this.listenerContainer = config.getListenerContainer();
-        }
-        this.listenerContainer.addMessageListener(listener, topic);
-        logger.info("subscribe jetcache invalidate notification. channel={}", config.getBroadcastChannel());
     }
 
     private void onMessage(Message message, byte[] pattern) {
@@ -89,13 +97,18 @@ public class SpringDataBroadcastManager extends BroadcastManager {
     }
 
     @Override
-    public synchronized void close() throws Exception {
-        if (this.listenerContainer != null) {
-            this.listenerContainer.removeMessageListener(listener);
-            if (this.config.getListenerContainer() == null) {
-                this.listenerContainer.destroy();
+    public void close() throws Exception {
+        reentrantLock.lock();
+        try {
+            if (this.listenerContainer != null) {
+                this.listenerContainer.removeMessageListener(listener);
+                if (this.config.getListenerContainer() == null) {
+                    this.listenerContainer.destroy();
+                }
             }
+            this.listenerContainer = null;
+        }finally {
+            reentrantLock.unlock();
         }
-        this.listenerContainer = null;
     }
 }

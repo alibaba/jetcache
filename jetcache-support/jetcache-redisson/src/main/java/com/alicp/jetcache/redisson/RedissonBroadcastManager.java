@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created on 2022/7/12.
@@ -24,6 +25,8 @@ public class RedissonBroadcastManager extends BroadcastManager {
     private final RedissonClient client;
     private volatile int subscribeId;
 
+    private final ReentrantLock reentrantLock = new ReentrantLock();
+
     public RedissonBroadcastManager(final CacheManager cacheManager, final RedissonCacheConfig<?, ?> config) {
         super(cacheManager);
         checkConfig(config);
@@ -33,24 +36,34 @@ public class RedissonBroadcastManager extends BroadcastManager {
     }
 
     @Override
-    public synchronized void startSubscribe() {
-        if (this.subscribeId == 0 && Objects.nonNull(this.channel) && !this.channel.isEmpty()) {
-            this.subscribeId = this.client.getTopic(this.channel)
-                    .addListener(byte[].class, (channel, msg) -> processNotification(msg, this.config.getValueDecoder()));
+    public void startSubscribe() {
+        reentrantLock.lock();
+        try {
+            if (this.subscribeId == 0 && Objects.nonNull(this.channel) && !this.channel.isEmpty()) {
+                this.subscribeId = this.client.getTopic(this.channel)
+                        .addListener(byte[].class, (channel, msg) -> processNotification(msg, this.config.getValueDecoder()));
+            }
+        }finally {
+            reentrantLock.unlock();
         }
     }
 
 
     @Override
-    public synchronized void close() {
-        final int id;
-        if ((id = this.subscribeId) > 0 && Objects.nonNull(this.channel)) {
-            this.subscribeId = 0;
-            try {
-                this.client.getTopic(this.channel).removeListener(id);
-            } catch (Throwable e) {
-                logger.warn("unsubscribe {} fail", this.channel, e);
+    public void close() {
+        reentrantLock.lock();
+        try {
+            final int id;
+            if ((id = this.subscribeId) > 0 && Objects.nonNull(this.channel)) {
+                this.subscribeId = 0;
+                try {
+                    this.client.getTopic(this.channel).removeListener(id);
+                } catch (Throwable e) {
+                    logger.warn("unsubscribe {} fail", this.channel, e);
+                }
             }
+        }finally {
+            reentrantLock.unlock();
         }
     }
 

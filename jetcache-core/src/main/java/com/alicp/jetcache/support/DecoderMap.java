@@ -30,14 +30,24 @@ public class DecoderMap {
         return decoderMap.get(identityNumber);
     }
 
-    public synchronized void register(int identityNumber, AbstractValueDecoder decoder) {
-        decoderMap.put(identityNumber, decoder);
-        inited = true;
+    public void register(int identityNumber, AbstractValueDecoder decoder) {
+        reentrantLock.lock();
+        try {
+            decoderMap.put(identityNumber, decoder);
+            inited = true;
+        }finally {
+            reentrantLock.unlock();
+        }
     }
 
-    public synchronized void clear() {
-        decoderMap.clear();
-        inited = true;
+    public void clear() {
+        reentrantLock.lock();
+        try {
+            decoderMap.clear();
+            inited = true;
+        }finally {
+            reentrantLock.unlock();
+        }
     }
 
     public void initDefaultDecoder() {
