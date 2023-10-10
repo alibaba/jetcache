@@ -20,6 +20,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * @author <a href="mailto:areyouok@gmail.com">huangli</a>
  */
@@ -34,6 +36,8 @@ public class LettuceBroadcastManager extends BroadcastManager {
 
     private final LettuceConnectionManager lettuceConnectionManager;
     private final BaseRedisAsyncCommands<byte[], byte[]> stringAsyncCommands;
+
+    private final ReentrantLock reentrantLock = new ReentrantLock();
 
 
     public LettuceBroadcastManager(CacheManager cacheManager, RedisLettuceCacheConfig<Object, Object> config) {
@@ -72,20 +76,25 @@ public class LettuceBroadcastManager extends BroadcastManager {
     }
 
     @Override
-    public synchronized void startSubscribe() {
-        if (subscribeThreadStart) {
-            throw new IllegalStateException("startSubscribe has invoked");
-        }
-        this.pubSubAdapter = new RedisPubSubAdapter<byte[], byte[]>() {
-            @Override
-            public void message(byte[] channel, byte[] message) {
-                processNotification(message, config.getValueDecoder());
+    public void startSubscribe() {
+        reentrantLock.lock();
+        try {
+            if (subscribeThreadStart) {
+                throw new IllegalStateException("startSubscribe has invoked");
             }
-        };
-        config.getPubSubConnection().addListener(this.pubSubAdapter);
-        RedisPubSubAsyncCommands<byte[], byte[]> asyncCommands = config.getPubSubConnection().async();
-        asyncCommands.subscribe(channel);
-        this.subscribeThreadStart = true;
+            this.pubSubAdapter = new RedisPubSubAdapter<byte[], byte[]>() {
+                @Override
+                public void message(byte[] channel, byte[] message) {
+                    processNotification(message, config.getValueDecoder());
+                }
+            };
+            config.getPubSubConnection().addListener(this.pubSubAdapter);
+            RedisPubSubAsyncCommands<byte[], byte[]> asyncCommands = config.getPubSubConnection().async();
+            asyncCommands.subscribe(channel);
+            this.subscribeThreadStart = true;
+        }finally {
+            reentrantLock.unlock();
+        }
     }
 
     @Override
