@@ -62,17 +62,6 @@
                 </dependencies>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <source>8</source>
-                    <target>8</target>
-                    <release>8</release>
-                    <compilerArgument>-parameters</compilerArgument>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
@@ -224,28 +213,34 @@
         -->
 
         <jackson.version>2.15.2</jackson.version>
+        <junit.version>5.9.3</junit.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <logback.version>1.4.11</logback.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
-
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <!--<version>1.7.36</version>-->
-                <version>2.0.9</version>
+                <version>${slf4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <!--<version>1.2.11</version>-->
-                <version>1.4.11</version>
+                <version>${logback.version}</version>
             </dependency>
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
-                <!--<version>1.2.11</version>-->
-                <version>1.4.11</version>
+                <version>${logback.version}</version>
             </dependency>
 
             <dependency>
@@ -311,15 +306,6 @@
                 <version>2.9.3</version>
                 <!--3.0+ need java 11-->
             </dependency>
-
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.8.2</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -360,6 +346,64 @@
         <url>https://github.com/alibaba/jetcache</url>
     </scm>
     <profiles>
+        <profile>
+            <id>compiler_java9+</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.10.1</version>
+                        <configuration>
+                            <source>8</source>
+                            <target>8</target>
+                            <release>8</release>
+                            <compilerArgument>-parameters</compilerArgument>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>compiler_java8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.10.1</version>
+                        <configuration>
+                            <source>8</source>
+                            <target>8</target>
+                            <!--
+                            <release>8</release>
+                            not supported in java 8 compiler
+                            -->
+                            <compilerArgument>-parameters</compilerArgument>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>spring_boot_2.x_for_java8_to_16</id>
+            <activation>
+                <jdk>(,16]</jdk>
+            </activation>
+            <properties>
+                <spring.framework.version>5.3.23</spring.framework.version>
+                <spring.boot.version>2.7.5</spring.boot.version>
+                <lettuce.version>6.1.10.RELEASE</lettuce.version>
+                <slf4j.version>1.7.36</slf4j.version>
+                <logback.version>1.2.11</logback.version>
+            </properties>
+        </profile>
         <profile>
             <id>release</id>
             <build>

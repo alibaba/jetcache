@@ -6,8 +6,10 @@ package com.alicp.jetcache.redis.springdata;
 import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.redis.AbstractBroadcastManagerTest;
 import com.alicp.jetcache.support.BroadcastManager;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledForJreRange;
+import org.junit.jupiter.api.condition.DisabledOnJre;
+import org.junit.jupiter.api.condition.JRE;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -45,7 +47,8 @@ public class SpringDataBroadcastManagerTest extends AbstractBroadcastManagerTest
     }
 
     @Test
-    @Ignore("need jedis 3.x")
+    @DisabledForJreRange(max = JRE.JAVA_16,
+            disabledReason = "in profile for java8 to 16, we use spring boot 2.x, it need jedis 3")
     public void testJedis() throws Exception {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("127.0.0.1", 6379);
         Constructor<JedisConnectionFactory> c = JedisConnectionFactory.class.getConstructor(RedisStandaloneConfiguration.class);
