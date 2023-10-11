@@ -216,7 +216,7 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count", int.class);
         cachedAnnoConfig.setDefineMethod(method);
         int x1, x2;
-        cachedAnnoConfig.setCondition("mvel{args[0]>10}");
+        cachedAnnoConfig.setCondition("args[0]>10");
         x1 = invokeQuery(method, new Object[]{10});
         x2 = invokeQuery(method, new Object[]{10});
         assertNotEquals(x1, x2);
@@ -230,7 +230,7 @@ public class CacheHandlerTest {
         Method method = CountClass.class.getMethod("count");
         cachedAnnoConfig.setDefineMethod(method);
         int x1, x2, x3;
-        cachedAnnoConfig.setPostCondition("mvel{result%2==1}");
+        cachedAnnoConfig.setPostCondition("result%2==1");
         cacheInvokeConfig.getCachedAnnoConfig().setPostConditionEvaluator(null);
         x1 = invokeQuery(method, null);//return 0, postCondition=false, so not cached
         x2 = invokeQuery(method, null);//return 1, postCondition=true, so cached

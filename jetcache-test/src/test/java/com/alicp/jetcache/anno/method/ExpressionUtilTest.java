@@ -38,14 +38,14 @@ public class ExpressionUtilTest {
 
     @Test
     public void testCondition1() {
-        cachedAnnoConfig.setCondition("mvel{args[0]==null}");
+        cachedAnnoConfig.setCondition("args[0]==null");
         assertFalse(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
         context.setArgs(new Object[2]);
         assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
     }
     @Test
     public void testCondition2() {
-        cachedAnnoConfig.setCondition("mvel{args[0].length()==4}");
+        cachedAnnoConfig.setCondition("args[0].length()==4");
         context.setArgs(new Object[]{"1234", 5678});
         assertTrue(ExpressionUtil.evalCondition(context, cachedAnnoConfig));
     }
