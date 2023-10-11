@@ -6,17 +6,17 @@ package jetcache.samples.springboot;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.template.QuickConfig;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.time.Duration;
 
 /**
  * @author huangli
  */
 @Component
-public class MyServiceImpl implements MyService {
+public class MyServiceImpl implements MyService, InitializingBean {
 
     @Autowired
     private UserService userService;
@@ -26,8 +26,8 @@ public class MyServiceImpl implements MyService {
 
     private Cache<String, String> orderCache;
 
-    @PostConstruct
-    public void init() {
+    @Override
+    public void afterPropertiesSet() {
         QuickConfig quickConfig = QuickConfig.newBuilder("orderCache").expire(Duration.ofSeconds(100)).build();
         orderCache = cacheManager.getOrCreateCache(quickConfig);
     }
