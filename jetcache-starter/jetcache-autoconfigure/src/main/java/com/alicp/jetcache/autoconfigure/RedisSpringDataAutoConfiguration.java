@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * Created on 2019/5/1.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Configuration
 @Conditional(RedisSpringDataAutoConfiguration.SpringDataRedisCondition.class)

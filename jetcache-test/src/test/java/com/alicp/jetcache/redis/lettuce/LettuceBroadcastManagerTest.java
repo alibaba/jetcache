@@ -23,7 +23,7 @@ import static com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest.checkOS;
 
 /**
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class LettuceBroadcastManagerTest extends AbstractBroadcastManagerTest {
 

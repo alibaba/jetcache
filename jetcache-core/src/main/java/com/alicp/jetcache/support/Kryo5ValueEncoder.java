@@ -8,7 +8,7 @@ import com.esotericsoftware.kryo.kryo5.serializers.CompatibleFieldSerializer;
 /**
  * Created on 2016/10/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class Kryo5ValueEncoder extends AbstractValueEncoder {
 

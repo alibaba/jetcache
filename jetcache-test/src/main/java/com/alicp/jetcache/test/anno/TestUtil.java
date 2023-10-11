@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class TestUtil {
     public static GlobalCacheConfig createGloableConfig() {

@@ -8,7 +8,7 @@ import com.alicp.jetcache.CacheBuilder;
 import java.util.Map;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class GlobalCacheConfig {
 

@@ -16,7 +16,7 @@ import java.util.WeakHashMap;
 /**
  * Created on 2017/4/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class LettuceConnectionManager {
 

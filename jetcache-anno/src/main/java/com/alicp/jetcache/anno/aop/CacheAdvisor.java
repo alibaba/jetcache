@@ -9,7 +9,7 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheAdvisor extends AbstractBeanFactoryPointcutAdvisor {
 

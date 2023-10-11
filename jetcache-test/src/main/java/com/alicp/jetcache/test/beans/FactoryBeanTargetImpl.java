@@ -4,7 +4,7 @@
 package com.alicp.jetcache.test.beans;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class FactoryBeanTargetImpl implements FactoryBeanTarget {
 

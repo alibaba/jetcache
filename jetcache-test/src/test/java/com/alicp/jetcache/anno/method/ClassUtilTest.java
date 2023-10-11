@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class ClassUtilTest {
 

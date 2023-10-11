@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Created on 2017/2/22.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheGetAllEvent extends CacheEvent {
     private final long millis;

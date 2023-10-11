@@ -14,7 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.time.Duration;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @SpringBootApplication
 public class CacheUpdater {

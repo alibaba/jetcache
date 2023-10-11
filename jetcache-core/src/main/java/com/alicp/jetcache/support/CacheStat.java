@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created on 2016/10/27.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheStat implements Serializable, Cloneable {
 

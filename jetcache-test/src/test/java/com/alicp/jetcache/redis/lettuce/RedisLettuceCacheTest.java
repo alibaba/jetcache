@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2017/5/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
     public static boolean checkOS() {

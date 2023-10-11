@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Created on 2016/12/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class AutoConfigureBeans {
 

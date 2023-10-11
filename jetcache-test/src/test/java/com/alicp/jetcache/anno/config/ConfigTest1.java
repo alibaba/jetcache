@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/12/29.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ConfigTest1.A.class)

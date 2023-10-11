@@ -5,7 +5,7 @@ import com.alicp.jetcache.AbstractCacheBuilder;
 /**
  * Created on 16/9/7.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class EmbeddedCacheBuilder<T extends EmbeddedCacheBuilder<T>> extends AbstractCacheBuilder<T> {
 

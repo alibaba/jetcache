@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno.method;
 import org.springframework.context.ApplicationContext;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringCacheInvokeContext extends CacheInvokeContext {
     protected ApplicationContext context;

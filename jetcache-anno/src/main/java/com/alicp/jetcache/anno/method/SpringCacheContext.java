@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 /**
  * Created on 2016/10/19.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringCacheContext extends CacheContext {
 

@@ -14,7 +14,7 @@ import com.alicp.jetcache.test.anno.TestUtil;
 import org.junit.jupiter.api.Assertions;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class AbstractBroadcastManagerTest {
     protected void testBroadcastManager(BroadcastManager manager) throws Exception {

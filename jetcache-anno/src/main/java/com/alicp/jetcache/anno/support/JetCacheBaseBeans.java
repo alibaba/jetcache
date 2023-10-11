@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 /**
  * used in non-spring-boot projects.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class JetCacheBaseBeans {
 

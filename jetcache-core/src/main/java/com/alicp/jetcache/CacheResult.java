@@ -8,7 +8,7 @@ import java.util.concurrent.*;
 /**
  * Created on 2016/9/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheResult {
 

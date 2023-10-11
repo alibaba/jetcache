@@ -8,7 +8,7 @@ import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import io.lettuce.core.RedisClient;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class LettuceExample {
     public static void main(String[] args) {

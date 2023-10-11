@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/11/3.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class DefaultMetricsManagerTest {
     @Test

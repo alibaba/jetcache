@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SyncLocalTest {
 

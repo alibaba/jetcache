@@ -17,7 +17,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CachePointcut extends StaticMethodMatcherPointcut implements ClassFilter {
 

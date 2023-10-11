@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheHandler implements InvocationHandler {
     private static Logger logger = LoggerFactory.getLogger(CacheHandler.class);

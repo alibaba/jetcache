@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Created on 2017/11/20.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class ConfigTree {
     private ConfigurableEnvironment environment;

@@ -7,7 +7,7 @@ import redis.clients.jedis.UnifiedJedis;
 /**
  * Created on 2016/12/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class JedisFactory implements FactoryBean<UnifiedJedis> {
     private String key;

@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface SerialPolicy {
     String JAVA = "JAVA";

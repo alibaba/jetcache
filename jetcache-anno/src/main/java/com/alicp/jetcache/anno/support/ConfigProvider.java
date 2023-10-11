@@ -21,7 +21,7 @@ import java.util.function.Function;
 /**
  * Created on 2016/11/29.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class ConfigProvider extends AbstractLifecycle {
 

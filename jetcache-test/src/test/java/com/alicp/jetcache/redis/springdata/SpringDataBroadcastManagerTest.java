@@ -18,7 +18,7 @@ import java.lang.reflect.Constructor;
 import java.util.UUID;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringDataBroadcastManagerTest extends AbstractBroadcastManagerTest {
 

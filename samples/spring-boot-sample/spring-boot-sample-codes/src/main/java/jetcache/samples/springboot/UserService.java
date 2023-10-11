@@ -6,7 +6,7 @@ package jetcache.samples.springboot;
 import com.alicp.jetcache.anno.Cached;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface UserService {
     @Cached(name = "loadUser", expire = 10)

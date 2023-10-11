@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * Created on 2016/11/25.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Configuration
 @Conditional(RedisAutoConfiguration.RedisCondition.class)

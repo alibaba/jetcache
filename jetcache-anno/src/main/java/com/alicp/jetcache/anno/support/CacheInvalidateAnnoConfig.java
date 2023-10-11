@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.support;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheInvalidateAnnoConfig extends CacheAnnoConfig {
     private boolean multi;

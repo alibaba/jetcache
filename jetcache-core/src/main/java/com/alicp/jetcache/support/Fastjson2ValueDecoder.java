@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created on 2022/07/26.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class Fastjson2ValueDecoder extends AbstractJsonDecoder {
 

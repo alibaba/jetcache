@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.method;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 enum EL {
     BUILD_IN, MVEL, SPRING_EL

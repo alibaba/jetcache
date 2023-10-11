@@ -6,7 +6,7 @@ import com.alicp.jetcache.anno.CacheConsts;
 /**
  * Created on 16/9/7.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class EmbeddedCacheConfig<K, V> extends CacheConfig<K, V> {
     private int limit = CacheConsts.DEFAULT_LOCAL_LIMIT;

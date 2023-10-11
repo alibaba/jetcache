@@ -13,7 +13,7 @@ import java.util.function.Function;
 /**
  * The cache interface, null value is supported.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface Cache<K, V> extends Closeable {
 

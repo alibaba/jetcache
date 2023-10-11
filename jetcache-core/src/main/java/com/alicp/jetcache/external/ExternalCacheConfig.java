@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 /**
  * Created on 16/9/9.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
 

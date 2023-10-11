@@ -9,7 +9,7 @@ import com.alicp.jetcache.anno.SerialPolicy;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class AbstractJsonEncoder extends AbstractValueEncoder {
     public AbstractJsonEncoder(boolean useIdentityNumber) {

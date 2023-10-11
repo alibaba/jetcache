@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 /**
  * Created on 2016/10/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class JavaValueEncoder extends AbstractValueEncoder {
 

@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 /**
  * Created on 2016/11/17.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Configuration
 @ConditionalOnClass(GlobalCacheConfig.class)

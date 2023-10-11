@@ -3,7 +3,7 @@ package com.alicp.jetcache;
 /**
  * Created on 2016/10/13.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheInvokeException extends CacheException {
 

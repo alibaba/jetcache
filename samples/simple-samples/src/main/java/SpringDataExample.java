@@ -15,7 +15,7 @@ import java.util.Arrays;
 
 /**
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringDataExample {
     public static void main(String[] args) {

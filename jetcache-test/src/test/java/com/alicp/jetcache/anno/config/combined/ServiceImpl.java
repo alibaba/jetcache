@@ -5,7 +5,7 @@ import com.alicp.jetcache.anno.Cached;
 /**
  * Created on 2017/2/14.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 //@Component
 public class ServiceImpl implements Service {

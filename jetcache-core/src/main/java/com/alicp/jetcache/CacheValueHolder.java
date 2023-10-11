@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created on 16/9/13.
  * This class is not thread safe.
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public final class CacheValueHolder<V> implements Serializable {
     private static final long serialVersionUID = -7973743507831565203L;

@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno.support;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface KeyConvertorParser {
     Function<Object, Object> parseKeyConvertor(String convertor);

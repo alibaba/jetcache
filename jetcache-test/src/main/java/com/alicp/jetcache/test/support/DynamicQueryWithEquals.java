@@ -6,7 +6,7 @@ package com.alicp.jetcache.test.support;
 import java.io.Serializable;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class DynamicQueryWithEquals implements Serializable {
     private static final long serialVersionUID = -6817023498652881802L;

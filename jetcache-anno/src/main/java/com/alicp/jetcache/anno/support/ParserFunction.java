@@ -5,7 +5,7 @@ import java.util.function.Function;
 /**
  * Created on 2022/04/06.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class ParserFunction implements Function {
 

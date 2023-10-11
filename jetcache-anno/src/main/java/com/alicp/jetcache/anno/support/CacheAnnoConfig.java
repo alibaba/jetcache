@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheAnnoConfig {
     private String area;

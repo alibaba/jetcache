@@ -8,7 +8,7 @@ import com.alibaba.fastjson2.JSON;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class Fastjson2KeyConvertor implements Function<Object, Object> {
 

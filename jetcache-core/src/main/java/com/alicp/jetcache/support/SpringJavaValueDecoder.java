@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringJavaValueDecoder extends JavaValueDecoder {
 

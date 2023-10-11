@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno;
 import java.time.Duration;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface CacheConsts {
     String DEFAULT_AREA = "default";

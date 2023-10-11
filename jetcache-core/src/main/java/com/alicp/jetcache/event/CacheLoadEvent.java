@@ -5,7 +5,7 @@ import com.alicp.jetcache.Cache;
 /**
  * Created on 2017/2/22.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheLoadEvent extends CacheEvent {
     private final long millis;

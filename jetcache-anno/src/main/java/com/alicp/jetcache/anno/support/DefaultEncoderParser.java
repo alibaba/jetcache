@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class DefaultEncoderParser implements EncoderParser {
     protected static Map<String, String> parseQueryParameters(String query) {

@@ -16,7 +16,7 @@ import com.alicp.jetcache.support.CacheNotifyMonitor;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class NotifyMonitorInstaller implements CacheMonitorInstaller {
 

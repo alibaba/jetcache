@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno.config;
  * @deprecated CreateCache annotation is replaced by CacheManager.getOrCreateCache(QuickConfig), the CacheManager instance
  *             can be injected use annotation such as @Autowired.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 
 import com.alicp.jetcache.anno.field.CreateCacheAnnotationBeanPostProcessor;

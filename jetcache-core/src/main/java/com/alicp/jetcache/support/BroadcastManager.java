@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class BroadcastManager implements AutoCloseable {
     private static Logger logger = LoggerFactory.getLogger(BroadcastManager.class);

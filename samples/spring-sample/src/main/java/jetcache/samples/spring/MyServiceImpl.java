@@ -13,7 +13,7 @@ import javax.annotation.PostConstruct;
 import java.time.Duration;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Component
 public class MyServiceImpl implements MyService {

@@ -20,7 +20,7 @@ import java.util.function.Function;
 /**
  * Created on 2017/5/25.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RefreshCache<K, V> extends LoadingCache<K, V> {
 

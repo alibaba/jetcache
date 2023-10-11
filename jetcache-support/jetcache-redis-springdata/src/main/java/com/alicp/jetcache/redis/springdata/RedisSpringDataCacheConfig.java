@@ -7,7 +7,7 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 /**
  * Created on 2019/4/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RedisSpringDataCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 

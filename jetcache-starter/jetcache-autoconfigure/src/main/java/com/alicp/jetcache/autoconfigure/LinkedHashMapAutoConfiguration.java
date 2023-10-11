@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created on 2016/12/2.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Component
 @Conditional(LinkedHashMapAutoConfiguration.LinkedHashMapCondition.class)

@@ -7,7 +7,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheManager;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface CacheMonitorInstaller {
     void addMonitors(CacheManager cacheManager, Cache cache, QuickConfig quickConfig);

@@ -4,7 +4,7 @@
 package jetcache.samples.spring;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface MyService {
 

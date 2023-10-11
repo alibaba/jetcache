@@ -4,7 +4,7 @@
 package com.alicp.jetcache;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheConfigException extends CacheException {
     private static final long serialVersionUID = -3401839239922905427L;

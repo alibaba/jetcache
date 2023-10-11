@@ -11,7 +11,7 @@ import java.io.IOException;
 /**
  * Created on 2016/10/8.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
 

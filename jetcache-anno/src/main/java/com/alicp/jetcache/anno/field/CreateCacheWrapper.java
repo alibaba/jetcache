@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
 /**
  * Created on 2016/12/13.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 class CreateCacheWrapper {
 

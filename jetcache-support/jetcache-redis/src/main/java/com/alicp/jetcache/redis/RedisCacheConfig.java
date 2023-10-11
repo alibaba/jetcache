@@ -8,7 +8,7 @@ import redis.clients.jedis.util.Pool;
 /**
  * Created on 2016/10/7.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 

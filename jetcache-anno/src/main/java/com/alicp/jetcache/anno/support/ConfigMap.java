@@ -9,7 +9,7 @@ import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class ConfigMap {
     private ConcurrentHashMap<String, CacheInvokeConfig> methodInfoMap = new ConcurrentHashMap<>();

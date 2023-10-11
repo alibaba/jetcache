@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     private Cache<ByteBuffer, byte[]> cache;

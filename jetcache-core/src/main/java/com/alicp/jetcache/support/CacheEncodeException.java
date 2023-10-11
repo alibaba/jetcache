@@ -5,7 +5,7 @@ import com.alicp.jetcache.CacheException;
 /**
  * Created on 2016/12/23.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheEncodeException extends CacheException {
 

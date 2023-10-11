@@ -8,7 +8,7 @@ import com.alicp.jetcache.CacheValueHolder;
 import java.nio.charset.StandardCharsets;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class AbstractJsonDecoder extends AbstractValueDecoder {
 

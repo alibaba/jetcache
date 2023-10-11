@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 /**
  * The CacheMessage is used for distributed message while CacheEvent used in single JVM.
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheMessage implements Serializable {
     private static final long serialVersionUID = -462475561129953207L;

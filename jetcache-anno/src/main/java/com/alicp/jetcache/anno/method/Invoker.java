@@ -4,7 +4,7 @@
 package com.alicp.jetcache.anno.method;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface Invoker {
     Object invoke() throws Throwable;

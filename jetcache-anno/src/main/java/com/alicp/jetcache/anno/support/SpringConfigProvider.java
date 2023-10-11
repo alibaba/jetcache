@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Created on 2016/12/1.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringConfigProvider extends ConfigProvider implements ApplicationContextAware {
     private ApplicationContext applicationContext;

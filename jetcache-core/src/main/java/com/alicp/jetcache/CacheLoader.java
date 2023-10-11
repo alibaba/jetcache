@@ -8,7 +8,7 @@ import java.util.function.Function;
 /**
  * Created on 2017/5/27.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @FunctionalInterface
 public interface CacheLoader<K, V> extends Function<K ,V> {

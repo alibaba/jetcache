@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Created on 2016/10/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class KryoValueEncoder extends AbstractValueEncoder {
 

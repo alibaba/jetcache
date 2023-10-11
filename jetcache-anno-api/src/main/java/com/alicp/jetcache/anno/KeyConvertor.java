@@ -8,7 +8,7 @@ import java.util.function.Function;
  * A custom key convertor implements Function<Object, Object> is enough.
  * If a key convertor implements this interface, it can process byte[] and String, see AbstractExternalCache.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface KeyConvertor extends Function<Object, Object> {
     String NONE = "NONE";

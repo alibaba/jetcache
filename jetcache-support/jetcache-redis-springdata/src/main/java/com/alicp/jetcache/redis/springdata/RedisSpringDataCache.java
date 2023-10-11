@@ -25,7 +25,7 @@ import java.util.function.Function;
 /**
  * Created on 2019/4/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
 

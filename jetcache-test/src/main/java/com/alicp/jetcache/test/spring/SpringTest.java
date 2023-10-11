@@ -16,7 +16,7 @@ import java.util.UUID;
 /**
  * Created on 2016/11/23.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class SpringTest extends SpringTestBase {
 

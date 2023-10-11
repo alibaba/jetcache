@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Created on 2016/11/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class JetCacheCondition extends SpringBootCondition {
 

@@ -8,7 +8,7 @@ import redis.clients.jedis.util.Pool;
 /**
  * Created on 2016/12/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class JedisPoolFactory implements FactoryBean<Pool<Jedis>> {
     private String key;

@@ -8,7 +8,7 @@ import com.alicp.jetcache.Cache;
 /**
  * The CacheEvent is used in single JVM while CacheMessage used for distributed message.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheEvent {
 

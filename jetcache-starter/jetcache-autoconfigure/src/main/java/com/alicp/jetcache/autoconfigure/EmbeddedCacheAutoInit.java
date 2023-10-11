@@ -7,7 +7,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 /**
  * Created on 2016/12/2.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class EmbeddedCacheAutoInit extends AbstractCacheAutoInit {
 

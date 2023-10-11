@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class KeyConvertorTest {
     static class C extends DynamicQuery {

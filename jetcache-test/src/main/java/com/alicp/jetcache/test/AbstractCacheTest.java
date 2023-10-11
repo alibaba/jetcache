@@ -39,7 +39,7 @@ import java.util.function.Function;
 /**
  * Created on 2016/10/8.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class AbstractCacheTest {
     private Logger logger = LoggerFactory.getLogger(this.getClass());

@@ -8,7 +8,7 @@ import com.alicp.jetcache.support.CacheMessage;
 /**
  * Created on 2016/10/20.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class MockRemoteCacheBuilder<T extends ExternalCacheBuilder<T>> extends ExternalCacheBuilder<T> {
 

@@ -10,7 +10,7 @@ import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.UnifiedJedis;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RedisBroadcastManagerTest extends AbstractBroadcastManagerTest {
     @Test

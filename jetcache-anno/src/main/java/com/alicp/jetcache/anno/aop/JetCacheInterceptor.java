@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationContextAware;
 import java.lang.reflect.Method;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class JetCacheInterceptor implements MethodInterceptor, ApplicationContextAware {
 

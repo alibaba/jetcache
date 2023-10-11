@@ -34,7 +34,7 @@ import javax.annotation.PostConstruct;
 /**
  * Created on 2017/05/11.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Configuration
 @EnableAutoConfiguration

@@ -23,7 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class LettuceBroadcastManager extends BroadcastManager {
     private static final Logger logger = LoggerFactory.getLogger(LettuceBroadcastManager.class);

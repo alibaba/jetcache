@@ -6,7 +6,7 @@ package jetcache.samples.spring;
 import java.io.Serializable;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class User implements Serializable {
     private static final long serialVersionUID = -5157877924507849953L;

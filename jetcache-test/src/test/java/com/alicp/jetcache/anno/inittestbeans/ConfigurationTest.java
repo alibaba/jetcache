@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Created on 2017/5/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Configuration
 public class ConfigurationTest {

@@ -7,7 +7,7 @@ package com.alicp.jetcache.support;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class AbstractLifecycle {
     private boolean init;

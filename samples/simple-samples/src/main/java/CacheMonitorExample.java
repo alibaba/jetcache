@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/11/2.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheMonitorExample {
     public static void main(String[] args) throws Exception {

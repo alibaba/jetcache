@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created on 2016/10/25.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CaffeineCache<K, V> extends AbstractEmbeddedCache<K, V> {
 

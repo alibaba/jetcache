@@ -6,7 +6,7 @@ package jetcache.samples.spring;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Repository
 public class UserServiceImpl implements UserService {

@@ -10,7 +10,7 @@ import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import java.util.List;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheInvokeConfig {
     private CachedAnnoConfig cachedAnnoConfig;

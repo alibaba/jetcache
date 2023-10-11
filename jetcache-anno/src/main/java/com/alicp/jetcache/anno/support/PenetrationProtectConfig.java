@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno.support;
 import java.time.Duration;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class PenetrationProtectConfig {
     private boolean penetrationProtect;

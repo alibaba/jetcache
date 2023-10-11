@@ -6,7 +6,7 @@ package com.alicp.jetcache.testsupport;
 import com.alicp.jetcache.test.support.DynamicQuery;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CountClass implements Count {
     private int count;

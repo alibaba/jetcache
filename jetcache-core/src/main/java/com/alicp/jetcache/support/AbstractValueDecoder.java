@@ -6,7 +6,7 @@ import java.util.function.Function;
 /**
  * Created on 2016/10/4.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public abstract class AbstractValueDecoder implements Function<byte[], Object>, ValueEncoders {
 

@@ -24,7 +24,7 @@ import java.time.Duration;
 /**
  * Created on 2022/08/02.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ConfigTest2.A.class)

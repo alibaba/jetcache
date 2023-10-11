@@ -11,7 +11,7 @@ import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import org.junit.Test;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class MockRemoteCacheTest extends AbstractCacheTest {
     @Test

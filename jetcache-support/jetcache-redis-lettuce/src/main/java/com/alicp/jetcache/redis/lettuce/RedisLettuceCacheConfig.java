@@ -9,7 +9,7 @@ import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 /**
  * Created on 2017/4/28.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class RedisLettuceCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 

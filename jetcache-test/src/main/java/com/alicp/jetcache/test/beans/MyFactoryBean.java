@@ -9,7 +9,7 @@ import org.springframework.beans.factory.InitializingBean;
 import java.lang.reflect.Proxy;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class MyFactoryBean implements FactoryBean, InitializingBean {
 

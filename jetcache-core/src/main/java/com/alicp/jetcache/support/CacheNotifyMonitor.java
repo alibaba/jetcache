@@ -20,7 +20,7 @@ import com.alicp.jetcache.event.CacheRemoveEvent;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class CacheNotifyMonitor implements CacheMonitor {
     private final BroadcastManager broadcastManager;

@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.function.Function;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class QuickConfig {
     private String area = CacheConsts.DEFAULT_AREA;

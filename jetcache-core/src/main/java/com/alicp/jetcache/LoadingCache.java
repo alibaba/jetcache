@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 /**
  * Created on 2017/5/17.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class LoadingCache<K, V> extends SimpleProxyCache<K, V> {
 

@@ -6,7 +6,7 @@ package com.alicp.jetcache.test.beans;
 import com.alicp.jetcache.anno.Cached;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface FactoryBeanTarget {
     @Cached

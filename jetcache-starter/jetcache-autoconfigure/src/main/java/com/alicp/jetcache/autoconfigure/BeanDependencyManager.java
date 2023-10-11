@@ -10,7 +10,7 @@ import java.util.Arrays;
 /**
  * Created on 2017/5/5.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public class BeanDependencyManager implements BeanFactoryPostProcessor {
 

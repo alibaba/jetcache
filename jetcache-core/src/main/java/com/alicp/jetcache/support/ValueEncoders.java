@@ -4,7 +4,7 @@
 package com.alicp.jetcache.support;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 public interface ValueEncoders {
 

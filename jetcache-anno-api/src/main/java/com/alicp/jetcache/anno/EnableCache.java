@@ -6,7 +6,7 @@ package com.alicp.jetcache.anno;
 import java.lang.annotation.*;
 
 /**
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

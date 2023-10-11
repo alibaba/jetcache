@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 /**
  * Created on 2017/5/5.
  *
- * @author <a href="mailto:areyouok@gmail.com">huangli</a>
+ * @author huangli
  */
 @Component
 public class AfterPropertiesSetBean1 extends MethodCacheInitTestBean implements InitializingBean {
