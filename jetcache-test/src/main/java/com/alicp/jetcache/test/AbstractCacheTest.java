@@ -36,6 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
+import static com.alicp.jetcache.test.support.Tick.tick;
+
 /**
  * Created on 2016/10/8.
  *
@@ -928,7 +930,7 @@ public abstract class AbstractCacheTest {
             this.cache = cache;
             this.loader = k -> {
                 try {
-                    Thread.sleep(75);
+                    Thread.sleep(tick(50));
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
