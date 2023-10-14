@@ -68,9 +68,10 @@ public class Kryo5ValueEncoder extends AbstractValueEncoder {
             StringBuilder sb = new StringBuilder("Kryo Encode error. ");
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
-        }finally {
-            if(kryoCache != null)
+        } finally {
+            if (kryoCache != null) {
                 kryoCacheObjectPool.returnObject(kryoCache);
+            }
         }
     }
 

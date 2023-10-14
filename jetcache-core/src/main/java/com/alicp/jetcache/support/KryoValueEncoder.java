@@ -72,8 +72,9 @@ public class KryoValueEncoder extends AbstractValueEncoder {
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
         } finally {
-            if(kryoCache != null)
+            if (kryoCache != null) {
                 kryoCacheObjectPool.returnObject(kryoCache);
+            }
         }
     }
 

@@ -53,9 +53,10 @@ public class JavaValueEncoder extends AbstractValueEncoder {
             StringBuilder sb = new StringBuilder("Java Encode error. ");
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
-        }finally {
-            if(bos != null)
+        } finally {
+            if (bos != null) {
                 bosPool.returnObject(bos);
+            }
         }
     }
 }
