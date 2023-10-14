@@ -918,63 +918,44 @@ public abstract class AbstractCacheTest {
         Assert.assertEquals("V", v);
     }
 
-    private static class PenetrationTestThread extends Thread {
-
-        private final String keyPrefix;
-        private final Cache cache;
-        private final Function loader;
-        volatile boolean running;
-
-        PenetrationTestThread(String keyPrefix, Cache cache, AtomicInteger loadSuccess) {
-            this.keyPrefix = keyPrefix;
-            this.cache = cache;
-            this.loader = k -> {
-                try {
-                    Thread.sleep(tick(50));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                loadSuccess.incrementAndGet();
-                return k + "_V";
-            };
-        }
-
-        @Override
-        public void run() {
-            running = true;
-            cache.computeIfAbsent(keyPrefix, loader);
-        }
-    }
-
     private static void penetrationProtectTimeoutTest(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtectTimeoutTest_";
-        {
-            AtomicInteger loadSuccess = new AtomicInteger(0);
-            cache.config().setPenetrationProtectTimeout(Duration.ofMillis(1));
-            PenetrationTestThread t1 = new PenetrationTestThread(keyPrefix + 1, cache, loadSuccess);
-            PenetrationTestThread t2 = new PenetrationTestThread(keyPrefix + 1, cache, loadSuccess);
-            t1.start();
-            t2.start();
-            t1.join();
-            t2.join();
-            Assert.assertEquals(2, loadSuccess.intValue());
-        }
-        {
-            AtomicInteger loadSuccess = new AtomicInteger(0);
-            cache.config().setPenetrationProtectTimeout(Duration.ofMillis(200));
-            PenetrationTestThread t1 = new PenetrationTestThread(keyPrefix + 2, cache, loadSuccess);
-            PenetrationTestThread t2 = new PenetrationTestThread(keyPrefix + 2, cache, loadSuccess);
-            PenetrationTestThread t3 = new PenetrationTestThread(keyPrefix + 2, cache, loadSuccess);
-            t1.start();
-            t2.start();
-            TestUtil.waitUtil(() -> t1.running == true || t2.running == true);
-            t3.start();
-            TestUtil.waitUtil(() -> t3.running == true);
-            t3.interrupt();
-            t1.join();
-            t2.join();
-            t3.join();
-            Assert.assertEquals(2, loadSuccess.intValue());
-        }
+        AtomicInteger loadSuccess = new AtomicInteger(0);
+        Function loader = k -> {
+            try {
+                Thread.sleep(tick(75));
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            loadSuccess.incrementAndGet();
+            return k + "_V";
+        };
+
+        cache.config().setPenetrationProtectTimeout(Duration.ofMillis(1));
+        Runnable runnable = () -> cache.computeIfAbsent(keyPrefix + 1, loader);
+        Thread t1 = new Thread(runnable);
+        Thread t2 = new Thread(runnable);
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+        Assert.assertEquals(2, loadSuccess.intValue());
+
+        cache.config().setPenetrationProtectTimeout(Duration.ofSeconds(60));
+        loadSuccess.set(0);
+        runnable = () -> cache.computeIfAbsent(keyPrefix + 2, loader);
+        t1 = new Thread(runnable);
+        t2 = new Thread(runnable);
+        Thread t3 = new Thread(runnable);
+        t1.start();
+        t2.start();
+        Thread.sleep(tick(25));
+        t3.start();
+        Thread.sleep(tick(25));
+        t3.interrupt();
+        t1.join();
+        t2.join();
+        t3.join();
+        Assert.assertEquals(2, loadSuccess.intValue());
     }
 }
