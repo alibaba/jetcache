@@ -6,7 +6,7 @@ package com.alicp.jetcache.embedded;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheResultCode;
-import com.alicp.jetcache.VirtualThreadUtil;
+import com.alicp.jetcache.support.VirtualThreadUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.cglib.core.ReflectUtils;

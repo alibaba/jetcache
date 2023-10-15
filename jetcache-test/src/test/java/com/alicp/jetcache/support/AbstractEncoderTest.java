@@ -1,7 +1,6 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheValueHolder;
-import com.alicp.jetcache.VirtualThreadUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

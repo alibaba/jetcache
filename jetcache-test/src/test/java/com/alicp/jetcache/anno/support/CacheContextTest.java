@@ -3,15 +3,8 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.VirtualThreadUtil;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.cglib.core.ReflectUtils;
-
-import java.lang.reflect.Method;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author huangli

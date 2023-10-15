@@ -1,6 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.VirtualThreadUtil;
 import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
 
