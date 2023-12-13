@@ -1,4 +1,4 @@
-0. Unit test in IDE under Windows/macOS
+0. Unit test in IDE under Windows
 ==========================================================
     Run redis in docker:
 
