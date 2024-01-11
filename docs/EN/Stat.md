@@ -43,10 +43,8 @@ The output of statistics can be customized:
     // for 2.6+
     @Bean
     public Consumer<StatInfo> metricsCallback() {
-        public Consumer<StatInfo> statCallback() {
-            return new StatInfoLogger(false);
-            // or implements another Consumer<StatInfo>
-        }
+        return new StatInfoLogger(false);
+        // or implements another Consumer<StatInfo>
     }
 
 ```
