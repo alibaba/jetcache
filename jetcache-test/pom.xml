@@ -97,7 +97,8 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.6.1</version>
+            <!--5.x byte code can't run under java 8-->
+            <version>4.11.0</version>
         </dependency>
         <dependency>
             <groupId>net.bytebuddy</groupId>
