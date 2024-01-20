@@ -31,23 +31,19 @@ public class DecoderMap {
     }
 
     public void register(int identityNumber, AbstractValueDecoder decoder) {
-        reentrantLock.lock();
-        try {
-            decoderMap.put(identityNumber, decoder);
-            inited = true;
-        }finally {
-            reentrantLock.unlock();
-        }
+        decoderMap.put(identityNumber, decoder);
     }
 
     public void clear() {
-        reentrantLock.lock();
-        try {
-            decoderMap.clear();
-            inited = true;
-        }finally {
-            reentrantLock.unlock();
-        }
+        decoderMap.clear();
+    }
+
+    public ReentrantLock getLock() {
+        return reentrantLock;
+    }
+
+    public void setInited(boolean inited) {
+        this.inited = inited;
     }
 
     public void initDefaultDecoder() {
@@ -64,7 +60,7 @@ public class DecoderMap {
             register(SerialPolicy.IDENTITY_NUMBER_KRYO5, Kryo5ValueDecoder.INSTANCE);
             // register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
             inited = true;
-        }finally {
+        } finally {
             reentrantLock.unlock();
         }
     }
