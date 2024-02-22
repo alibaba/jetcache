@@ -25,7 +25,7 @@ jetcache tested with below spring/spring-boot versions
 * use lettuce to connect redis cluster need specify "mode=cluster" in yml
 * default key convertor change to "fastjson2", fastjson2 and fastjson can be used together, fastjson(not fastjson2)/kryo/kryo5/mvel is now optional in maven
 * if not use spring boot, add ```@Import(JetCacheBaseBeans.class)```, and remove old configProvider bean definition. see docs for detail example.
-* change GlobalCacheConfig.areaInCacheName default value to false
+* change GlobalCacheConfig.areaInCacheName default value to false (has bug, default value may still be true), need to add areaInCacheName=false
 
 ## 2.6.0
 * GET/GET_ALL method of RefreshCache will not trigger auto refresh

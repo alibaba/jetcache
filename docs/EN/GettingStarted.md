@@ -173,7 +173,7 @@ public class JetCacheConfig {
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);
-        //globalCacheConfig.setAreaInCacheName(false); for jetcache <=2.6 
+        globalCacheConfig.setAreaInCacheName(false); 
 
         return globalCacheConfig;
     }
