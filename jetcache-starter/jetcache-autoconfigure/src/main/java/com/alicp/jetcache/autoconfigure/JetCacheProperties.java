@@ -12,7 +12,7 @@ public class JetCacheProperties {
 
     private String[] hiddenPackages;
     private int statIntervalMinutes;
-    private boolean areaInCacheName = true;
+    private boolean areaInCacheName = false;
     private boolean penetrationProtect = false;
     private boolean enableMethodCache = true;
 
