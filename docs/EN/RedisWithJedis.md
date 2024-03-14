@@ -21,6 +21,10 @@ jetcache:
       #password:***
       #sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
       #masterName: mymaster
+      #cluster:
+      # - 127.0.0.1:6379
+      # - 127.0.0.1:6380
+      # - 127.0.0.1:6381
 ```
 
 ```JedisPoolFactory``` used to get ```JedisPool``` as a Spring bean: 
@@ -33,10 +37,24 @@ public JedisPoolFactory defaultPool() {
 }
 ```
 
-Then you can inject an ```JedisPool``` to you bean using ```@Autowired```: 
+And ```JedisFactory``` used to get ```JedisCluster``` as a Spring bean:
+```java
+@Bean(name = "defaultCluster")
+@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
+//@DependsOn("redisAutoInit")//jetcache2.1
+public JedisFactory defaultCluster() {
+    return new JedisFactory("remote.default", JedisCluster.class);
+}
+```
+
+
+Then you can inject an ```JedisPool/JedisCluster``` to you bean using ```@Autowired```: 
 ```java
 @Autowired
 private Pool<Jedis> defaultPool;
+
+@Autowired
+private JedisCluster defaultCluster;
 ```
 
 The ```<T> T unwrap(Class<T> clazz)``` method of ```Cache``` can used to get ```JedisPool```.

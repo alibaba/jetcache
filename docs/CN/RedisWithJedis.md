@@ -21,9 +21,13 @@ jetcache:
       #password:***
       #sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
       #masterName: mymaster
+      #cluster:
+      # - 127.0.0.1:6379
+      # - 127.0.0.1:6380
+      # - 127.0.0.1:6381
 ```
 
-如果需要直接操作JedisPool，可以通过以下方式获取
+如果需要直接操作JedisPool/JedisCluster，可以通过以下方式获取
 ```java
 @Bean(name = "defaultPool")
 @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
@@ -31,11 +35,21 @@ jetcache:
 public JedisPoolFactory defaultPool() {
     return new JedisPoolFactory("remote.default", JedisPool.class);
 }
+
+@Bean(name = "defaultCluster")
+@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
+//@DependsOn("redisAutoInit")//jetcache2.1
+public JedisFactory defaultCluster() {
+    return new JedisFactory("remote.default", JedisCluster.class);
+}
 ```
 然后可以直接使用
 ```java
 @Autowired
 private Pool<Jedis> defaultPool;
+
+@Autowired
+private JedisCluster defaultCluster;
 ```
 
 也可以用```Cache```接口上的```<T> T unwrap(Class<T> clazz)```方法来获取JedisPool，参见RedisCache.unwrap源代码。
