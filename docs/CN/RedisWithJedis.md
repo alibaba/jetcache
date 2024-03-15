@@ -27,7 +27,7 @@ jetcache:
       # - 127.0.0.1:6381
 ```
 
-如果需要直接操作JedisPool/JedisCluster，可以通过以下方式获取
+如果需要直接操作JedisPool/JedisCluster，可以通过以下方式获取（取决于你的配置，同一个 Area 只能使用一种连接方式）：
 ```java
 @Bean(name = "defaultPool")
 @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
@@ -43,7 +43,7 @@ public JedisFactory defaultCluster() {
     return new JedisFactory("remote.default", JedisCluster.class);
 }
 ```
-然后可以直接使用
+然后根据配置的 Bean 可以直接使用：
 ```java
 @Autowired
 private Pool<Jedis> defaultPool;

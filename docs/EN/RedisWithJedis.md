@@ -37,7 +37,7 @@ public JedisPoolFactory defaultPool() {
 }
 ```
 
-And ```JedisFactory``` used to get ```JedisCluster``` as a Spring bean:
+Or ```JedisFactory``` used to get ```JedisCluster``` as a Spring bean(depend on you configuration, you can only use one of them):
 ```java
 @Bean(name = "defaultCluster")
 @DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
@@ -48,7 +48,7 @@ public JedisFactory defaultCluster() {
 ```
 
 
-Then you can inject an ```JedisPool/JedisCluster``` to you bean using ```@Autowired```: 
+Then you can inject an ```JedisPool``` or ```JedisCluster``` to you bean using ```@Autowired```: 
 ```java
 @Autowired
 private Pool<Jedis> defaultPool;
