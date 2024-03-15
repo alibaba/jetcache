@@ -43,7 +43,7 @@ public JedisFactory defaultCluster() {
     return new JedisFactory("remote.default", JedisCluster.class);
 }
 ```
-然后根据配置的 Bean 可以直接使用：
+然后根据上述的配置，可以在 Spring Bean 中直接使用其中一个：
 ```java
 @Autowired
 private Pool<Jedis> defaultPool;
