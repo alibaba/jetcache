@@ -21,10 +21,6 @@ jetcache:
       #password:***
       #sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
       #masterName: mymaster
-      #cluster:
-      # - 127.0.0.1:6379
-      # - 127.0.0.1:6380
-      # - 127.0.0.1:6381
 ```
 
 ```JedisPoolFactory``` used to get ```JedisPool``` as a Spring bean: 
@@ -37,24 +33,10 @@ public JedisPoolFactory defaultPool() {
 }
 ```
 
-Or ```JedisFactory``` used to get ```JedisCluster``` as a Spring bean(depend on you configuration, you can only use one of them):
-```java
-@Bean(name = "defaultCluster")
-@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
-//@DependsOn("redisAutoInit")//jetcache2.1
-public JedisFactory defaultCluster() {
-    return new JedisFactory("remote.default", JedisCluster.class);
-}
-```
-
-
-Then you can inject an ```JedisPool``` or ```JedisCluster``` to you bean using ```@Autowired```: 
+Then you can inject an ```JedisPool``` to you bean using ```@Autowired```: 
 ```java
 @Autowired
 private Pool<Jedis> defaultPool;
-
-@Autowired
-private JedisCluster defaultCluster;
 ```
 
 The ```<T> T unwrap(Class<T> clazz)``` method of ```Cache``` can used to get ```JedisPool```.
@@ -125,4 +107,120 @@ Cache<Long,OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .buildCache();
 ```
+
+
+
+# Jedis Cluster with spring boot
+
+`application.yml` (without local cache configurations):
+
+> In Cluster mode, most of the configurations are common with Standalone mode.
+> The only difference is that you need to configure the `cluster` and optional `maxAttempt` properties to specify multiple nodes in the cluster, 
+> while in Standalone mode, you only need to fill in the `host` and `port`.
+
+```yml
+jetcache: 
+  areaInCacheName: false
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      # common configuration
+      timeout: 2000
+      connectionTimeout: 2000
+      soTimeout: 2000
+      # optional configuration
+      #user: ***  
+      #password:***
+      #clientName: 
+      #ssl: false
+      # cluster specified configuration
+      cluster:
+        - 127.0.0.1:6379
+        - 127.0.0.1:6378
+        - 127.0.0.1:6377
+      maxAttempt: 5
+```
+
+```JedisFactory``` used to get ```JedisCluster``` as a Spring bean: 
+
+```java
+@Bean(name = "defaultCluster")
+@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
+//@DependsOn("redisAutoInit")//jetcache2.1
+public JedisFactory defaultCluster() {
+    return new JedisFactory("remote.default", JedisCluster.class);
+}
+```
+Then you can inject an ```JedisCluster``` to you bean using ```@Autowired```: 
+
+```java
+@Autowired
+private JedisCluster defaultCluster;
+```
+
+# Jedis Sentinels with spring boot
+
+`application.yml` (without local cache configurations):
+
+> In Sentinel mode, most of the configurations are common with Standalone mode.
+> The only difference is that you need to configure some specific settings for Sentinel.
+
+```yml
+jetcache: 
+  areaInCacheName: false
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      # common configuration
+      timeout: 2000
+      connectionTimeout: 2000
+      soTimeout: 2000
+      # optional configuration
+      #user: ***  
+      #password:***
+      #clientName: 
+      #ssl: false
+      # sentinel specified configuration
+      sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
+      masterName: mymaster
+      sentinelConnectionTimeout: 2000
+      sentinelSoTimeout: 2000
+      # sentinel specified optional configuration
+      #sentinelUser: ***
+      #sentinelPassword: ***
+      #sentinelClientName: 
+    
+```
+
+```JedisPoolFactory``` used to get ```JedisSentinelPool``` as a Spring bean: 
+
+```java
+@Bean(name = "defaultSentinelPool")
+@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
+//@DependsOn("redisAutoInit")//jetcache2.1
+public JedisSentinelPool defaultSentinelPool() {
+    return new JedisPoolFactory("remote.default", JedisSentinelPool.class);
+}
+```
+
+Then you can inject an ```JedisSentinelPool``` to you bean using ```@Autowired```: 
+
+```java
+@Autowired
+private JedisSentinelPool defaultSentinelPool;
+```
+
+
 
