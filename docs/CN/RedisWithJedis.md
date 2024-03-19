@@ -105,3 +105,113 @@ Cache<Long,OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .buildCache();
 ```
 
+
+# Spring Boot环境下的 Jedis 的集群模式支持
+
+`application.yml` 文件如下（这里省去了local相关的配置）：
+
+> Cluster 模式下，大部分配置和单机模式通用，只是需要配置 `cluster` 和可选的 `maxAttempt` 属性，指定集群的多个节点，而单机模式下只需要填写 `host` 和 `port` 即可。
+
+```yml
+jetcache: 
+  areaInCacheName: false
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      # 通用配置
+      timeout: 2000
+      connectionTimeout: 2000
+      soTimeout: 2000
+      # 按需选配的通用配置
+      #user: ***  
+      #password:***
+      #clientName: 
+      #ssl: false
+      # 集群特定配置
+      cluster:
+        - 127.0.0.1:6379
+        - 127.0.0.1:6378
+        - 127.0.0.1:6377
+      maxAttempt: 5
+```
+
+如果需要直接操作 JedisCluster，可以通过以下方式获取：
+
+```java
+@Bean(name = "defaultCluster")
+@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
+//@DependsOn("redisAutoInit")//jetcache2.1
+public JedisFactory defaultCluster() {
+    return new JedisFactory("remote.default", JedisCluster.class);
+}
+```
+然后直接在 Spring Bean 中使用：
+
+```java
+@Autowired
+private JedisCluster defaultCluster;
+```
+
+# Spring Boot环境下的 Jedis 的哨兵模式支持
+
+`application.yml` 文件如下（这里省去了local相关的配置）：
+
+> 哨兵模式下，大部分配置和单机模式通用，但需要配置额外的哨兵配置
+
+```yml
+jetcache: 
+  areaInCacheName: false
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson2
+      broadcastChannel: projectA
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      # 通用配置
+      timeout: 2000
+      connectionTimeout: 2000
+      soTimeout: 2000
+      # 按需选配的通用配置
+      #user: ***  
+      #password:***
+      #clientName: 
+      #ssl: false
+      # 哨兵特定配置
+      sentinels: 127.0.0.1:26379 , 127.0.0.1:26380, 127.0.0.1:26381
+      masterName: mymaster
+      sentinelConnectionTimeout: 2000
+      sentinelSoTimeout: 2000
+      # 哨兵可选配置
+      #sentinelUser: ***
+      #sentinelPassword: ***
+      #sentinelClientName: 
+    
+```
+
+如果需要直接操作 JedisSentinelPool，可以通过以下方式获取：
+
+```java
+@Bean(name = "defaultSentinelPool")
+@DependsOn(RedisAutoConfiguration.AUTO_INIT_BEAN_NAME)//jetcache2.2+
+//@DependsOn("redisAutoInit")//jetcache2.1
+public JedisSentinelPool defaultSentinelPool() {
+    return new JedisPoolFactory("remote.default", JedisSentinelPool.class);
+}
+```
+然后直接在 Spring Bean 中使用：
+
+```java
+@Autowired
+private JedisSentinelPool defaultSentinelPool;
+```
+
+
