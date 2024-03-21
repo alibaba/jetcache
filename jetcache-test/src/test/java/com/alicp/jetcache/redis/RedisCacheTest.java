@@ -102,10 +102,12 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
         if (jedis instanceof JedisPooled) {
             Assert.assertSame(jedis, cache.unwrap(JedisPooled.class));
-        } else if (jedis instanceof JedisCluster) {
-            Assert.assertSame(jedis, cache.unwrap(JedisCluster.class));
+        } else if (jedis instanceof JedisClusterWrapper) {
+            Assert.assertSame(jedis, cache.unwrap(JedisClusterWrapper.class));
         } else if (jedis instanceof Pool) {
             Assert.assertSame(jedis, cache.unwrap(Pool.class));
+        } else if (jedis instanceof JedisCluster) {
+            Assert.assertSame(jedis, cache.unwrap(JedisCluster.class));
         }
 
         baseTest();

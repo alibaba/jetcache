@@ -304,6 +304,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 ((Pipeline) pipeline).sync();
             } else if (pipeline instanceof ClusterPipeline) {
                 ((ClusterPipeline) pipeline).sync();
+                ((ClusterPipeline) pipeline).close();
             } else {
                 throw new UnsupportedOperationException("unrecognized pipeline type");
             }
