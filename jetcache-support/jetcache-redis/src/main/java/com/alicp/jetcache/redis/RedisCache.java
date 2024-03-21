@@ -278,18 +278,21 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         StringBinaryCommands commands = null;
-        Connection connection = null;
+        Closeable closeable = null;
         try {
             commands = (StringBinaryCommands) writeCommands();
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
             StringPipelineBinaryCommands pipeline;
             if (commands instanceof JedisPooled) {
-                connection = ((JedisPooled) commands).getPool().getResource();
+                Connection connection = ((JedisPooled) commands).getPool().getResource();
+                closeable = connection;
                 pipeline = new Pipeline(connection);
             } else if (commands instanceof JedisClusterWrapper) {
                 JedisClusterWrapper cluster = (JedisClusterWrapper) commands;
-                pipeline = cluster.getPipeline();
+                ClusterPipeline clusterPipeline = cluster.getPipeline();
+                pipeline = clusterPipeline;
+                closeable = clusterPipeline;
             } else if (commands instanceof Jedis) {
                 pipeline = new Pipeline((Jedis) commands);
             } else {
@@ -304,7 +307,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 ((Pipeline) pipeline).sync();
             } else if (pipeline instanceof ClusterPipeline) {
                 ((ClusterPipeline) pipeline).sync();
-                ((ClusterPipeline) pipeline).close();
             } else {
                 throw new UnsupportedOperationException("unrecognized pipeline type");
             }
@@ -320,7 +322,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             return new CacheResult(ex);
         } finally {
             closeJedis(commands);
-            close(connection);
+            close(closeable);
         }
     }
 
