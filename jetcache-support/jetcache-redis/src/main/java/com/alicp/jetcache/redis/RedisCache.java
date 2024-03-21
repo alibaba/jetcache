@@ -11,6 +11,7 @@ import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import redis.clients.jedis.ClusterPipeline;
 import redis.clients.jedis.Connection;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
@@ -20,6 +21,7 @@ import redis.clients.jedis.Response;
 import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.commands.KeyBinaryCommands;
 import redis.clients.jedis.commands.StringBinaryCommands;
+import redis.clients.jedis.commands.StringPipelineBinaryCommands;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.util.Pool;
 
@@ -280,32 +282,32 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             commands = (StringBinaryCommands) writeCommands();
             int failCount = 0;
-            if(commands instanceof Jedis || commands instanceof JedisPooled) {
-                List<Response<String>> responses = new ArrayList<>();
-                Pipeline pipeline = null;
-                if(commands instanceof JedisPooled) {
-                    connection = ((JedisPooled) commands).getPool().getResource();
-                    pipeline = new Pipeline(connection);
-                } else {
-                    pipeline = new Pipeline((Jedis) commands);
-                }
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                    Response<String> resp = pipeline.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                    responses.add(resp);
-                }
-                pipeline.sync();
-                for (Response<String> resp : responses) {
-                    if (!"OK".equals(resp.get())) {
-                        failCount++;
-                    }
-                }
+            List<Response<String>> responses = new ArrayList<>();
+            StringPipelineBinaryCommands pipeline;
+            if (commands instanceof JedisPooled) {
+                connection = ((JedisPooled) commands).getPool().getResource();
+                pipeline = new Pipeline(connection);
+            } else if (commands instanceof JedisCluster) {
+                JedisCluster cluster = (JedisCluster) commands;
+                pipeline = cluster.pipelined();
             } else {
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheResult r = do_PUT(en.getKey(), en.getValue(), expireAfterWrite, timeUnit);
-                    if (!r.isSuccess()) {
-                        failCount++;
-                    }
+                pipeline = new Pipeline((Jedis) commands);
+            }
+            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+                Response<String> resp = pipeline.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
+                responses.add(resp);
+            }
+            if (pipeline instanceof Pipeline) {
+                ((Pipeline) pipeline).sync();
+            } else if (pipeline instanceof ClusterPipeline) {
+                ((ClusterPipeline) pipeline).sync();
+            } else {
+                throw new UnsupportedOperationException("unrecognized pipeline type");
+            }
+            for (Response<String> resp : responses) {
+                if (!"OK".equals(resp.get())) {
+                    failCount++;
                 }
             }
             return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
