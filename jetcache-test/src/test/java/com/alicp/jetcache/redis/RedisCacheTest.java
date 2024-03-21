@@ -77,7 +77,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 7000));
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 7001));
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 7002));
-        JedisCluster jedis = new JedisCluster(jedisClusterNodes);
+        JedisCluster jedis = new JedisClusterWrapper(jedisClusterNodes);
         testImpl(jedis);
     }
 

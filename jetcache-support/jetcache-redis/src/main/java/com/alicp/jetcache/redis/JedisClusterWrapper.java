@@ -23,6 +23,16 @@ public class JedisClusterWrapper extends JedisCluster {
         this.provider = new ClusterConnectionProvider(hostAndPortSet, jedisClientConfig, poolConfig);
     }
 
+    /**
+     * only for unit test
+     * @param hostAndPortSet
+     */
+    public JedisClusterWrapper(Set<HostAndPort> hostAndPortSet) {
+        super(hostAndPortSet);
+        DefaultJedisClientConfig defaultConfig = DefaultJedisClientConfig.builder().build();
+        this.provider = new ClusterConnectionProvider(hostAndPortSet, defaultConfig);
+    }
+
     public ClusterPipeline getPipeline() {
         return new ClusterPipeline(provider);
     }
