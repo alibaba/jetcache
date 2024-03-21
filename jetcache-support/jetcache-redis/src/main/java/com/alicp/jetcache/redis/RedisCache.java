@@ -145,7 +145,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         int x = 0;
         for (int i = 0; i < weights.length; i++) {
             x += weights[i];
-            if(r < x){
+            if (r < x) {
                 return i;
             }
         }
@@ -287,11 +287,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             if (commands instanceof JedisPooled) {
                 connection = ((JedisPooled) commands).getPool().getResource();
                 pipeline = new Pipeline(connection);
-            } else if (commands instanceof JedisCluster) {
-                JedisCluster cluster = (JedisCluster) commands;
-                pipeline = cluster.pipelined();
-            } else {
+            } else if (commands instanceof JedisClusterWrapper) {
+                JedisClusterWrapper cluster = (JedisClusterWrapper) commands;
+                pipeline = cluster.getPipeline();
+            } else if (commands instanceof Jedis) {
                 pipeline = new Pipeline((Jedis) commands);
+            } else {
+                throw new IllegalStateException("Jedis type can not be unWrapper JedisCluster");
             }
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));

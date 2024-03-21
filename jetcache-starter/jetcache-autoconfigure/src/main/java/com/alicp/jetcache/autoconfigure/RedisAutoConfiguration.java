@@ -2,6 +2,7 @@ package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.CacheBuilder;
 import com.alicp.jetcache.CacheConfigException;
+import com.alicp.jetcache.redis.JedisClusterWrapper;
 import com.alicp.jetcache.redis.RedisCacheBuilder;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.beans.PropertyValues;
@@ -13,7 +14,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.util.ClassUtils;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.Protocol;
@@ -137,7 +137,8 @@ public class RedisAutoConfiguration {
                             .map(uri -> uri.toString().split(":"))
                             .map(hostAndPort -> new HostAndPort(hostAndPort[0], Integer.parseInt(hostAndPort[1])))
                             .collect(Collectors.toSet());
-                    return new JedisCluster(hostAndPortSet, connectionTimeout, soTimeout, maxAttempt, user, password,
+                    // we use our wrapper here to support pipeline
+                    return new JedisClusterWrapper(hostAndPortSet, connectionTimeout, soTimeout, maxAttempt, user, password,
                             clientName, poolConfig, ssl);
                 }
             } else {
