@@ -13,7 +13,6 @@ import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
-import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -34,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static com.alicp.jetcache.test.support.Tick.tick;
@@ -920,42 +920,83 @@ public abstract class AbstractCacheTest {
 
     private static void penetrationProtectTimeoutTest(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtectTimeoutTest_";
-        AtomicInteger loadSuccess = new AtomicInteger(0);
-        Function loader = k -> {
-            try {
-                Thread.sleep(tick(75));
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        final Duration SHORT_PROTECT_DURATION = Duration.ofMillis(1);
+        final Duration LONG_PROTECT_DURATION = Duration.ofSeconds(60);
+        cache.config().setPenetrationProtectTimeout(SHORT_PROTECT_DURATION);
+        final AtomicInteger loadSuccess = new AtomicInteger(0);
+        final CountDownLatch firstBarrier = new CountDownLatch(1);
+        final Function normalLoader = k -> {
             loadSuccess.incrementAndGet();
             return k + "_V";
         };
+        // 1. 第一个 Loader 需要等待 firstBarrier 释放, 并记录线程等待的时间
+        AtomicReference<Duration> duration = new AtomicReference<>();
+        Function firstBarrierLoader = k -> {
+            long start = System.nanoTime();
+            try {
+                firstBarrier.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            duration.set(Duration.ofNanos(System.nanoTime() - start));
+            return normalLoader.apply(k);
+        };
 
-        cache.config().setPenetrationProtectTimeout(Duration.ofMillis(1));
-        Runnable runnable = () -> cache.computeIfAbsent(keyPrefix + 1, loader);
-        Thread t1 = new Thread(runnable);
-        Thread t2 = new Thread(runnable);
+        Thread t1 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 1, firstBarrierLoader));
+        Thread t2 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 1, normalLoader));
+        // 先启动线程 1，验证 barrierLoader 阻塞线程 1
         t1.start();
+        Thread.sleep(tick(25));
+        Assert.assertEquals(0, loadSuccess.intValue());
+        // 启动线程 2 再延迟一段时间，验证线程 2 过了保护时间后可以成功加载
         t2.start();
+        Thread.sleep(tick(25));
+        Assert.assertEquals(1, loadSuccess.intValue());
+        // 释放线程 1，验证两个都加载好了, 并且线程 1 等待时间超过保护时间
+        firstBarrier.countDown();
         t1.join();
         t2.join();
         Assert.assertEquals(2, loadSuccess.intValue());
+        Assert.assertTrue(SHORT_PROTECT_DURATION.compareTo(duration.get()) < 0);
 
-        cache.config().setPenetrationProtectTimeout(Duration.ofSeconds(60));
+        // 设置长保护时间, 重置 loadSuccess 和 duration
+        cache.config().setPenetrationProtectTimeout(LONG_PROTECT_DURATION);
+        CountDownLatch secondBarrier = new CountDownLatch(1);
         loadSuccess.set(0);
-        runnable = () -> cache.computeIfAbsent(keyPrefix + 2, loader);
-        t1 = new Thread(runnable);
-        t2 = new Thread(runnable);
-        Thread t3 = new Thread(runnable);
+        duration.set(Duration.ZERO);
+        Function secondBarrierLoader = k -> {
+            long start = System.nanoTime();
+            try {
+                secondBarrier.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            duration.set(Duration.ofNanos(System.nanoTime() - start));
+            return normalLoader.apply(k);
+        };
+        // 设置线程 1，3 为长时间等待，线程 2 为正常加载
+        t1 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 2, secondBarrierLoader));
+        t2 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 2, normalLoader));
+        Thread t3 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 2, secondBarrierLoader));
+        // 延迟启动 1、2、3
         t1.start();
+        Thread.sleep(tick(25));
         t2.start();
         Thread.sleep(tick(25));
         t3.start();
         Thread.sleep(tick(25));
-        t3.interrupt();
+        // 验证延迟一段之间后，仍然是 0，即使有普通加载的 t2 线程
+        Assert.assertEquals(0, loadSuccess.intValue());
+        // 先中断线程 2，然后延迟一段时间释放 barrier，验证线程 1、3 都加载成功
+        t2.interrupt();
+        Thread.sleep(tick(25));
+        secondBarrier.countDown();
         t1.join();
         t2.join();
         t3.join();
+        // 验证只有两个线程加载成功，线程 2 加载失败
         Assert.assertEquals(2, loadSuccess.intValue());
+        // 验证时间没超过保护时间
+        Assert.assertTrue(LONG_PROTECT_DURATION.compareTo(duration.get()) > 0);
     }
 }
