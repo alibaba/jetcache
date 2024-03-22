@@ -4,9 +4,8 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.anno.CreateCache;
 import com.alicp.jetcache.anno.config.EnableCreateCacheAnnotation;
 import com.alicp.jetcache.anno.config.EnableMethodCache;
-import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheConfig;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import io.lettuce.core.RedisClient;
@@ -20,6 +19,7 @@ import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
 import org.junit.Assert;
 import org.junit.Test;
+import org.redisson.spring.starter.RedissonAutoConfigurationV2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -37,7 +37,7 @@ import javax.annotation.PostConstruct;
  * @author huangli
  */
 @Configuration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = {RedissonAutoConfigurationV2.class})
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation

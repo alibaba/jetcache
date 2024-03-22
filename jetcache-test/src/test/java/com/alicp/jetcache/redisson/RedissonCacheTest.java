@@ -11,6 +11,7 @@ import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.junit.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.KryoCodec;
 import org.redisson.config.Config;
 
 import java.util.Random;
@@ -27,6 +28,7 @@ public class RedissonCacheTest extends AbstractExternalCacheTest {
     public void redissonTest() throws Exception {
         final Config config = new Config();
         config.useSingleServer().setAddress("redis://127.0.0.1:6379").setDatabase(0);
+        config.setCodec(new KryoCodec());
         doTest(Redisson.create(config));
     }
 

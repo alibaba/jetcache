@@ -5,6 +5,8 @@ import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.redisson.RedissonCacheBuilder;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.KryoCodec;
+import org.redisson.spring.starter.RedissonAutoConfigurationCustomizer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -69,5 +71,10 @@ public class RedissonAutoConfiguration {
         public void setApplicationContext(final ApplicationContext context) throws BeansException {
             this.context = context;
         }
+    }
+
+    @Bean("redissonCodecCustomizer")
+    public RedissonAutoConfigurationCustomizer redissonCodecCustomizer() {
+        return config -> config.setCodec(new KryoCodec());
     }
 }

@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.KryoCodec;
 import org.redisson.config.Config;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.UnifiedJedis;
@@ -78,6 +79,7 @@ public class SyncLocalTest {
     public void testRedisson() throws Exception {
         final String keyPrefix = getClass().getSimpleName() + "testRedisson";
         final Config config = new Config();
+        config.setCodec(new KryoCodec());
         config.useSingleServer().setAddress("redis://127.0.0.1:6379").setDatabase(0);
         RedissonClient client1 = Redisson.create(config);
         RedissonClient client2 = Redisson.create(config);

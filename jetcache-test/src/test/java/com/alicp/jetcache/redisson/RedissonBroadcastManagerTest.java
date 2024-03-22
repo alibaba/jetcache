@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
+import org.redisson.codec.KryoCodec;
 import org.redisson.config.Config;
 
 import java.util.Random;
@@ -27,6 +28,8 @@ public class RedissonBroadcastManagerTest extends AbstractBroadcastManagerTest {
     public void initRedissonClient() {
         final Config config = new Config();
         config.useSingleServer().setAddress("redis://127.0.0.1:6379").setDatabase(0);
+        // 兼容 kryo4
+        config.setCodec(new KryoCodec());
         this.client = Redisson.create(config);
     }
 

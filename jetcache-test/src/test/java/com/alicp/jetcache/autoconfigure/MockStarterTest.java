@@ -11,6 +11,7 @@ import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
 import org.junit.Assert;
 import org.junit.Test;
+import org.redisson.spring.starter.RedissonAutoConfigurationV2;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +28,7 @@ import java.util.function.Function;
  * @author huangli
  */
 @Configuration
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = {RedissonAutoConfigurationV2.class})
 @ComponentScan(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableMethodCache(basePackages = {"com.alicp.jetcache.test.beans", "com.alicp.jetcache.anno.inittestbeans"})
 @EnableCreateCacheAnnotation
