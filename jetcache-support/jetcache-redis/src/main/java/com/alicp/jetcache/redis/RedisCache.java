@@ -11,11 +11,9 @@ import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import redis.clients.jedis.Connection;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPooled;
-import redis.clients.jedis.Pipeline;
 import redis.clients.jedis.PipelineBase;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.UnifiedJedis;
@@ -282,13 +280,14 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             commands = (StringBinaryCommands) writeCommands();
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
-            if (commands instanceof JedisPooled) {
-                Connection connection = ((JedisPooled) commands).getPool().getResource();
-                pipeline = new Pipeline(connection);
+            if (commands instanceof Jedis) {
+                pipeline = ((Jedis) commands).pipelined();
+            } else if (commands instanceof JedisPooled) {
+                pipeline = ((JedisPooled) commands).pipelined();
             } else if (commands instanceof JedisCluster) {
                 pipeline = ((JedisCluster) commands).pipelined();
             } else {
-                pipeline = new Pipeline((Jedis) commands);
+                throw new IllegalArgumentException("unrecognized redis client type");
             }
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
