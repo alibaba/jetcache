@@ -16,6 +16,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPooled;
 import redis.clients.jedis.Pipeline;
+import redis.clients.jedis.PipelineBase;
 import redis.clients.jedis.Response;
 import redis.clients.jedis.UnifiedJedis;
 import redis.clients.jedis.commands.KeyBinaryCommands;
@@ -143,7 +144,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         int x = 0;
         for (int i = 0; i < weights.length; i++) {
             x += weights[i];
-            if(r < x){
+            if (r < x) {
                 return i;
             }
         }
@@ -276,36 +277,28 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         StringBinaryCommands commands = null;
-        Connection connection = null;
+        PipelineBase pipeline = null;
         try {
             commands = (StringBinaryCommands) writeCommands();
             int failCount = 0;
-            if(commands instanceof Jedis || commands instanceof JedisPooled) {
-                List<Response<String>> responses = new ArrayList<>();
-                Pipeline pipeline = null;
-                if(commands instanceof JedisPooled) {
-                    connection = ((JedisPooled) commands).getPool().getResource();
-                    pipeline = new Pipeline(connection);
-                } else {
-                    pipeline = new Pipeline((Jedis) commands);
-                }
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                    Response<String> resp = pipeline.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                    responses.add(resp);
-                }
-                pipeline.sync();
-                for (Response<String> resp : responses) {
-                    if (!"OK".equals(resp.get())) {
-                        failCount++;
-                    }
-                }
+            List<Response<String>> responses = new ArrayList<>();
+            if (commands instanceof JedisPooled) {
+                Connection connection = ((JedisPooled) commands).getPool().getResource();
+                pipeline = new Pipeline(connection);
+            } else if (commands instanceof JedisCluster) {
+                pipeline = ((JedisCluster) commands).pipelined();
             } else {
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheResult r = do_PUT(en.getKey(), en.getValue(), expireAfterWrite, timeUnit);
-                    if (!r.isSuccess()) {
-                        failCount++;
-                    }
+                pipeline = new Pipeline((Jedis) commands);
+            }
+            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+                Response<String> resp = pipeline.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
+                responses.add(resp);
+            }
+            pipeline.sync();
+            for (Response<String> resp : responses) {
+                if (!"OK".equals(resp.get())) {
+                    failCount++;
                 }
             }
             return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
@@ -315,7 +308,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             return new CacheResult(ex);
         } finally {
             closeJedis(commands);
-            close(connection);
+            close(pipeline);
         }
     }
 
