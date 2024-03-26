@@ -281,6 +281,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             int failCount = 0;
             List<Response<String>> responses = new ArrayList<>();
             if (commands instanceof Jedis) {
+                // FIXME 这里的 Connection 能关吗？
                 pipeline = ((Jedis) commands).pipelined();
             } else if (commands instanceof JedisPooled) {
                 pipeline = ((JedisPooled) commands).pipelined();
