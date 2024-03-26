@@ -13,7 +13,6 @@ import com.alicp.jetcache.ProxyCache;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
-import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import org.junit.Assert;
 import org.slf4j.Logger;
@@ -34,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static com.alicp.jetcache.test.support.Tick.tick;
@@ -920,42 +920,81 @@ public abstract class AbstractCacheTest {
 
     private static void penetrationProtectTimeoutTest(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtectTimeoutTest_";
-        AtomicInteger loadSuccess = new AtomicInteger(0);
-        Function loader = k -> {
-            try {
-                Thread.sleep(tick(75));
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        final Duration SHORT_PROTECT_DURATION = Duration.ofMillis(1);
+        final Duration LONG_PROTECT_DURATION = Duration.ofSeconds(60);
+        cache.config().setPenetrationProtectTimeout(SHORT_PROTECT_DURATION);
+        final AtomicInteger loadSuccess = new AtomicInteger(0);
+        final CountDownLatch firstBarrier = new CountDownLatch(1);
+        // 1. create a normal loader, and a blocking loader with a duration record
+        final Function normalLoader = k -> {
             loadSuccess.incrementAndGet();
             return k + "_V";
         };
-
-        cache.config().setPenetrationProtectTimeout(Duration.ofMillis(1));
-        Runnable runnable = () -> cache.computeIfAbsent(keyPrefix + 1, loader);
-        Thread t1 = new Thread(runnable);
-        Thread t2 = new Thread(runnable);
+        AtomicReference<Duration> duration = new AtomicReference<>();
+        Function firstBarrierLoader = k -> {
+            long start = System.nanoTime();
+            try {
+                firstBarrier.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            duration.set(Duration.ofNanos(System.nanoTime() - start));
+            return normalLoader.apply(k);
+        };
+        // 2. assemble loader into thread.
+        Thread t1 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 1, firstBarrierLoader));
+        Thread t2 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 1, normalLoader));
+        // 3. start the blocking loader thread, and then verify that there is a block.
         t1.start();
+        Thread.sleep(tick(25));
+        Assert.assertEquals(0, loadSuccess.intValue());
+        // 4. start the normal loader thread, and verify penetration protector expired after the delay.
         t2.start();
+        Thread.sleep(tick(25));
+        Assert.assertEquals(1, loadSuccess.intValue());
+        // 5. release the barrier of blocking loader, and then verify all of the loaders execute.
+        firstBarrier.countDown();
         t1.join();
         t2.join();
         Assert.assertEquals(2, loadSuccess.intValue());
+        Assert.assertTrue(SHORT_PROTECT_DURATION.compareTo(duration.get()) < 0);
 
-        cache.config().setPenetrationProtectTimeout(Duration.ofSeconds(60));
+        // 6. reset the time of PenetrationProtectTimeout to a longer Duration.
+        // reset two threads to a new loader.
+        cache.config().setPenetrationProtectTimeout(LONG_PROTECT_DURATION);
+        CountDownLatch secondBarrier = new CountDownLatch(1);
         loadSuccess.set(0);
-        runnable = () -> cache.computeIfAbsent(keyPrefix + 2, loader);
-        t1 = new Thread(runnable);
-        t2 = new Thread(runnable);
-        Thread t3 = new Thread(runnable);
+        duration.set(Duration.ZERO);
+        Function secondBarrierLoader = k -> {
+            long start = System.nanoTime();
+            try {
+                secondBarrier.await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            duration.set(Duration.ofNanos(System.nanoTime() - start));
+            return normalLoader.apply(k);
+        };
+        t1 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 2, secondBarrierLoader));
+        t2 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 2, normalLoader));
+        Thread t3 = new Thread(() -> cache.computeIfAbsent(keyPrefix + 2, secondBarrierLoader));
+        // 7. serializing delays the startup of each thread, and then verify no any loader executes.
         t1.start();
+        Thread.sleep(tick(25));
         t2.start();
         Thread.sleep(tick(25));
         t3.start();
         Thread.sleep(tick(25));
-        t3.interrupt();
+        Assert.assertEquals(0, loadSuccess.intValue());
+        // 8. interrupt the second thread, and then release the barrier of blocking loader
+        t2.interrupt();
+        Thread.sleep(tick(25));
+        secondBarrier.countDown();
         t1.join();
         t2.join();
         t3.join();
+        // 9. verify only the first and the third threads were executed, and verify PenetrationProtect didn't expire.
         Assert.assertEquals(2, loadSuccess.intValue());
+        Assert.assertTrue(LONG_PROTECT_DURATION.compareTo(duration.get()) > 0);
     }
 }
