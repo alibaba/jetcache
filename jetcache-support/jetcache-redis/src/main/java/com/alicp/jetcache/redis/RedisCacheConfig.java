@@ -2,8 +2,12 @@ package com.alicp.jetcache.redis;
 
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.UnifiedJedis;
+import redis.clients.jedis.providers.ClusterConnectionProvider;
 import redis.clients.jedis.util.Pool;
+
+import java.lang.reflect.Field;
 
 /**
  * Created on 2016/10/7.
@@ -18,6 +22,7 @@ public class RedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
     private UnifiedJedis[] slaves;
     private boolean readFromSlave;
     private int[] slaveReadWeights;
+    private ClusterConnectionProvider provider;
 
     public Pool<Jedis> getJedisPool() {
         return jedisPool;
@@ -41,6 +46,18 @@ public class RedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     public void setJedis(UnifiedJedis jedis) {
         this.jedis = jedis;
+        if (jedis instanceof JedisCluster) {
+            Class<? extends UnifiedJedis> clz = jedis.getClass();
+            try {
+                Field field = clz.getField("provider");
+                boolean accessible = field.isAccessible();
+                field.setAccessible(true);
+                provider = (ClusterConnectionProvider) field.get(jedis);
+                field.setAccessible(accessible);
+            } catch (Exception ex) {
+                throw new IllegalStateException("can not get ConnectionProvider from JedisClient", ex);
+            }
+        }
     }
 
     public UnifiedJedis[] getSlaves() {
@@ -65,5 +82,9 @@ public class RedisCacheConfig<K, V> extends ExternalCacheConfig<K, V> {
 
     public void setSlaveReadWeights(int... slaveReadWeights) {
         this.slaveReadWeights = slaveReadWeights;
+    }
+
+    public ClusterConnectionProvider getProvider() {
+        return provider;
     }
 }

@@ -77,7 +77,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 7000));
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 7001));
         jedisClusterNodes.add(new HostAndPort("127.0.0.1", 7002));
-        JedisCluster jedis = new JedisClusterWrapper(jedisClusterNodes);
+        JedisCluster jedis = new JedisCluster(jedisClusterNodes);
         testImpl(jedis);
     }
 
@@ -102,12 +102,10 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
         if (jedis instanceof JedisPooled) {
             Assert.assertSame(jedis, cache.unwrap(JedisPooled.class));
-        } else if (jedis instanceof JedisClusterWrapper) {
-            Assert.assertSame(jedis, cache.unwrap(JedisClusterWrapper.class));
-        } else if (jedis instanceof Pool) {
-            Assert.assertSame(jedis, cache.unwrap(Pool.class));
         } else if (jedis instanceof JedisCluster) {
             Assert.assertSame(jedis, cache.unwrap(JedisCluster.class));
+        } else if (jedis instanceof Pool) {
+            Assert.assertSame(jedis, cache.unwrap(Pool.class));
         }
 
         baseTest();

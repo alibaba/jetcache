@@ -281,42 +281,22 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         Closeable closeable = null;
         try {
             commands = (StringBinaryCommands) writeCommands();
-            int failCount = 0;
-            List<Response<String>> responses = new ArrayList<>();
             StringPipelineBinaryCommands pipeline;
+            // JedisPooled, JedisCluster 都是用到连接池的连接，需要还回去
             if (commands instanceof JedisPooled) {
                 Connection connection = ((JedisPooled) commands).getPool().getResource();
                 closeable = connection;
                 pipeline = new Pipeline(connection);
-            } else if (commands instanceof JedisClusterWrapper) {
-                JedisClusterWrapper cluster = (JedisClusterWrapper) commands;
-                ClusterPipeline clusterPipeline = cluster.getPipeline();
-                pipeline = clusterPipeline;
+            } else if (commands instanceof JedisCluster) {
+                ClusterPipeline clusterPipeline = new ClusterPipeline(config.getProvider());
                 closeable = clusterPipeline;
+                pipeline = clusterPipeline;
             } else if (commands instanceof Jedis) {
                 pipeline = new Pipeline((Jedis) commands);
             } else {
-                throw new IllegalStateException("Jedis type can not be unWrapper JedisCluster");
+                throw new IllegalArgumentException(String.format("unknown jedis client type, <%s>", commands.getClass().getName()));
             }
-            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                Response<String> resp = pipeline.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                responses.add(resp);
-            }
-            if (pipeline instanceof Pipeline) {
-                ((Pipeline) pipeline).sync();
-            } else if (pipeline instanceof ClusterPipeline) {
-                ((ClusterPipeline) pipeline).sync();
-            } else {
-                throw new UnsupportedOperationException("unrecognized pipeline type");
-            }
-            for (Response<String> resp : responses) {
-                if (!"OK".equals(resp.get())) {
-                    failCount++;
-                }
-            }
-            return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
-                    failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
+            return executeWithPipeline(pipeline, map, expireAfterWrite, timeUnit);
         } catch (Exception ex) {
             logError("PUT_ALL", "map(" + map.size() + ")", ex);
             return new CacheResult(ex);
@@ -324,6 +304,30 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             closeJedis(commands);
             close(closeable);
         }
+    }
+
+    private CacheResult executeWithPipeline(StringPipelineBinaryCommands pipeline, Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
+        int failCount = 0;
+        List<Response<String>> responses = new ArrayList<>();
+        for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+            CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+            Response<String> resp = pipeline.psetex(buildKey(en.getKey()), timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
+            responses.add(resp);
+        }
+        if (pipeline instanceof Pipeline) {
+            ((Pipeline) pipeline).sync();
+        } else if (pipeline instanceof ClusterPipeline) {
+            ((ClusterPipeline) pipeline).sync();
+        } else {
+            throw new UnsupportedOperationException("unrecognized pipeline type");
+        }
+        for (Response<String> resp : responses) {
+            if (!"OK".equals(resp.get())) {
+                failCount++;
+            }
+        }
+        return failCount == 0 ? CacheResult.SUCCESS_WITHOUT_MSG :
+                failCount == map.size() ? CacheResult.FAIL_WITHOUT_MSG : CacheResult.PART_SUCCESS_WITHOUT_MSG;
     }
 
     @Override
