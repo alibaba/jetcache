@@ -791,6 +791,11 @@ public abstract class AbstractCacheTest {
 
             @Override
             public Object apply(Object k) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 if ((keyPrefix + "1").equals(k)) {
                     // fail 2 times
                     if (count1.getAndIncrement() <= 1) {
