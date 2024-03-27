@@ -774,6 +774,12 @@ public abstract class AbstractCacheTest {
         cache.config().setPenetrationProtectTimeout(oldTime);
     }
 
+    /**
+     * This unit test case verifies that for a single key, only one thread can enter.
+     *
+     * @param cache
+     * @throws Exception
+     */
     private static void penetrationProtectTestWithComputeIfAbsent(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtect_";
 
@@ -789,12 +795,12 @@ public abstract class AbstractCacheTest {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                if ((keyPrefix + "1").equals(k)) {
+                if ((keyPrefix + "0").equals(k)) {
                     // fail 2 times
                     if (count1.getAndIncrement() <= 1) {
                         throw new RuntimeException("mock error");
                     }
-                } else if ((keyPrefix + "2").equals(k)) {
+                } else if ((keyPrefix + "1").equals(k)) {
                     // fail 3 times
                     if (count2.getAndIncrement() <= 2) {
                         throw new RuntimeException("mock error");
@@ -812,7 +818,8 @@ public abstract class AbstractCacheTest {
         for (int i = 0; i < threadCount; i++) {
             final int index = i;
             Thread t = new Thread(() -> {
-                String key = keyPrefix + (index % 3);
+                // use the lowest bit
+                String key = keyPrefix + (index & 1);
                 try {
                     Object o = cache.computeIfAbsent(key, loader);
                     if (!o.equals(key + "_V")) {
@@ -831,12 +838,12 @@ public abstract class AbstractCacheTest {
         countDownLatch.await();
 
         Assert.assertFalse(fail.get());
-        Assert.assertEquals(3, loadSuccess.get());
+        Assert.assertEquals(2, loadSuccess.get());
+        // the rest of the threads will fail 5 times only.
         Assert.assertEquals(2 + 3, getFailCount.get());
 
         cache.remove(keyPrefix + "0");
         cache.remove(keyPrefix + "1");
-        cache.remove(keyPrefix + "2");
     }
 
     private static void penetrationProtectTestWithLoadingCache(Cache cache) throws Exception {
