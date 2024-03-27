@@ -81,7 +81,7 @@ public abstract class AbstractCacheTest {
 
         asyncTest();
 
-        penetrationProtectTestWrapper(cache);
+        penetrationProtectTest(cache);
     }
 
     private void illegalArgTest() {
@@ -745,38 +745,45 @@ public abstract class AbstractCacheTest {
 
     }
 
-    private static void penetrationProtectTestWrapper(Cache cache) throws Exception {
+    private static void penetrationProtectTestWrapper(Cache cache, CheckedConsumer<Cache> testFunc) throws Exception {
         boolean oldPenetrationProtect = cache.config().isCachePenetrationProtect();
         Duration oldTime = cache.config().getPenetrationProtectTimeout();
-        cache.config().setCachePenetrationProtect(true);
+        long oldExpireAfterWriteInMillis = cache.config().getExpireAfterWriteInMillis();
+        long oldExpireAfterAccessInMillis = cache.config().getExpireAfterAccessInMillis();
 
-        penetrationProtectTest(cache);
+        cache.config().setCachePenetrationProtect(true);
+        cache.config().setPenetrationProtectTimeout(null);
+        cache.config().setExpireAfterWriteInMillis(Integer.MAX_VALUE);
+        cache.config().setExpireAfterAccessInMillis(Integer.MAX_VALUE);
+
+        testFunc.accept(cache);
 
         cache.config().setCachePenetrationProtect(oldPenetrationProtect);
         cache.config().setPenetrationProtectTimeout(oldTime);
+        cache.config().setExpireAfterWriteInMillis(oldExpireAfterWriteInMillis);
+        cache.config().setExpireAfterAccessInMillis(oldExpireAfterAccessInMillis);
     }
 
     public static void penetrationProtectTest(Cache cache) throws Exception {
-        boolean oldPenetrationProtect = cache.config().isCachePenetrationProtect();
-        Duration oldTime = cache.config().getPenetrationProtectTimeout();
-        cache.config().setCachePenetrationProtect(true);
+        penetrationProtectTestWrapper(cache, AbstractCacheTest::penetrationProtectTestWithComputeIfAbsent);
 
-        penetrationProtectTestWithComputeIfAbsent(cache);
         if (cache instanceof LoadingCache) {
-            penetrationProtectTestWithLoadingCache(cache);
+            penetrationProtectTestWrapper(cache, AbstractCacheTest::penetrationProtectTestWithLoadingCache);
         }
 
-        penetrationProtectReEntryTest(cache);
+        penetrationProtectTestWrapper(cache, AbstractCacheTest::penetrationProtectReEntryTest);
 
-        penetrationProtectTimeoutTest(cache);
-
-        cache.config().setCachePenetrationProtect(oldPenetrationProtect);
-        cache.config().setPenetrationProtectTimeout(oldTime);
+        penetrationProtectTestWrapper(cache, AbstractCacheTest::penetrationProtectTimeoutTest);
     }
 
+    /**
+     * This unit test case verifies that for a single key, only one thread can enter.
+     *
+     * @param cache
+     * @throws Exception
+     */
     private static void penetrationProtectTestWithComputeIfAbsent(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtect_";
-
         AtomicInteger loadSuccess = new AtomicInteger(0);
         Function loader = new Function() {
             private AtomicInteger count1 = new AtomicInteger(0);
@@ -832,11 +839,12 @@ public abstract class AbstractCacheTest {
 
         Assert.assertFalse(fail.get());
         Assert.assertEquals(3, loadSuccess.get());
+        // the rest of the threads will fail 5 times only.
         Assert.assertEquals(2 + 3, getFailCount.get());
 
-        cache.remove(keyPrefix + "0");
-        cache.remove(keyPrefix + "1");
-        cache.remove(keyPrefix + "2");
+        Assert.assertTrue(cache.remove(keyPrefix + "0"));
+        Assert.assertTrue(cache.remove(keyPrefix + "1"));
+        Assert.assertTrue(cache.remove(keyPrefix + "2"));
     }
 
     private static void penetrationProtectTestWithLoadingCache(Cache cache) throws Exception {
@@ -995,5 +1003,10 @@ public abstract class AbstractCacheTest {
         // 9. verify only the first and the third threads were executed, and verify PenetrationProtect didn't expire.
         Assert.assertEquals(2, loadSuccess.intValue());
         Assert.assertTrue(LONG_PROTECT_DURATION.compareTo(duration.get()) > 0);
+    }
+
+    @FunctionalInterface
+    interface CheckedConsumer<T> {
+        void accept(T t) throws Exception;
     }
 }
