@@ -23,9 +23,11 @@ import redis.clients.jedis.commands.KeyBinaryCommands;
 import redis.clients.jedis.commands.StringBinaryCommands;
 import redis.clients.jedis.commands.StringPipelineBinaryCommands;
 import redis.clients.jedis.params.SetParams;
+import redis.clients.jedis.providers.ClusterConnectionProvider;
 import redis.clients.jedis.util.Pool;
 
 import java.io.Closeable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,6 +51,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
 
     Function<Object, byte[]> valueEncoder;
     Function<byte[], Object> valueDecoder;
+    ClusterConnectionProvider provider = null;
 
     private static ThreadLocalRandom random = ThreadLocalRandom.current();
 
@@ -83,6 +86,18 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         }
         if (config.isExpireAfterAccess()) {
             throw new CacheConfigException("expireAfterAccess is not supported");
+        }
+        UnifiedJedis jedis = config.getJedis();
+        if (jedis != null && jedis instanceof JedisCluster) {
+            try {
+                Field field = UnifiedJedis.class.getDeclaredField("provider");
+                boolean accessible = field.isAccessible();
+                field.setAccessible(true);
+                provider = (ClusterConnectionProvider) field.get(jedis);
+                field.setAccessible(accessible);
+            } catch (Exception ex) {
+                throw new IllegalStateException("can not get ConnectionProvider from JedisClient", ex);
+            }
         }
     }
 
@@ -282,13 +297,13 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             commands = (StringBinaryCommands) writeCommands();
             StringPipelineBinaryCommands pipeline;
-            // JedisPooled, JedisCluster 都是用到连接池的连接，需要还回去
+            // The connection from JedisPooled or JedisCluster needs to be returned to the pool.
             if (commands instanceof JedisPooled) {
                 Connection connection = ((JedisPooled) commands).getPool().getResource();
                 closeable = connection;
                 pipeline = new Pipeline(connection);
             } else if (commands instanceof JedisCluster) {
-                ClusterPipeline clusterPipeline = new ClusterPipeline(config.getProvider());
+                ClusterPipeline clusterPipeline = new ClusterPipeline(provider);
                 closeable = clusterPipeline;
                 pipeline = clusterPipeline;
             } else if (commands instanceof Jedis) {
