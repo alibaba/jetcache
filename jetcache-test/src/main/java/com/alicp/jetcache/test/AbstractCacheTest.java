@@ -490,7 +490,6 @@ public abstract class AbstractCacheTest {
             try (AutoReleaseLock lock = cache.tryLock("LockKeyAndRunKey", 1, TimeUnit.SECONDS)) {
                 Assert.assertNotNull(lock);
             }
-            ;
         }
     }
 
