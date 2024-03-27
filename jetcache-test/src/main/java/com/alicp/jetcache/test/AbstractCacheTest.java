@@ -790,11 +790,8 @@ public abstract class AbstractCacheTest {
 
             @Override
             public Object apply(Object k) {
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+                // There are a total of 7 threads that can enter, prefix_0 can enter 3 times, prefix_1 can enter 4 times,
+                // and the rest of them will be return cached value.
                 if ((keyPrefix + "0").equals(k)) {
                     // fail 2 times
                     if (count1.getAndIncrement() <= 1) {
