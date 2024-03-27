@@ -783,6 +783,16 @@ public abstract class AbstractCacheTest {
     private static void penetrationProtectTestWithComputeIfAbsent(Cache cache) throws Exception {
         String keyPrefix = "penetrationProtect_";
 
+        boolean oldPenetrationProtect = cache.config().isCachePenetrationProtect();
+        Duration oldTime = cache.config().getPenetrationProtectTimeout();
+        long expireAfterWriteInMillis = cache.config().getExpireAfterWriteInMillis();
+        long expireAfterAccessInMillis = cache.config().getExpireAfterAccessInMillis();
+
+        cache.config().setCachePenetrationProtect(true);
+        cache.config().setPenetrationProtectTimeout(null);
+        cache.config().setExpireAfterWriteInMillis(Integer.MAX_VALUE);
+        cache.config().setExpireAfterAccessInMillis(Integer.MAX_VALUE);
+
         AtomicInteger loadSuccess = new AtomicInteger(0);
         Function loader = new Function() {
             private AtomicInteger count1 = new AtomicInteger(0);
@@ -790,14 +800,12 @@ public abstract class AbstractCacheTest {
 
             @Override
             public Object apply(Object k) {
-                // There are a total of 7 threads that can enter, prefix_0 can enter 3 times, prefix_1 can enter 4 times,
-                // and the rest of them will be return cached value.
-                if ((keyPrefix + "0").equals(k)) {
+                if ((keyPrefix + "1").equals(k)) {
                     // fail 2 times
                     if (count1.getAndIncrement() <= 1) {
                         throw new RuntimeException("mock error");
                     }
-                } else if ((keyPrefix + "1").equals(k)) {
+                } else if ((keyPrefix + "2").equals(k)) {
                     // fail 3 times
                     if (count2.getAndIncrement() <= 2) {
                         throw new RuntimeException("mock error");
@@ -815,8 +823,7 @@ public abstract class AbstractCacheTest {
         for (int i = 0; i < threadCount; i++) {
             final int index = i;
             Thread t = new Thread(() -> {
-                // use the lowest bit
-                String key = keyPrefix + (index & 1);
+                String key = keyPrefix + (index % 3);
                 try {
                     Object o = cache.computeIfAbsent(key, loader);
                     if (!o.equals(key + "_V")) {
@@ -835,12 +842,18 @@ public abstract class AbstractCacheTest {
         countDownLatch.await();
 
         Assert.assertFalse(fail.get());
-        Assert.assertEquals(2, loadSuccess.get());
+        Assert.assertEquals(3, loadSuccess.get());
         // the rest of the threads will fail 5 times only.
         Assert.assertEquals(2 + 3, getFailCount.get());
 
-        cache.remove(keyPrefix + "0");
-        cache.remove(keyPrefix + "1");
+        Assert.assertTrue(cache.remove(keyPrefix + "0"));
+        Assert.assertTrue(cache.remove(keyPrefix + "1"));
+        Assert.assertTrue(cache.remove(keyPrefix + "3"));
+
+        cache.config().setCachePenetrationProtect(oldPenetrationProtect);
+        cache.config().setPenetrationProtectTimeout(oldTime);
+        cache.config().setExpireAfterWriteInMillis(expireAfterWriteInMillis);
+        cache.config().setExpireAfterAccessInMillis(expireAfterAccessInMillis);
     }
 
     private static void penetrationProtectTestWithLoadingCache(Cache cache) throws Exception {
