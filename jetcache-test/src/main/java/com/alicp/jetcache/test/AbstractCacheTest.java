@@ -848,7 +848,7 @@ public abstract class AbstractCacheTest {
 
         Assert.assertTrue(cache.remove(keyPrefix + "0"));
         Assert.assertTrue(cache.remove(keyPrefix + "1"));
-        Assert.assertTrue(cache.remove(keyPrefix + "3"));
+        Assert.assertTrue(cache.remove(keyPrefix + "2"));
 
         cache.config().setCachePenetrationProtect(oldPenetrationProtect);
         cache.config().setPenetrationProtectTimeout(oldTime);
