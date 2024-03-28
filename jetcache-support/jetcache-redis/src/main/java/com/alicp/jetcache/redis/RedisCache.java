@@ -223,10 +223,16 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         StringBinaryCommands readCommands = (StringBinaryCommands) readCommands();
         ArrayList<K> keyList = new ArrayList<K>(keys);
         byte[][] newKeys = keyList.stream().map(this::buildKey).toArray(byte[][]::new);
-        if (!(readCommands instanceof JedisCluster)) {
-            List<byte[]> mget = readCommands.mget(newKeys);
-            this.getAllResultAssemble(keyList, mget, resultMap);
+        try {
+            if (!(readCommands instanceof JedisCluster)) {
+                List<byte[]> mgetResults = readCommands.mget(newKeys);
+                this.getAllResultAssemble(keyList, mgetResults, resultMap);
+            }
+        } catch (Exception ex) {
+            logError("GET_ALL", "keys(" + keys.size() + ")", ex);
+            return new MultiGetResult<K, V>(ex);
         }
+
         return this.<StringBinaryCommands, StringPipelineBinaryCommands, MultiGetResult<K, V>>doWithPipeline(readCommands, (pipeline, ex) -> {
             if (ex != null) {
                 logError("GET_ALL", "keys(" + keys.size() + ")", ex);
@@ -244,7 +250,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                 responseList.add(response);
             }
 
-            //TODO this seems ugly
             sync(pipeline);
 
             List<byte[]> collect = responseList.stream().map(Response::get).collect(Collectors.toList());
@@ -319,7 +324,6 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             responses.add(resp);
         }
 
-        //TODO this seems ugly
         sync(pipeline);
 
         for (Response<String> resp : responses) {
@@ -366,10 +370,16 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         // define the result object early to gain statefulFunction feature.
         byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
         KeyBinaryCommands writeCommands = (KeyBinaryCommands) writeCommands();
-        if (!(writeCommands instanceof JedisCluster)) {
-            writeCommands.del(newKeys);
-            return CacheResult.SUCCESS_WITHOUT_MSG;
+        try {
+            if (!(writeCommands instanceof JedisCluster)) {
+                writeCommands.del(newKeys);
+                return CacheResult.SUCCESS_WITHOUT_MSG;
+            }
+        } catch (Exception ex) {
+            logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
+            return new CacheResult(ex);
         }
+
         AtomicLong x = new AtomicLong();
         return this.<KeyBinaryCommands, KeyPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, (pipeline, ex) -> {
             if (ex != null) {
