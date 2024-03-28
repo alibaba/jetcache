@@ -1,5 +1,8 @@
-
-> Redis 有多种 Java 版本的客户端，JetCache 2.2 以前使用 Jedis 客户端访问 Redis。从 JetCache 2.2 版本开始，增加了对 Lettuce 客户端的支持，JetCache 的 Lettuce 支持提供了异步操作和 Redis 集群支持。
+> [!NOTE]  
+> Redis 有多种 Java 版本的客户端:
+> - JetCache 2.2 以前使用 Jedis 客户端访问 Redis。
+> - 从 JetCache 2.2 版本开始，增加了对 Lettuce 客户端的支持，JetCache 的 Lettuce 支持提供了异步操作和 Redis 集群支持。
+> - 从 JetCache 2.7 版本开始，增加了对 Redisson 客户端的支持。
 
 如果选用 Lettuce 访问 Redis，对应的 Maven Artifact 是 `jetcache-redis-lettuce` 和 `jetcache-starter-redis-lettuce`。lettuce 使用 Netty 建立并复用单个连接实现 redis 的通信，因此无须配置连接池。
 
@@ -89,7 +92,7 @@ public class JetCacheConfig {
 }
 ```
 
-# builder API
+# Builder API
 如果不通过@CreateCache和@Cached注解，可以通过下面的方式创建Cache。通过注解创建的缓存会自动设置keyPrefix，这里是手工创建缓存，对于远程缓存需要设置keyPrefix属性，以免不同Cache实例的key发生冲突。
 ```java
 RedisClient client = RedisClient.create("redis://127.0.0.1");
