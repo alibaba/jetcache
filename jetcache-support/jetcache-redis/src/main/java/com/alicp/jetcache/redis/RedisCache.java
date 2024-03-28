@@ -221,19 +221,8 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         // define the result object early to gain statefulFunction feature.
         Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
         StringBinaryCommands readCommands = (StringBinaryCommands) readCommands();
-        ArrayList<K> keyList = new ArrayList<K>(keys);
-        byte[][] newKeys = keyList.stream().map(this::buildKey).toArray(byte[][]::new);
-        try {
-            if (!(readCommands instanceof JedisCluster)) {
-                List<byte[]> mgetResults = readCommands.mget(newKeys);
-                this.getAllResultAssemble(keyList, mgetResults, resultMap);
-            }
-        } catch (Exception ex) {
-            logError("GET_ALL", "keys(" + keys.size() + ")", ex);
-            return new MultiGetResult<K, V>(ex);
-        }
 
-        return this.<StringBinaryCommands, StringPipelineBinaryCommands, MultiGetResult<K, V>>doWithPipeline(readCommands, (pipeline, ex) -> {
+        return this.<StringBinaryCommands, StringPipelineBinaryCommands, MultiGetResult<K, V>>doWithPipeline(readCommands, false, (pipeline, ex) -> {
             if (ex != null) {
                 logError("GET_ALL", "keys(" + keys.size() + ")", ex);
                 if (!resultMap.isEmpty()) {
@@ -242,19 +231,25 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                     return new MultiGetResult<K, V>(ex);
                 }
             }
+            ArrayList<K> keyList = new ArrayList<K>(keys);
+            byte[][] newKeys = keyList.stream().map(this::buildKey).toArray(byte[][]::new);
+            List<byte[]> results;
+            if (pipeline != null) {
+                List<Response<byte[]>> responseList = new ArrayList<>();
+                // Which is faster between pipeline.get or Jedis.mget()?
+                for (byte[] newKey : newKeys) {
+                    Response<byte[]> response = pipeline.get(newKey);
+                    responseList.add(response);
+                }
 
-            List<Response<byte[]>> responseList = new ArrayList<>();
-            // Which is faster between pipeline.get or Jedis.mget()?
-            for (byte[] newKey : newKeys) {
-                Response<byte[]> response = pipeline.get(newKey);
-                responseList.add(response);
+                sync(pipeline);
+
+                results = responseList.stream().map(Response::get).collect(Collectors.toList());
+            } else {
+                results = readCommands.mget(newKeys);
             }
 
-            sync(pipeline);
-
-            List<byte[]> collect = responseList.stream().map(Response::get).collect(Collectors.toList());
-
-            return this.getAllResultAssemble(keyList, collect, resultMap);
+            return this.getAllResultAssemble(keyList, results, resultMap);
         });
     }
 
@@ -305,7 +300,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         }
         StringBinaryCommands writeCommands = (StringBinaryCommands) writeCommands();
-        return this.<StringBinaryCommands, StringPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, (pipeline, ex) -> {
+        return this.<StringBinaryCommands, StringPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, true, (pipeline, ex) -> {
             if (ex != null) {
                 logError("PUT_ALL", "map(" + map.size() + ")", ex);
                 return new CacheResult(ex);
@@ -367,21 +362,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null || keys.isEmpty()) {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         }
-        // define the result object early to gain statefulFunction feature.
-        byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
         KeyBinaryCommands writeCommands = (KeyBinaryCommands) writeCommands();
-        try {
-            if (!(writeCommands instanceof JedisCluster)) {
-                writeCommands.del(newKeys);
-                return CacheResult.SUCCESS_WITHOUT_MSG;
-            }
-        } catch (Exception ex) {
-            logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
-            return new CacheResult(ex);
-        }
-
         AtomicLong x = new AtomicLong();
-        return this.<KeyBinaryCommands, KeyPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, (pipeline, ex) -> {
+        return this.<KeyBinaryCommands, KeyPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, false, (pipeline, ex) -> {
             if (ex != null) {
                 logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
                 if (x.get() > 0) {
@@ -390,12 +373,19 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
                     return new CacheResult(ex);
                 }
             }
-            for (byte[] newKey : newKeys) {
-                pipeline.del(newKey);
-                x.getAndIncrement();
+            byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
+
+            if (pipeline != null) {
+                for (byte[] newKey : newKeys) {
+                    pipeline.del(newKey);
+                    x.getAndIncrement();
+                }
+
+                sync(pipeline);
+            } else {
+                writeCommands.del(newKeys);
             }
 
-            sync(pipeline);
             return CacheResult.SUCCESS_WITHOUT_MSG;
         });
     }
@@ -433,32 +423,34 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
      * - https://medium.com/@jychen7/redis-get-pipeline-vs-mget-6e41aeaecef
      * - https://stackoverflow.com/questions/73992769/redis-del-many-keys-vs-pipeline-are-both-non-blocking
      *
-     * @param client     redisClient
-     * @param biFunction callback
-     * @param <C>        client type
-     * @param <R>        result type
+     * @param client        redisClient
+     * @param pipelineFirst set as false when only want to use the pipeline on cluster clients.
+     * @param biFunction    callback
+     * @param <C>           client type
+     * @param <R>           result type
      * @return result
      */
     @SuppressWarnings("unchecked")
-    private <C, P, R> R doWithPipeline(C client, BiFunction<P, Exception, R> biFunction) {
+    private <C, P, R> R doWithPipeline(C client, boolean pipelineFirst, BiFunction<P, Exception, R> biFunction) {
         C commands = null;
         Closeable closeable = null;
         try {
             commands = client;
             P pipeline;
             // The connection from JedisPooled or JedisCluster needs to be returned to the pool.
-            if (commands instanceof JedisPooled) {
-                Connection connection = ((JedisPooled) commands).getPool().getResource();
-                closeable = connection;
-                pipeline = (P) new Pipeline(connection);
-            } else if (commands instanceof JedisCluster) {
+            if (commands instanceof JedisCluster) {
                 ClusterPipeline clusterPipeline = new ClusterPipeline(provider);
                 closeable = clusterPipeline;
                 pipeline = (P) clusterPipeline;
-            } else if (commands instanceof Jedis) {
+            } else if (commands instanceof JedisPooled && pipelineFirst) {
+                Connection connection = ((JedisPooled) commands).getPool().getResource();
+                closeable = connection;
+                pipeline = (P) new Pipeline(connection);
+            } else if (commands instanceof Jedis && pipelineFirst) {
                 pipeline = (P) new Pipeline((Jedis) commands);
             } else {
-                throw new IllegalArgumentException(String.format("unknown jedis client type, <%s>", commands.getClass().getName()));
+                // use the client rather than pipeline
+                pipeline = null;
             }
 
             return biFunction.apply(pipeline, null);
