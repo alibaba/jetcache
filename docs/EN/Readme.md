@@ -34,6 +34,7 @@ see *samples* directory of the repository.
 * Redis support (using either of bellows)
   * [Using jedis client](RedisWithJedis.md)
   * [Using lettuce client](RedisWithLettuce.md)
+  * [Using redisson client](RedisWithRedisson.md)
   * Spring data redis (document needed)
 * [In-memory ```Cache``` implements: LinkedHashMapCache and CaffeineCache](Embedded.md)
 * [Statistics](Stat.md)

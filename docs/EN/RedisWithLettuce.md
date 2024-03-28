@@ -1,6 +1,7 @@
-
-There are various client libraries for redis. JetCache support *jedis* and *lettuce*. 
-In JetCache, the lettuce client brings asynchronous access and cluster support. 
+> [!NOTE]  
+> There are various client libraries for redis:
+> JetCache support *jedis*, *lettuce* and *redisson*.
+> In JetCache, the lettuce client brings asynchronous access and cluster support.
 
 Add *jetcache-redis-lettuce* or *jetcache-starter-redis-lettuce*(spring boot) to *pom.xml* if you choose to using lettuce client.
 > Note: The groupId and java package name changed in lettuce5. *jetcache-redis-lettuce* and *jetcache-starter-redis-lettuce* support lettuce5, *jetcache-redis-lettuce4* and *jetcache-starter-redis-lettuce4* support lettuce4. 

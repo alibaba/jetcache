@@ -32,6 +32,7 @@ JetCache需要JDK1.8、Spring Framework4.0.8以上版本。Spring Boot为可选�
 * Redis支持(redis客户端任选一即可)
   * [使用jedis客户端连接redis](RedisWithJedis.md)
   * [使用lettuce客户端连接redis](RedisWithLettuce.md)
+  * [使用redisson客户端连接redis](RedisWithRedisson.md)
   * Spring data redis (文档待写)
 * [内存缓存```LinkedHashMapCache```和```CaffeineCache```](Embedded.md)
 * [统计](Stat.md)

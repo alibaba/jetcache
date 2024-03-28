@@ -1,7 +1,11 @@
+> [!NOTE]  
+> Redis 有多种 Java 版本的客户端:
+> - JetCache 2.2 以前使用 Jedis 客户端访问 Redis。
+> - 从 JetCache 2.2 版本开始，增加了对 Lettuce 客户端的支持，JetCache 的 Lettuce 支持提供了异步操作和 Redis 集群支持。
+> - 从 JetCache 2.7 版本开始，增加了对 Redisson 客户端的支持。
 
-redis有多种java版本的客户端，JetCache2.2以前使用jedis客户端访问redis。从JetCache2.2版本开始，增加了对luttece客户端的支持，jetcache的luttece支持提供了异步操作和redis集群支持。
+如果选用 Jedis 访问 Redis，对应的 Maven Artifact 是 `jetcache-redis` 和 `jetcache-starter-redis`(spring boot)。
 
-如果选用jedis访问redis，对应的maven artifact是jetcache-redis和jetcache-starter-redis(spring boot)。
 # spring boot环境下的jedis支持
 application.yml文件如下（这里省去了local相关的配置）：
 ```
@@ -68,7 +72,7 @@ public class JetCacheConfig {
 
         Map remoteBuilders = new HashMap();
         RedisCacheBuilder remoteCacheBuilder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKey2Convertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .broadcastChannel("projectA")
