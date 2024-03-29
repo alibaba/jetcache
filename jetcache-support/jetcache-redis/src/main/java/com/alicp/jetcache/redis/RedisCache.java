@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -219,9 +218,9 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         }
         // define the result object early to gain statefulFunction feature.
         Map<K, CacheGetResult<V>> resultMap = new HashMap<>();
-        StringBinaryCommands readCommands = (StringBinaryCommands) readCommands();
 
         try {
+            StringBinaryCommands readCommands = (StringBinaryCommands) readCommands();
             ArrayList<K> keyList = new ArrayList<K>(keys);
             byte[][] newKeys = keyList.stream().map(this::buildKey).toArray(byte[][]::new);
 
@@ -296,8 +295,8 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (map == null || map.isEmpty()) {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         }
-        StringBinaryCommands writeCommands = (StringBinaryCommands) writeCommands();
         try {
+            StringBinaryCommands writeCommands = (StringBinaryCommands) writeCommands();
             return this.<StringBinaryCommands, StringPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, true, pipeline -> {
                 int failCount = 0;
                 List<Response<String>> responses = new ArrayList<>();
@@ -356,17 +355,16 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         if (keys == null || keys.isEmpty()) {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         }
-        KeyBinaryCommands writeCommands = (KeyBinaryCommands) writeCommands();
-        AtomicLong x = new AtomicLong();
+        long[] count = new long[1];
         try {
+            KeyBinaryCommands writeCommands = (KeyBinaryCommands) writeCommands();
             byte[][] newKeys = keys.stream().map((k) -> buildKey(k)).toArray((len) -> new byte[keys.size()][]);
-
             return this.<KeyBinaryCommands, KeyPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, false, (pipeline) -> {
 
                 if (pipeline != null) {
                     for (byte[] newKey : newKeys) {
                         pipeline.del(newKey);
-                        x.getAndIncrement();
+                        count[0]++;
                     }
 
                     sync(pipeline);
@@ -378,7 +376,7 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             });
         } catch (Exception ex) {
             logError("REMOVE_ALL", "keys(" + keys.size() + ")", ex);
-            if (x.get() > 0) {
+            if (count[0] > 0) {
                 return new CacheResult(CacheResultCode.PART_SUCCESS, ex.toString());
             } else {
                 return new CacheResult(ex);
@@ -433,21 +431,20 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         Closeable closeable = null;
         try {
             commands = client;
-            P pipeline;
+            P pipeline = null;
             // The connection from JedisPooled or JedisCluster needs to be returned to the pool.
             if (commands instanceof JedisCluster) {
                 ClusterPipeline clusterPipeline = new ClusterPipeline(provider);
                 closeable = clusterPipeline;
                 pipeline = (P) clusterPipeline;
-            } else if (commands instanceof JedisPooled && pipelineFirst) {
-                Connection connection = ((JedisPooled) commands).getPool().getResource();
-                closeable = connection;
-                pipeline = (P) new Pipeline(connection);
-            } else if (commands instanceof Jedis && pipelineFirst) {
-                pipeline = (P) new Pipeline((Jedis) commands);
-            } else {
-                // use the client rather than pipeline
-                pipeline = null;
+            } else if (pipelineFirst) {
+                if (commands instanceof JedisPooled) {
+                    Connection connection = ((JedisPooled) commands).getPool().getResource();
+                    closeable = connection;
+                    pipeline = (P) new Pipeline(connection);
+                } else if (commands instanceof Jedis) {
+                    pipeline = (P) new Pipeline((Jedis) commands);
+                }
             }
 
             return function.apply(pipeline);
