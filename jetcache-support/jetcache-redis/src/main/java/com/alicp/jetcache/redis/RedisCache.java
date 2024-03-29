@@ -448,11 +448,15 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
      * - https://stackoverflow.com/questions/73992769/redis-del-many-keys-vs-pipeline-are-both-non-blocking
      *
      * @param client        redisClient
-     * @param pipelineFirst set as false when only want to use the pipeline on cluster clients.
-     * @param biFunction    callback
+     * @param pipelineFirst set as false when only want to use the pipeline on cluster clients,
+     *                      it won't create the pipeline on not cluster clients.
+     * @param operator      request function
+     * @param biFunction    result and exception callback
      * @param <C>           client type
+     * @param <P>           pipeline type
+     * @param <T>           raw-result type
      * @param <R>           result type
-     * @return result
+     * @return
      */
     @SuppressWarnings("unchecked")
     private <C, P, T, R> R doWithPipeline(C client, boolean pipelineFirst, Function<P, T> operator, BiFunction<T, Exception, R> biFunction) {
