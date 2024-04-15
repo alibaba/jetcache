@@ -10,11 +10,21 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>spring-boot-sample-codes</artifactId>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.alicp.jetcache</groupId>
+                <artifactId>jetcache-bom</artifactId>
+                <version>2.7.6-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>com.alicp.jetcache</groupId>
             <artifactId>jetcache-autoconfigure</artifactId>
-            <version>${jetcache.version}</version>
         </dependency>
     </dependencies>
 </project>

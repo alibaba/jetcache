@@ -4,6 +4,7 @@
         <artifactId>jetcache-parent</artifactId>
         <groupId>com.alicp.jetcache</groupId>
         <version>2.7.6-SNAPSHOT</version>
+        <relativePath>../jetcache-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
