@@ -33,7 +33,7 @@ jobs:
         cache: maven
     - name: Build with coveralls report
       if: ${{ env.cov_token != '' }}
-      run: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report -DrepoToken=${{ secrets.COV_TOKEN }} -Dtick=3
+      run: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test org.jacoco:jacoco-maven-plugin:0.8.8:report-aggregate coveralls:report -DrepoToken=${{ secrets.COV_TOKEN }} -Dtick=3
     - name: Build without coveralls report
       if: ${{ env.cov_token == '' }}
       run: mvn -B clean test

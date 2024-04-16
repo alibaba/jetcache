@@ -51,4 +51,34 @@
         <connection>scm:git:https://github.com/alibaba/jetcache.git</connection>
         <url>https://github.com/alibaba/jetcache</url>
     </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.8</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>4.3.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.3.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
 </project>
