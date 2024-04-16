@@ -10,6 +10,9 @@
     <packaging>pom</packaging>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
         <build-helper-maven-plugin.version>1.12</build-helper-maven-plugin.version>
         <maven-help-plugin.version>3.2.0</maven-help-plugin.version>
         <xml-maven-plugin.version>1.0.2</xml-maven-plugin.version>
