@@ -42,5 +42,5 @@ Spring Boot方式的配置支持都在jetcache-starter里面。
 
 # 修改版本号以便发布自己的snapshot版本
 ```
-mvn versions:set -DnewVersion=x.x.x-SNAPSHOT
+mvn versions:set -DnewVersion=x.x.x-SNAPSHOT -DprocessAllModules=true
 ```
