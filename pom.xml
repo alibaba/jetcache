@@ -6,7 +6,7 @@
     <groupId>com.alicp.jetcache</groupId>
     <artifactId>jetcache-build</artifactId>
     <packaging>pom</packaging>
-    <version>2.7.6-SNAPSHOT</version>
+    <version>2.7.6</version>
 
     <name>jetcache</name>
     <description>a Java cache abstraction which provides consistent use for various caching solutions</description>
