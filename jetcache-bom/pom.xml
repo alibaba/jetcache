@@ -6,7 +6,7 @@
 
     <groupId>com.alicp.jetcache</groupId>
     <artifactId>jetcache-bom</artifactId>
-    <version>2.7.6</version>
+    <version>2.7.7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>jetcache</name>
@@ -71,62 +71,62 @@
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-anno</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-anno-api</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-core</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-autoconfigure</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-starter-redis</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-starter-redis-lettuce</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-starter-redis-springdata</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-starter-redisson</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-redis</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-redis-lettuce</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-redis-springdata</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.alicp.jetcache</groupId>
                 <artifactId>jetcache-redisson</artifactId>
-                <version>2.7.6</version>
+                <version>2.7.7-SNAPSHOT</version>
             </dependency>
 
             <dependency>
