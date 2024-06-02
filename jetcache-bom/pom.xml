@@ -9,6 +9,30 @@
     <version>2.7.6</version>
     <packaging>pom</packaging>
 
+    <name>jetcache</name>
+    <description>a Java cache abstraction which provides consistent use for various caching solutions</description>
+    <url>https://github.com/alibaba/jetcache</url>
+    <inceptionYear>2013</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>huangli</name>
+            <email>areyouok@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/alibaba/jetcache.git</connection>
+        <url>https://github.com/alibaba/jetcache</url>
+    </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
