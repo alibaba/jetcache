@@ -64,18 +64,6 @@ public class ClassUtilTest {
         private double p8;
         private boolean p9;
 
-        // Constructor and getters/setters for all parameters
-        public Foo3Params(byte p2, short p3, char p4, int p5, long p6, float p7, double p8, boolean p9) {
-            this.p2 = p2;
-            this.p3 = p3;
-            this.p4 = p4;
-            this.p5 = p5;
-            this.p6 = p6;
-            this.p7 = p7;
-            this.p8 = p8;
-            this.p9 = p9;
-        }
-
         public byte getP2() {
             return p2;
         }
