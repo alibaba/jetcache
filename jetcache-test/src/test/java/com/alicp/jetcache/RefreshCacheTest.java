@@ -103,11 +103,11 @@ public class RefreshCacheTest extends AbstractCacheTest {
         getRefreshCache(cache).stopRefresh();
 
         count.set(0);
-        cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(stopRefreshAfterLastAccess);
+        cache.config().getRefreshPolicy().setRefreshIntervalMillis(stopRefreshAfterLastAccess);
         refreshCacheTest2(cache);
         getRefreshCache(cache).stopRefresh();
 
-        cache.config().getRefreshPolicy().setStopRefreshAfterLastAccessMillis(0);
+        cache.config().getRefreshPolicy().setRefreshIntervalMillis(0);
         vetoTest(cache);
         getRefreshCache(cache).stopRefresh();
 
@@ -126,7 +126,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
         cache.close();
 
         count.set(0);
-        builder.getConfig().getRefreshPolicy().stopRefreshAfterLastAccess(stopRefreshAfterLastAccess, TimeUnit.MILLISECONDS);
+        builder.getConfig().getRefreshPolicy().refreshIntervalMillis(stopRefreshAfterLastAccess, TimeUnit.MILLISECONDS);
         cache = builder.buildCache();
         refreshCacheTest2(cache);
         cache.close();
@@ -253,7 +253,7 @@ public class RefreshCacheTest extends AbstractCacheTest {
         DefaultCacheMonitor monitor = new DefaultCacheMonitor("test");
         cache.config().getMonitors().add(monitor);
         long refreshMillis = cache.config().getRefreshPolicy().getRefreshMillis();
-        long stopRefresh = cache.config().getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
+        long stopRefresh = cache.config().getRefreshPolicy().getRefreshIntervalMillis();
 
         Set s = new HashSet();
         s.add("refreshCacheTest2_K1");

@@ -242,7 +242,7 @@ public class RefreshCache<K, V> extends LoadingCache<K, V> {
                     return;
                 }
                 long now = System.currentTimeMillis();
-                long stopRefreshAfterLastAccessMillis = config.getRefreshPolicy().getStopRefreshAfterLastAccessMillis();
+                long stopRefreshAfterLastAccessMillis = config.getRefreshPolicy().getRefreshIntervalMillis();
                 if (stopRefreshAfterLastAccessMillis > 0) {
                     if (lastAccessTime + stopRefreshAfterLastAccessMillis < now) {
                         logger.debug("cancel refresh: {}", key);

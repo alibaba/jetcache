@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class RefreshPolicy implements Cloneable {
 
     private long refreshMillis;
-    private long stopRefreshAfterLastAccessMillis;
+    private long refreshIntervalMillis;
     private long refreshLockTimeoutMillis = 60 * 1000;
 
     public RefreshPolicy() {
@@ -22,8 +22,8 @@ public class RefreshPolicy implements Cloneable {
         return p;
     }
 
-    public RefreshPolicy stopRefreshAfterLastAccess(long time, TimeUnit timeUnit) {
-        this.stopRefreshAfterLastAccessMillis = timeUnit.toMillis(time);
+    public RefreshPolicy refreshIntervalMillis(long time, TimeUnit unit) {
+        this.refreshIntervalMillis = unit.toMillis(time);
         return this;
     }
 
@@ -49,12 +49,12 @@ public class RefreshPolicy implements Cloneable {
         this.refreshMillis = refreshMillis;
     }
 
-    public long getStopRefreshAfterLastAccessMillis() {
-        return stopRefreshAfterLastAccessMillis;
+    public long getRefreshIntervalMillis() {
+        return refreshIntervalMillis;
     }
 
-    public void setStopRefreshAfterLastAccessMillis(long stopRefreshAfterLastAccessMillis) {
-        this.stopRefreshAfterLastAccessMillis = stopRefreshAfterLastAccessMillis;
+    public void setRefreshIntervalMillis(long refreshIntervalMillis) {
+        this.refreshIntervalMillis = refreshIntervalMillis;
     }
 
     public long getRefreshLockTimeoutMillis() {
