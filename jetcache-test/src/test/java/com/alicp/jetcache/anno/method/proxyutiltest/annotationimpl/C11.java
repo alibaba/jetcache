@@ -1,4 +1,6 @@
-package com.alicp.jetcache.anno.method.interfaces;
+package com.alicp.jetcache.anno.method.proxyutiltest.annotationimpl;
+
+import com.alicp.jetcache.anno.method.interfaces.I11;
 
 public class C11 implements I11 {
     int count;
