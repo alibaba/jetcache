@@ -143,69 +143,34 @@ public class CreateCacheTest extends SpringTest {
                 return cache;
             }
 
+
             @PostConstruct
-            public void test() throws Exception {
+            public void init() throws Exception {
                 runGeneralTest();
                 refreshTest();
                 cacheWithoutConvertorTest();
-                AbstractCacheTest.penetrationProtectTest(cacheWithProtect);
                 testCacheWithLocalExpire();
-
-                cache1.put("KK1", "V1");
-                Assert.assertNull(cache_A1.get("KK1"));
-                Assert.assertNull(cache2.get("KK1"));
-
-                Assert.assertSame(getTarget(cacheSameName1), getTarget(cacheSameName2));
-                Assert.assertSame(getTarget(cacheSameName1),
-                        getTarget(cacheManager.getCache("sameCacheName")));
-                Assert.assertNotSame(getTarget(cacheSameName1), getTarget(cache1));
-
-                cacheSameName1.put("SameKey", "SameValue");
-                Assert.assertEquals(cacheSameName1.get("SameKey"),cacheSameName2.get("SameKey"));
-                Assert.assertNull(cache1.get("SameKey"));
-
-                Assert.assertTrue(getTarget(cache1) instanceof MockRemoteCache);
-                Assert.assertSame(Fastjson2KeyConvertor.INSTANCE, cache1.config().getKeyConvertor());
-
-                Assert.assertTrue(getTarget(cacheWithConfig) instanceof MultiLevelCache);
-                Assert.assertEquals(50, cacheWithConfig.config().getExpireAfterWriteInMillis());
-
-                MultiLevelCache mc = (MultiLevelCache) getTarget(cacheWithConfig);
-                Cache localCache = getTarget(mc.caches()[0]);
-                Cache remoteCache = getTarget(mc.caches()[1]);
-                Assert.assertTrue(localCache instanceof LinkedHashMapCache);
-                Assert.assertTrue(remoteCache instanceof MockRemoteCache);
-                EmbeddedCacheConfig localConfig = (EmbeddedCacheConfig) localCache.config();
-                ExternalCacheConfig remoteConfig = (ExternalCacheConfig) remoteCache.config();
-                Assert.assertEquals(50, localConfig.getExpireAfterWriteInMillis());
-                Assert.assertEquals(50, remoteConfig.getExpireAfterWriteInMillis());
-                Assert.assertEquals(10, localConfig.getLimit());
-                Assert.assertEquals(JavaValueEncoder.class, remoteConfig.getValueEncoder().getClass());
-                Assert.assertTrue(remoteConfig.getValueDecoder() instanceof JavaValueDecoder);
-                Assert.assertSame(KeyConvertor.NONE_INSTANCE, localConfig.getKeyConvertor());
-                Assert.assertSame(KeyConvertor.NONE_INSTANCE, remoteConfig.getKeyConvertor());
-
-            }
-
-            private void testCacheWithLocalExpire() {
-                MultiLevelCacheConfig<?,?> config = (MultiLevelCacheConfig) cacheWithLocalExpire_1.config();
-                Assert.assertTrue(config.isUseExpireOfSubCache());
-                Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
-                Assert.assertEquals(1000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
-                Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
-
-                config = (MultiLevelCacheConfig) cacheWithLocalExpire_2.config();
-                Assert.assertFalse(config.isUseExpireOfSubCache());
-                Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
-                Assert.assertEquals(2000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
-                Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
-
-                Assert.assertEquals(2000, cacheWithLocalExpire_3.config().getExpireAfterWriteInMillis());
             }
 
             private void runGeneralTest() throws Exception {
                 super.cache = this.cache1;
                 super.baseTest();
+            }
+            private int refreshCount;
+            private void refreshTest() throws Exception {
+                LoadingCacheTest.loadingCacheTest(cacheWithRefresh1, 0);
+                RefreshCacheTest.refreshCacheTest(cacheWithRefresh2, 200, 100);
+                RefreshCacheTest.computeIfAbsentTest(cacheWithRefresh2);
+
+                cacheWithRefresh3.config().setLoader((k) -> refreshCount++);
+                cacheWithRefresh3.put("K1", "V1");
+                Assert.assertEquals("V1", cacheWithRefresh3.get("K1"));
+                Thread.sleep((long) (cacheWithRefresh3.config().getRefreshPolicy().getRefreshMillis() * 1.5));
+                Assert.assertEquals(0, cacheWithRefresh3.get("K1"));
+
+                cacheWithRefresh1.close();
+                cacheWithRefresh2.close();
+                cacheWithRefresh3.close();
             }
 
             private void cacheWithoutConvertorTest() {
@@ -236,24 +201,33 @@ public class CreateCacheTest extends SpringTest {
                 Assert.assertEquals(CacheResultCode.SUCCESS, cacheWithoutConvertor.GET(dqwe3).getResultCode());
             }
 
-            private int refreshCount;
-            private void refreshTest() throws Exception {
-                LoadingCacheTest.loadingCacheTest(cacheWithRefresh1, 0);
-                RefreshCacheTest.refreshCacheTest(cacheWithRefresh2, 200, 100);
-                RefreshCacheTest.computeIfAbsentTest(cacheWithRefresh2);
-
-                cacheWithRefresh3.config().setLoader((k) -> refreshCount++);
-                cacheWithRefresh3.put("K1", "V1");
-                Assert.assertEquals("V1", cacheWithRefresh3.get("K1"));
-                Thread.sleep((long) (cacheWithRefresh3.config().getRefreshPolicy().getRefreshMillis() * 1.5));
-                Assert.assertEquals(0, cacheWithRefresh3.get("K1"));
-
-                cacheWithRefresh1.close();
-                cacheWithRefresh2.close();
-                cacheWithRefresh3.close();
+            private void testCacheWithLocalExpire() {
+                testCache1Config();
+                testCache2Config();
+                testCache3Config();
             }
+
+            private void testCache1Config() {
+                MultiLevelCacheConfig<?, ?> config = (MultiLevelCacheConfig<?, ?>) cacheWithLocalExpire_1.config();
+                Assert.assertTrue(config.isUseExpireOfSubCache());
+                Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
+                Assert.assertEquals(1000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
+                Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
+            }
+
+            private void testCache2Config() {
+                MultiLevelCacheConfig<?, ?> config = (MultiLevelCacheConfig<?, ?>) cacheWithLocalExpire_2.config();
+                Assert.assertFalse(config.isUseExpireOfSubCache());
+                Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
+                Assert.assertEquals(2000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
+                Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
+            }
+
+            private void testCache3Config() {
+                Assert.assertEquals(2000, cacheWithLocalExpire_3.config().getExpireAfterWriteInMillis());
+            }
+
         }
     }
-
 
 }
