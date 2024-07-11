@@ -42,49 +42,61 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
 
     @Override
     public Object invoke(final MethodInvocation invocation) throws Throwable {
+        initializeDependencies();
+
+        if (globalCacheConfig == null || !globalCacheConfig.isEnableMethodCache()) {
+            return invocation.proceed();
+        }
+
+        if (!initializeCacheManager()) {
+            return invocation.proceed();
+        }
+
+        CacheInvokeConfig cac = getCacheInvokeConfig(invocation);
+
+        if (cac == null || cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
+            return invocation.proceed();
+        }
+
+        return handleCacheInvocation(invocation, cac);
+    }
+
+    private void initializeDependencies() {
         if (configProvider == null) {
             configProvider = applicationContext.getBean(ConfigProvider.class);
         }
         if (configProvider != null && globalCacheConfig == null) {
             globalCacheConfig = configProvider.getGlobalCacheConfig();
         }
-        if (globalCacheConfig == null || !globalCacheConfig.isEnableMethodCache()) {
-            return invocation.proceed();
-        }
+    }
+
+    private boolean initializeCacheManager() {
         if (cacheManager == null) {
             cacheManager = applicationContext.getBean(CacheManager.class);
             if (cacheManager == null) {
                 logger.error("There is no cache manager instance in spring context");
-                return invocation.proceed();
+                return false;
             }
         }
+        return true;
+    }
 
+    private CacheInvokeConfig getCacheInvokeConfig(final MethodInvocation invocation) {
         Method method = invocation.getMethod();
         Object obj = invocation.getThis();
         CacheInvokeConfig cac = null;
         if (obj != null) {
             String key = CachePointcut.getKey(method, obj.getClass());
-            cac  = cacheConfigMap.getByMethodInfo(key);
+            cac = cacheConfigMap.getByMethodInfo(key);
         }
+        return cac;
+    }
 
-        /*
-        if(logger.isTraceEnabled()){
-            logger.trace("JetCacheInterceptor invoke. foundJetCacheConfig={}, method={}.{}(), targetClass={}",
-                    cac != null,
-                    method.getDeclaringClass().getName(),
-                    method.getName(),
-                    invocation.getThis() == null ? null : invocation.getThis().getClass().getName());
-        }
-        */
-
-        if (cac == null || cac == CacheInvokeConfig.getNoCacheInvokeConfigInstance()) {
-            return invocation.proceed();
-        }
-
+    private Object handleCacheInvocation(final MethodInvocation invocation, CacheInvokeConfig cac) throws Throwable {
         CacheInvokeContext context = configProvider.newContext(cacheManager).createCacheInvokeContext(cacheConfigMap);
         context.setTargetObject(invocation.getThis());
         context.setInvoker(invocation::proceed);
-        context.setMethod(method);
+        context.setMethod(invocation.getMethod());
         context.setArgs(invocation.getArguments());
         context.setCacheInvokeConfig(cac);
         context.setHiddenPackages(globalCacheConfig.getHiddenPackages());
