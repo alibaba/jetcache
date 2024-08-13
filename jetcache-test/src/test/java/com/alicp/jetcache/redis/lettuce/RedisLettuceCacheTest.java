@@ -140,7 +140,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
 
         LoadingCacheTest.loadingCacheTest(MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
                 .expireAfterWrite(5000, TimeUnit.MILLISECONDS)
-                .addCache(l1Cache, l2Cache), 50);
+                .addCache(l1Cache, l2Cache), 20);
 
         LettuceConnectionManager.defaultManager().removeAndClose(client);
     }
@@ -165,7 +165,7 @@ public class RedisLettuceCacheTest extends AbstractExternalCacheTest {
                 .keyConvertor(FastjsonKeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
-                .keyPrefix(new Random().nextInt() + ""), 50);
+                .keyPrefix(new Random().nextInt() + ""), 20);
 
         cache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
                 .redisClient(client)

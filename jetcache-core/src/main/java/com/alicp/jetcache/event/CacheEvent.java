@@ -4,6 +4,7 @@
 package com.alicp.jetcache.event;
 
 import com.alicp.jetcache.Cache;
+import com.alicp.jetcache.support.Epoch;
 
 /**
  * The CacheEvent is used in single JVM while CacheMessage used for distributed message.
@@ -11,6 +12,8 @@ import com.alicp.jetcache.Cache;
  * @author huangli
  */
 public class CacheEvent {
+
+    private final long epoch = Epoch.get();
 
     protected Cache cache;
 
@@ -22,4 +25,7 @@ public class CacheEvent {
         return cache;
     }
 
+    public long getEpoch() {
+        return epoch;
+    }
 }

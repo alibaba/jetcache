@@ -32,6 +32,7 @@ public class DefaultCacheMonitor implements CacheMonitor {
     private final ReentrantLock reentrantLock = new ReentrantLock();
     protected CacheStat cacheStat;
     private String cacheName;
+    private long epoch;
 
     public DefaultCacheMonitor(String cacheName) {
         if (cacheName == null) {
@@ -51,6 +52,8 @@ public class DefaultCacheMonitor implements CacheMonitor {
             cacheStat = new CacheStat();
             cacheStat.setStatStartTime(System.currentTimeMillis());
             cacheStat.setCacheName(cacheName);
+            Epoch.increment();
+            epoch = Epoch.get();
         }finally {
             reentrantLock.unlock();
         }
@@ -71,6 +74,9 @@ public class DefaultCacheMonitor implements CacheMonitor {
     public void afterOperation(CacheEvent event) {
         reentrantLock.lock();
         try {
+            if (event.getEpoch() < epoch) {
+                return;
+            }
             if (event instanceof CacheGetEvent) {
                 CacheGetEvent e = (CacheGetEvent) event;
                 afterGet(e.getMillis(), e.getKey(), e.getResult());

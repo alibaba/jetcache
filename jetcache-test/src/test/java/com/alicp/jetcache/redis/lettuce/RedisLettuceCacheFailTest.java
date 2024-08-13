@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -69,6 +70,16 @@ public class RedisLettuceCacheFailTest {
             BiFunction function = invoke.getArgument(0);
             Object resultData = function.apply(value, ex);
             return CompletableFuture.completedFuture(resultData);
+        });
+        when(redisFuture.handleAsync(any(), any())).thenAnswer((invoke) -> {
+            BiFunction function = invoke.getArgument(0);
+            Executor executor = invoke.getArgument(1);
+            CompletableFuture f = new CompletableFuture();
+            executor.execute(() -> {
+                Object resultData = function.apply(value, ex);
+                f.complete(resultData);
+            });
+            return f;
         });
         return redisFuture;
     }
