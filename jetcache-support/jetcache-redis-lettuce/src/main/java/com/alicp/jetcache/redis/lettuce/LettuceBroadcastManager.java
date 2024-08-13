@@ -85,7 +85,7 @@ public class LettuceBroadcastManager extends BroadcastManager {
             this.pubSubAdapter = new RedisPubSubAdapter<byte[], byte[]>() {
                 @Override
                 public void message(byte[] channel, byte[] message) {
-                    processNotification(message, config.getValueDecoder());
+                    JetCacheExecutor.defaultExecutor().execute(() -> processNotification(message, config.getValueDecoder()));
                 }
             };
             config.getPubSubConnection().addListener(this.pubSubAdapter);

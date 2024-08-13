@@ -80,7 +80,7 @@ public class TestUtil {
         int waitCount = 0;
         while (deadline - System.nanoTime() > 0) {
             try {
-                Thread.sleep(5);
+                Thread.sleep(1);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

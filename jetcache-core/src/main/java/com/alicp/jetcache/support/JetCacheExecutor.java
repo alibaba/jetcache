@@ -45,8 +45,8 @@ public class JetCacheExecutor {
                     t.setDaemon(true);
                     return t;
                 };
-                defaultExecutor = new ScheduledThreadPoolExecutor(
-                        1, tf, new ThreadPoolExecutor.DiscardPolicy());
+                int coreSize = Math.min(4, Runtime.getRuntime().availableProcessors());
+                defaultExecutor = new ScheduledThreadPoolExecutor(coreSize, tf);
             }
         }finally {
             reentrantLock.unlock();

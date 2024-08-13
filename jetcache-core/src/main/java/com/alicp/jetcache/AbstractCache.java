@@ -9,6 +9,7 @@ import com.alicp.jetcache.event.CachePutEvent;
 import com.alicp.jetcache.event.CacheRemoveAllEvent;
 import com.alicp.jetcache.event.CacheRemoveEvent;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.support.JetCacheExecutor;
 import com.alicp.jetcache.support.SquashedLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,10 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
     }
 
     public void notify(CacheEvent e) {
+        JetCacheExecutor.defaultExecutor().execute(() -> notify0(e));
+    }
+
+    private void notify0(CacheEvent e) {
         List<CacheMonitor> monitors = config().getMonitors();
         for (CacheMonitor m : monitors) {
             m.afterOperation(e);
@@ -87,10 +92,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_GET(key);
         }
-        result.future().thenRun(() -> {
-            CacheGetEvent event = new CacheGetEvent(this, System.currentTimeMillis() - t, key, result);
-            notify(event);
-        });
+        CacheGetEvent event = new CacheGetEvent(this, System.currentTimeMillis() - t, key, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
@@ -105,10 +108,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_GET_ALL(keys);
         }
-        result.future().thenRun(() -> {
-            CacheGetAllEvent event = new CacheGetAllEvent(this, System.currentTimeMillis() - t, keys, result);
-            notify(event);
-        });
+        CacheGetAllEvent event = new CacheGetAllEvent(this, System.currentTimeMillis() - t, keys, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
@@ -259,10 +260,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_PUT(key, value, expireAfterWrite, timeUnit);
         }
-        result.future().thenRun(() -> {
-            CachePutEvent event = new CachePutEvent(this, System.currentTimeMillis() - t, key, value, result);
-            notify(event);
-        });
+        CachePutEvent event = new CachePutEvent(this, System.currentTimeMillis() - t, key, value, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
@@ -277,10 +276,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_PUT_ALL(map, expireAfterWrite, timeUnit);
         }
-        result.future().thenRun(() -> {
-            CachePutAllEvent event = new CachePutAllEvent(this, System.currentTimeMillis() - t, map, result);
-            notify(event);
-        });
+        CachePutAllEvent event = new CachePutAllEvent(this, System.currentTimeMillis() - t, map, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
@@ -295,10 +292,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_REMOVE(key);
         }
-        result.future().thenRun(() -> {
-            CacheRemoveEvent event = new CacheRemoveEvent(this, System.currentTimeMillis() - t, key, result);
-            notify(event);
-        });
+        CacheRemoveEvent event = new CacheRemoveEvent(this, System.currentTimeMillis() - t, key, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
@@ -313,10 +308,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_REMOVE_ALL(keys);
         }
-        result.future().thenRun(() -> {
-            CacheRemoveAllEvent event = new CacheRemoveAllEvent(this, System.currentTimeMillis() - t, keys, result);
-            notify(event);
-        });
+        CacheRemoveAllEvent event = new CacheRemoveAllEvent(this, System.currentTimeMillis() - t, keys, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
@@ -331,10 +324,8 @@ public abstract class AbstractCache<K, V> implements Cache<K, V> {
         } else {
             result = do_PUT_IF_ABSENT(key, value, expireAfterWrite, timeUnit);
         }
-        result.future().thenRun(() -> {
-            CachePutEvent event = new CachePutEvent(this, System.currentTimeMillis() - t, key, value, result);
-            notify(event);
-        });
+        CachePutEvent event = new CachePutEvent(this, System.currentTimeMillis() - t, key, value, result);
+        result.future().thenRunAsync(() -> notify0(event), JetCacheExecutor.defaultExecutor());
         return result;
     }
 
