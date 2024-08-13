@@ -57,7 +57,8 @@ public class ConfigProviderTest {
         Assertions.assertTrue(MockRemoteCacheBuilder.isSubscribeStart());
         List<CacheMonitor> monitors = c.config().getMonitors();
         Assertions.assertEquals(2, monitors.size());
-        c.put("K1", "V1");
-        Assertions.assertEquals("K1", MockRemoteCacheBuilder.getLastPublishMessage().getKeys()[0]);
+        c.put("ConfigProviderTest_K1", "V1");
+        TestUtil.waitUtil(() -> MockRemoteCacheBuilder.getLastPublishMessage() != null);
+        Assertions.assertEquals("ConfigProviderTest_K1", MockRemoteCacheBuilder.getLastPublishMessage().getKeys()[0]);
     }
 }

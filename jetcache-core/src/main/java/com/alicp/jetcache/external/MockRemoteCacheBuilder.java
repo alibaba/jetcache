@@ -12,8 +12,8 @@ import com.alicp.jetcache.support.CacheMessage;
  */
 public class MockRemoteCacheBuilder<T extends ExternalCacheBuilder<T>> extends ExternalCacheBuilder<T> {
 
-    private static boolean subscribeStart;
-    private static CacheMessage lastPublishMessage;
+    private static volatile boolean subscribeStart;
+    private static volatile CacheMessage lastPublishMessage;
 
     public static class MockRemoteCacheBuilderImpl extends MockRemoteCacheBuilder<MockRemoteCacheBuilderImpl> {
     }
