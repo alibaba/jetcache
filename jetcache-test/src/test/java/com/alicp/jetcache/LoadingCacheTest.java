@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.alicp.jetcache.test.support.Tick.tick;
+
 /**
  * Created on 2017/5/24.
  *
@@ -34,9 +36,9 @@ public class LoadingCacheTest extends AbstractCacheTest {
         AtomicInteger count = new AtomicInteger(0);
         CacheLoader oldLoader = cache.config().getLoader();
         cache.config().setLoader((key) -> key + "_V" + count.getAndIncrement());
-        loadingCacheTestImpl(cache, waitMillis);
-        vetoTest(cache, waitMillis);
-        nullValueTest(cache, waitMillis);
+        loadingCacheTestImpl(cache, tick(waitMillis));
+        vetoTest(cache, tick(waitMillis));
+        nullValueTest(cache, tick(waitMillis));
         cache.config().setLoader(oldLoader);
     }
 
@@ -44,9 +46,9 @@ public class LoadingCacheTest extends AbstractCacheTest {
         AtomicInteger count = new AtomicInteger(0);
         builder.loader((key) -> key + "_V" + count.getAndIncrement());
         Cache cache = builder.buildCache();
-        loadingCacheTestImpl(cache, waitMillis);
-        vetoTest(cache, waitMillis);
-        nullValueTest(cache, waitMillis);
+        loadingCacheTestImpl(cache, tick(waitMillis));
+        vetoTest(cache, tick(waitMillis));
+        nullValueTest(cache, tick(waitMillis));
     }
 
     private static void vetoTest(Cache cache, long waitMillis) throws Exception {

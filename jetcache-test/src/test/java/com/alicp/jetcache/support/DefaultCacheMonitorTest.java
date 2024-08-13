@@ -3,7 +3,7 @@ package com.alicp.jetcache.support;
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.MultiLevelCache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
-import org.junit.Assert;
+import com.alicp.jetcache.test.anno.TestUtil;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.alicp.jetcache.test.anno.TestUtil.waitUtil;
 
 /**
  * Created on 2016/11/1.
@@ -27,93 +29,154 @@ public class DefaultCacheMonitorTest {
     }
 
     private static void basetest(Cache cache, DefaultCacheMonitor m) {
-        CacheStat oldStat = m.getCacheStat().clone();
-        cache.get("MONITOR_TEST_K1");
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.get("MONITOR_TEST_K1");
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetMissCount() + 1 == s.getGetMissCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.put("MONITOR_TEST_K1", "V1");
-        Assert.assertEquals(oldStat.getPutCount() + 1, m.getCacheStat().getPutCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.put("MONITOR_TEST_K1", "V1");
+            waitUtil(oldStat.getPutCount() + 1, () -> m.getCacheStat().getPutCount());
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.get("MONITOR_TEST_K1");
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetHitCount() + 1, m.getCacheStat().getGetHitCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.get("MONITOR_TEST_K1");
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetHitCount() + 1 == s.getGetHitCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.remove("MONITOR_TEST_K1");
-        Assert.assertEquals(oldStat.getRemoveCount() + 1, m.getCacheStat().getRemoveCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.remove("MONITOR_TEST_K1");
+            waitUtil(oldStat.getRemoveCount() + 1, () -> m.getCacheStat().getRemoveCount());
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.computeIfAbsent("MONITOR_TEST_K1", (k) -> null);
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
-        Assert.assertEquals(oldStat.getPutCount(), m.getCacheStat().getPutCount());
-        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
-        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.computeIfAbsent("MONITOR_TEST_K1", (k) -> null);
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetMissCount() + 1 == s.getGetMissCount()
+                        && oldStat.getPutCount() == s.getPutCount()
+                        && oldStat.getLoadCount() + 1 == s.getLoadCount()
+                        && oldStat.getLoadSuccessCount() + 1 == s.getLoadSuccessCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.computeIfAbsent("MONITOR_TEST_K1", (k) -> null, true);
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
-        Assert.assertEquals(oldStat.getPutCount() + 1, m.getCacheStat().getPutCount());
-        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
-        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.computeIfAbsent("MONITOR_TEST_K1", (k) -> null, true);
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetMissCount() + 1 == s.getGetMissCount()
+                        && oldStat.getPutCount() + 1 == s.getPutCount()
+                        && oldStat.getLoadCount() + 1 == s.getLoadCount()
+                        && oldStat.getLoadSuccessCount() + 1 == s.getLoadSuccessCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.get("MONITOR_TEST_K1");
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetHitCount() + 1, m.getCacheStat().getGetHitCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.get("MONITOR_TEST_K1");
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetHitCount() + 1 == s.getGetHitCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.remove("MONITOR_TEST_K1");
-        Assert.assertEquals(oldStat.getRemoveCount() + 1, m.getCacheStat().getRemoveCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.remove("MONITOR_TEST_K1");
+            waitUtil(oldStat.getRemoveCount() + 1, () -> m.getCacheStat().getRemoveCount());
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.computeIfAbsent("MONITOR_TEST_K2", (k) -> null, false, 10, TimeUnit.SECONDS);
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
-        Assert.assertEquals(oldStat.getPutCount(), m.getCacheStat().getPutCount());
-        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
-        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.computeIfAbsent("MONITOR_TEST_K2", (k) -> null, false, 10, TimeUnit.SECONDS);
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetMissCount() + 1 == s.getGetMissCount()
+                        && oldStat.getPutCount() == s.getPutCount()
+                        && oldStat.getLoadCount() + 1 == s.getLoadCount()
+                        && oldStat.getLoadSuccessCount() + 1 == s.getLoadSuccessCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.computeIfAbsent("MONITOR_TEST_K2", (k) -> null, true, 10, TimeUnit.SECONDS);
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
-        Assert.assertEquals(oldStat.getPutCount() + 1, m.getCacheStat().getPutCount());
-        Assert.assertEquals(oldStat.getLoadCount() + 1, m.getCacheStat().getLoadCount());
-        Assert.assertEquals(oldStat.getLoadSuccessCount() + 1, m.getCacheStat().getLoadSuccessCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.computeIfAbsent("MONITOR_TEST_K2", (k) -> null, true, 10, TimeUnit.SECONDS);
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetMissCount() + 1 == s.getGetMissCount()
+                        && oldStat.getPutCount() + 1 == s.getPutCount()
+                        && oldStat.getLoadCount() + 1 == s.getLoadCount()
+                        && oldStat.getLoadSuccessCount() + 1 == s.getLoadSuccessCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.get("MONITOR_TEST_K2");
-        Assert.assertEquals(oldStat.getGetCount() + 1, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetHitCount() + 1, m.getCacheStat().getGetHitCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.get("MONITOR_TEST_K2");
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 1 == s.getGetCount()
+                        && oldStat.getGetHitCount() + 1 == s.getGetHitCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.remove("MONITOR_TEST_K2");
-        Assert.assertEquals(oldStat.getRemoveCount() + 1, m.getCacheStat().getRemoveCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.remove("MONITOR_TEST_K2");
+            waitUtil(oldStat.getRemoveCount() + 1, () -> m.getCacheStat().getRemoveCount());
+        }
 
-        oldStat = m.getCacheStat().clone();
         Map map = new HashMap();
         map.put("MONITOR_TEST_multi_k1", "V1");
         map.put("MONITOR_TEST_multi_k2", "V2");
-        cache.putAll(map);
-        Assert.assertEquals(oldStat.getPutCount() + 2, m.getCacheStat().getPutCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            cache.putAll(map);
+            waitUtil(oldStat.getPutCount() + 2, () -> m.getCacheStat().getPutCount());
+        }
 
-        oldStat = m.getCacheStat().clone();
-        HashSet keys = new HashSet(map.keySet());
-        keys.add("MONITOR_TEST_multi_k3");
-        cache.getAll(keys);
-        Assert.assertEquals(oldStat.getGetCount() + 3, m.getCacheStat().getGetCount());
-        Assert.assertEquals(oldStat.getGetHitCount() + 2, m.getCacheStat().getGetHitCount());
-        Assert.assertEquals(oldStat.getGetMissCount() + 1, m.getCacheStat().getGetMissCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            HashSet keys = new HashSet(map.keySet());
+            keys.add("MONITOR_TEST_multi_k3");
+            cache.getAll(keys);
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getGetCount() + 3 == s.getGetCount()
+                        && oldStat.getGetHitCount() + 2 == s.getGetHitCount()
+                        && oldStat.getGetMissCount() + 1 == s.getGetMissCount();
+            });
+        }
 
-        oldStat = m.getCacheStat().clone();
-        cache.removeAll(keys);
-        Assert.assertEquals(oldStat.getRemoveCount() + 3, m.getCacheStat().getRemoveCount());
-        Assert.assertEquals(oldStat.getRemoveCount() + 3, m.getCacheStat().getRemoveSuccessCount());
+        {
+            CacheStat oldStat = m.getCacheStat();
+            HashSet keys = new HashSet(map.keySet());
+            cache.removeAll(keys);
+            waitUtil(() -> {
+                CacheStat s = m.getCacheStat();
+                return oldStat.getRemoveCount() + 2 == s.getRemoveCount()
+                        && oldStat.getRemoveSuccessCount() + 2 == s.getRemoveSuccessCount();
+            });
+        }
     }
 
     public static void testMonitor(Cache cache) {
