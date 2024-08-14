@@ -4,5 +4,5 @@ jdk:
 services:
   - docker
 before_install:
-  - docker-compose up -d
+  - docker compose up -d
 script: mvn -B -DjacocoReports=jetcache-test/target/site/jacoco-aggregate/jacoco.xml clean test jacoco:report-aggregate coveralls:report
