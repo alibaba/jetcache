@@ -13,7 +13,7 @@
 1.1 Run redis
     At first we run redis server using Docker, under jetcache directory, run:
 
-    docker-compose up
+    docker compose up
 
     This will run 1 redis server with 2 slaves, 3 sentinels, and 6 redis cluster node (3 masters, 3 slaves).
 
