@@ -65,25 +65,30 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         void cleanExpiredEntry() {
             Lock lock = readWriteLock.writeLock();
             lock.lock();
-            try{
-                for (Iterator it = entrySet().iterator(); it.hasNext();) {
+            long t = System.currentTimeMillis();
+            try {
+                for (Iterator it = entrySet().iterator(); it.hasNext(); ) {
                     Map.Entry en = (Map.Entry) it.next();
                     Object value = en.getValue();
-                    if (value != null && value instanceof CacheValueHolder) {
-                        CacheValueHolder h = (CacheValueHolder) value;
-                        if (System.currentTimeMillis() >= h.getExpireTime()) {
+                    if (value != null) {
+                        CacheValueHolder h;
+                        try {
+                            h = (CacheValueHolder) value;
+                        } catch (ClassCastException e) {
+                            // assert false
+                            logger.error("value of key " + en.getKey() + " is not a CacheValueHolder. type=" + value.getClass());
+                            it.remove();
+                            continue;
+                        }
+                        if (t >= h.getExpireTime()) {
                             it.remove();
                         }
                     } else {
                         // assert false
-                        if (value == null) {
-                            logger.error("key " + en.getKey() + " is null");
-                        } else {
-                            logger.error("value of key " + en.getKey() + " is not a CacheValueHolder. type=" + value.getClass());
-                        }
+                        logger.error("key " + en.getKey() + " is null");
                     }
                 }
-            }finally {
+            } finally {
                 lock.unlock();
             }
         }
