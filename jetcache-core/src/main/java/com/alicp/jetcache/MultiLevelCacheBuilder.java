@@ -40,6 +40,15 @@ public class MultiLevelCacheBuilder<T extends MultiLevelCacheBuilder<T>> extends
         getConfig().setCaches(caches);
     }
 
+    @Deprecated
+    public T useExpireOfSubCache(boolean useExpireOfSubCache) {
+        return self();
+    }
+
+    @Deprecated
+    public void setUseExpireOfSubCache(boolean useExpireOfSubCache) {
+    }
+
     @Override
     public T keyConvertor(Function<Object, Object> keyConvertor) {
         throw new UnsupportedOperationException("MultiLevelCache do not need a key convertor");

@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @author huangli
  */
 public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
+
     private Cache[] caches;
 
     private MultiLevelCacheConfig<K, V> config;
@@ -102,11 +103,11 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         long now = System.currentTimeMillis();
         if (now <= currentExpire) {
             /*
-            原来这里有两种情况：
-              - 如果 isUseExpireOfSubCache，那么让 Local 自己选择过期时间
-              - 如果为 false，那么选择远程的剩余时间作为过期时间
-            现在的代码，总是选择远程的剩余时间作为过期时间，但是增加了参数 isForce 来控制不能超过配置的本地缓存时间
-            而对于用户直接 PUT_EXPIRED 则允许此类操作
+            There are two situations here from the legacy version:
+              - if isUseExpireOfSubCache, let subordinate cache choose the expiration time by itself
+              - if not, choose the remaining time of the current cache as the expiration time
+            In the current version, the remaining time of the current cache is always chosen as the expiration time,
+            but a parameter isForce is added to control that it cannot exceed the expiration time that subordinate cache configured
              */
             long restTtl = currentExpire - now;
             if (restTtl > 0) {
@@ -172,7 +173,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (timeUnit == null) {
                 r = cache.PUT(key, value);
             } else {
-                // 只有 isForce = 用户强制 或者 expire <= 本地缓存时间 才会使用参数的 expire
+                // only use argument expiration time when user force and expiration minus than configuration
                 if (isForce || expire <= cache.config().getExpireAfterWriteInMillis()) {
                     r = cache.PUT(key, value, expire, timeUnit);
                 } else {
