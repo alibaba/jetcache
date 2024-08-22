@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
  * @author huangli
  */
 public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
-
     private Cache[] caches;
 
     private MultiLevelCacheConfig<K, V> config;
@@ -28,7 +27,6 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CacheConfig lastConfig = caches[caches.length - 1].config();
         config = new MultiLevelCacheConfig<>();
         config.setCaches(Arrays.asList(caches));
-        config.setExpireAfterWriteInMillis(lastConfig.getExpireAfterWriteInMillis());
         config.setCacheNullValue(lastConfig.isCacheNullValue());
     }
 
@@ -61,20 +59,14 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public CacheResult PUT(K key, V value) {
-        if (config.isUseExpireOfSubCache()) {
-            return PUT(key, value, 0, null);
-        } else {
-            return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
-        }
+        // let each level cache decide the expiration time
+        return PUT(key, value, 0, null);
     }
 
     @Override
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
-        if (config.isUseExpireOfSubCache()) {
-            return PUT_ALL(map, 0, null);
-        } else {
-            return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
-        }
+        // let each level cache decide the expiration time
+        return PUT_ALL(map, 0, null);
     }
 
     @Override
@@ -109,13 +101,16 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         long currentExpire = h.getExpireTime();
         long now = System.currentTimeMillis();
         if (now <= currentExpire) {
-            if(config.isUseExpireOfSubCache()){
-                PUT_caches(i, key, h.getValue(), 0, null);
-            } else {
-                long restTtl = currentExpire - now;
-                if (restTtl > 0) {
-                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
-                }
+            /*
+            原来这里有两种情况：
+              - 如果 isUseExpireOfSubCache，那么让 Local 自己选择过期时间
+              - 如果为 false，那么选择远程的剩余时间作为过期时间
+            现在的代码，总是选择远程的剩余时间作为过期时间，但是增加了参数 isForce 来控制不能超过配置的本地缓存时间
+            而对于用户直接 PUT_EXPIRED 则允许此类操作
+             */
+            long restTtl = currentExpire - now;
+            if (restTtl > 0) {
+                PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS,false);
             }
         }
     }
@@ -151,7 +146,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        return PUT_caches(caches.length, key, value, expireAfterWrite, timeUnit);
+        return PUT_caches(caches.length, key, value, expireAfterWrite, timeUnit, true);
     }
 
     @Override
@@ -169,7 +164,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         return new CacheResult(future);
     }
 
-    private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
+    private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit, boolean isForce) {
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
@@ -177,7 +172,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (timeUnit == null) {
                 r = cache.PUT(key, value);
             } else {
-                r = cache.PUT(key, value, expire, timeUnit);
+                // 只有 isForce = 用户强制 && expire <= 本地缓存时间 才会使用参数的 expire
+                if (isForce && expire <= cache.config().getExpireAfterWriteInMillis()) {
+                    r = cache.PUT(key, value, expire, timeUnit);
+                } else {
+                    r = cache.PUT(key, value);
+                }
             }
             future = combine(future, r);
         }

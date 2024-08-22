@@ -189,13 +189,11 @@ public class CreateCacheTest extends SpringTest {
 
             private void testCacheWithLocalExpire() {
                 MultiLevelCacheConfig<?,?> config = (MultiLevelCacheConfig) cacheWithLocalExpire_1.config();
-                Assert.assertTrue(config.isUseExpireOfSubCache());
                 Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
                 Assert.assertEquals(1000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
                 Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());
 
                 config = (MultiLevelCacheConfig) cacheWithLocalExpire_2.config();
-                Assert.assertFalse(config.isUseExpireOfSubCache());
                 Assert.assertEquals(2000, config.getExpireAfterWriteInMillis());
                 Assert.assertEquals(2000, config.getCaches().get(0).config().getExpireAfterWriteInMillis());
                 Assert.assertEquals(2000, config.getCaches().get(1).config().getExpireAfterWriteInMillis());

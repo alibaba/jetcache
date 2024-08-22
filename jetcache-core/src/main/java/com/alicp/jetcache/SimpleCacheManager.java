@@ -119,11 +119,9 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
             Cache remote = buildRemote(config);
 
 
-            boolean useExpireOfSubCache = config.getLocalExpire() != null;
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
                     .expireAfterWrite(remote.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                     .addCache(local, remote)
-                    .useExpireOfSubCache(useExpireOfSubCache)
                     .cacheNullValue(config.getCacheNullValue() != null ?
                             config.getCacheNullValue() : DEFAULT_CACHE_NULL_VALUE)
                     .buildCache();

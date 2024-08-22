@@ -40,15 +40,6 @@ public class MultiLevelCacheBuilder<T extends MultiLevelCacheBuilder<T>> extends
         getConfig().setCaches(caches);
     }
 
-    public T useExpireOfSubCache(boolean useExpireOfSubCache) {
-        getConfig().setUseExpireOfSubCache(useExpireOfSubCache);
-        return self();
-    }
-
-    public void setUseExpireOfSubCache(boolean useExpireOfSubCache) {
-        getConfig().setUseExpireOfSubCache(useExpireOfSubCache);
-    }
-
     @Override
     public T keyConvertor(Function<Object, Object> keyConvertor) {
         throw new UnsupportedOperationException("MultiLevelCache do not need a key convertor");
