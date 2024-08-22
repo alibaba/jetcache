@@ -172,8 +172,8 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (timeUnit == null) {
                 r = cache.PUT(key, value);
             } else {
-                // 只有 isForce = 用户强制 && expire <= 本地缓存时间 才会使用参数的 expire
-                if (isForce && expire <= cache.config().getExpireAfterWriteInMillis()) {
+                // 只有 isForce = 用户强制 或者 expire <= 本地缓存时间 才会使用参数的 expire
+                if (isForce || expire <= cache.config().getExpireAfterWriteInMillis()) {
                     r = cache.PUT(key, value, expire, timeUnit);
                 } else {
                     r = cache.PUT(key, value);
