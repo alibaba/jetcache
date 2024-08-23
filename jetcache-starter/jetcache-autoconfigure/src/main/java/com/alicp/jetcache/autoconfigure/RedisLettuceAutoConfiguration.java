@@ -112,6 +112,7 @@ public class RedisLettuceAutoConfiguration {
             LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
             m.init(client, connection);
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".connection", m.connection(client));
+            autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".pubSubConnection", m.pubSubConnection(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".commands", m.commands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".asyncCommands", m.asyncCommands(client));
             autoConfigureBeans.getCustomContainer().put(cacheAreaWithPrefix + ".reactiveCommands", m.reactiveCommands(client));
