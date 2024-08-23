@@ -49,11 +49,13 @@ public class LettuceConnectionManager {
     }
 
     public void init(AbstractRedisClient redisClient, StatefulConnection connection) {
-        map.computeIfAbsent(redisClient, key -> {
-            LettuceObjects lo = new LettuceObjects();
-            lo.connection = connection;
-            return lo;
-        });
+        LettuceObjects lettuceObjects = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
+        lettuceObjects.connection = connection;
+    }
+
+    public void init(AbstractRedisClient redisClient, StatefulRedisPubSubConnection pubSubConnection) {
+        LettuceObjects lettuceObjects = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
+        lettuceObjects.pubSubConnection = pubSubConnection;
     }
 
     public StatefulConnection connection(AbstractRedisClient redisClient) {
