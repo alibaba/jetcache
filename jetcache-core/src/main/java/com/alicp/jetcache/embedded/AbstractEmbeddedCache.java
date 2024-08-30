@@ -112,9 +112,6 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
             newKeyMap.put(buildKey(en.getKey()), cacheObject);
         }
         innerMap.putAllValues(newKeyMap);
-
-        final HashMap resultMap = new HashMap();
-        map.keySet().forEach((k) -> resultMap.put(k, CacheResultCode.SUCCESS));
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }
 
