@@ -28,6 +28,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CacheConfig lastConfig = caches[caches.length - 1].config();
         config = new MultiLevelCacheConfig<>();
         config.setCaches(Arrays.asList(caches));
+        config.setExpireAfterWriteInMillis(lastConfig.getExpireAfterWriteInMillis());
         config.setCacheNullValue(lastConfig.isCacheNullValue());
     }
 
@@ -60,14 +61,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public CacheResult PUT(K key, V value) {
-        // let each level cache decide the expiration time
-        return PUT(key, value, 0, null);
+        return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
-        // let each level cache decide the expiration time
-        return PUT_ALL(map, 0, null);
+        return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -111,7 +110,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
              */
             long restTtl = currentExpire - now;
             if (restTtl > 0) {
-                PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS,false);
+                PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -147,7 +146,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        return PUT_caches(caches.length, key, value, expireAfterWrite, timeUnit, true);
+        return PUT_caches(caches.length, key, value, expireAfterWrite, timeUnit);
     }
 
     @Override
@@ -165,7 +164,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         return new CacheResult(future);
     }
 
-    private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit, boolean isForce) {
+    private CacheResult PUT_caches(int lastIndex, K key, V value, long expire, TimeUnit timeUnit) {
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (int i = 0; i < lastIndex; i++) {
             Cache cache = caches[i];
@@ -173,12 +172,8 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (timeUnit == null) {
                 r = cache.PUT(key, value);
             } else {
-                // only use argument expiration time when user force and expiration minus than configuration
-                if (isForce || expire <= cache.config().getExpireAfterWriteInMillis()) {
-                    r = cache.PUT(key, value, expire, timeUnit);
-                } else {
-                    r = cache.PUT(key, value);
-                }
+                long useExpireTime = Math.min(expire, cache.config().getExpireAfterWriteInMillis());
+                r = cache.PUT(key, value, useExpireTime, timeUnit);
             }
             future = combine(future, r);
         }
