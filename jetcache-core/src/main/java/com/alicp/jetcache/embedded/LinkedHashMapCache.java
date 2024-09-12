@@ -9,8 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author huangli
@@ -48,8 +47,7 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
     final class LRUMap extends LinkedHashMap implements InnerMap {
 
         private final int max;
-//        private final Object lockObj;
-        private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+        private final ReentrantLock lock = new ReentrantLock();
 
         public LRUMap(int max) {
             super((int) (max * 1.4f), 0.75f, true);
@@ -63,7 +61,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         }
 
         void cleanExpiredEntry() {
-            Lock lock = readWriteLock.writeLock();
             lock.lock();
             long t = System.currentTimeMillis();
             try {
@@ -95,7 +92,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public Object getValue(Object key) {
-            Lock lock = readWriteLock.readLock();
             lock.lock();
             try{
                 return get(key);
@@ -106,7 +102,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public Map getAllValues(Collection keys) {
-            Lock lock = readWriteLock.readLock();
             lock.lock();
             Map values = new HashMap();
             try{
@@ -124,7 +119,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void putValue(Object key, Object value) {
-            Lock lock = readWriteLock.writeLock();
             lock.lock();
             try{
                 put(key, value);
@@ -135,7 +129,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void putAllValues(Map map) {
-            Lock lock = readWriteLock.writeLock();
             lock.lock();
             try{
                 Set<Map.Entry> set = map.entrySet();
@@ -149,7 +142,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public boolean removeValue(Object key) {
-            Lock lock = readWriteLock.writeLock();
             lock.lock();
             try{
                 return remove(key) != null;
@@ -160,7 +152,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
 
         @Override
         public void removeAllValues(Collection keys) {
-            Lock lock = readWriteLock.writeLock();
             lock.lock();
             try{
                 for (Object k : keys) {
@@ -174,7 +165,6 @@ public class LinkedHashMapCache<K, V> extends AbstractEmbeddedCache<K, V> {
         @Override
         @SuppressWarnings("unchecked")
         public boolean putIfAbsentValue(Object key, Object value) {
-            Lock lock = readWriteLock.writeLock();
             lock.lock();
             try{
                 CacheValueHolder h = (CacheValueHolder) get(key);
