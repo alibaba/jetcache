@@ -40,11 +40,13 @@ public class MultiLevelCacheBuilder<T extends MultiLevelCacheBuilder<T>> extends
         getConfig().setCaches(caches);
     }
 
+    @Deprecated
     public T useExpireOfSubCache(boolean useExpireOfSubCache) {
         getConfig().setUseExpireOfSubCache(useExpireOfSubCache);
         return self();
     }
 
+    @Deprecated
     public void setUseExpireOfSubCache(boolean useExpireOfSubCache) {
         getConfig().setUseExpireOfSubCache(useExpireOfSubCache);
     }
