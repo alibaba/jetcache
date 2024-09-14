@@ -8,6 +8,7 @@ import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.cluster.RedisClusterClient;
 import io.lettuce.core.cluster.api.StatefulRedisClusterConnection;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 import java.util.Collections;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class LettuceConnectionManager {
 
     private static class LettuceObjects {
         private StatefulConnection connection;
+        private StatefulRedisPubSubConnection pubSubConnection;
         private Object commands;
         private Object asyncCommands;
         private Object reactiveCommands;
@@ -47,11 +49,13 @@ public class LettuceConnectionManager {
     }
 
     public void init(AbstractRedisClient redisClient, StatefulConnection connection) {
-        map.computeIfAbsent(redisClient, key -> {
-            LettuceObjects lo = new LettuceObjects();
-            lo.connection = connection;
-            return lo;
-        });
+        LettuceObjects lettuceObjects = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
+        lettuceObjects.connection = connection;
+    }
+
+    public void init(AbstractRedisClient redisClient, StatefulRedisPubSubConnection pubSubConnection) {
+        LettuceObjects lettuceObjects = map.computeIfAbsent(redisClient, key -> new LettuceObjects());
+        lettuceObjects.pubSubConnection = pubSubConnection;
     }
 
     public StatefulConnection connection(AbstractRedisClient redisClient) {
@@ -67,6 +71,21 @@ public class LettuceConnectionManager {
         }
         return lo.connection;
     }
+
+    public StatefulRedisPubSubConnection pubSubConnection(AbstractRedisClient redisClient) {
+        LettuceObjects lo = getLettuceObjectsFromMap(redisClient);
+        if (lo.pubSubConnection == null) {
+            if (redisClient instanceof RedisClient) {
+                lo.pubSubConnection = ((RedisClient) redisClient).connectPubSub(new JetCacheCodec());
+            } else if (redisClient instanceof RedisClusterClient) {
+                lo.pubSubConnection = ((RedisClusterClient) redisClient).connectPubSub(new JetCacheCodec());
+            } else {
+                throw new CacheConfigException("type " + redisClient.getClass() + " is not supported");
+            }
+        }
+        return lo.pubSubConnection;
+    }
+
 
     public Object commands(AbstractRedisClient redisClient) {
         connection(redisClient);
@@ -132,6 +151,9 @@ public class LettuceConnectionManager {
         */
         if (lo.connection != null) {
             lo.connection.close();
+        }
+        if (lo.pubSubConnection != null){
+            lo.pubSubConnection.close();
         }
         redisClient.shutdown();
     }

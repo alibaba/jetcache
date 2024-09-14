@@ -5,6 +5,7 @@ import io.lettuce.core.api.StatefulConnection;
 import io.lettuce.core.cluster.api.async.RedisClusterAsyncCommands;
 import io.lettuce.core.cluster.api.reactive.RedisClusterReactiveCommands;
 import io.lettuce.core.cluster.api.sync.RedisClusterCommands;
+import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -35,7 +36,9 @@ public class LettuceFactory implements FactoryBean {
             key += ".client";
         } else if (StatefulConnection.class.isAssignableFrom(clazz)) {
             key += ".connection";
-        } else if (RedisClusterCommands.class.isAssignableFrom(clazz)) {
+        } else if (StatefulRedisPubSubConnection.class.isAssignableFrom(clazz)){
+            key += ".pubSubConnection";
+        }else if (RedisClusterCommands.class.isAssignableFrom(clazz)) {
             // RedisCommands extends RedisClusterCommands
             key += ".commands";
         } else if (RedisClusterAsyncCommands.class.isAssignableFrom(clazz)) {
