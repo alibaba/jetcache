@@ -25,19 +25,110 @@ public class ClassUtilTest {
 
     class C1 {
         public void foo() {
+            // Original foo method implementation
         }
 
         public String foo(I1 p) {
+            // Original foo method implementation with different parameter
             return null;
         }
 
         public String foo2(I1 p) {
+            // Original foo2 method implementation with different parameter
             return null;
         }
 
-        public void foo3(byte p2, short p3, char p4, int p5, long p6, float p7, double p8, boolean p9) {
+        // Refactored foo3 method using a parameter object
+        public void foo3(Foo3Params params) {
+            byte p2 = params.getP2();
+            short p3 = params.getP3();
+            char p4 = params.getP4();
+            int p5 = params.getP5();
+            long p6 = params.getP6();
+            float p7 = params.getP7();
+            double p8 = params.getP8();
+            boolean p9 = params.isP9();
+
+            // Method logic using parameters
         }
     }
+
+    // Parameter object for foo3 method
+    class Foo3Params {
+        private byte p2;
+        private short p3;
+        private char p4;
+        private int p5;
+        private long p6;
+        private float p7;
+        private double p8;
+        private boolean p9;
+
+        public byte getP2() {
+            return p2;
+        }
+
+        public void setP2(byte p2) {
+            this.p2 = p2;
+        }
+
+        public short getP3() {
+            return p3;
+        }
+
+        public void setP3(short p3) {
+            this.p3 = p3;
+        }
+
+        public char getP4() {
+            return p4;
+        }
+
+        public void setP4(char p4) {
+            this.p4 = p4;
+        }
+
+        public int getP5() {
+            return p5;
+        }
+
+        public void setP5(int p5) {
+            this.p5 = p5;
+        }
+
+        public long getP6() {
+            return p6;
+        }
+
+        public void setP6(long p6) {
+            this.p6 = p6;
+        }
+
+        public float getP7() {
+            return p7;
+        }
+
+        public void setP7(float p7) {
+            this.p7 = p7;
+        }
+
+        public double getP8() {
+            return p8;
+        }
+
+        public void setP8(double p8) {
+            this.p8 = p8;
+        }
+
+        public boolean isP9() {
+            return p9;
+        }
+
+        public void setP9(boolean p9) {
+            this.p9 = p9;
+        }
+    }
+
 
     @Test
     public void testGetAllInterfaces() throws Exception {

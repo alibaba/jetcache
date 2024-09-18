@@ -76,7 +76,7 @@ public class SimpleCacheManagerTest {
         RefreshPolicy rp = new RefreshPolicy();
         rp.setRefreshMillis(100);
         rp.setRefreshLockTimeoutMillis(200);
-        rp.setStopRefreshAfterLastAccessMillis(300);
+        rp.setRefreshIntervalMillis(300);
 
         Function keyConvertor = k -> k;
         Function valueEncoder = k -> k;
