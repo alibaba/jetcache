@@ -45,4 +45,11 @@ public @interface CacheInvalidate {
      * set multi to true indicates jetcache to invalidate each element of the iterable keys.
      */
     boolean multi() default CacheConsts.DEFAULT_MULTI;
+
+
+    /**
+     * If set to true, jetcache will delete all keys with the specified prefix.
+     * @return
+     */
+    boolean delByPrefix() default false;
 }

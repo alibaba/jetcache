@@ -119,6 +119,7 @@ public class CacheConfigUtil {
         cc.setCondition(anno.condition());
         cc.setMulti(anno.multi());
         cc.setDefineMethod(m);
+        cc.setDelByPrefix(anno.delByPrefix());
         return cc;
     }
 

@@ -22,6 +22,7 @@ public class CacheAnnoConfig {
     private Cache<?, ?> cache;
     private Method defineMethod;
 
+
     public String getArea() {
         return area;
     }

@@ -32,6 +32,7 @@ import java.util.function.Consumer;
         CaffeineAutoConfiguration.class,
         MockRemoteCacheAutoConfiguration.class,
         LinkedHashMapAutoConfiguration.class,
+        ConcurrentPatriciaTrieCacheAutoConfiguration.class,
         RedisLettuceAutoConfiguration.class,
         RedisSpringDataAutoConfiguration.class,
         RedissonAutoConfiguration.class})

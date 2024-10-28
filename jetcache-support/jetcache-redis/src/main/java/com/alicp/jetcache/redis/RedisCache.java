@@ -1,13 +1,6 @@
 package com.alicp.jetcache.redis;
 
-import com.alicp.jetcache.CacheConfig;
-import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.CacheException;
-import com.alicp.jetcache.CacheGetResult;
-import com.alicp.jetcache.CacheResult;
-import com.alicp.jetcache.CacheResultCode;
-import com.alicp.jetcache.CacheValueHolder;
-import com.alicp.jetcache.MultiGetResult;
+import com.alicp.jetcache.*;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +16,16 @@ import redis.clients.jedis.commands.KeyBinaryCommands;
 import redis.clients.jedis.commands.KeyPipelineBinaryCommands;
 import redis.clients.jedis.commands.StringBinaryCommands;
 import redis.clients.jedis.commands.StringPipelineBinaryCommands;
+import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.providers.ClusterConnectionProvider;
+import redis.clients.jedis.resps.ScanResult;
 import redis.clients.jedis.util.Pool;
 
 import java.io.Closeable;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -464,4 +454,38 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
         }
     }
 
+
+    /**
+     * If the specified key is not already associated with a value, associate it with the given value.
+     * delete  by prefix
+     *
+     * @param keyPrefix
+     * @return
+     */
+    @Override
+    public boolean delByPrefix(K keyPrefix) {
+        {
+            byte[] realKeyPrefix = buildKey(keyPrefix);
+            String keyPrefixStr = new String(realKeyPrefix, StandardCharsets.UTF_8);
+            keyPrefixStr = keyPrefixStr.endsWith("*") ? keyPrefixStr : keyPrefixStr + "*";
+            KeyBinaryCommands jedis = (KeyBinaryCommands) writeCommands();
+            try {
+                String cursor = "0";
+                ScanParams scanParams = new ScanParams();
+                do {
+                    scanParams.count(1000);
+                    scanParams.match(keyPrefixStr);
+                    ScanResult<byte[]> scan = jedis.scan(cursor.getBytes(StandardCharsets.UTF_8), scanParams);
+                    List<byte[]> result = scan.getResult();
+                    cursor = scan.getCursor();
+                    if (!result.isEmpty()) {
+                        jedis.del(result.toArray(new byte[result.size()][]));
+                    }
+                } while (!"0".equalsIgnoreCase(cursor));
+            } finally {
+                closeJedis(jedis);
+            }
+        }
+        return true;
+    }
 }
