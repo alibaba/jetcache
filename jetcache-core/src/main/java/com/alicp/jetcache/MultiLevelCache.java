@@ -1,11 +1,6 @@
 package com.alicp.jetcache;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +54,15 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         return config;
     }
 
+
+    public boolean delByPrefix(K keyPrefix) {
+        for (int i = 0; i < caches.length; i++) {
+            Cache c = caches[i];
+            (c).delByPrefix(keyPrefix);
+        }
+        return true;
+    }
+
     @Override
     public CacheResult PUT(K key, V value) {
         if (config.isUseExpireOfSubCache()) {
@@ -109,7 +113,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         long currentExpire = h.getExpireTime();
         long now = System.currentTimeMillis();
         if (now <= currentExpire) {
-            if(config.isUseExpireOfSubCache()){
+            if (config.isUseExpireOfSubCache()) {
                 PUT_caches(i, key, h.getValue(), 0, null);
             } else {
                 long restTtl = currentExpire - now;
@@ -159,7 +163,7 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         CompletableFuture<ResultData> future = CompletableFuture.completedFuture(null);
         for (Cache c : caches) {
             CacheResult r;
-            if(timeUnit == null) {
+            if (timeUnit == null) {
                 r = c.PUT_ALL(map);
             } else {
                 r = c.PUT_ALL(map, expireAfterWrite, timeUnit);

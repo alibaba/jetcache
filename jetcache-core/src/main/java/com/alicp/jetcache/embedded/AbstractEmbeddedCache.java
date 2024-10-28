@@ -59,7 +59,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
             lock.lock();
-            try{
+            try {
                 long accessTime = holder.getAccessTime();
                 if (config.isExpireAfterAccess()) {
                     long expireAfterAccess = config.getExpireAfterAccessInMillis();
@@ -68,7 +68,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
                     }
                 }
                 holder.setAccessTime(now);
-            }finally {
+            } finally {
                 lock.unlock();
             }
 
@@ -99,7 +99,7 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
-        CacheValueHolder<V> cacheObject = new CacheValueHolder(value ,timeUnit.toMillis(expireAfterWrite));
+        CacheValueHolder<V> cacheObject = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
         innerMap.putValue(buildKey(key), cacheObject);
         return CacheResult.SUCCESS_WITHOUT_MSG;
     }

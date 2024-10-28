@@ -13,6 +13,7 @@ import com.alicp.jetcache.anno.support.CacheInvalidateAnnoConfig;
 import com.alicp.jetcache.anno.support.CacheUpdateAnnoConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigMap;
+import com.alicp.jetcache.embedded.ConcurrentPatriciaTrieCache;
 import com.alicp.jetcache.event.CacheLoadEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -178,7 +173,12 @@ public class CacheHandler implements InvocationHandler {
         } else {
             cache.remove(key);
         }
+        // delByPrefix
+        if (annoConfig.isDelByPrefix()) {
+            (cache).delByPrefix(key);
+        }
     }
+
 
     private static void doUpdate(CacheInvokeContext context, CacheUpdateAnnoConfig updateAnnoConfig) {
         Cache cache = context.getCacheFunction().apply(context, updateAnnoConfig);

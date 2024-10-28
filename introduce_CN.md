@@ -133,8 +133,34 @@ Cache<String, Long> orderSumCache = RedisCacheBuilder.createRedisCacheBuilder()
 当前支持的缓存系统包括以下4个，而且要支持一种新的缓存也是非常容易的：
 * [Caffeine](https://github.com/ben-manes/caffeine)（基于本地内存）
 * LinkedHashMap（基于本地内存，JetCache自己实现的简易LRU缓存）
+* ConcurrentPatriciaTrieCache (基于本地内存，PatriciaTrie 实现的缓存前缀缓存，可根据前缀删除key)
 * Alibaba Tair（相关实现未在Github开源，在阿里内部Gitlab上可以找到）
-* Redis（含jedis、lettuce、spring-data、redisson几种访问方式）
+* Redis（含jedis、lettuce、spring-data、redisson几种访问方式，新增前缀删除能力）
+
+前缀删除demo
+```java
+
+@Cached(name = "cache-name1", key = "#req.tid+'-'+#req.pid + '-'+#request.param1",
+        localExpire = 900,
+        cacheType = CacheType.BOTH)
+public boolean getSomething01(Request request) {
+ return true;
+}
+
+@Cached(name = "cache-name2", key = "#req.tid+'-'+#req.pid + '-'+#request.param2",
+        localExpire = 900,
+        cacheType = CacheType.BOTH)
+public boolean getSomething02(Request request) {
+    return true;
+}
+
+@CacheInvalidate(name = "cache-name1", key = "#req.tid+'-'+#req.pid",delByPrefix = true)
+@CacheInvalidate(name = "cache-name2", key = "#req.tid+'-'+#req.pid",delByPrefix = true)
+public void delSomething(Request req) {}
+ //delByPrefix = true 代表删除所有以req.tid+'-'+#req.pid为前缀的key
+
+//调用delSomething 时会将cache-name1和cache-name2中以req.tid+'-'+#req.pid为前缀的key全部删除
+``` 
 
 
 使用JetCache的系统需求：

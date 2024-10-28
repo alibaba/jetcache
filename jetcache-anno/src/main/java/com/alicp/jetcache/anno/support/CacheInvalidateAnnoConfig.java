@@ -16,4 +16,14 @@ public class CacheInvalidateAnnoConfig extends CacheAnnoConfig {
     public void setMulti(boolean multi) {
         this.multi = multi;
     }
+
+    private boolean delByPrefix;
+
+    public boolean isDelByPrefix() {
+        return delByPrefix;
+    }
+
+    public void setDelByPrefix(boolean delByPrefix) {
+        this.delByPrefix = delByPrefix;
+    }
 }
