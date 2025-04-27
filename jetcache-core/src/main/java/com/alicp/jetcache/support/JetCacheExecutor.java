@@ -43,6 +43,15 @@ public class JetCacheExecutor {
                 ThreadFactory tf = r -> {
                     Thread t = new Thread(r, "JetCacheDefaultExecutor");
                     t.setDaemon(true);
+
+                    ClassLoader classLoader = JetCacheExecutor.class.getClassLoader();
+                    if (classLoader == null) {
+                        // This class was loaded by the Bootstrap ClassLoader,
+                        // so let's tie the thread's context ClassLoader to the System ClassLoader instead.
+                        classLoader = ClassLoader.getSystemClassLoader();
+                    }
+                    t.setContextClassLoader(classLoader);
+
                     return t;
                 };
                 int coreSize = Math.min(4, Runtime.getRuntime().availableProcessors());
