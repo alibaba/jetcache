@@ -17,7 +17,7 @@ public class JetCacheExecutor {
     protected volatile static ScheduledExecutorService heavyIOExecutor;
     private static final ReentrantLock reentrantLock = new ReentrantLock();
 
-    private static AtomicInteger threadCount = new AtomicInteger(0);
+    private static final AtomicInteger threadCount = new AtomicInteger(0);
 
     static {
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -73,6 +73,13 @@ public class JetCacheExecutor {
                 ThreadFactory tf = r -> {
                     Thread t = new Thread(r, "JetCacheHeavyIOExecutor" + threadCount.getAndIncrement());
                     t.setDaemon(true);
+                    ClassLoader classLoader = JetCacheExecutor.class.getClassLoader();
+                    if (classLoader == null) {
+                        // This class was loaded by the Bootstrap ClassLoader,
+                        // so let's tie the thread's context ClassLoader to the System ClassLoader instead.
+                        classLoader = ClassLoader.getSystemClassLoader();
+                    }
+                    t.setContextClassLoader(classLoader);
                     return t;
                 };
                 heavyIOExecutor = new ScheduledThreadPoolExecutor(
