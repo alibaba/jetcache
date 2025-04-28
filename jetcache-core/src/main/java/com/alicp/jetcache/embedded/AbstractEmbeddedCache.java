@@ -58,19 +58,19 @@ public abstract class AbstractEmbeddedCache<K, V> extends AbstractCache<K, V> {
         } else if (now >= holder.getExpireTime()) {
             return CacheGetResult.EXPIRED_WITHOUT_MSG;
         } else {
-            lock.lock();
-            try{
-                long accessTime = holder.getAccessTime();
-                if (config.isExpireAfterAccess()) {
+            if (config.isExpireAfterAccess()) {
+                lock.lock();
+                try {
+                    long accessTime = holder.getAccessTime();
                     long expireAfterAccess = config.getExpireAfterAccessInMillis();
                     if (now >= accessTime + expireAfterAccess) {
                         return CacheGetResult.EXPIRED_WITHOUT_MSG;
                     }
+                } finally {
+                    lock.unlock();
                 }
-                holder.setAccessTime(now);
-            }finally {
-                lock.unlock();
             }
+            holder.setAccessTime(now);
 
             return new CacheGetResult(CacheResultCode.SUCCESS, null, holder);
         }
