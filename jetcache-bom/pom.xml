@@ -47,11 +47,11 @@
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
         -->
 
-        <spring.framework.version>6.0.11</spring.framework.version>
-        <spring.boot.version>3.1.3</spring.boot.version>
-        <lettuce.version>6.2.6.RELEASE</lettuce.version>
+        <spring.framework.version>6.1.15</spring.framework.version>
+        <spring.boot.version>3.2.12</spring.boot.version>
+        <lettuce.version>6.3.2.RELEASE</lettuce.version>
 
-        <jedis.version>4.3.2</jedis.version>
+        <jedis.version>5.0.2</jedis.version>
         <redisson.version>3.18.0</redisson.version>
 
         <!--
