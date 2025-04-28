@@ -25,6 +25,8 @@
 
     docker run -it --rm --network host -v $HOME/.m2:/root/.m2 -v `pwd`:/usr/src/mymaven -w /usr/src/mymaven maven:3.9-eclipse-temurin-17 mvn clean test
 
+    You may need enable host networking mode in Docker Desktop, Settings - Resources - Network.
+
 1.2.c Run tests in Windows
 
     docker run -it --rm --network host -v /c/Users/hl_20/.m2:/root/.m2 -v /c/Users/hl_20/IdeaProjects/jetcache/jetcache:/usr/src/mymaven -w /usr/src/mymaven maven:3.9-eclipse-temurin-17 mvn clean test
