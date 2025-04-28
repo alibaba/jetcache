@@ -18,6 +18,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.lang.reflect.Method;
 
@@ -88,7 +89,16 @@ public class JetCacheInterceptor implements MethodInterceptor, ApplicationContex
         context.setArgs(invocation.getArguments());
         context.setCacheInvokeConfig(cac);
         context.setHiddenPackages(globalCacheConfig.getHiddenPackages());
-        return CacheHandler.invoke(context);
+        Class<?> returnType = invocation.getMethod().getReturnType();
+        Object result =  CacheHandler.invoke(context);
+        try{
+            Object typedResult = returnType.cast(result);
+            return typedResult;
+        }catch (ClassCastException e){
+            System.out.println("i am changed");
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.convertValue(result,returnType);
+        }
     }
 
     public void setCacheConfigMap(ConfigMap cacheConfigMap) {
