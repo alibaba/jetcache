@@ -6,7 +6,7 @@ jetcache tested with below spring/spring-boot versions
 | 2.5      | 4.0.8.RELEASE~5.1.1.RELEASE | 1.1.9.RELEASE~2.0.5.RELEASE ||
 | 2.6      | 5.0.4.RELEASE~5.2.4.RELEASE | 2.0.0.RELEASE~2.2.5.RELEASE | jetcache-redis depends on jedis3.1.0, spring-data(jedis, boot version<=2.1.X) depends on jedis2.9.3, can't used together |
 | 2.7      | 5.2.4.RELEASE~5.3.23        | 2.2.5.RELEASE~2.7.5         | jetcache-redis depends on jedis4, spring-data(jedis) depends on jedis3, can't used together                              |
-| 2.7.4      | 5.2.4.RELEASE~6.0.11        | 2.2.5.RELEASE~3.1.3         | |
+| 2.7.4      | 5.2.4.RELEASE~6.1.15        | 2.2.5.RELEASE~3.2.12        | |
 
 # compatible change notes
 ## 2.7.4
