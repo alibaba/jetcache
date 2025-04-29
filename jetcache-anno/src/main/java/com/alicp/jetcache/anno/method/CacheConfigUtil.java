@@ -81,7 +81,7 @@ public class CacheConfigUtil {
         TimeUnit t = cacheRefresh.timeUnit();
         policy.setRefreshMillis(t.toMillis(cacheRefresh.refresh()));
         if (!CacheConsts.isUndefined(cacheRefresh.stopRefreshAfterLastAccess())) {
-            policy.setStopRefreshAfterLastAccessMillis(t.toMillis(cacheRefresh.stopRefreshAfterLastAccess()));
+            policy.setRefreshIntervalMillis(t.toMillis(cacheRefresh.stopRefreshAfterLastAccess()));
         }
         if (!CacheConsts.isUndefined(cacheRefresh.refreshLockTimeout())) {
             policy.setRefreshLockTimeoutMillis(t.toMillis(cacheRefresh.refreshLockTimeout()));
