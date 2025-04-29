@@ -29,10 +29,12 @@ public class MultiLevelCacheConfig<K, V> extends CacheConfig<K, V> {
         this.caches = caches;
     }
 
+    @Deprecated
     public boolean isUseExpireOfSubCache() {
         return useExpireOfSubCache;
     }
 
+    @Deprecated
     public void setUseExpireOfSubCache(boolean useExpireOfSubCache) {
         this.useExpireOfSubCache = useExpireOfSubCache;
     }

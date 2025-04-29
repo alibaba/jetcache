@@ -61,20 +61,12 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
 
     @Override
     public CacheResult PUT(K key, V value) {
-        if (config.isUseExpireOfSubCache()) {
-            return PUT(key, value, 0, null);
-        } else {
-            return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
-        }
+        return PUT(key, value, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
     public CacheResult PUT_ALL(Map<? extends K, ? extends V> map) {
-        if (config.isUseExpireOfSubCache()) {
-            return PUT_ALL(map, 0, null);
-        } else {
-            return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
-        }
+        return PUT_ALL(map, config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -109,13 +101,16 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
         long currentExpire = h.getExpireTime();
         long now = System.currentTimeMillis();
         if (now <= currentExpire) {
-            if(config.isUseExpireOfSubCache()){
-                PUT_caches(i, key, h.getValue(), 0, null);
-            } else {
-                long restTtl = currentExpire - now;
-                if (restTtl > 0) {
-                    PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
-                }
+            /*
+            There are two situations here from the legacy version:
+              - if isUseExpireOfSubCache, let subordinate cache choose the expiration time by itself
+              - if not, choose the remaining time of the current cache as the expiration time
+            In the current version, the remaining time of the current cache is always chosen as the expiration time,
+            but a parameter isForce is added to control that it cannot exceed the expiration time that subordinate cache configured
+             */
+            long restTtl = currentExpire - now;
+            if (restTtl > 0) {
+                PUT_caches(i, key, h.getValue(), restTtl, TimeUnit.MILLISECONDS);
             }
         }
     }
@@ -177,7 +172,8 @@ public class MultiLevelCache<K, V> extends AbstractCache<K, V> {
             if (timeUnit == null) {
                 r = cache.PUT(key, value);
             } else {
-                r = cache.PUT(key, value, expire, timeUnit);
+                long useExpireTime = Math.min(expire, cache.config().getExpireAfterWriteInMillis());
+                r = cache.PUT(key, value, useExpireTime, timeUnit);
             }
             future = combine(future, r);
         }

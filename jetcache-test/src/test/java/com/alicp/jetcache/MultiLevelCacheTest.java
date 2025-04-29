@@ -169,7 +169,6 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
     private void testUseExpireOfSubCache() throws Exception {
         long oldExpire = l1Cache.config().getExpireAfterWriteInMillis();
-        ((MultiLevelCacheConfig<Object, Object>)cache.config()).setUseExpireOfSubCache(true);
         l1Cache.config().setExpireAfterWriteInMillis(15);
 
         cache.put("useSubExpire_key", "V1");
@@ -194,7 +193,6 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         Assert.assertNull(l1Cache.get("useSubExpire_key"));
         cache.remove("useSubExpire_key");
 
-        ((MultiLevelCacheConfig<Object, Object>)cache.config()).setUseExpireOfSubCache(false);
         l1Cache.config().setExpireAfterAccessInMillis(oldExpire);
     }
 
