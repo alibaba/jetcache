@@ -47,7 +47,7 @@
         <lettuce.version>6.1.10.RELEASE</lettuce.version>
         -->
 
-        <spring.framework.version>6.1.15</spring.framework.version>
+        <spring.framework.version>6.1.20</spring.framework.version>
         <spring.boot.version>3.2.12</spring.boot.version>
         <lettuce.version>6.3.2.RELEASE</lettuce.version>
 
