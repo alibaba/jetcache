@@ -52,7 +52,7 @@
         <lettuce.version>6.3.2.RELEASE</lettuce.version>
 
         <jedis.version>5.0.2</jedis.version>
-        <redisson.version>3.18.0</redisson.version>
+        <redisson.version>3.44.0</redisson.version>
 
         <!--
         <spring.framework.version>5.2.4.RELEASE</spring.framework.version>
