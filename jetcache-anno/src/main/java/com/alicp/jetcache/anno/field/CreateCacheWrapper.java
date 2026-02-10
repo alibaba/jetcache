@@ -70,10 +70,10 @@ class CreateCacheWrapper {
         cac.setLocalLimit(ann.localLimit());
         cac.setSerialPolicy(ann.serialPolicy());
         cac.setKeyConvertor(ann.keyConvertor());
+        cac.setExternalWriteInterceptors(ann.externalWriteInterceptors());
 
         cac.setRefreshPolicy(refreshPolicy);
         cac.setPenetrationProtectConfig(protectConfig);
-
         String cacheName = cac.getName();
         if (CacheConsts.isUndefined(cacheName)) {
             String[] hiddenPackages = globalCacheConfig.getHiddenPackages();

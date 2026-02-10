@@ -87,15 +87,17 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
     }
 
     protected void executeWriteInterceptors(K key, V value, byte[] keyBytes, byte[] valueBytes,
-                                   long expireAfterWrite, TimeUnit timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op op) {
+                                            long expireAfterWrite, TimeUnit timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op op) {
         ExternalCacheWriteInterceptor.WriteContext<K, V> ctx = new ExternalCacheWriteInterceptor.WriteContext<>(
-                this, key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit,op);
+                this, key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, op);
         executeWriteInterceptors(ctx);
     }
 
     private void executeWriteInterceptors(ExternalCacheWriteInterceptor.WriteContext<K, V> ctx) {
         List<ExternalCacheWriteInterceptor> list = config.getWriteInterceptors();
-        if (list == null || list.isEmpty()) return;
+        if (list == null || list.isEmpty()) {
+            return;
+        }
 
         for (ExternalCacheWriteInterceptor it : list) {
             it.intercept(ctx);

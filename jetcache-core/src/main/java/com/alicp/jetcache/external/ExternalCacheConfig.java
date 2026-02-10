@@ -70,8 +70,10 @@ public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
         this.writeInterceptors = writeInterceptors;
     }
 
-    public void  addWriteInterceptor(ExternalCacheWriteInterceptor interceptor) {
-        if (interceptor == null) return;
+    public void addWriteInterceptor(ExternalCacheWriteInterceptor interceptor) {
+        if (interceptor == null) {
+            return;
+        }
         this.writeInterceptors.add(interceptor);
     }
 }
