@@ -7,6 +7,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.template.QuickConfig;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+
+import java.util.List;
 
 /**
  * @author huangli
@@ -114,6 +117,15 @@ public class CacheContext {
             b.penetrationProtectTimeout(ppc.getPenetrationProtectTimeout());
         }
         b.refreshPolicy(cac.getRefreshPolicy());
+        if (!CacheConsts.isUndefined(cac.getExternalWriteInterceptors())) {
+            if (cac.getCacheType() == CacheType.LOCAL) {
+                logger.warn("externalWriteInterceptors is configured but cacheType is LOCAL, " +
+                        "externalWriteInterceptors only works for REMOTE or BOTH cache types. Ignoring externalWriteInterceptors.");
+            } else if (configProvider instanceof SpringConfigProvider) {
+                SpringConfigProvider springConfigProvider = (SpringConfigProvider) configProvider;
+                b.externalWriteInterceptors(springConfigProvider.parseWriteInterceptors(cac.getExternalWriteInterceptors()));
+            }
+        }
         return cacheManager.getOrCreateCache(b.build());
     }
 

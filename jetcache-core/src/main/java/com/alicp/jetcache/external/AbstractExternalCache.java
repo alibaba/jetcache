@@ -7,6 +7,8 @@ import com.alicp.jetcache.RefreshCache;
 import com.alicp.jetcache.anno.KeyConvertor;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created on 2016/10/8.
@@ -83,5 +85,22 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
         }
         return true;
     }
+
+    protected void executeWriteInterceptors(K key, V value, byte[] keyBytes, byte[] valueBytes,
+                                   long expireAfterWrite, TimeUnit timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op op) {
+        ExternalCacheWriteInterceptor.WriteContext<K, V> ctx = new ExternalCacheWriteInterceptor.WriteContext<>(
+                this, key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit,op);
+        executeWriteInterceptors(ctx);
+    }
+
+    private void executeWriteInterceptors(ExternalCacheWriteInterceptor.WriteContext<K, V> ctx) {
+        List<ExternalCacheWriteInterceptor> list = config.getWriteInterceptors();
+        if (list == null || list.isEmpty()) return;
+
+        for (ExternalCacheWriteInterceptor it : list) {
+            it.intercept(ctx);
+        }
+    }
+
 
 }

@@ -42,6 +42,7 @@ private Cache<Long, UserDO> userCache;
 |localLimit|undefined|Specify max elements in local memory when ```cacheType``` is CacheType.LOCAL or CacheType.BOTH. Use global config if the attribute value is absent, and if the global config is not defined either, use 100.|
 |serialPolicy|undefined|Specify the serialization policy of remote cache when ```cacheType``` is CacheType.REMOTE or CacheType.BOTH. The JetCache build-in ```serialPolicy``` are SerialPolicy.JAVA or SerialPolicy.KRYO. Use global config if the attribute value is absent, and if the global config is not defined either, use ```SerialPolicy.JAVA```.|
 |keyConvertor|undefined|Specify the key convertor. Used to convert the complex key object. The JetCache build-in ```keyConvertor``` are KeyConvertor.FASTJSON or KeyConvertor.NONE. NONE indicate do not convert, FASTJSON will use fastjson to convert key object to a string. Use global config if the attribute value is absent.|
+|externalWriteInterceptors|undefined|Specify the list of external cache write interceptors. Only effective when ```cacheType``` is REMOTE or BOTH.|
 
 # Default values
 There are some attributes in the above table has no default value. JetCache will use global config value when you not specify the value in annotation.

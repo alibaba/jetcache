@@ -23,6 +23,7 @@ jetcache:
       broadcastChannel: projectA
       valueEncoder: java #其他可选：kryo/kryo5
       valueDecoder: java #其他可选：kryo/kryo5
+      externalWriteInterceptors: bean:loggingInterceptor
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -59,6 +60,7 @@ jetcache:
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | 无穷大                         | 以毫秒为单位指定超时时间的全局配置(以前为defaultExpireInMillis)                                                                                                                                                           |
 | jetcache.remote.${area}.broadcastChannel | 无                           | jetcahe2.7的两级缓存支持更新以后失效其他JVM中的local cache，但多个服务共用redis同一个channel可能会造成广播风暴，需要在这里指定channel，你可以决定多个不同的服务是否共用同一个channel。如果没有指定则不开启。                                                                       |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0                           | 需要jetcache2.2以上，以毫秒为单位，指定多长时间没有访问，就让缓存失效，当前只有本地缓存支持。0表示不使用这个功能。                                                                                                                                       |
+| jetcache.remote.${area}.externalWriteInterceptors | 无                           | 指定外部缓存写入拦截器，使用 `bean:` 前缀引用 Spring Bean 名称，多个用逗号分隔。例如：`bean:loggingInterceptor,bean:auditInterceptor`。                                                                                                  |
 
 上表中${area}对应@Cached和@CreateCache的area属性。注意如果注解上没有指定area，默认值是"default"。
 

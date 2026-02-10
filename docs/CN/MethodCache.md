@@ -37,6 +37,7 @@ key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framewo
 |cacheNullValue|false|当方法返回值为null的时候是否要缓存|
 |condition|未定义|使用[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)指定条件，如果表达式返回true的时候才去缓存中查询|
 |postCondition|未定义|使用[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)指定条件，如果表达式返回true的时候才更新缓存，该评估在方法执行后进行，因此可以访问到#result|
+|externalWriteInterceptors|未定义|指定外部缓存写入拦截器，多个用逗号分隔。仅当 cacheType 为 REMOTE 或 BOTH 时生效。例如：`"loggingInterceptor,auditInterceptor"`。详细用法参见 [externalWriteInterceptors 使用指南](../externalWriteInterceptors-usage.md)。|
 
 @CacheInvalidate注解说明：
 

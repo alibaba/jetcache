@@ -23,6 +23,7 @@ jetcache:
       broadcastChannel: projectA
       valueEncoder: java #other choose：kryo/kryo5
       valueDecoder: java #other choose：kryo/kryo5
+      externalWriteInterceptors: bean:loggingInterceptor
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -59,6 +60,7 @@ The description of configuration listed in the below table:
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | infinity | Global config of write expire time, in millis.                                                                                                                                                                                                                                                                                                       |
 | jetcache.remote.${area}.broadcastChannel | n/a | jetcahe2.7 support invalidate local cache of other jvm after updatation (cacheType = CacheType.BOTH), this config specify broadcast channel, this feature disabled if not set                                                                                                                                                                        |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0 | Global config of read expire time, in millis. Need jetcache2.2+, only local cache support this feature. 0 indicates disabled read expire feature.                                                                                                                                                                                                    |
+| jetcache.remote.${area}.externalWriteInterceptors | n/a | Specify external cache write interceptors. Use `bean:` prefix to reference Spring Bean names, separated by commas. Example: `bean:loggingInterceptor,bean:auditInterceptor`. Only effective for remote cache.                                                                                                                                   |
 
 The ${area} of the above table is the ```area``` attribute of ```@Cached``` and ```@CreateCache```. Note that the default value of ```area``` attribute of the two annotation is ```"default"```.
 

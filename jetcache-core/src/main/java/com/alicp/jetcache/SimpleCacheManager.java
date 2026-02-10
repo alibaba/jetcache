@@ -12,6 +12,7 @@ import com.alicp.jetcache.template.CacheMonitorInstaller;
 import com.alicp.jetcache.template.QuickConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -181,7 +182,9 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         if (config.getValueDecoder() != null) {
             cacheBuilder.getConfig().setValueDecoder(config.getValueDecoder());
         }
-
+        if (!CollectionUtils.isEmpty(config.getExternalWriteInterceptors())) {
+            cacheBuilder.getConfig().setWriteInterceptors(config.getExternalWriteInterceptors());
+        }
         cacheBuilder.setCacheNullValue(config.getCacheNullValue() != null ?
                 config.getCacheNullValue() : DEFAULT_CACHE_NULL_VALUE);
         return cacheBuilder.buildCache();
