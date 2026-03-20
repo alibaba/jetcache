@@ -18,8 +18,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import java.util.List;
-
 /**
  * @author huangli
  */
@@ -119,11 +117,9 @@ public class CacheContext {
         b.refreshPolicy(cac.getRefreshPolicy());
         if (!CacheConsts.isUndefined(cac.getExternalWriteInterceptors())) {
             if (cac.getCacheType() == CacheType.LOCAL) {
-                logger.warn("externalWriteInterceptors is configured but cacheType is LOCAL, " +
-                        "externalWriteInterceptors only works for REMOTE or BOTH cache types. Ignoring externalWriteInterceptors.");
-            } else if (configProvider instanceof SpringConfigProvider) {
-                SpringConfigProvider springConfigProvider = (SpringConfigProvider) configProvider;
-                b.externalWriteInterceptors(springConfigProvider.parseWriteInterceptors(cac.getExternalWriteInterceptors()));
+                throw new CacheConfigException("externalWriteInterceptors only works for REMOTE or BOTH cache types");
+            } else {
+                b.externalWriteInterceptors(configProvider.parseWriteInterceptors(cac.getExternalWriteInterceptors()));
             }
         }
         return cacheManager.getOrCreateCache(b.build());

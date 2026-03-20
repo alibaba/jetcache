@@ -129,15 +129,22 @@ public @interface Cached {
     String postCondition() default CacheConsts.UNDEFINED_STRING;
 
     /**
-     * Specify external write interceptors bean names which are used to intercept cache write operations.
-     * Multiple interceptor names can be separated by commas.
-     * The interceptor beans should be registered in the Spring container with a name.
+     * Specify external cache write pre-hooks for this cache.
+     * Multiple interceptor bean references can be separated by commas.
+     * In annotation-based configuration, interceptor beans must be Spring beans
+     * referenced with the {@code bean:} prefix, for example
+     * {@code bean:loggingInterceptor,bean:auditInterceptor}.
      * <p>
-     * <b>Note:</b> externalWriteInterceptors only work for external caches (REMOTE or BOTH cache types).
-     * They do not affect local caches (LOCAL cache type).
+     * The hook runs before REMOTE/BOTH cache write attempts and receives an
+     * immutable write context. It is intended for observation or validation,
+     * not for mutating the outgoing write request.
+     * </p>
+     * <p>
+     * This attribute is only valid for external caches (REMOTE or BOTH cache types).
+     * Using it with LOCAL cache type is a configuration error.
      * </p>
      *
-     * @return external write interceptor bean names
+     * @return external cache write interceptor bean references
      */
     String externalWriteInterceptors() default CacheConsts.UNDEFINED_STRING;
 

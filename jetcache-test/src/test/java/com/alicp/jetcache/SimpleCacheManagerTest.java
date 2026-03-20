@@ -11,6 +11,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
+import com.alicp.jetcache.external.LoggingExternalCacheWriteInterceptor;
 import com.alicp.jetcache.template.CacheBuilderTemplate;
 import com.alicp.jetcache.template.QuickConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
@@ -19,11 +20,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -125,6 +128,17 @@ public class SimpleCacheManagerTest {
         cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName).cacheType(CacheType.LOCAL).build());
         Cache c = cacheManager.getCache(cacheName);
         assertTrue(c instanceof AbstractEmbeddedCache);
+    }
+
+    @Test
+    public void testLocalShouldThrowWhenExternalWriteInterceptorsConfigured() {
+        String cacheName = UUID.randomUUID().toString();
+        QuickConfig qc = QuickConfig.newBuilder(cacheName)
+                .cacheType(CacheType.LOCAL)
+                .externalWriteInterceptors(Collections.singletonList(new LoggingExternalCacheWriteInterceptor()))
+                .build();
+
+        assertThrows(CacheConfigException.class, () -> cacheManager.getOrCreateCache(qc));
     }
 
     @Test

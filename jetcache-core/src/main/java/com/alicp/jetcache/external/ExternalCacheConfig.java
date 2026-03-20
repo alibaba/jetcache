@@ -22,6 +22,17 @@ public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
     private String broadcastChannel;
     private List<ExternalCacheWriteInterceptor> writeInterceptors = new ArrayList<>();
 
+    @Override
+    public ExternalCacheConfig<K, V> clone() {
+        ExternalCacheConfig<K, V> copy = (ExternalCacheConfig<K, V>) super.clone();
+        if (writeInterceptors != null) {
+            copy.writeInterceptors = new ArrayList<>(writeInterceptors);
+        } else {
+            copy.writeInterceptors = new ArrayList<>();
+        }
+        return copy;
+    }
+
     public String getKeyPrefix() {
         return keyPrefixSupplier == null ? null : keyPrefixSupplier.get();
     }
@@ -67,12 +78,19 @@ public class ExternalCacheConfig<K, V> extends CacheConfig<K, V> {
     }
 
     public void setWriteInterceptors(List<ExternalCacheWriteInterceptor> writeInterceptors) {
-        this.writeInterceptors = writeInterceptors;
+        if (writeInterceptors == null) {
+            this.writeInterceptors = new ArrayList<>();
+        } else {
+            this.writeInterceptors = writeInterceptors;
+        }
     }
 
     public void addWriteInterceptor(ExternalCacheWriteInterceptor interceptor) {
         if (interceptor == null) {
             return;
+        }
+        if (this.writeInterceptors == null) {
+            this.writeInterceptors = new ArrayList<>();
         }
         this.writeInterceptors.add(interceptor);
     }

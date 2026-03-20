@@ -18,16 +18,7 @@ import java.util.function.Function;
  * @author huangli
  */
 public class QuickConfig {
-
-    /**
-     * writeInterceptors for external caches.
-     * <p>
-     * <b>Note:</b> writeInterceptors only work for external caches (REMOTE or BOTH cache types).
-     * They do not affect local caches (LOCAL cache type).
-     * </p>
-     */
     private String area = CacheConsts.DEFAULT_AREA;
-
     private String name;
     private Duration expire;
     private Duration localExpire;

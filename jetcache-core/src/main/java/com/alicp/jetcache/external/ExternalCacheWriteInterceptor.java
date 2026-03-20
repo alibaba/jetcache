@@ -5,6 +5,14 @@ import com.alicp.jetcache.Cache;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * Callback invoked before an external cache write attempt is dispatched.
+ * <p>
+ * This hook is intended for observation, validation and side effects such as
+ * logging, metrics or big-key detection. The provided {@link WriteContext} is
+ * immutable, so implementations cannot mutate the outgoing write request or
+ * change the cache write result through this API.
+ * </p>
+ *
  * Created on 2026/1/30.
  *
  * @author youjie_li
@@ -14,6 +22,9 @@ public interface ExternalCacheWriteInterceptor {
     <K, V> void intercept(WriteContext<K, V> ctx);
 
 
+    /**
+     * Immutable metadata of a single external cache write attempt.
+     */
     final class WriteContext<K, V> {
 
         public final Cache<K, V> cache;

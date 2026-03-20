@@ -1,7 +1,6 @@
 package com.alicp.jetcache.sample;
 
 import com.alicp.jetcache.anno.Cached;
-import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 使用 @Cached 注解配置 writeInterceptors 的示例
+ * 使用 @Cached 配置外部缓存写入前回调的示例。
  *
  * @author jetcache
  */
@@ -22,11 +21,10 @@ public class UserService {
         name = "user",
         expire = 3600,
         timeUnit = TimeUnit.SECONDS,
-        externalWriteInterceptors = "loggingInterceptor,auditInterceptor"
+        externalWriteInterceptors = "bean:loggingInterceptor,bean:auditInterceptor"
     )
     public User getUserById(Long id) {
         logger.info("Fetching user from database: {}", id);
-        // 模拟从数据库查询
         return new User(id, "User" + id, "user" + id + "@example.com");
     }
 
@@ -34,7 +32,7 @@ public class UserService {
         name = "userInfo",
         expire = 1800,
         timeUnit = TimeUnit.SECONDS,
-        externalWriteInterceptors = "loggingInterceptor"
+        externalWriteInterceptors = "bean:loggingInterceptor"
     )
     public String getUserInfo(Long id) {
         logger.info("Fetching user info from database: {}", id);
@@ -55,7 +53,6 @@ public class UserService {
             this.email = email;
         }
 
-        // getters and setters
         public Long getId() {
             return id;
         }

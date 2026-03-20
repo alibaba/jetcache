@@ -37,7 +37,7 @@ key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framewo
 |cacheNullValue|false|当方法返回值为null的时候是否要缓存|
 |condition|未定义|使用[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)指定条件，如果表达式返回true的时候才去缓存中查询|
 |postCondition|未定义|使用[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)指定条件，如果表达式返回true的时候才更新缓存，该评估在方法执行后进行，因此可以访问到#result|
-|externalWriteInterceptors|未定义|指定外部缓存写入拦截器，多个用逗号分隔。仅当 cacheType 为 REMOTE 或 BOTH 时生效。例如：`"loggingInterceptor,auditInterceptor"`。详细用法参见 [externalWriteInterceptors 使用指南](../externalWriteInterceptors-usage.md)。|
+|externalWriteInterceptors|未定义|指定外部缓存写入前回调，多个用逗号分隔。仅当 cacheType 为 REMOTE 或 BOTH 时有效；如果配置在 LOCAL 上会抛出配置异常。注解方式必须使用 `bean:` 前缀引用 Spring Bean，例如：`"bean:loggingInterceptor,bean:auditInterceptor"`。该回调接收的是不可变写入上下文，适合做日志、审计、埋点、大 key 检测等，不用于修改实际写入请求。全局配置方式参见 [Config](Config.md)。|
 
 @CacheInvalidate注解说明：
 
@@ -77,4 +77,3 @@ key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framewo
 
 
 对于以上未定义默认值的参数，如果没有指定，将使用yml中指定的全局配置，全局配置请参考[配置说明](Config.md)。
-

@@ -28,6 +28,7 @@ public class JetCacheBaseBeans {
             @Autowired GlobalCacheConfig globalCacheConfig,
             @Autowired(required = false) EncoderParser encoderParser,
             @Autowired(required = false) KeyConvertorParser keyConvertorParser,
+            @Autowired(required = false) ExternalWriteInterceptorParser externalWriteInterceptorParser,
             @Autowired(required = false) Consumer<StatInfo> metricsCallback) {
         SpringConfigProvider cp = createConfigProvider();
         cp.setApplicationContext(applicationContext);
@@ -41,11 +42,25 @@ public class JetCacheBaseBeans {
             cp.setKeyConvertorParser(keyConvertorParser);
         }
 
+        if (externalWriteInterceptorParser != null) {
+            cp.setExternalWriteInterceptorParser(externalWriteInterceptorParser);
+        }
+
         if (metricsCallback != null) {
             cp.setMetricsCallback(metricsCallback);
         }
         cp.init();
         return cp;
+    }
+
+    public SpringConfigProvider springConfigProvider(
+            ApplicationContext applicationContext,
+            GlobalCacheConfig globalCacheConfig,
+            EncoderParser encoderParser,
+            KeyConvertorParser keyConvertorParser,
+            Consumer<StatInfo> metricsCallback) {
+        return springConfigProvider(applicationContext, globalCacheConfig, encoderParser,
+                keyConvertorParser, null, metricsCallback);
     }
 
     @Bean(name = "jcCacheManager",destroyMethod = "close")

@@ -12,7 +12,6 @@ import com.alicp.jetcache.template.CacheMonitorInstaller;
 import com.alicp.jetcache.template.QuickConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -110,6 +109,11 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
     }
 
     private Cache create(QuickConfig config) {
+        if (config.getCacheType() == CacheType.LOCAL
+                && config.getExternalWriteInterceptors() != null
+                && !config.getExternalWriteInterceptors().isEmpty()) {
+            throw new CacheConfigException("externalWriteInterceptors only works for REMOTE or BOTH cache types");
+        }
         Cache cache;
         if (config.getCacheType() == null || config.getCacheType() == CacheType.REMOTE) {
             cache = buildRemote(config);
@@ -182,7 +186,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         if (config.getValueDecoder() != null) {
             cacheBuilder.getConfig().setValueDecoder(config.getValueDecoder());
         }
-        if (!CollectionUtils.isEmpty(config.getExternalWriteInterceptors())) {
+        if (config.getExternalWriteInterceptors() != null && !config.getExternalWriteInterceptors().isEmpty()) {
             cacheBuilder.getConfig().setWriteInterceptors(config.getExternalWriteInterceptors());
         }
         cacheBuilder.setCacheNullValue(config.getCacheNullValue() != null ?

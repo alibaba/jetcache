@@ -34,7 +34,7 @@ The attributes of ```@Cached``` are similar with ```@CreateCache``` except ```@C
 |cacheNullValue|false|Specify whether a null value should be cached.|
 |condition|undefined|Expression script used for conditioning the method caching, the cache is not used when evaluation result is false. Can't refer return value of real method.|
 |postCondition|undefined|Expression script used for conditioning the method cache updating, the cache updating action is vetoed when the evaluation result is false. Evaluation occurs after real method invocation so we can refer *#result* in script.|
-|externalWriteInterceptors|undefined|Specify external cache write interceptors, separated by commas. Only effective when cacheType is REMOTE or BOTH. Example: `"loggingInterceptor,auditInterceptor"`. For detailed usage, see [externalWriteInterceptors Usage Guide](../externalWriteInterceptors-usage.md).|
+|externalWriteInterceptors|undefined|Specify external cache pre-write hooks, separated by commas. It is only valid when cacheType is REMOTE or BOTH; using it with LOCAL causes a configuration error. Annotation-based configuration must reference Spring Beans with the `bean:` prefix, for example: `"bean:loggingInterceptor,bean:auditInterceptor"`. The hook receives an immutable write context and is intended for logging, auditing, metrics or big-key detection, not for mutating the outgoing write request. For global configuration style, see [Config](Config.md).|
 
 @CacheInvalidate attribute table:
 

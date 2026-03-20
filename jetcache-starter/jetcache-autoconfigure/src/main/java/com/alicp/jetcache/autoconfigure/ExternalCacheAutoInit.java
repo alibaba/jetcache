@@ -1,10 +1,13 @@
 package com.alicp.jetcache.autoconfigure;
 
 import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.support.ParserFunction;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
 
@@ -14,6 +17,9 @@ import java.util.Map;
  * @author huangli
  */
 public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
+    @Autowired(required = false)
+    protected ApplicationContext applicationContext;
+
     public ExternalCacheAutoInit(String... cacheTypes) {
         super(cacheTypes);
     }
@@ -38,10 +44,19 @@ public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
         for (String beanRef : beanRefs) {
             beanRef = beanRef.trim();
             if (!beanRef.isEmpty()) {
-                Object interceptor = resolveBean(beanRef);
-                if (interceptor != null) {
-                    ecb.addWriteInterceptor((ExternalCacheWriteInterceptor) interceptor);
+                Object interceptor;
+                try {
+                    interceptor = resolveBean(beanRef);
+                } catch (Exception e) {
+                    throw new CacheConfigException("externalWriteInterceptors bean resolve failed: " + beanRef, e);
                 }
+                if (interceptor == null) {
+                    throw new CacheConfigException("externalWriteInterceptors bean not found: " + beanRef);
+                }
+                if (!(interceptor instanceof ExternalCacheWriteInterceptor)) {
+                    throw new CacheConfigException("externalWriteInterceptors bean is not ExternalCacheWriteInterceptor: " + beanRef);
+                }
+                ecb.addWriteInterceptor((ExternalCacheWriteInterceptor) interceptor);
             }
         }
     }
@@ -55,6 +70,9 @@ public abstract class ExternalCacheAutoInit extends AbstractCacheAutoInit {
         String beanPrefix = "bean:";
         if (beanRef.startsWith(beanPrefix)) {
             String beanName = beanRef.substring(beanPrefix.length());
+            if (applicationContext != null) {
+                return applicationContext.getBean(beanName);
+            }
             return customContainer.get(beanName);
         }
 
