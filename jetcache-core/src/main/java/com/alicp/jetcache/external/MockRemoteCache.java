@@ -148,20 +148,27 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     protected CacheResult do_PUT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         byte[] keyBytes = buildKey(key);
         byte[] valueBytes = config.getValueEncoder().apply(value);
-        executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+        CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+        if (interceptorResult != null) {
+            return interceptorResult;
+        }
         return cache.PUT(genKey(key), valueBytes, expireAfterWrite, timeUnit);
     }
 
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         Map<ByteBuffer, byte[]> newMap = new HashMap<>();
-        map.entrySet().forEach((e) -> {
-                    byte[] keyBytes = buildKey(e.getKey());
-                    byte[] valueBytes = config.getValueEncoder().apply(e.getValue());
-                    executeWriteInterceptors(e.getKey(), e.getValue(), keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
-                    newMap.put(genKey(keyBytes), valueBytes);
-                }
-        );
+        for (Map.Entry<? extends K, ? extends V> e : map.entrySet()) {
+            byte[] keyBytes = buildKey(e.getKey());
+            byte[] valueBytes = config.getValueEncoder().apply(e.getValue());
+            CacheResult interceptorResult = interceptWrite(e.getKey(), e.getValue(), keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
+            newMap.put(genKey(keyBytes), valueBytes);
+        }
         return cache.PUT_ALL(newMap, expireAfterWrite, timeUnit);
     }
 
@@ -179,7 +186,11 @@ public class MockRemoteCache<K, V> extends AbstractExternalCache<K, V> {
     protected CacheResult do_PUT_IF_ABSENT(K key, V value, long expireAfterWrite, TimeUnit timeUnit) {
         byte[] keyBytes = buildKey(key);
         byte[] valueBytes = config.getValueEncoder().apply(value);
-        executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+        CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+        if (interceptorResult != null) {
+            return interceptorResult;
+        }
         return cache.PUT_IF_ABSENT(genKey(keyBytes), valueBytes, expireAfterWrite, timeUnit);
     }
 }

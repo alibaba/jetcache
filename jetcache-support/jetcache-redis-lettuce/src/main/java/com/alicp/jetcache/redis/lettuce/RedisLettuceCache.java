@@ -107,7 +107,11 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             byte[] encodedValue = valueEncoder.apply(holder);
-            executeWriteInterceptors(key, value, newKey, encodedValue, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            CacheResult interceptorResult = interceptWrite(key, value, newKey, encodedValue,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             RedisFuture<String> future = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), encodedValue);
             CacheResult result = new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {
@@ -132,13 +136,24 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
     @Override
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         try {
-            CompletionStage<Integer> future = CompletableFuture.completedFuture(0);
+            List<byte[]> preparedKeys = new ArrayList<>(map.size());
+            List<byte[]> preparedValues = new ArrayList<>(map.size());
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
                 byte[] newKey = buildKey(en.getKey());
                 byte[] encodedValue = valueEncoder.apply(holder);
-                executeWriteInterceptors(en.getKey(), en.getValue(), newKey, encodedValue, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
-                RedisFuture<String> resp = stringAsyncCommands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), encodedValue);
+                CacheResult interceptorResult = interceptWrite(en.getKey(), en.getValue(), newKey, encodedValue,
+                        expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+                if (interceptorResult != null) {
+                    return interceptorResult;
+                }
+                preparedKeys.add(newKey);
+                preparedValues.add(encodedValue);
+            }
+            CompletionStage<Integer> future = CompletableFuture.completedFuture(0);
+            for (int i = 0; i < preparedKeys.size(); i++) {
+                RedisFuture<String> resp = stringAsyncCommands.psetex(preparedKeys.get(i),
+                        timeUnit.toMillis(expireAfterWrite), preparedValues.get(i));
                 future = future.thenCombine(resp, (failCount, respStr) -> "OK".equals(respStr) ? failCount : failCount + 1);
             }
             CacheResult result = new CacheResult(future.handle((failCount, ex) -> {
@@ -300,7 +315,11 @@ public class RedisLettuceCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] keyBytes = buildKey(key);
             byte[] valueBytes = valueEncoder.apply(holder);
-            executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             RedisFuture<String> future = stringAsyncCommands.set(keyBytes, valueBytes, SetArgs.Builder.nx().px(timeUnit.toMillis(expireAfterWrite)));
             CacheResult result = new CacheResult(future.handle((rt, ex) -> {
                 if (ex != null) {

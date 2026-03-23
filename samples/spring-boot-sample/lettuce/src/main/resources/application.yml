@@ -15,4 +15,5 @@ jetcache:
       valueDecoder: java
       uri: redis://127.0.0.1:6379/
       defaultExpireInMillis: 5000
-      externalWriteInterceptors: logging
+      # Demonstrates both interceptor resolution paths: Spring bean name via "bean:" and customContainer entry via plain name.
+      externalWriteInterceptors: bean:loggingExternalCacheWriteInterceptor,auditExternalCacheWriteInterceptor

@@ -3,6 +3,7 @@ package com.alicp.jetcache.external;
 import com.alicp.jetcache.AbstractCache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheException;
+import com.alicp.jetcache.CacheResult;
 import com.alicp.jetcache.RefreshCache;
 import com.alicp.jetcache.anno.KeyConvertor;
 
@@ -86,22 +87,28 @@ public abstract class AbstractExternalCache<K, V> extends AbstractCache<K, V> {
         return true;
     }
 
-    protected void executeWriteInterceptors(K key, V value, byte[] keyBytes, byte[] valueBytes,
-                                            long expireAfterWrite, TimeUnit timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op op) {
+    protected CacheResult interceptWrite(K key, V value, byte[] keyBytes, byte[] valueBytes,
+                                         long expireAfterWrite, TimeUnit timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op op) {
         ExternalCacheWriteInterceptor.WriteContext<K, V> ctx = new ExternalCacheWriteInterceptor.WriteContext<>(
                 this, key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, op);
-        executeWriteInterceptors(ctx);
+        return interceptWrite(ctx);
     }
 
-    private void executeWriteInterceptors(ExternalCacheWriteInterceptor.WriteContext<K, V> ctx) {
+    private CacheResult interceptWrite(ExternalCacheWriteInterceptor.WriteContext<K, V> ctx) {
         List<ExternalCacheWriteInterceptor> list = config.getWriteInterceptors();
         if (list == null || list.isEmpty()) {
-            return;
+            return null;
         }
 
         for (ExternalCacheWriteInterceptor it : list) {
-            it.intercept(ctx);
+            try {
+                it.intercept(ctx);
+            } catch (Exception e) {
+                logError("WRITE_INTERCEPT", ctx.getKeyObj(), e);
+                return new CacheResult(e);
+            }
         }
+        return null;
     }
 
 

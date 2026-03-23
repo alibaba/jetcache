@@ -103,8 +103,11 @@ public @interface CreateCache {
      * {@code bean:loggingInterceptor,bean:auditInterceptor}.
      * <p>
      * The hook runs before REMOTE/BOTH cache write attempts and receives an
-     * immutable write context. It is intended for observation or validation,
-     * not for mutating the outgoing write request.
+     * read-only write metadata view. It is intended for observation or
+     * validation, not for mutating the outgoing encoded write request.
+     * Throwing an exception from the hook causes the current write operation
+     * to fail through its cache result instead of propagating from the base
+     * write methods.
      * </p>
      * <p>
      * This attribute is only valid for external caches (REMOTE or BOTH cache types).

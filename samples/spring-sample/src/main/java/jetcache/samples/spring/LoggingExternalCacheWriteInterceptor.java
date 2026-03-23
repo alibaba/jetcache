@@ -1,12 +1,13 @@
-package com.alicp.jetcache.external;
+package jetcache.samples.spring;
 
+import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author youjie_li
  */
-public class LoggingExternalCacheWriteInterceptor implements ExternalCacheWriteInterceptor{
+public class LoggingExternalCacheWriteInterceptor implements ExternalCacheWriteInterceptor {
     private static Logger logger = LoggerFactory.getLogger(LoggingExternalCacheWriteInterceptor.class);
     @Override
     public void intercept(WriteContext ctx) {

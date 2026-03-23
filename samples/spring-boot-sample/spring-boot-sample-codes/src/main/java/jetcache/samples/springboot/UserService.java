@@ -9,6 +9,6 @@ import com.alicp.jetcache.anno.Cached;
  * @author huangli
  */
 public interface UserService {
-    @Cached(name = "loadUser", expire = 10)
+    @Cached(name = "loadUser", expire = 10,externalWriteInterceptors = "bean:loggingExternalCacheWriteInterceptor")
     User loadUser(long userId);
 }

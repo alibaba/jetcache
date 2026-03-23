@@ -128,7 +128,11 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] keyBytes = buildKey(key);
             byte[] valueBytes = valueEncoder.apply(holder);
-            executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             Boolean result = con.pSetEx(keyBytes, timeUnit.toMillis(expireAfterWrite), valueBytes);
             if (Boolean.TRUE.equals(result)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
@@ -147,15 +151,25 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         RedisConnection con = null;
         try {
-            con = connectionFactory.getConnection();
-            int failCount = 0;
+            List<byte[]> preparedKeys = new ArrayList<>(map.size());
+            List<byte[]> preparedValues = new ArrayList<>(map.size());
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
                 byte[] keyBytes = buildKey(en.getKey());
                 byte[] valueBytes = valueEncoder.apply(holder);
-                executeWriteInterceptors(en.getKey(), en.getValue(), keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
-                Boolean result = con.pSetEx(keyBytes,
-                        timeUnit.toMillis(expireAfterWrite), valueBytes);
+                CacheResult interceptorResult = interceptWrite(en.getKey(), en.getValue(), keyBytes, valueBytes,
+                        expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+                if (interceptorResult != null) {
+                    return interceptorResult;
+                }
+                preparedKeys.add(keyBytes);
+                preparedValues.add(valueBytes);
+            }
+            con = connectionFactory.getConnection();
+            int failCount = 0;
+            for (int i = 0; i < preparedKeys.size(); i++) {
+                Boolean result = con.pSetEx(preparedKeys.get(i),
+                        timeUnit.toMillis(expireAfterWrite), preparedValues.get(i));
                 if (!Boolean.TRUE.equals(result)) {
                     failCount++;
                 }
@@ -222,7 +236,11 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] keyBytes = buildKey(key);
             byte[] valueBytes = valueEncoder.apply(holder);
-            executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             Boolean result = con.set(keyBytes, valueBytes,
                     Expiration.from(expireAfterWrite, timeUnit), RedisStringCommands.SetOption.ifAbsent());
             if (Boolean.TRUE.equals(result)) {

@@ -8,9 +8,12 @@ import java.util.concurrent.TimeUnit;
  * Callback invoked before an external cache write attempt is dispatched.
  * <p>
  * This hook is intended for observation, validation and side effects such as
- * logging, metrics or big-key detection. The provided {@link WriteContext} is
- * immutable, so implementations cannot mutate the outgoing write request or
- * change the cache write result through this API.
+ * logging, metrics or big-key detection. The provided {@link WriteContext}
+ * exposes read-only metadata of the outgoing write request and does not expose
+ * mutable encoded payload bytes through this API.
+ * Any exception thrown by an interceptor marks the current write operation as
+ * failed. The failure is reported through the cache write result rather than
+ * propagating from the base write methods.
  * </p>
  *
  * Created on 2026/1/30.
@@ -23,7 +26,9 @@ public interface ExternalCacheWriteInterceptor {
 
 
     /**
-     * Immutable metadata of a single external cache write attempt.
+     * Read-only metadata of a single external cache write attempt.
+     * Throwing an exception from {@link #intercept(WriteContext)} rejects the
+     * current write operation.
      */
     final class WriteContext<K, V> {
 
@@ -68,12 +73,12 @@ public interface ExternalCacheWriteInterceptor {
             return valueObj;
         }
 
-        public byte[] getKeyBytes() {
-            return keyBytes;
+        public int getKeySize() {
+            return keyBytes == null ? 0 : keyBytes.length;
         }
 
-        public byte[] getValueBytes() {
-            return valueBytes;
+        public int getValueSize() {
+            return valueBytes == null ? 0 : valueBytes.length;
         }
 
         public long getExpireAfterWrite() {

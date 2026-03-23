@@ -19,7 +19,9 @@ import org.redisson.client.codec.Codec;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -181,7 +183,11 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
             final CacheValueHolder<V> holder = new CacheValueHolder<>(value, timeUnit.toMillis(expireAfterWrite));
             byte[] keyBytes = buildKey(key);
             byte[] valueBytes = encoder(holder);
-            executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             this.client.getBucket(getCacheKey(keyBytes), getCodec()).set(valueBytes, expireAfterWrite, timeUnit);
             return CacheGetResult.SUCCESS_WITHOUT_MSG;
         } catch (Throwable e) {
@@ -195,19 +201,30 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             if (Objects.nonNull(map) && !map.isEmpty()) {
                 final long expire = timeUnit.toMillis(expireAfterWrite);
-                final RBatch batch = this.client.createBatch();
-
-
+                final List<byte[]> preparedKeys = new ArrayList<>(map.size());
+                final List<byte[]> preparedValues = new ArrayList<>(map.size());
                 map.forEach((k, v) -> {
                     final CacheValueHolder<V> holder = new CacheValueHolder<>(v, expire);
                     final byte[] keyBytes = buildKey(k);
                     byte[] valueBytes = encoder(holder);
-                    executeWriteInterceptors(k, v, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
-                    batch.getBucket(getCacheKey(keyBytes), getCodec()).setAsync(valueBytes, expireAfterWrite, timeUnit);
+                    CacheResult interceptorResult = interceptWrite(k, v, keyBytes, valueBytes,
+                            expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+                    if (interceptorResult != null) {
+                        throw new InterceptorAbortException(interceptorResult);
+                    }
+                    preparedKeys.add(keyBytes);
+                    preparedValues.add(valueBytes);
                 });
+                final RBatch batch = this.client.createBatch();
+                for (int i = 0; i < preparedKeys.size(); i++) {
+                    batch.getBucket(getCacheKey(preparedKeys.get(i)), getCodec())
+                            .setAsync(preparedValues.get(i), expireAfterWrite, timeUnit);
+                }
                 batch.execute();
             }
             return CacheResult.SUCCESS_WITHOUT_MSG;
+        } catch (InterceptorAbortException e) {
+            return e.getResult();
         } catch (Throwable e) {
             logError("PUT_ALL", "map(" + map.size() + ")", e);
             return new CacheResult(e);
@@ -247,12 +264,28 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
             final CacheValueHolder<V> holder = new CacheValueHolder<>(value, expire.toMillis());
             final byte[] keyBytes = buildKey(key);
             final byte[] valueBytes = encoder(holder);
-            executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             final boolean success = this.client.getBucket(getCacheKey(keyBytes), getCodec()).setIfAbsent(valueBytes, expire);
             return success ? CacheResult.SUCCESS_WITHOUT_MSG : CacheResult.EXISTS_WITHOUT_MSG;
         } catch (Throwable e) {
             logError("PUT_IF_ABSENT", key, e);
             return new CacheResult(e);
+        }
+    }
+
+    private static class InterceptorAbortException extends RuntimeException {
+        private final CacheResult result;
+
+        private InterceptorAbortException(CacheResult result) {
+            this.result = result;
+        }
+
+        private CacheResult getResult() {
+            return result;
         }
     }
 }

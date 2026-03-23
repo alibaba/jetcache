@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
+import java.util.Collections;
 
 /**
  * @author huangli
@@ -27,7 +28,8 @@ public class MyServiceImpl implements MyService, InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        QuickConfig quickConfig = QuickConfig.newBuilder("orderCache").expire(Duration.ofSeconds(100)).build();
+        QuickConfig quickConfig =
+                QuickConfig.newBuilder("orderCache").externalWriteInterceptors(Collections.singletonList(new LoggingExternalCacheWriteInterceptor())).expire(Duration.ofSeconds(100)).build();
         orderCache = cacheManager.getOrCreateCache(quickConfig);
     }
 

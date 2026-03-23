@@ -9,7 +9,7 @@ public class BigKeyDetectExternalCacheWriteInterceptor implements ExternalCacheW
 
     @Override
     public void intercept(WriteContext ctx) {
-        if (ctx.getValueBytes().length > 20) {
+        if (ctx.getValueSize() > 20) {
             bigKeyCount++;
         }
     }

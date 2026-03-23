@@ -277,7 +277,11 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] newKey = buildKey(key);
             byte[] encodedValue = valueEncoder.apply(holder);
-            executeWriteInterceptors(key, value, newKey, encodedValue, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            CacheResult interceptorResult = interceptWrite(key, value, newKey, encodedValue,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             commands = (StringBinaryCommands) writeCommands();
             String rt = commands.psetex(newKey, timeUnit.toMillis(expireAfterWrite), encodedValue);
             if ("OK".equals(rt)) {
@@ -299,16 +303,27 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             return CacheResult.SUCCESS_WITHOUT_MSG;
         }
         try {
+            List<byte[]> preparedKeys = new ArrayList<>(map.size());
+            List<byte[]> preparedValues = new ArrayList<>(map.size());
+            for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
+                CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
+                byte[] newKey = buildKey(en.getKey());
+                byte[] encodedValue = valueEncoder.apply(holder);
+                CacheResult interceptorResult = interceptWrite(en.getKey(), en.getValue(), newKey, encodedValue,
+                        expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+                if (interceptorResult != null) {
+                    return interceptorResult;
+                }
+                preparedKeys.add(newKey);
+                preparedValues.add(encodedValue);
+            }
             StringBinaryCommands writeCommands = (StringBinaryCommands) writeCommands();
             return this.<StringBinaryCommands, StringPipelineBinaryCommands, CacheResult>doWithPipeline(writeCommands, true, pipeline -> {
                 int failCount = 0;
                 List<Response<String>> responses = new ArrayList<>();
-                for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
-                    CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                    byte[] newKey = buildKey(en.getKey());
-                    byte[] encodedValue = valueEncoder.apply(holder);
-                    executeWriteInterceptors(en.getKey(), en.getValue(), newKey, encodedValue, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
-                    Response<String> resp = pipeline.psetex(newKey, timeUnit.toMillis(expireAfterWrite), encodedValue);
+                for (int i = 0; i < preparedKeys.size(); i++) {
+                    Response<String> resp = pipeline.psetex(preparedKeys.get(i),
+                            timeUnit.toMillis(expireAfterWrite), preparedValues.get(i));
                     responses.add(resp);
                 }
 
@@ -397,7 +412,11 @@ public class RedisCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] keyBytes = buildKey(key);
             byte[] valueBytes = valueEncoder.apply(holder);
-            executeWriteInterceptors(key, value, keyBytes, valueBytes, expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             SetParams params = new SetParams();
             params.nx().px(timeUnit.toMillis(expireAfterWrite));
             commands = (StringBinaryCommands) writeCommands();

@@ -60,7 +60,7 @@ jetcache:
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | 无穷大                         | 以毫秒为单位指定超时时间的全局配置(以前为defaultExpireInMillis)                                                                                                                                                           |
 | jetcache.remote.${area}.broadcastChannel | 无                           | jetcahe2.7的两级缓存支持更新以后失效其他JVM中的local cache，但多个服务共用redis同一个channel可能会造成广播风暴，需要在这里指定channel，你可以决定多个不同的服务是否共用同一个channel。如果没有指定则不开启。                                                                       |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0                           | 需要jetcache2.2以上，以毫秒为单位，指定多长时间没有访问，就让缓存失效，当前只有本地缓存支持。0表示不使用这个功能。                                                                                                                                       |
-| jetcache.remote.${area}.externalWriteInterceptors | 无                           | 指定外部缓存写入前回调，多个用逗号分隔。`bean:xxx` 表示按 Spring Bean 名称解析；普通名称表示从 `AutoConfigureBeans.customContainer` 中解析。例如：`bean:loggingInterceptor,logging`。回调接收的是不可变写入上下文，适合做日志、审计、埋点、大 key 检测等，不用于修改实际写入请求。 |
+| jetcache.remote.${area}.externalWriteInterceptors | 无                           | 指定外部缓存写入前回调，多个用逗号分隔。`bean:xxx` 表示按 Spring Bean 名称解析；普通名称表示从 `AutoConfigureBeans.customContainer` 中解析。例如：`bean:loggingInterceptor,logging`。回调接收的是只读写入元数据，适合做日志、审计、埋点、大 key 检测等，不用于修改实际编码后的写入请求。若回调抛出异常，当前写操作会以失败结果返回，而不会从基础写方法向外传播异常。 |
 
 上表中${area}对应@Cached和@CreateCache的area属性。注意如果注解上没有指定area，默认值是"default"。
 
