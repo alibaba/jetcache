@@ -9,9 +9,11 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.external.LoggingExternalCacheWriteInterceptor;
+import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.template.CacheBuilderTemplate;
 import com.alicp.jetcache.template.QuickConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
@@ -142,6 +144,36 @@ public class SimpleCacheManagerTest {
     }
 
     @Test
+    public void testQuickConfigExternalWriteInterceptorsShouldOverrideGlobalConfig() {
+        CountingInterceptor globalInterceptor = new CountingInterceptor();
+        CountingInterceptor localInterceptor = new CountingInterceptor();
+
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        MockRemoteCacheBuilder remoteBuilder = (MockRemoteCacheBuilder)
+                globalCacheConfig.getRemoteCacheBuilders().get(CacheConsts.DEFAULT_AREA);
+        remoteBuilder.addWriteInterceptor(globalInterceptor);
+
+        cacheManager.close();
+        cacheManager = new SimpleCacheManager();
+        CacheBuilderTemplate cb = new CacheBuilderTemplate(false,
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        cacheManager.setCacheBuilderTemplate(cb);
+
+        String cacheName = UUID.randomUUID().toString();
+        Cache<Object, Object> cache = cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName)
+                .externalWriteInterceptors(Collections.singletonList(localInterceptor))
+                .build());
+
+        cache.put("K1", "V1");
+
+        assertEquals(0, globalInterceptor.getCount());
+        assertEquals(1, localInterceptor.getCount());
+        ExternalCacheConfig config = (ExternalCacheConfig) cache.config();
+        assertEquals(1, config.getWriteInterceptors().size());
+        assertSame(localInterceptor, config.getWriteInterceptors().get(0));
+    }
+
+    @Test
     public void testLoader() {
         String cacheName = UUID.randomUUID().toString();
         Cache<String, String> cache = cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName).loader(k -> k + "V").build());
@@ -158,5 +190,19 @@ public class SimpleCacheManagerTest {
                 .build());
         assertEquals("K10", cache.get("K1"));
         TestUtil.waitUtil(() -> !"K10".equals(cache.get("K1")));
+    }
+
+    private static class CountingInterceptor implements ExternalCacheWriteInterceptor {
+        private final AtomicInteger count = new AtomicInteger();
+
+        @Override
+        public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
+            count.incrementAndGet();
+            return WriteInterceptDecision.allow();
+        }
+
+        int getCount() {
+            return count.get();
+        }
     }
 }

@@ -50,7 +50,8 @@ public class SpringConfigProviderTest {
     private static ExternalCacheWriteInterceptor noopInterceptor() {
         return new ExternalCacheWriteInterceptor() {
             @Override
-            public <K, V> void intercept(WriteContext<K, V> ctx) {
+            public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
+                return WriteInterceptDecision.allow();
             }
         };
     }

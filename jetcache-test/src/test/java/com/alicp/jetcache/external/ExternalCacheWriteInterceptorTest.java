@@ -91,7 +91,7 @@ public class ExternalCacheWriteInterceptorTest {
     }
 
     @Test
-    public void testPutAllShouldNotPartiallyWriteWhenInterceptorFailsMidBatch() {
+    public void testPutAllShouldNotPartiallyWriteWhenInterceptorRejectsMidBatch() {
         MockRemoteCache c = (MockRemoteCache) MockRemoteCacheBuilder.createMockRemoteCacheBuilder()
                 .keyPrefix("")
                 .addWriteInterceptor(new KeyRejectingInterceptor("K2"))
@@ -103,6 +103,7 @@ public class ExternalCacheWriteInterceptorTest {
 
         CacheResult result = c.PUT_ALL(map);
         assertEquals(CacheResultCode.FAIL, result.getResultCode());
+        assertEquals("REJECTED_KEY: reject key K2", result.getMessage());
         assertNull(c.get("K1"));
         assertNull(c.get("K2"));
     }
@@ -113,10 +114,11 @@ public class ExternalCacheWriteInterceptorTest {
         private WriteContext.Op lastOp;
 
         @Override
-        public <K, V> void intercept(WriteContext<K, V> ctx) {
+        public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
             lastKeySize = ctx.getKeySize();
             lastValueSize = ctx.getValueSize();
             lastOp = ctx.getOp();
+            return WriteInterceptDecision.allow();
         }
 
         int getLastKeySize() {
@@ -134,7 +136,7 @@ public class ExternalCacheWriteInterceptorTest {
 
     private static class FailingInterceptor implements ExternalCacheWriteInterceptor {
         @Override
-        public <K, V> void intercept(WriteContext<K, V> ctx) {
+        public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
             throw new IllegalStateException("interceptor failure");
         }
     }
@@ -147,10 +149,11 @@ public class ExternalCacheWriteInterceptorTest {
         }
 
         @Override
-        public <K, V> void intercept(WriteContext<K, V> ctx) {
+        public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
             if (rejectedKey.equals(ctx.getKeyObj())) {
-                throw new IllegalStateException("reject key " + rejectedKey);
+                return WriteInterceptDecision.reject("REJECTED_KEY", "reject key " + rejectedKey);
             }
+            return WriteInterceptDecision.allow();
         }
     }
 

@@ -12,7 +12,7 @@ public class AuditExternalCacheWriteInterceptor implements ExternalCacheWriteInt
     private static final Logger logger = LoggerFactory.getLogger(AuditExternalCacheWriteInterceptor.class);
 
     @Override
-    public <K, V> void intercept(WriteContext<K, V> ctx) {
+    public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
         logger.info("Operation: {}, Key: {}, Value: {}, ValueSize: {}, Expire: {} {}",
                 ctx.getOp(),
                 ctx.getKeyObj(),
@@ -20,5 +20,6 @@ public class AuditExternalCacheWriteInterceptor implements ExternalCacheWriteInt
                 ctx.getValueSize(),
                 ctx.getExpireAfterWrite(),
                 ctx.getTimeUnit());
+        return WriteInterceptDecision.allow();
     }
 }

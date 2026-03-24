@@ -12,7 +12,8 @@ import org.springframework.stereotype.Component;
 public class LoggingExternalCacheWriteInterceptor implements ExternalCacheWriteInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(LoggingExternalCacheWriteInterceptor.class);
     @Override
-    public void intercept(WriteContext ctx) {
+    public WriteInterceptDecision intercept(WriteContext ctx) {
         logger.info("external cache writing. key: {} value length: {}", ctx.getKeyObj(), ctx.getValueSize());
+        return WriteInterceptDecision.allow();
     }
 }

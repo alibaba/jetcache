@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 public class LoggingExternalCacheWriteInterceptor implements ExternalCacheWriteInterceptor{
     private static Logger logger = LoggerFactory.getLogger(LoggingExternalCacheWriteInterceptor.class);
     @Override
-    public void intercept(WriteContext ctx) {
+    public WriteInterceptDecision intercept(WriteContext ctx) {
         logger.info("external cache writing. key: {} value length: {}", ctx.getKeyObj(), ctx.getValueSize());
+        return WriteInterceptDecision.allow();
     }
 }

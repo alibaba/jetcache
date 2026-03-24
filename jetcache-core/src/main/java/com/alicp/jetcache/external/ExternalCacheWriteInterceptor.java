@@ -10,10 +10,11 @@ import java.util.concurrent.TimeUnit;
  * This hook is intended for observation, validation and side effects such as
  * logging, metrics or big-key detection. The provided {@link WriteContext}
  * exposes read-only metadata of the outgoing write request and does not expose
- * mutable encoded payload bytes through this API.
- * Any exception thrown by an interceptor marks the current write operation as
- * failed. The failure is reported through the cache write result rather than
- * propagating from the base write methods.
+ * mutable encoded payload bytes through this API. Returning
+ * {@link WriteInterceptDecision#reject(String)} marks the current write
+ * operation as rejected. Throwing an exception indicates the interceptor
+ * itself failed unexpectedly. Both outcomes are reported through the cache
+ * write result rather than propagating from the base write methods.
  * </p>
  *
  * Created on 2026/1/30.
@@ -22,13 +23,69 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ExternalCacheWriteInterceptor {
 
-    <K, V> void intercept(WriteContext<K, V> ctx);
+    <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx);
+
+    /**
+     * Decision returned by {@link #intercept(WriteContext)}.
+     */
+    final class WriteInterceptDecision {
+
+        public enum Type {ALLOW, REJECT}
+
+        public static final WriteInterceptDecision ALLOW =
+                new WriteInterceptDecision(Type.ALLOW, null, null);
+
+        private final Type type;
+
+        private final String code;
+
+        private final String message;
+
+        private WriteInterceptDecision(Type type, String code, String message) {
+            this.type = type;
+            this.code = code;
+            this.message = message;
+        }
+
+        public static WriteInterceptDecision allow() {
+            return ALLOW;
+        }
+
+        public static WriteInterceptDecision reject(String message) {
+            return new WriteInterceptDecision(Type.REJECT, null, message);
+        }
+
+        public static WriteInterceptDecision reject(String code, String message) {
+            return new WriteInterceptDecision(Type.REJECT, code, message);
+        }
+
+        public boolean isAllow() {
+            return type == Type.ALLOW;
+        }
+
+        public boolean isReject() {
+            return type == Type.REJECT;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
 
 
     /**
      * Read-only metadata of a single external cache write attempt.
-     * Throwing an exception from {@link #intercept(WriteContext)} rejects the
-     * current write operation.
+     * Returning {@link WriteInterceptDecision#reject(String)} rejects the
+     * current write operation. Throwing an exception indicates the interceptor
+     * itself failed unexpectedly.
      */
     final class WriteContext<K, V> {
 
