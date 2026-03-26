@@ -75,6 +75,28 @@ public class ExternalWriteInterceptorAnnotationIntegrationTest extends SpringTes
         bean.putViaCreateCache("K2", "V2");
         Assert.assertEquals(1, interceptor.getCount());
         Assert.assertEquals(0, globalInterceptor.getCount());
+        Assert.assertEquals("V2", bean.getViaCreateCache("K2"));
+    }
+
+    @Test
+    public void testEmptyAnnotationConfigShouldDisableGlobalInterceptor() {
+        CountingInterceptor interceptor = (CountingInterceptor) context.getBean("countingInterceptor");
+        CountingInterceptor globalInterceptor = (CountingInterceptor) context.getBean("globalCountingInterceptor");
+        CountBean bean = context.getBean(CountBean.class);
+
+        interceptor.reset();
+        globalInterceptor.reset();
+        String value = bean.countWithoutInterceptor("K3");
+        Assert.assertEquals(value, bean.countWithoutInterceptor("K3"));
+        Assert.assertEquals(0, interceptor.getCount());
+        Assert.assertEquals(0, globalInterceptor.getCount());
+
+        interceptor.reset();
+        globalInterceptor.reset();
+        bean.putViaCreateCacheWithoutInterceptor("K4", "V4");
+        Assert.assertEquals(0, interceptor.getCount());
+        Assert.assertEquals(0, globalInterceptor.getCount());
+        Assert.assertEquals("V4", bean.getViaCreateCacheWithoutInterceptor("K4"));
     }
 
     public static class CountBean {
@@ -84,6 +106,13 @@ public class ExternalWriteInterceptorAnnotationIntegrationTest extends SpringTes
                 timeUnit = TimeUnit.SECONDS,
                 externalWriteInterceptors = "bean:countingInterceptor")
         private Cache<Object, Object> createCache;
+
+        @CreateCache(name = "annoCreateCacheWriteInterceptorDisabled",
+                cacheType = CacheType.REMOTE,
+                expire = 3,
+                timeUnit = TimeUnit.SECONDS,
+                externalWriteInterceptors = "")
+        private Cache<Object, Object> createCacheWithoutInterceptor;
 
         private int i;
 
@@ -97,8 +126,30 @@ public class ExternalWriteInterceptorAnnotationIntegrationTest extends SpringTes
             return key + i++;
         }
 
+        @Cached(name = "annoCachedWriteInterceptorDisabled",
+                cacheType = CacheType.REMOTE,
+                expire = 3,
+                timeUnit = TimeUnit.SECONDS,
+                key = "#key",
+                externalWriteInterceptors = "")
+        public String countWithoutInterceptor(String key) {
+            return key + i++;
+        }
+
         public void putViaCreateCache(String key, String value) {
             createCache.put(key, value);
+        }
+
+        public Object getViaCreateCache(String key) {
+            return createCache.get(key);
+        }
+
+        public void putViaCreateCacheWithoutInterceptor(String key, String value) {
+            createCacheWithoutInterceptor.put(key, value);
+        }
+
+        public Object getViaCreateCacheWithoutInterceptor(String key) {
+            return createCacheWithoutInterceptor.get(key);
         }
     }
 

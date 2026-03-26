@@ -186,7 +186,7 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         if (config.getValueDecoder() != null) {
             cacheBuilder.getConfig().setValueDecoder(config.getValueDecoder());
         }
-        if (config.getExternalWriteInterceptors() != null && !config.getExternalWriteInterceptors().isEmpty()) {
+        if (config.getExternalWriteInterceptors() != null) {
             cacheBuilder.getConfig().setWriteInterceptors(config.getExternalWriteInterceptors());
         }
         cacheBuilder.setCacheNullValue(config.getCacheNullValue() != null ?

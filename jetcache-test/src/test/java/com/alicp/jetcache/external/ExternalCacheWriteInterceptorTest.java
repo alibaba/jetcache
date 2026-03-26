@@ -22,10 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ExternalCacheWriteInterceptorTest {
 
     @Test
-    public void testWriteInterceptOnlyLogging() {
+    public void testWriteInterceptShouldCoverAllWriteOperations() {
+        CountingInterceptor interceptor = new CountingInterceptor();
         MockRemoteCache c = (MockRemoteCache) MockRemoteCacheBuilder.createMockRemoteCacheBuilder()
                 .keyPrefix("")
-                .addWriteInterceptor(new LoggingExternalCacheWriteInterceptor())
+                .addWriteInterceptor(interceptor)
                 .buildCache();
         c.put("key", "value");
         c.putIfAbsent("key", "value");
@@ -34,6 +35,8 @@ public class ExternalCacheWriteInterceptorTest {
         map.put("K2", "V2");
         c.putAll(map);
         c.put("key", "LONG_TEXT_VALUE");
+
+        assertEquals(5, interceptor.getCount());
     }
 
     @Test
@@ -131,6 +134,20 @@ public class ExternalCacheWriteInterceptorTest {
 
         WriteContext.Op getLastOp() {
             return lastOp;
+        }
+    }
+
+    private static class CountingInterceptor implements ExternalCacheWriteInterceptor {
+        private int count;
+
+        @Override
+        public <K, V> WriteInterceptDecision intercept(WriteContext<K, V> ctx) {
+            count++;
+            return WriteInterceptDecision.allow();
+        }
+
+        int getCount() {
+            return count;
         }
     }
 

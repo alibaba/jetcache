@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,8 +20,11 @@ public class DefaultSpringExternalWriteInterceptorParser
 
     @Override
     public List<ExternalCacheWriteInterceptor> parseExternalWriteInterceptors(String value) {
-        if (value == null || value.trim().isEmpty()) {
+        if (value == null) {
             return null;
+        }
+        if (value.trim().isEmpty()) {
+            return Collections.emptyList();
         }
         List<ExternalCacheWriteInterceptor> interceptors = new ArrayList<>();
         String[] beanRefs = value.split(",");
@@ -41,7 +45,7 @@ public class DefaultSpringExternalWriteInterceptorParser
                 }
             }
         }
-        return interceptors.isEmpty() ? null : interceptors;
+        return interceptors;
     }
 
     @Override

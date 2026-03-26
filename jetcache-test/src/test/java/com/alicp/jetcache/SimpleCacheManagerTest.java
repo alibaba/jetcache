@@ -168,9 +168,38 @@ public class SimpleCacheManagerTest {
 
         assertEquals(0, globalInterceptor.getCount());
         assertEquals(1, localInterceptor.getCount());
+        assertEquals("V1", cache.get("K1"));
         ExternalCacheConfig config = (ExternalCacheConfig) cache.config();
         assertEquals(1, config.getWriteInterceptors().size());
         assertSame(localInterceptor, config.getWriteInterceptors().get(0));
+    }
+
+    @Test
+    public void testQuickConfigEmptyExternalWriteInterceptorsShouldDisableGlobalConfig() {
+        CountingInterceptor globalInterceptor = new CountingInterceptor();
+
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        MockRemoteCacheBuilder remoteBuilder = (MockRemoteCacheBuilder)
+                globalCacheConfig.getRemoteCacheBuilders().get(CacheConsts.DEFAULT_AREA);
+        remoteBuilder.addWriteInterceptor(globalInterceptor);
+
+        cacheManager.close();
+        cacheManager = new SimpleCacheManager();
+        CacheBuilderTemplate cb = new CacheBuilderTemplate(false,
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        cacheManager.setCacheBuilderTemplate(cb);
+
+        String cacheName = UUID.randomUUID().toString();
+        Cache<Object, Object> cache = cacheManager.getOrCreateCache(QuickConfig.newBuilder(cacheName)
+                .externalWriteInterceptors(Collections.emptyList())
+                .build());
+
+        cache.put("K1", "V1");
+
+        assertEquals(0, globalInterceptor.getCount());
+        assertEquals("V1", cache.get("K1"));
+        ExternalCacheConfig config = (ExternalCacheConfig) cache.config();
+        assertTrue(config.getWriteInterceptors().isEmpty());
     }
 
     @Test
