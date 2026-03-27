@@ -23,7 +23,8 @@ jetcache:
       broadcastChannel: projectA
       valueEncoder: java #other choose：kryo/kryo5
       valueDecoder: java #other choose：kryo/kryo5
-      externalWriteInterceptors: logging
+      # Demonstrates both resolution paths: Spring bean via "bean:" and customContainer entry via plain name.
+      externalWriteInterceptors: bean:loggingExternalCacheWriteInterceptor,auditExternalCacheWriteInterceptor
       poolConfig:
         minIdle: 5
         maxIdle: 20

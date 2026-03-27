@@ -23,7 +23,8 @@ jetcache:
       broadcastChannel: projectA
       valueEncoder: java #其他可选：kryo/kryo5
       valueDecoder: java #其他可选：kryo/kryo5
-      externalWriteInterceptors: logging
+      # 同时演示两种解析方式：带 bean: 前缀的 Spring Bean，以及 plain name 对应的 customContainer 条目
+      externalWriteInterceptors: bean:loggingExternalCacheWriteInterceptor,auditExternalCacheWriteInterceptor
       poolConfig:
         minIdle: 5
         maxIdle: 20
