@@ -3,7 +3,7 @@
 > JetCache support *jedis*, *lettuce* and *redisson*.
 > In JetCache, the lettuce client brings asynchronous access and cluster support.
 
-Add *jetcache-redssion* or *jetcache-starter-redssion*(spring boot) to *pom.xml* if you choose to using redisson client.
+Add *jetcache-redisson* or *jetcache-starter-redisson*(spring boot) to *pom.xml* if you choose to using redisson client.
 # with spring boot
 
 JetCache Redisson does not support creating clients through configuration, but instead obtains the Client instance by getting the Spring bean. 
