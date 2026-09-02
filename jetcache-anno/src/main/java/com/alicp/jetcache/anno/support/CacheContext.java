@@ -7,6 +7,7 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.anno.CacheConsts;
+import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.EnableCache;
 import com.alicp.jetcache.anno.method.CacheInvokeContext;
 import com.alicp.jetcache.template.QuickConfig;
@@ -114,6 +115,13 @@ public class CacheContext {
             b.penetrationProtectTimeout(ppc.getPenetrationProtectTimeout());
         }
         b.refreshPolicy(cac.getRefreshPolicy());
+        if (!CacheConsts.isUndefined(cac.getExternalWriteInterceptors())) {
+            if (cac.getCacheType() == CacheType.LOCAL) {
+                throw new CacheConfigException("externalWriteInterceptors only works for REMOTE or BOTH cache types");
+            } else {
+                b.externalWriteInterceptors(configProvider.parseWriteInterceptors(cac.getExternalWriteInterceptors()));
+            }
+        }
         return cacheManager.getOrCreateCache(b.build());
     }
 

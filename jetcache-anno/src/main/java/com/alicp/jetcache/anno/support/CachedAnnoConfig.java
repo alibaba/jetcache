@@ -29,6 +29,7 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
     private Function<Object, Boolean> postConditionEvaluator;
     private RefreshPolicy refreshPolicy;
     private PenetrationProtectConfig penetrationProtectConfig;
+    private String externalWriteInterceptors;
 
     public boolean isEnabled() {
         return enabled;
@@ -141,5 +142,13 @@ public class CachedAnnoConfig extends CacheAnnoConfig {
 
     public void setSyncLocal(boolean syncLocal) {
         this.syncLocal = syncLocal;
+    }
+
+    public String getExternalWriteInterceptors() {
+        return externalWriteInterceptors;
+    }
+
+    public void setExternalWriteInterceptors(String externalWriteInterceptors) {
+        this.externalWriteInterceptors = externalWriteInterceptors;
     }
 }

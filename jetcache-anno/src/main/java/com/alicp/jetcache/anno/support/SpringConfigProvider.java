@@ -22,11 +22,21 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
         super();
         encoderParser = new DefaultSpringEncoderParser();
         keyConvertorParser = new DefaultSpringKeyConvertorParser();
+        externalWriteInterceptorParser = new DefaultSpringExternalWriteInterceptorParser();
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        if (encoderParser instanceof ApplicationContextAware) {
+            ((ApplicationContextAware) encoderParser).setApplicationContext(applicationContext);
+        }
+        if (keyConvertorParser instanceof ApplicationContextAware) {
+            ((ApplicationContextAware) keyConvertorParser).setApplicationContext(applicationContext);
+        }
+        if (externalWriteInterceptorParser instanceof ApplicationContextAware) {
+            ((ApplicationContextAware) externalWriteInterceptorParser).setApplicationContext(applicationContext);
+        }
     }
 
     @Override
@@ -36,6 +46,9 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
         }
         if (keyConvertorParser instanceof ApplicationContextAware) {
             ((ApplicationContextAware) keyConvertorParser).setApplicationContext(applicationContext);
+        }
+        if (externalWriteInterceptorParser instanceof ApplicationContextAware) {
+            ((ApplicationContextAware) externalWriteInterceptorParser).setApplicationContext(applicationContext);
         }
         super.doInit();
     }
@@ -59,8 +72,13 @@ public class SpringConfigProvider extends ConfigProvider implements ApplicationC
 
     @Autowired(required = false)
     @Override
+    public void setExternalWriteInterceptorParser(ExternalWriteInterceptorParser externalWriteInterceptorParser) {
+        super.setExternalWriteInterceptorParser(externalWriteInterceptorParser);
+    }
+
+    @Autowired(required = false)
+    @Override
     public void setMetricsCallback(Consumer<StatInfo> metricsCallback) {
         super.setMetricsCallback(metricsCallback);
     }
-
 }

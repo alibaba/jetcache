@@ -23,6 +23,8 @@ jetcache:
       broadcastChannel: projectA
       valueEncoder: java #other choose：kryo/kryo5
       valueDecoder: java #other choose：kryo/kryo5
+      # Demonstrates both resolution paths: Spring bean via "bean:" and customContainer entry via plain name.
+      externalWriteInterceptors: bean:loggingExternalCacheWriteInterceptor,auditExternalCacheWriteInterceptor
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -60,6 +62,7 @@ The description of configuration listed in the below table:
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | infinity | Global config of write expire time, in millis.                                                                                                                                                                                                                                                                                                       |
 | jetcache.remote.${area}.broadcastChannel | n/a | jetcahe2.7 support invalidate local cache of other jvm after updatation (cacheType = CacheType.BOTH), this config specify broadcast channel, this feature disabled if not set                                                                                                                                                                        |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0 | Global config of read expire time, in millis. Need jetcache2.2+, only local cache support this feature. 0 indicates disabled read expire feature.                                                                                                                                                                                                    |
+| jetcache.remote.${area}.externalWriteInterceptors | n/a | Specify external cache pre-write hooks, separated by commas. `bean:xxx` resolves a Spring Bean by name; a plain name resolves an entry from `AutoConfigureBeans.customContainer`. Example: `bean:loggingInterceptor,logging`. The hook receives read-only write metadata and is intended for logging, auditing, metrics or big-key detection, not for mutating the outgoing encoded write request. Returning `WriteInterceptDecision.reject(...)` rejects the current write operation through its cache result. Throwing an exception indicates the interceptor itself failed unexpectedly and is also reported through the cache result instead of propagating from the base write methods. Cache-specific configuration such as `@Cached`, `@CreateCache`, or `QuickConfig.externalWriteInterceptors(...)` overrides this global setting for the current cache. |
 | jetcache.decodeFilterEnabled | true | Master switch for deserialization filter, enabled by default. Set to false to restore old behavior (NOT recommended) |
 | jetcache.decodeFilterAllowPatterns | undefined | User-defined allow patterns appended to the default allow list. Three match modes are supported (see below) |
 | jetcache.decodeFilterDenyPatterns | undefined | User-defined deny patterns appended to the default deny list. Deny patterns always take precedence over allow patterns |

@@ -1,7 +1,13 @@
 package com.alicp.jetcache.redisson;
 
-import com.alicp.jetcache.*;
+import com.alicp.jetcache.CacheConfig;
+import com.alicp.jetcache.CacheGetResult;
+import com.alicp.jetcache.CacheResult;
+import com.alicp.jetcache.CacheResultCode;
+import com.alicp.jetcache.CacheValueHolder;
+import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import com.alicp.jetcache.support.CacheEncodeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -13,7 +19,9 @@ import org.redisson.client.codec.Codec;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -41,7 +49,11 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
 
     protected String getCacheKey(final K key) {
         final byte[] newKey = buildKey(key);
-        return new String(newKey, StandardCharsets.UTF_8);
+        return getCacheKey(newKey);
+    }
+
+    protected String getCacheKey(final byte[] key) {
+        return new String(key, StandardCharsets.UTF_8);
     }
 
     @Override
@@ -73,7 +85,7 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
                 holder = (CacheValueHolder<V>) valueDecoder.apply(data);
             } catch (CacheEncodeException e) {
                 holder = compatibleOldVal(key, data, counter + 1);
-                if(Objects.isNull(holder)){
+                if (Objects.isNull(holder)) {
                     logError("decoder", key, e);
                 }
             } catch (Throwable e) {
@@ -169,7 +181,14 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
     protected CacheResult do_PUT(final K key, final V value, final long expireAfterWrite, final TimeUnit timeUnit) {
         try {
             final CacheValueHolder<V> holder = new CacheValueHolder<>(value, timeUnit.toMillis(expireAfterWrite));
-            this.client.getBucket(getCacheKey(key), getCodec()).set(encoder(holder), expireAfterWrite, timeUnit);
+            byte[] keyBytes = buildKey(key);
+            byte[] valueBytes = encoder(holder);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
+            this.client.getBucket(getCacheKey(keyBytes), getCodec()).set(valueBytes, expireAfterWrite, timeUnit);
             return CacheGetResult.SUCCESS_WITHOUT_MSG;
         } catch (Throwable e) {
             logError("PUT", key, e);
@@ -182,14 +201,30 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             if (Objects.nonNull(map) && !map.isEmpty()) {
                 final long expire = timeUnit.toMillis(expireAfterWrite);
-                final RBatch batch = this.client.createBatch();
+                final List<byte[]> preparedKeys = new ArrayList<>(map.size());
+                final List<byte[]> preparedValues = new ArrayList<>(map.size());
                 map.forEach((k, v) -> {
                     final CacheValueHolder<V> holder = new CacheValueHolder<>(v, expire);
-                    batch.getBucket(getCacheKey(k), getCodec()).setAsync(encoder(holder), expireAfterWrite, timeUnit);
+                    final byte[] keyBytes = buildKey(k);
+                    byte[] valueBytes = encoder(holder);
+                    CacheResult interceptorResult = interceptWrite(k, v, keyBytes, valueBytes,
+                            expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+                    if (interceptorResult != null) {
+                        throw new InterceptorAbortException(interceptorResult);
+                    }
+                    preparedKeys.add(keyBytes);
+                    preparedValues.add(valueBytes);
                 });
+                final RBatch batch = this.client.createBatch();
+                for (int i = 0; i < preparedKeys.size(); i++) {
+                    batch.getBucket(getCacheKey(preparedKeys.get(i)), getCodec())
+                            .setAsync(preparedValues.get(i), expireAfterWrite, timeUnit);
+                }
                 batch.execute();
             }
             return CacheResult.SUCCESS_WITHOUT_MSG;
+        } catch (InterceptorAbortException e) {
+            return e.getResult();
         } catch (Throwable e) {
             logError("PUT_ALL", "map(" + map.size() + ")", e);
             return new CacheResult(e);
@@ -227,11 +262,30 @@ public class RedissonCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             final Duration expire = Duration.ofMillis(timeUnit.toMillis(expireAfterWrite));
             final CacheValueHolder<V> holder = new CacheValueHolder<>(value, expire.toMillis());
-            final boolean success = this.client.getBucket(getCacheKey(key), getCodec()).setIfAbsent(encoder(holder), expire);
+            final byte[] keyBytes = buildKey(key);
+            final byte[] valueBytes = encoder(holder);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
+            final boolean success = this.client.getBucket(getCacheKey(keyBytes), getCodec()).setIfAbsent(valueBytes, expire);
             return success ? CacheResult.SUCCESS_WITHOUT_MSG : CacheResult.EXISTS_WITHOUT_MSG;
         } catch (Throwable e) {
             logError("PUT_IF_ABSENT", key, e);
             return new CacheResult(e);
+        }
+    }
+
+    private static class InterceptorAbortException extends RuntimeException {
+        private final CacheResult result;
+
+        private InterceptorAbortException(CacheResult result) {
+            this.result = result;
+        }
+
+        private CacheResult getResult() {
+            return result;
         }
     }
 }

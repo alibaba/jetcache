@@ -97,4 +97,27 @@ public @interface CreateCache {
      * @return convertor name of cache key
      */
     String keyConvertor() default CacheConsts.UNDEFINED_STRING;
+
+    /**
+     * Specify external cache write pre-hooks for this cache.
+     * Multiple interceptor bean references can be separated by commas.
+     * In annotation-based configuration, interceptor beans must be Spring beans
+     * referenced with the {@code bean:} prefix, for example
+     * {@code bean:loggingInterceptor,bean:auditInterceptor}.
+     * <p>
+     * The hook runs before REMOTE/BOTH cache write attempts and receives an
+     * read-only write metadata view. It is intended for observation or
+     * validation, not for mutating the outgoing encoded write request.
+     * Throwing an exception from the hook causes the current write operation
+     * to fail through its cache result instead of propagating from the base
+     * write methods.
+     * </p>
+     * <p>
+     * This attribute is only valid for external caches (REMOTE or BOTH cache types).
+     * Using it with LOCAL cache type is a configuration error.
+     * </p>
+     *
+     * @return external cache write interceptor bean references
+     */
+    String externalWriteInterceptors() default CacheConsts.UNDEFINED_STRING;
 }

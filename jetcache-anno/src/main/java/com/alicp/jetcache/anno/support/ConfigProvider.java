@@ -1,8 +1,10 @@
 package com.alicp.jetcache.anno.support;
 
 import com.alicp.jetcache.CacheBuilder;
+import com.alicp.jetcache.CacheConfigException;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
+import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.AbstractLifecycle;
 import com.alicp.jetcache.support.DecodeFilter;
@@ -33,6 +35,7 @@ public class ConfigProvider extends AbstractLifecycle {
 
     protected EncoderParser encoderParser;
     protected KeyConvertorParser keyConvertorParser;
+    protected ExternalWriteInterceptorParser externalWriteInterceptorParser;
     private Consumer<StatInfo> metricsCallback;
 
     private CacheBuilderTemplate cacheBuilderTemplate;
@@ -40,6 +43,7 @@ public class ConfigProvider extends AbstractLifecycle {
     public ConfigProvider() {
         encoderParser = new DefaultEncoderParser();
         keyConvertorParser = new DefaultKeyConvertorParser();
+        externalWriteInterceptorParser = new DefaultExternalWriteInterceptorParser();
         metricsCallback = new StatInfoLogger(false);
     }
 
@@ -153,6 +157,14 @@ public class ConfigProvider extends AbstractLifecycle {
         return keyConvertorParser.parseKeyConvertor(convertor);
     }
 
+    public List<ExternalCacheWriteInterceptor> parseWriteInterceptors(String value) {
+        if (externalWriteInterceptorParser == null) {
+            throw new CacheConfigException("externalWriteInterceptors is configured, " +
+                    "but no ExternalWriteInterceptorParser is available for the current ConfigProvider");
+        }
+        return externalWriteInterceptorParser.parseExternalWriteInterceptors(value);
+    }
+
     public CacheNameGenerator createCacheNameGenerator(String[] hiddenPackages) {
         return new DefaultCacheNameGenerator(hiddenPackages);
     }
@@ -167,6 +179,10 @@ public class ConfigProvider extends AbstractLifecycle {
 
     public void setKeyConvertorParser(KeyConvertorParser keyConvertorParser) {
         this.keyConvertorParser = keyConvertorParser;
+    }
+
+    public void setExternalWriteInterceptorParser(ExternalWriteInterceptorParser externalWriteInterceptorParser) {
+        this.externalWriteInterceptorParser = externalWriteInterceptorParser;
     }
 
     public GlobalCacheConfig getGlobalCacheConfig() {

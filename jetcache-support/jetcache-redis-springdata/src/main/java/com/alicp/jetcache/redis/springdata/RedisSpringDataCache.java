@@ -7,6 +7,7 @@ import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.CacheValueHolder;
 import com.alicp.jetcache.MultiGetResult;
 import com.alicp.jetcache.external.AbstractExternalCache;
+import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -127,6 +128,11 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
             byte[] keyBytes = buildKey(key);
             byte[] valueBytes = valueEncoder.apply(holder);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
             Boolean result = con.pSetEx(keyBytes, timeUnit.toMillis(expireAfterWrite), valueBytes);
             if (Boolean.TRUE.equals(result)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
@@ -145,13 +151,26 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
     protected CacheResult do_PUT_ALL(Map<? extends K, ? extends V> map, long expireAfterWrite, TimeUnit timeUnit) {
         RedisConnection con = null;
         try {
-            con = connectionFactory.getConnection();
-            int failCount = 0;
+            List<byte[]> preparedKeys = new ArrayList<>(map.size());
+            List<byte[]> preparedValues = new ArrayList<>(map.size());
             for (Map.Entry<? extends K, ? extends V> en : map.entrySet()) {
                 CacheValueHolder<V> holder = new CacheValueHolder(en.getValue(), timeUnit.toMillis(expireAfterWrite));
-                Boolean result = con.pSetEx(buildKey(en.getKey()),
-                        timeUnit.toMillis(expireAfterWrite), valueEncoder.apply(holder));
-                if(!Boolean.TRUE.equals(result)){
+                byte[] keyBytes = buildKey(en.getKey());
+                byte[] valueBytes = valueEncoder.apply(holder);
+                CacheResult interceptorResult = interceptWrite(en.getKey(), en.getValue(), keyBytes, valueBytes,
+                        expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_ALL);
+                if (interceptorResult != null) {
+                    return interceptorResult;
+                }
+                preparedKeys.add(keyBytes);
+                preparedValues.add(valueBytes);
+            }
+            con = connectionFactory.getConnection();
+            int failCount = 0;
+            for (int i = 0; i < preparedKeys.size(); i++) {
+                Boolean result = con.pSetEx(preparedKeys.get(i),
+                        timeUnit.toMillis(expireAfterWrite), preparedValues.get(i));
+                if (!Boolean.TRUE.equals(result)) {
                     failCount++;
                 }
             }
@@ -215,9 +234,15 @@ public class RedisSpringDataCache<K, V> extends AbstractExternalCache<K, V> {
         try {
             con = connectionFactory.getConnection();
             CacheValueHolder<V> holder = new CacheValueHolder(value, timeUnit.toMillis(expireAfterWrite));
-            byte[] newKey = buildKey(key);
-            Boolean result = con.set(newKey, valueEncoder.apply(holder),
-                   Expiration.from(expireAfterWrite, timeUnit), RedisStringCommands.SetOption.ifAbsent());
+            byte[] keyBytes = buildKey(key);
+            byte[] valueBytes = valueEncoder.apply(holder);
+            CacheResult interceptorResult = interceptWrite(key, value, keyBytes, valueBytes,
+                    expireAfterWrite, timeUnit, ExternalCacheWriteInterceptor.WriteContext.Op.PUT_IF_ABSENT);
+            if (interceptorResult != null) {
+                return interceptorResult;
+            }
+            Boolean result = con.set(keyBytes, valueBytes,
+                    Expiration.from(expireAfterWrite, timeUnit), RedisStringCommands.SetOption.ifAbsent());
             if (Boolean.TRUE.equals(result)) {
                 return CacheResult.SUCCESS_WITHOUT_MSG;
             }/* else if (result == null) {

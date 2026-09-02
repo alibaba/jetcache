@@ -7,8 +7,10 @@ import com.alicp.jetcache.CacheLoader;
 import com.alicp.jetcache.RefreshPolicy;
 import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -32,6 +34,7 @@ public class QuickConfig {
     private Duration penetrationProtectTimeout;
     private RefreshPolicy refreshPolicy;
     private CacheLoader<? extends Object, ? extends Object> loader;
+    private List<ExternalCacheWriteInterceptor> externalWriteInterceptors;
 
     private QuickConfig() {
     }
@@ -61,6 +64,7 @@ public class QuickConfig {
         private Duration penetrationProtectTimeout;
         private RefreshPolicy refreshPolicy;
         private CacheLoader<? extends Object, ? extends Object> loader;
+        private List<ExternalCacheWriteInterceptor> externalWriteInterceptors;
 
         Builder(String name) {
             Objects.requireNonNull(name);
@@ -92,6 +96,7 @@ public class QuickConfig {
             c.penetrationProtectTimeout = penetrationProtectTimeout;
             c.refreshPolicy = refreshPolicy;
             c.loader = loader;
+            c.externalWriteInterceptors = externalWriteInterceptors;
             return c;
         }
 
@@ -164,6 +169,15 @@ public class QuickConfig {
             this.loader = loader;
             return this;
         }
+
+        public Builder externalWriteInterceptors(List<ExternalCacheWriteInterceptor> externalWriteInterceptors) {
+            this.externalWriteInterceptors = externalWriteInterceptors;
+            return this;
+        }
+
+        public List<ExternalCacheWriteInterceptor> getExternalWriteInterceptors() {
+            return externalWriteInterceptors;
+        }
     }
 
     public String getArea() {
@@ -228,5 +242,9 @@ public class QuickConfig {
 
     public <K, V> CacheLoader<K, V> getLoader() {
         return (CacheLoader<K, V>) loader;
+    }
+
+    public List<ExternalCacheWriteInterceptor> getExternalWriteInterceptors() {
+        return externalWriteInterceptors;
     }
 }

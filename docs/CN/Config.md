@@ -23,6 +23,8 @@ jetcache:
       broadcastChannel: projectA
       valueEncoder: java #其他可选：kryo/kryo5
       valueDecoder: java #其他可选：kryo/kryo5
+      # 同时演示两种解析方式：带 bean: 前缀的 Spring Bean，以及 plain name 对应的 customContainer 条目
+      externalWriteInterceptors: bean:loggingExternalCacheWriteInterceptor,auditExternalCacheWriteInterceptor
       poolConfig:
         minIdle: 5
         maxIdle: 20
@@ -60,6 +62,7 @@ jetcache:
 | jetcache.[local/remote].${area}.expireAfterWriteInMillis | 无穷大                         | 以毫秒为单位指定超时时间的全局配置(以前为defaultExpireInMillis)                                                                                                                                                           |
 | jetcache.remote.${area}.broadcastChannel | 无                           | jetcahe2.7的两级缓存支持更新以后失效其他JVM中的local cache，但多个服务共用redis同一个channel可能会造成广播风暴，需要在这里指定channel，你可以决定多个不同的服务是否共用同一个channel。如果没有指定则不开启。                                                                       |
 | jetcache.local.${area}.expireAfterAccessInMillis | 0                           | 需要jetcache2.2以上，以毫秒为单位，指定多长时间没有访问，就让缓存失效，当前只有本地缓存支持。0表示不使用这个功能。                                                                                                                                       |
+| jetcache.remote.${area}.externalWriteInterceptors | 无                           | 指定外部缓存写入前回调，多个用逗号分隔。`bean:xxx` 表示按 Spring Bean 名称解析；普通名称表示从 `AutoConfigureBeans.customContainer` 中解析。例如：`bean:loggingInterceptor,logging`。回调接收的是只读写入元数据，适合做日志、审计、埋点、大 key 检测等，不用于修改实际编码后的写入请求。返回 `WriteInterceptDecision.reject(...)` 会拒绝当前写操作，并通过缓存结果返回失败；若回调抛出异常，则表示拦截器自身执行异常，同样会通过缓存结果返回，而不会从基础写方法向外传播。像 `@Cached`、`@CreateCache`、`QuickConfig.externalWriteInterceptors(...)` 这样的单 cache 配置会覆盖这个全局配置。 |
 | jetcache.decodeFilterEnabled | true | 反序列化过滤器总开关，默认开启。关闭后恢复旧行为（不推荐关闭） |
 | jetcache.decodeFilterAllowPatterns | 无 | 用户自定义的允许列表模式，追加到默认允许列表之后。支持三种匹配模式（见下方说明） |
 | jetcache.decodeFilterDenyPatterns | 无 | 用户自定义的拒绝列表模式，追加到默认拒绝列表之后。拒绝列表始终优先于允许列表 |

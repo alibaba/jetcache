@@ -4,6 +4,7 @@ import com.alicp.jetcache.AbstractCacheBuilder;
 import com.alicp.jetcache.CacheManager;
 import com.alicp.jetcache.support.BroadcastManager;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -77,5 +78,12 @@ public abstract class ExternalCacheBuilder<T extends ExternalCacheBuilder<T>> ex
 
     public void setValueDecoder(Function<byte[], Object> valueDecoder){
         getConfig().setValueDecoder(valueDecoder);
+    }
+
+    public void setWriteInterceptors(List<ExternalCacheWriteInterceptor> writeInterceptors){getConfig().setWriteInterceptors(writeInterceptors);}
+
+    public T addWriteInterceptor(ExternalCacheWriteInterceptor interceptor) {
+        getConfig().addWriteInterceptor(interceptor);
+        return self();
     }
 }
