@@ -4,7 +4,6 @@
 package com.alicp.jetcache.support;
 
 import com.alicp.jetcache.CacheValueHolder;
-import com.alicp.jetcache.anno.SerialPolicy;
 
 import java.nio.charset.StandardCharsets;
 
@@ -12,8 +11,11 @@ import java.nio.charset.StandardCharsets;
  * @author huangli
  */
 public abstract class AbstractJsonEncoder extends AbstractValueEncoder {
-    public AbstractJsonEncoder(boolean useIdentityNumber) {
+    private final int identityNumber;
+
+    public AbstractJsonEncoder(boolean useIdentityNumber, int identityNumber) {
         super(useIdentityNumber);
+        this.identityNumber = identityNumber;
     }
 
     protected abstract byte[] encodeSingleValue(Object value);
@@ -26,7 +28,7 @@ public abstract class AbstractJsonEncoder extends AbstractValueEncoder {
             byte[] buffer = useIdentityNumber ? new byte[len + 4] : new byte[len];
             int index = 0;
             if (useIdentityNumber) {
-                index = writeInt(buffer, index, SerialPolicy.IDENTITY_NUMBER_FASTJSON2);
+                index = writeInt(buffer, index, identityNumber);
             }
             if (data == null) {
                 writeShort(buffer, index, -1);
@@ -45,7 +47,7 @@ public abstract class AbstractJsonEncoder extends AbstractValueEncoder {
             }
             return buffer;
         } catch (Throwable e) {
-            StringBuilder sb = new StringBuilder("Fastjson Encode error. ");
+            StringBuilder sb = new StringBuilder("Json Encode error. ");
             sb.append("msg=").append(e.getMessage());
             throw new CacheEncodeException(sb.toString(), e);
         }

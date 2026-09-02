@@ -7,6 +7,7 @@ import com.alicp.jetcache.anno.CacheConsts;
 import com.alicp.jetcache.anno.CacheType;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.embedded.AbstractEmbeddedCache;
+import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.external.AbstractExternalCache;
 import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
@@ -30,6 +31,7 @@ import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -233,5 +235,78 @@ public class SimpleCacheManagerTest {
         int getCount() {
             return count.get();
         }
+    @Test
+    public void testUseDefaultLocalExpireInMultiLevelCache_on_builderShorter() {
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        EmbeddedCacheBuilder localBuilder = (EmbeddedCacheBuilder)
+                globalCacheConfig.getLocalCacheBuilders().get(CacheConsts.DEFAULT_AREA);
+        localBuilder.expireAfterWrite(1000, TimeUnit.MILLISECONDS);
+
+        SimpleCacheManager mgr = new SimpleCacheManager();
+        CacheBuilderTemplate cb = new CacheBuilderTemplate(false, true,
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        mgr.setCacheBuilderTemplate(cb);
+
+        String cacheName = UUID.randomUUID().toString();
+        QuickConfig qc = QuickConfig.newBuilder(cacheName)
+                .expire(Duration.ofSeconds(5))
+                .cacheType(CacheType.BOTH)
+                .build();
+        Cache c = mgr.getOrCreateCache(qc);
+        MultiLevelCache mc = (MultiLevelCache) c;
+        assertTrue(mc.config().isUseExpireOfSubCache());
+        assertEquals(1000, mc.caches()[0].config().getExpireAfterWriteInMillis());
+        assertEquals(5000, mc.caches()[1].config().getExpireAfterWriteInMillis());
+        mgr.close();
+    }
+
+    @Test
+    public void testUseDefaultLocalExpireInMultiLevelCache_on_builderLonger() {
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        EmbeddedCacheBuilder localBuilder = (EmbeddedCacheBuilder)
+                globalCacheConfig.getLocalCacheBuilders().get(CacheConsts.DEFAULT_AREA);
+        localBuilder.expireAfterWrite(10000, TimeUnit.MILLISECONDS);
+
+        SimpleCacheManager mgr = new SimpleCacheManager();
+        CacheBuilderTemplate cb = new CacheBuilderTemplate(false, true,
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        mgr.setCacheBuilderTemplate(cb);
+
+        String cacheName = UUID.randomUUID().toString();
+        QuickConfig qc = QuickConfig.newBuilder(cacheName)
+                .expire(Duration.ofSeconds(5))
+                .cacheType(CacheType.BOTH)
+                .build();
+        Cache c = mgr.getOrCreateCache(qc);
+        MultiLevelCache mc = (MultiLevelCache) c;
+        assertFalse(mc.config().isUseExpireOfSubCache());
+        assertEquals(5000, mc.caches()[0].config().getExpireAfterWriteInMillis());
+        assertEquals(5000, mc.caches()[1].config().getExpireAfterWriteInMillis());
+        mgr.close();
+    }
+
+    @Test
+    public void testUseDefaultLocalExpireInMultiLevelCache_off() {
+        GlobalCacheConfig globalCacheConfig = TestUtil.createGloableConfig();
+        EmbeddedCacheBuilder localBuilder = (EmbeddedCacheBuilder)
+                globalCacheConfig.getLocalCacheBuilders().get(CacheConsts.DEFAULT_AREA);
+        localBuilder.expireAfterWrite(1000, TimeUnit.MILLISECONDS);
+
+        SimpleCacheManager mgr = new SimpleCacheManager();
+        CacheBuilderTemplate cb = new CacheBuilderTemplate(false,
+                globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
+        mgr.setCacheBuilderTemplate(cb);
+
+        String cacheName = UUID.randomUUID().toString();
+        QuickConfig qc = QuickConfig.newBuilder(cacheName)
+                .expire(Duration.ofSeconds(5))
+                .cacheType(CacheType.BOTH)
+                .build();
+        Cache c = mgr.getOrCreateCache(qc);
+        MultiLevelCache mc = (MultiLevelCache) c;
+        assertFalse(mc.config().isUseExpireOfSubCache());
+        assertEquals(5000, mc.caches()[0].config().getExpireAfterWriteInMillis());
+        assertEquals(5000, mc.caches()[1].config().getExpireAfterWriteInMillis());
+        mgr.close();
     }
 }

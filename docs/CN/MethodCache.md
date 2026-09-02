@@ -14,7 +14,7 @@ public interface UserService {
     void deleteUser(long userId);
 }
 ```
-key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)脚本来指定。如果要使用参数名（比如这里的```key="#userId"```），项目编译设置target必须为1.8格式，并且指定javac的-parameters参数，否则就要使用```key="args[0]"```这样按下标访问的形式。
+key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)脚本来指定。如果要使用参数名（比如这里的```key="#userId"```），需要指定javac的-parameters参数，否则就要使用```key="args[0]"```这样按下标访问的形式。
 
 @CacheUpdate和@CacheInvalidate的name和area属性必须和@Cached相同，name属性还会用做cache的key前缀。
 
@@ -32,7 +32,7 @@ key使用Spring的[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framewo
 |localLimit|未定义|如果cacheType为LOCAL或BOTH，这个参数指定本地缓存的最大元素数量，以控制内存占用。如果注解上没有定义，会使用全局配置，如果此时全局配置也没有定义，则为100|
 |localExpire|未定义|仅当cacheType为BOTH时适用，为内存中的Cache指定一个不一样的超时时间，通常应该小于expire|
 |serialPolicy|未定义|指定远程缓存的序列化方式。可选值为SerialPolicy.JAVA和SerialPolicy.KRYO。如果注解上没有定义，会使用全局配置，如果此时全局配置也没有定义，则为SerialPolicy.JAVA|
-|keyConvertor|未定义|指定KEY的转换方式，用于将复杂的KEY类型转换为缓存实现可以接受的类型，当前支持KeyConvertor.FASTJSON和KeyConvertor.NONE。NONE表示不转换，FASTJSON可以将复杂对象KEY转换成String。如果注解上没有定义，会使用全局配置。|
+|keyConvertor|未定义|指定KEY的转换方式，用于将复杂的KEY类型转换为缓存实现可以接受的类型，JetCache内置的可选值为KeyConvertor.FASTJSON、KeyConvertor.JACKSON、KeyConvertor.JACKSON3和KeyConvertor.NONE。NONE表示不转换，FASTJSON通过fastjson2将复杂对象KEY转换成String（2.8起fastjson1已移除，FASTJSON内部使用fastjson2实现）。如果注解上没有定义，会使用全局配置。|
 |enabled|true|是否激活缓存。例如某个dao方法上加缓存注解，由于某些调用场景下不能有缓存，所以可以设置enabled为false，正常调用不会使用缓存，在需要的地方可使用CacheContext.enableCache在回调中激活缓存，缓存激活的标记在ThreadLocal上，该标记被设置后，所有enable=false的缓存都被激活|
 |cacheNullValue|false|当方法返回值为null的时候是否要缓存|
 |condition|未定义|使用[SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html)指定条件，如果表达式返回true的时候才去缓存中查询|

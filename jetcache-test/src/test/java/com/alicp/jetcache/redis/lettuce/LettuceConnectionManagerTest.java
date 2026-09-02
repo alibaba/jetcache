@@ -3,8 +3,8 @@ package com.alicp.jetcache.redis.lettuce;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.cluster.RedisClusterClient;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
@@ -20,9 +20,9 @@ public class LettuceConnectionManagerTest {
         RedisClient client = RedisClient.create("redis://127.0.0.1");
         LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
         m.init(client, null);
-        Assert.assertSame(m.commands(client), m.commands(client));
-        Assert.assertSame(m.asyncCommands(client), m.asyncCommands(client));
-        Assert.assertSame(m.reactiveCommands(client), m.reactiveCommands(client));
+        Assertions.assertSame(m.commands(client), m.commands(client));
+        Assertions.assertSame(m.asyncCommands(client), m.asyncCommands(client));
+        Assertions.assertSame(m.reactiveCommands(client), m.reactiveCommands(client));
         m.removeAndClose(client);
     }
 
@@ -37,9 +37,9 @@ public class LettuceConnectionManagerTest {
         RedisClusterClient client = RedisClusterClient.create(Arrays.asList(node1, node2, node3));
         LettuceConnectionManager m = LettuceConnectionManager.defaultManager();
         m.init(client, null);
-        Assert.assertSame(m.commands(client), m.commands(client));
-        Assert.assertSame(m.asyncCommands(client), m.asyncCommands(client));
-        Assert.assertSame(m.reactiveCommands(client), m.reactiveCommands(client));
+        Assertions.assertSame(m.commands(client), m.commands(client));
+        Assertions.assertSame(m.asyncCommands(client), m.asyncCommands(client));
+        Assertions.assertSame(m.reactiveCommands(client), m.reactiveCommands(client));
         m.removeAndClose(client);
     }
 }

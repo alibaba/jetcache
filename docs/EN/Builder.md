@@ -27,6 +27,12 @@ Cache<Long, OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .buildCache();
 ```
 
+> **Note**: JetCache 2.8.x enables the deserialization security filter by default. If your cached values contain custom classes (e.g. `OrderDO` above), you need to configure the filter allow list before creating the cache, otherwise deserialization will fail:
+> ```java
+> DecodeFilter.getDefault().addAllowPatterns("com.yourcompany.");
+> ```
+> See the "Deserialization Filter Configuration" section in the [configuration docs](Config.md) for details.
+
 # Multi level cache
 ```java
 Cache multiLevelCache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()

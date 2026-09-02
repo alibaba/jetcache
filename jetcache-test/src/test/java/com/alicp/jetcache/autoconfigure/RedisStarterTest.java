@@ -10,8 +10,8 @@ import com.alicp.jetcache.redis.RedisCacheConfig;
 import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,7 +26,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisSentinelPool;
 import redis.clients.jedis.util.Pool;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Arrays;
 
 /**
@@ -55,13 +55,13 @@ public class RedisStarterTest extends SpringTest {
 
         Pool<Jedis> t1 = (Pool<Jedis>) context.getBean("defaultPool");
         Pool<Jedis> t2 = (Pool<Jedis>) context.getBean("A1Pool");
-        Assert.assertTrue(t1 instanceof Pool);
-        Assert.assertTrue(t2 instanceof JedisSentinelPool);
-        Assert.assertNotSame(t1, t2);
+        Assertions.assertTrue(t1 instanceof Pool);
+        Assertions.assertTrue(t2 instanceof JedisSentinelPool);
+        Assertions.assertNotSame(t1, t2);
 
         if (RedisLettuceCacheTest.checkOS()) {
             JedisCluster a2 = (JedisCluster) context.getBean("A2Jedis");
-            Assert.assertNotNull(a2);
+            Assertions.assertNotNull(a2);
         }
     }
 
@@ -74,18 +74,18 @@ public class RedisStarterTest extends SpringTest {
         private Cache c2;
 
         public void test() {
-            Assert.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
+            Assertions.assertNotNull(c1.unwrap(com.github.benmanes.caffeine.cache.Cache.class));
             EmbeddedCacheConfig cc1 = (EmbeddedCacheConfig) c1.config();
-            Assert.assertEquals(200, cc1.getLimit());
-            Assert.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
-            Assert.assertFalse(cc1.isExpireAfterAccess());
+            Assertions.assertEquals(200, cc1.getLimit());
+            Assertions.assertEquals(10000, cc1.getExpireAfterWriteInMillis());
+            Assertions.assertFalse(cc1.isExpireAfterAccess());
 
             RedisCacheConfig c = (RedisCacheConfig) c2.config();
-            Assert.assertFalse(c.isReadFromSlave());
+            Assertions.assertFalse(c.isReadFromSlave());
             Pool[] slavePools = c.getJedisSlavePools();
-            Assert.assertEquals(2, slavePools.length);
+            Assertions.assertEquals(2, slavePools.length);
             int[] ws = c.getSlaveReadWeights();
-            Assert.assertTrue(Arrays.equals(new int[]{30, 100}, ws) || Arrays.equals(new int[]{100, 30}, ws));
+            Assertions.assertTrue(Arrays.equals(new int[]{30, 100}, ws) || Arrays.equals(new int[]{100, 30}, ws));
         }
     }
 
@@ -99,8 +99,8 @@ public class RedisStarterTest extends SpringTest {
 
         @PostConstruct
         public void init() {
-            Assert.assertNotNull(defaultPool);
-            Assert.assertNotNull(A1Pool);
+            Assertions.assertNotNull(defaultPool);
+            Assertions.assertNotNull(A1Pool);
         }
     }
 

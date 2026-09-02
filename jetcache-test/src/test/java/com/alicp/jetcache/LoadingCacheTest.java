@@ -3,8 +3,8 @@ package com.alicp.jetcache;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.test.AbstractCacheTest;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
 import java.util.HashSet;
@@ -65,13 +65,13 @@ public class LoadingCacheTest extends AbstractCacheTest {
         });
         cache.get("vetoTest");
         Thread.sleep(waitMillis);//wait for async operations
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
 
         Set s = new HashSet();
         s.add("vetoTest");
         cache.getAll(s);
         Thread.sleep(waitMillis);//wait for async operations
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("vetoTest").getResultCode());
     }
 
     private static void nullValueTest(Cache cache, long waitMillis) throws Exception {
@@ -79,30 +79,30 @@ public class LoadingCacheTest extends AbstractCacheTest {
         cache.config().getMonitors().add(monitor);
 
         cache.config().setLoader((key) -> null);
-        Assert.assertNull(cache.get("nullValueTest_K1"));
+        Assertions.assertNull(cache.get("nullValueTest_K1"));
         Thread.sleep(waitMillis); //wait for async operations
-        Assert.assertEquals(1, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(0, monitor.getCacheStat().getPutCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetCount());
+        Assertions.assertEquals(0, monitor.getCacheStat().getGetHitCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetMissCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getLoadCount());
+        Assertions.assertEquals(0, monitor.getCacheStat().getPutCount());
 
         cache.config().setCacheNullValue(true);
-        Assert.assertNull(cache.get("nullValueTest_K1"));
+        Assertions.assertNull(cache.get("nullValueTest_K1"));
         Thread.sleep(waitMillis); //wait for async operations
-        Assert.assertEquals(2, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getGetCount());
+        Assertions.assertEquals(0, monitor.getCacheStat().getGetHitCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getGetMissCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getLoadCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getPutCount());
 
-        Assert.assertNull(cache.get("nullValueTest_K1"));
+        Assertions.assertNull(cache.get("nullValueTest_K1"));
         Thread.sleep(waitMillis); //wait for async operations
-        Assert.assertEquals(3, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(2, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(2, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
+        Assertions.assertEquals(3, monitor.getCacheStat().getGetCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetHitCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getGetMissCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getLoadCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getPutCount());
 
         cache.config().getMonitors().remove(monitor);
     }
@@ -111,20 +111,20 @@ public class LoadingCacheTest extends AbstractCacheTest {
         DefaultCacheMonitor monitor = new DefaultCacheMonitor("test");
         cache.config().getMonitors().add(monitor);
 
-        Assert.assertEquals("LoadingCache_Key1_V0", cache.get("LoadingCache_Key1"));
+        Assertions.assertEquals("LoadingCache_Key1_V0", cache.get("LoadingCache_Key1"));
         Thread.sleep(waitMillis); //wait for async operations
-        Assert.assertEquals(1, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(0, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
-        Assert.assertEquals("LoadingCache_Key1_V0", cache.get("LoadingCache_Key1"));
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetCount());
+        Assertions.assertEquals(0, monitor.getCacheStat().getGetHitCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetMissCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getLoadCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getPutCount());
+        Assertions.assertEquals("LoadingCache_Key1_V0", cache.get("LoadingCache_Key1"));
         Thread.sleep(waitMillis); //wait for async operations
-        Assert.assertEquals(2, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(1, monitor.getCacheStat().getPutCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getGetCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetHitCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getGetMissCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getLoadCount());
+        Assertions.assertEquals(1, monitor.getCacheStat().getPutCount());
 
         Set<String> keys = new TreeSet<>();
         keys.add("LoadingCache_Key1");
@@ -132,15 +132,15 @@ public class LoadingCacheTest extends AbstractCacheTest {
         keys.add("LoadingCache_Key3");
         Map<Object, Object> map = cache.getAll(keys);
         Thread.sleep(waitMillis); //wait for async operations
-        Assert.assertEquals("LoadingCache_Key1_V0", map.get("LoadingCache_Key1"));
-        Assert.assertEquals("LoadingCache_Key2_V1", map.get("LoadingCache_Key2"));
-        Assert.assertEquals("LoadingCache_Key3_V2", map.get("LoadingCache_Key3"));
+        Assertions.assertEquals("LoadingCache_Key1_V0", map.get("LoadingCache_Key1"));
+        Assertions.assertEquals("LoadingCache_Key2_V1", map.get("LoadingCache_Key2"));
+        Assertions.assertEquals("LoadingCache_Key3_V2", map.get("LoadingCache_Key3"));
 
-        Assert.assertEquals(5, monitor.getCacheStat().getGetCount());
-        Assert.assertEquals(2, monitor.getCacheStat().getGetHitCount());
-        Assert.assertEquals(3, monitor.getCacheStat().getGetMissCount());
-        Assert.assertEquals(3, monitor.getCacheStat().getLoadCount());
-        Assert.assertEquals(3, monitor.getCacheStat().getPutCount());
+        Assertions.assertEquals(5, monitor.getCacheStat().getGetCount());
+        Assertions.assertEquals(2, monitor.getCacheStat().getGetHitCount());
+        Assertions.assertEquals(3, monitor.getCacheStat().getGetMissCount());
+        Assertions.assertEquals(3, monitor.getCacheStat().getLoadCount());
+        Assertions.assertEquals(3, monitor.getCacheStat().getPutCount());
 
         cache.config().getMonitors().remove(monitor);
     }
@@ -151,14 +151,14 @@ public class LoadingCacheTest extends AbstractCacheTest {
         });
         try {
             cache.get("K1");
-            Assert.fail();
+            Assertions.fail();
         } catch (CacheInvokeException e) {
         }
         try {
             Set s = new HashSet();
             s.add("K1");
             cache.getAll(s);
-            Assert.fail();
+            Assertions.fail();
         } catch (CacheInvokeException e) {
         }
     }

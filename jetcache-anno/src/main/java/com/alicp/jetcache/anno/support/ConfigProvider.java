@@ -7,6 +7,7 @@ import com.alicp.jetcache.embedded.EmbeddedCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheWriteInterceptor;
 import com.alicp.jetcache.external.ExternalCacheBuilder;
 import com.alicp.jetcache.support.AbstractLifecycle;
+import com.alicp.jetcache.support.DecodeFilter;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
 import com.alicp.jetcache.template.CacheBuilderTemplate;
@@ -49,6 +50,7 @@ public class ConfigProvider extends AbstractLifecycle {
     @Override
     protected void doInit() {
         cacheBuilderTemplate = new CacheBuilderTemplate(globalCacheConfig.isPenetrationProtect(),
+                globalCacheConfig.isUseDefaultLocalExpireInMultiLevelCache(),
                 globalCacheConfig.getLocalCacheBuilders(), globalCacheConfig.getRemoteCacheBuilders());
         for (CacheBuilder builder : globalCacheConfig.getLocalCacheBuilders().values()) {
             EmbeddedCacheBuilder eb = (EmbeddedCacheBuilder) builder;
@@ -72,6 +74,7 @@ public class ConfigProvider extends AbstractLifecycle {
                 eb.setValueDecoder(parseValueDecoder(f.getValue()));
             }
         }
+        initDecodeFilter();
         initCacheMonitorInstallers();
     }
 
@@ -82,6 +85,19 @@ public class ConfigProvider extends AbstractLifecycle {
             if (i instanceof AbstractLifecycle) {
                 ((AbstractLifecycle) i).init();
             }
+        }
+    }
+
+    private void initDecodeFilter() {
+        DecodeFilter f = DecodeFilter.getDefault();
+        f.setEnabled(globalCacheConfig.isDecodeFilterEnabled());
+        List<String> allowPatterns = globalCacheConfig.getDecodeFilterAllowPatterns();
+        if (allowPatterns != null && !allowPatterns.isEmpty()) {
+            f.addAllowPatterns(allowPatterns.toArray(new String[0]));
+        }
+        List<String> denyPatterns = globalCacheConfig.getDecodeFilterDenyPatterns();
+        if (denyPatterns != null && !denyPatterns.isEmpty()) {
+            f.addDenyPatterns(denyPatterns.toArray(new String[0]));
         }
     }
 

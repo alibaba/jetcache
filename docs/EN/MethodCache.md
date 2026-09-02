@@ -14,7 +14,7 @@ public interface UserService {
     void deleteUser(long userId);
 }
 ```
-the ```key``` and ```value``` attribute use [SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html) script. To enable use parameter name such as ```key="#userId"```, you javac compiler target must be 1.8 and the ```-parameters``` should be set, otherwise use index to access parameters like ```key="args[0]"```.
+the ```key``` and ```value``` attribute use [SpEL](https://docs.spring.io/spring/docs/4.2.x/spring-framework-reference/html/expressions.html) script. To enable use parameter name such as ```key="#userId"```, the ```-parameters``` javac compiler flag should be set, otherwise use index to access parameters like ```key="args[0]"```.
 
 The attributes of ```@Cached``` are similar with ```@CreateCache``` except ```@Cached``` has more attributes:
 
@@ -29,7 +29,7 @@ The attributes of ```@Cached``` are similar with ```@CreateCache``` except ```@C
 |localLimit|undefined|Specify max elements in local memory when ```cacheType``` is CacheType.LOCAL or CacheType.BOTH. Use global config if the attribute value is absent, and if the global config is not defined either, use 100 instead.|
 |localExpire|undefined|Only use with cacheType=CacheType.BOTH, specify a different local expire (typically less than expire) for local cache|
 |serialPolicy|undefined|Specify the serialization policy of remote cache when ```cacheType``` is CacheType.REMOTE or CacheType.BOTH. The JetCache build-in ```serialPolicy``` are SerialPolicy.JAVA or SerialPolicy.KRYO. Use global config if the attribute value is absent, and if the global config is not defined either, use SerialPolicy.JAVA instead.|
-|keyConvertor|undefined|Specify the key convertor. Used to convert the complex key object. The JetCache build-in ```keyConvertor``` are KeyConvertor.FASTJSON or KeyConvertor.NONE. NONE indicate do not convert, FASTJSON will use fastjson to convert key object to a string. Use global config if the attribute value is absent.|
+|keyConvertor|undefined|Specify the key convertor. Used to convert the complex key object. The JetCache build-in ```keyConvertor``` are KeyConvertor.FASTJSON, KeyConvertor.JACKSON, KeyConvertor.JACKSON3 or KeyConvertor.NONE. NONE indicate do not convert, FASTJSON will use fastjson2 to convert key object to a string (since 2.8, fastjson1 is removed). Use global config if the attribute value is absent.|
 |enabled|true|Specify whether the method caching is enabled. If set to false, you can enable it in thread context using ```CacheContext.enableCache(Supplier<T> callback)```|
 |cacheNullValue|false|Specify whether a null value should be cached.|
 |condition|undefined|Expression script used for conditioning the method caching, the cache is not used when evaluation result is false. Can't refer return value of real method.|

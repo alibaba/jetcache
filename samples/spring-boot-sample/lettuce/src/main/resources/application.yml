@@ -1,6 +1,8 @@
 jetcache:
   statIntervalMinutes: 1
   areaInCacheName: false
+  decodeFilterAllowPatterns:
+    - jetcache.samples.
   local:
     default:
       type: linkedhashmap

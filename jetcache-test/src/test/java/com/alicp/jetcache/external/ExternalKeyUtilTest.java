@@ -1,7 +1,7 @@
 package com.alicp.jetcache.external;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -21,30 +21,30 @@ public class ExternalKeyUtilTest {
 
     @Test
     public void testBuildKey() throws Exception {
-        Assert.assertArrayEquals(buildKey("123"), buildKey(new String("123")));
-        Assert.assertArrayEquals(buildKey(new byte[]{1, 2, 3}), buildKey(new byte[]{1, 2, 3}));
-        Assert.assertArrayEquals(buildKey(123), buildKey(123));
-        Assert.assertArrayEquals(buildKey(123L), buildKey(123L));
-        Assert.assertArrayEquals(buildKey(true), buildKey(true));
-        Assert.assertArrayEquals(buildKey(new Date(123)), buildKey(new Date(123)));
-        Assert.assertArrayEquals(buildKey(new Date(123)), buildKey(new Date(123)));
+        Assertions.assertArrayEquals(buildKey("123"), buildKey(new String("123")));
+        Assertions.assertArrayEquals(buildKey(new byte[]{1, 2, 3}), buildKey(new byte[]{1, 2, 3}));
+        Assertions.assertArrayEquals(buildKey(123), buildKey(123));
+        Assertions.assertArrayEquals(buildKey(123L), buildKey(123L));
+        Assertions.assertArrayEquals(buildKey(true), buildKey(true));
+        Assertions.assertArrayEquals(buildKey(new Date(123)), buildKey(new Date(123)));
+        Assertions.assertArrayEquals(buildKey(new Date(123)), buildKey(new Date(123)));
         C c1 = new C();
         C c2 = new C();
         c1.a = 100;
         c1.b = "123";
         c2.a = 100;
         c2.b = "123";
-        Assert.assertArrayEquals(buildKey(c1), buildKey(c2));
+        Assertions.assertArrayEquals(buildKey(c1), buildKey(c2));
 
         try {
-            Assert.assertArrayEquals(buildKey(123), buildKey(123L));
-            Assert.fail();
+            Assertions.assertArrayEquals(buildKey(123), buildKey(123L));
+            Assertions.fail();
         } catch (Error e) {
         }
 
         try {
-            Assert.assertArrayEquals(buildKey(c1), buildKey(new C()));
-            Assert.fail();
+            Assertions.assertArrayEquals(buildKey(c1), buildKey(new C()));
+            Assertions.fail();
         } catch (Error e) {
         }
     }

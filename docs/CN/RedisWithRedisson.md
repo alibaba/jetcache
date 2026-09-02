@@ -21,7 +21,7 @@ jetcache:
       redissonClient: redisClientBeanName
       # 下面是通用配置, 只列举了一些
       broadcastChannel: projectA
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       defaultExpireInMillis: 10000
       keyPrefix: spring-data-redis
 ```
@@ -82,7 +82,7 @@ config.useSingleServer().setAddress("redis://127.0.0.1:6379").setDatabase(0);
 
 Cache<String, String> cache = RedissonCacheBuilder.createBuilder()
         .redissonClient(Redisson.create(config))
-        .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+        .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
         .valueEncoder(JavaValueEncoder.INSTANCE)
         .valueDecoder(JavaValueDecoder.INSTANCE)
         .expireAfterWrite(200, TimeUnit.SECONDS)

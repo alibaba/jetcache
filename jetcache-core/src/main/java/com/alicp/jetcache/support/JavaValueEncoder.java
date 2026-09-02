@@ -1,11 +1,8 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.anno.SerialPolicy;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.lang.ref.WeakReference;
 
 /**
  * Created on 2016/10/4.
@@ -40,10 +37,10 @@ public class JavaValueEncoder extends AbstractValueEncoder {
         try {
             bos = bosPool.borrowObject();
             if (useIdentityNumber) {
-                bos.write((SerialPolicy.IDENTITY_NUMBER_JAVA >> 24) & 0xFF);
-                bos.write((SerialPolicy.IDENTITY_NUMBER_JAVA >> 16) & 0xFF);
-                bos.write((SerialPolicy.IDENTITY_NUMBER_JAVA >> 8) & 0xFF);
-                bos.write(SerialPolicy.IDENTITY_NUMBER_JAVA & 0xFF);
+                bos.write((DecoderMap.IDENTITY_NUMBER_JAVA >> 24) & 0xFF);
+                bos.write((DecoderMap.IDENTITY_NUMBER_JAVA >> 16) & 0xFF);
+                bos.write((DecoderMap.IDENTITY_NUMBER_JAVA >> 8) & 0xFF);
+                bos.write(DecoderMap.IDENTITY_NUMBER_JAVA & 0xFF);
             }
             ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(value);

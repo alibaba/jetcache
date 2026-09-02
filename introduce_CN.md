@@ -84,7 +84,7 @@ pc.setMaxIdle(10);
 pc.setMaxTotal(10);
 JedisPool pool = new JedisPool(pc, "127.0.0.1", 6379);
 Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
@@ -92,6 +92,8 @@ Cache<Long, UserDO> userCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .expireAfterWrite(200, TimeUnit.SECONDS)
                 .buildCache();
 ```
+
+> **安全提示**：JetCache 2.8.x 默认开启了反序列化安全过滤器，只允许常见Java包和JetCache包下的类被反序列化。如果缓存值包含自定义类（如 `UserDO`、`OrderDO`），需要配置允许列表，详见[配置文档](docs/CN/Config.md)中的"反序列化过滤器配置"章节。
 
 Cache接口支持异步：
 ```java
@@ -138,9 +140,9 @@ Cache<String, Long> orderSumCache = RedisCacheBuilder.createRedisCacheBuilder()
 
 
 使用JetCache的系统需求：
-* JDK：必须Java 8
-* Spring Framework（可选，如果用low level api就不需要）：jetcache2.5需要4.0.8以上，jetcache2.7需要5.2.4以上
-* Spring Boot（可选）：jetcache2.5需要1.1.9以上，jetcache2.7需要2.2.5以上
+* JDK：jetcache 2.8+需要Java 17以上版本，jetcache 2.7及以下版本支持Java 8+
+* Spring Framework（可选，如果用low level api就不需要）：jetcache 2.8需要6.x以上，jetcache 2.7需要5.2.4以上
+* Spring Boot（可选）：jetcache 2.8需要3.x以上，jetcache 2.7需要2.2.5以上
 
 更多文档可以在github仓库的docs中找到。
 

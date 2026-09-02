@@ -1,6 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,8 +17,8 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
         decoder = Kryo5ValueDecoder.INSTANCE;
         baseTest();
 
-        encoder = new Kryo5ValueEncoder(false);
-        decoder = new Kryo5ValueDecoder(false);
+        encoder = new Kryo5ValueEncoder(false, Kryo5ValueEncoder.DEFAULT_POOL);
+        decoder = new Kryo5ValueDecoder(false, Kryo5ValueEncoder.DEFAULT_POOL);
         baseTest();
     }
 
@@ -48,14 +47,14 @@ public class Kryo5EncoderTest extends AbstractEncoderTest {
         byte[] bytes = encoder.apply("12345");
         bytes[0] = 0;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
-        writeHeader(bytes, SerialPolicy.IDENTITY_NUMBER_JAVA);
+        writeHeader(bytes, DecoderMap.IDENTITY_NUMBER_JAVA);
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
 
         encoder = Kryo5ValueEncoder.INSTANCE;
-        decoder = new Kryo5ValueDecoder(false);
+        decoder = new Kryo5ValueDecoder(false, Kryo5ValueEncoder.DEFAULT_POOL);
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
 
-        encoder = new Kryo5ValueEncoder(false);
+        encoder = new Kryo5ValueEncoder(false, Kryo5ValueEncoder.DEFAULT_POOL);
         decoder = Kryo5ValueDecoder.INSTANCE;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
     }

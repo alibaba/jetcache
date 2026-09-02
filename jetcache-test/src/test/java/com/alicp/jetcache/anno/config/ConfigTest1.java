@@ -13,23 +13,21 @@ import com.alicp.jetcache.embedded.EmbeddedCacheConfig;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
 import com.alicp.jetcache.external.ExternalCacheConfig;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,8 +38,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author huangli
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ConfigTest1.A.class)
+@SpringJUnitConfig(ConfigTest1.A.class)
 public class ConfigTest1 implements ApplicationContextAware {
 
     private ApplicationContext context;
@@ -57,40 +54,40 @@ public class ConfigTest1 implements ApplicationContextAware {
 
         {
             ExternalCacheConfig c = (ExternalCacheConfig) bean.defualtRemote.config();
-            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
-            Assert.assertSame(JavaValueEncoder.INSTANCE, c.getValueEncoder());
-            Assert.assertSame(JavaValueDecoder.INSTANCE, c.getValueDecoder());
-            Assert.assertFalse(c.isExpireAfterAccess());
-            Assert.assertEquals(90, c.getExpireAfterWriteInMillis());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertSame(JavaValueEncoder.INSTANCE, c.getValueEncoder());
+            Assertions.assertSame(JavaValueDecoder.INSTANCE, c.getValueDecoder());
+            Assertions.assertFalse(c.isExpireAfterAccess());
+            Assertions.assertEquals(90, c.getExpireAfterWriteInMillis());
 
             c = (ExternalCacheConfig) bean.a1Remote.config();
-            Assert.assertEquals(CacheConsts.DEFAULT_EXPIRE * 1000L, c.getExpireAfterWriteInMillis());
-            Assert.assertEquals(110, c.getExpireAfterAccessInMillis());
+            Assertions.assertEquals(CacheConsts.DEFAULT_EXPIRE * 1000L, c.getExpireAfterWriteInMillis());
+            Assertions.assertEquals(110, c.getExpireAfterAccessInMillis());
 
             c = (ExternalCacheConfig) bean.customRemote.config();
-            Assert.assertFalse(c.isExpireAfterAccess());
-            Assert.assertEquals(1000, c.getExpireAfterWriteInMillis());
-            Assert.assertEquals(KryoValueEncoder.class, c.getValueEncoder().getClass());
-            Assert.assertEquals(KryoValueDecoder.class, c.getValueDecoder().getClass());
-            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertFalse(c.isExpireAfterAccess());
+            Assertions.assertEquals(1000, c.getExpireAfterWriteInMillis());
+            Assertions.assertEquals(KryoValueEncoder.class, c.getValueEncoder().getClass());
+            Assertions.assertEquals(KryoValueDecoder.class, c.getValueDecoder().getClass());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
         }
 
         {
             EmbeddedCacheConfig c = (EmbeddedCacheConfig) bean.defaultLocal.config();
-            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
-            Assert.assertEquals(20, c.getLimit());
-            Assert.assertFalse(c.isExpireAfterAccess());
-            Assert.assertEquals(50, c.getExpireAfterWriteInMillis());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertEquals(20, c.getLimit());
+            Assertions.assertFalse(c.isExpireAfterAccess());
+            Assertions.assertEquals(50, c.getExpireAfterWriteInMillis());
 
             c = (EmbeddedCacheConfig) bean.a1Local.config();
-            Assert.assertEquals(CacheConsts.DEFAULT_EXPIRE * 1000L, c.getExpireAfterWriteInMillis());
-            Assert.assertEquals(60, c.getExpireAfterAccessInMillis());
+            Assertions.assertEquals(CacheConsts.DEFAULT_EXPIRE * 1000L, c.getExpireAfterWriteInMillis());
+            Assertions.assertEquals(60, c.getExpireAfterAccessInMillis());
 
             c = (EmbeddedCacheConfig) bean.customLocal.config();
-            Assert.assertFalse(c.isExpireAfterAccess());
-            Assert.assertEquals(1000, c.getExpireAfterWriteInMillis());
-            Assert.assertEquals(123, c.getLimit());
-            Assert.assertSame(FastjsonKeyConvertor.INSTANCE, c.getKeyConvertor());
+            Assertions.assertFalse(c.isExpireAfterAccess());
+            Assertions.assertEquals(1000, c.getExpireAfterWriteInMillis());
+            Assertions.assertEquals(123, c.getLimit());
+            Assertions.assertSame(Fastjson2KeyConvertor.INSTANCE, c.getKeyConvertor());
         }
     }
 
@@ -114,9 +111,9 @@ public class ConfigTest1 implements ApplicationContextAware {
         public GlobalCacheConfig config() {
             Map localFactories = new HashMap();
             EmbeddedCacheBuilder localFactory = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                    .limit(20).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterWrite(50, TimeUnit.MILLISECONDS);
+                    .limit(20).keyConvertor(Fastjson2KeyConvertor.INSTANCE).expireAfterWrite(50, TimeUnit.MILLISECONDS);
             EmbeddedCacheBuilder localFactory2 = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                    .limit(10).keyConvertor(FastjsonKeyConvertor.INSTANCE).expireAfterAccess(60, TimeUnit.MILLISECONDS);
+                    .limit(10).keyConvertor(Fastjson2KeyConvertor.INSTANCE).expireAfterAccess(60, TimeUnit.MILLISECONDS);
             localFactories.put(CacheConsts.DEFAULT_AREA, localFactory);
             localFactories.put("A1", localFactory2);
 
@@ -125,7 +122,7 @@ public class ConfigTest1 implements ApplicationContextAware {
 
             MockRemoteCacheBuilder remoteBuilder = new MockRemoteCacheBuilder();
             remoteBuilder.setKeyConvertor(null);
-            remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+            remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
             remoteBuilder.setValueEncoder(JavaValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(JavaValueDecoder.INSTANCE);
             remoteBuilder.setExpireAfterWriteInMillis(90);
@@ -133,7 +130,7 @@ public class ConfigTest1 implements ApplicationContextAware {
             remoteFactories.put(CacheConsts.DEFAULT_AREA, remoteBuilder);
 
             remoteBuilder = new MockRemoteCacheBuilder();
-            remoteBuilder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+            remoteBuilder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
             remoteBuilder.setValueEncoder(KryoValueEncoder.INSTANCE);
             remoteBuilder.setValueDecoder(KryoValueDecoder.INSTANCE);
             remoteBuilder.setExpireAfterAccessInMillis(110);

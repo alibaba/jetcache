@@ -13,7 +13,7 @@ import com.alicp.jetcache.external.MockRemoteCacheBuilder;
 import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
-import junit.framework.AssertionFailedError;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,7 +90,7 @@ public class TestUtil {
                 return;
             }
         }
-        throw new AssertionFailedError("expect: " + expectValue + ", actual:" + obj + ", timeout="
+        throw new AssertionError("expect: " + expectValue + ", actual:" + obj + ", timeout="
                 + timeoutMillis + "ms, cost=" + (System.nanoTime() - start) / 1000 / 1000 + "ms, waitCount=" + waitCount);
     }
 

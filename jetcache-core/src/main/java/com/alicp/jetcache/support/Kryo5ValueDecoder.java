@@ -12,10 +12,12 @@ import java.io.ByteArrayInputStream;
  */
 public class Kryo5ValueDecoder extends AbstractValueDecoder {
 
-    public static final Kryo5ValueDecoder INSTANCE = new Kryo5ValueDecoder(true);
+    public static final Kryo5ValueDecoder INSTANCE = new Kryo5ValueDecoder(true, Kryo5ValueEncoder.DEFAULT_POOL);
+    private final ObjectPool<Kryo5ValueEncoder.KryoCache> pool;
 
-    public Kryo5ValueDecoder(boolean useIdentityNumber) {
+    public Kryo5ValueDecoder(boolean useIdentityNumber, ObjectPool<Kryo5ValueEncoder.KryoCache> pool) {
         super(useIdentityNumber);
+        this.pool = pool;
     }
 
     @Override
@@ -27,9 +29,9 @@ public class Kryo5ValueDecoder extends AbstractValueDecoder {
             in = new ByteArrayInputStream(buffer);
         }
         Input input = new Input(in);
-        Kryo5ValueEncoder.Kryo5Cache kryoCache = null;
+        Kryo5ValueEncoder.KryoCache kryoCache = null;
         try {
-            kryoCache = Kryo5ValueEncoder.kryoCacheObjectPool.borrowObject();
+            kryoCache = pool.borrowObject();
             Kryo kryo = kryoCache.getKryo();
             ClassLoader classLoader = Kryo5ValueDecoder.class.getClassLoader();
             Thread t = Thread.currentThread();
@@ -43,7 +45,7 @@ public class Kryo5ValueDecoder extends AbstractValueDecoder {
             return kryo.readClassAndObject(input);
         }finally {
             if(kryoCache != null){
-                Kryo5ValueEncoder.kryoCacheObjectPool.returnObject(kryoCache);
+                pool.returnObject(kryoCache);
             }
         }
     }

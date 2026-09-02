@@ -1,7 +1,7 @@
 package com.alicp.jetcache.anno.inittestbeans;
 
 import com.alicp.jetcache.test.beans.TestBean;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -15,7 +15,7 @@ public class MethodCacheInitTestBean {
     private TestBean testBean;
 
     public void doTest() {
-        Assert.assertEquals(testBean.count(), testBean.count());
+        Assertions.assertEquals(testBean.count(), testBean.count());
     }
 
 }

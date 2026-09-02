@@ -54,11 +54,11 @@ jetcache:
   local:
     default:
       type: linkedhashmap
-      keyConvertor: fastjson
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java
       valueDecoder: java
@@ -69,6 +69,15 @@ jetcache:
       host: 127.0.0.1
       port: 6379
 ```
+
+> **Note**: JetCache 2.8.x enables the deserialization security filter by default. The configuration above uses the `java` serializer. If your cached values contain custom classes (e.g. `UserDO`, `OrderDO`, etc.), deserialization will be blocked by the filter. You need to add `decodeFilterAllowPatterns` to allow your classes:
+> ```yaml
+> jetcache:
+>   decodeFilterAllowPatterns:
+>     - com.company.mypackage.  # allow all classes under this package
+> ```
+> If you also need to block additional packages or classes, configure `decodeFilterDenyPatterns`. See the "Deserialization Filter Configuration" section in the [configuration docs](Config.md) for details. You can set `jetcache.decodeFilterEnabled: false` to disable the filter temporarily (**NOT recommended in production**).
+
 Then create the application class of Spring Boot:
 ```java
 package com.company.mypackage;
@@ -128,7 +137,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 @Configuration
 @EnableMethodCache(basePackages = "com.company.mypackage")
@@ -156,7 +165,7 @@ public class JetCacheConfig {
         Map localBuilders = new HashMap();
         EmbeddedCacheBuilder localBuilder = LinkedHashMapCacheBuilder
                 .createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE);
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE);
         localBuilders.put(CacheConsts.DEFAULT_AREA, localBuilder);
 
         Map remoteBuilders = new HashMap();
@@ -174,6 +183,9 @@ public class JetCacheConfig {
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(15);
         globalCacheConfig.setAreaInCacheName(false); 
+
+        // If cached values contain custom classes, configure the deserialization filter allow list
+        DecodeFilter.getDefault().addAllowPatterns("com.company.mypackage.");
 
         return globalCacheConfig;
     }

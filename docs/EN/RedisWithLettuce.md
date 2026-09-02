@@ -15,7 +15,7 @@ jetcache:
   remote:
     default:
       type: redis.lettuce
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       uri: redis://127.0.0.1:6379/
       #uri: redis-sentinel://127.0.0.1:26379,127.0.0.1:26380,127.0.0.1:26381/?sentinelMasterId=mymaster
@@ -33,7 +33,7 @@ jetcache:
   remote:
     default:
       type: redis.lettuce
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       mode: cluster
       #readFrom: slavePreferred
@@ -101,7 +101,7 @@ The ```keyPrefix``` will add to key as prefix.
 RedisClient client = RedisClient.create("redis://127.0.0.1");
 
 Cache<Long,OrderDO> orderCache = RedisLettuceCacheBuilder.createRedisLettuceCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .redisClient(client)

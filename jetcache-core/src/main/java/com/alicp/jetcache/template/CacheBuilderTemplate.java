@@ -15,17 +15,28 @@ import java.util.Map;
  */
 public class CacheBuilderTemplate {
     private final boolean penetrationProtect;
+    private final boolean useDefaultLocalExpireInMultiLevelCache;
     private final Map<String, CacheBuilder>[] cacheBuilders;
     private final List<CacheMonitorInstaller> cacheMonitorInstallers = new ArrayList<>();
 
     @SafeVarargs
-    public CacheBuilderTemplate(boolean penetrationProtect, Map<String, CacheBuilder>... cacheBuilders) {
+    public CacheBuilderTemplate(boolean penetrationProtect, boolean useDefaultLocalExpireInMultiLevelCache, Map<String, CacheBuilder>... cacheBuilders) {
         this.penetrationProtect = penetrationProtect;
+        this.useDefaultLocalExpireInMultiLevelCache = useDefaultLocalExpireInMultiLevelCache;
         this.cacheBuilders = cacheBuilders;
+    }
+
+    @SafeVarargs
+    public CacheBuilderTemplate(boolean penetrationProtect, Map<String, CacheBuilder>... cacheBuilders) {
+        this(penetrationProtect, false, cacheBuilders);
     }
 
     public boolean isPenetrationProtect() {
         return penetrationProtect;
+    }
+
+    public boolean isUseDefaultLocalExpireInMultiLevelCache() {
+        return useDefaultLocalExpireInMultiLevelCache;
     }
 
     public CacheBuilder getCacheBuilder(int level, String area) {

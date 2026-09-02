@@ -27,6 +27,12 @@ Cache<Long, OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
                 .buildCache();
 ```
 
+> **注意**：JetCache 2.8.x 默认开启了反序列化安全过滤器。如果缓存值包含自定义类（如上面的 `OrderDO`），需要在创建缓存前配置过滤器允许列表，否则反序列化时会报错：
+> ```java
+> DecodeFilter.getDefault().addAllowPatterns("com.yourcompany.");
+> ```
+> 详见[配置文档](Config.md)中的"反序列化过滤器配置"章节。
+
 # 多级缓存
 在2.2以后通过下面的方式创建多级缓存：
 ```java

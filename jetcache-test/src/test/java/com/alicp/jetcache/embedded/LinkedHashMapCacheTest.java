@@ -7,8 +7,8 @@ import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
 import com.alicp.jetcache.CacheResultCode;
 import com.alicp.jetcache.VirtualThreadUtil;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.cglib.core.ReflectUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -57,7 +57,7 @@ public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
             for (int i = 0; i < 1000; i++) {
                 Object value = cache.get("K" + i);
                 if(!Objects.isNull(value))
-                    Assert.assertEquals(("V"+i),value);
+                    Assertions.assertEquals(("V"+i),value);
             }
         });
         executorService.shutdown();
@@ -70,9 +70,9 @@ public class LinkedHashMapCacheTest extends AbstractEmbeddedCacheTest {
                 .buildFunc(getBuildFunc()).expireAfterWrite(2000, TimeUnit.MILLISECONDS).limit(3).buildCache();
         cache.put("K1", "V1", 1, TimeUnit.MILLISECONDS);
         Thread.sleep(1);
-        Assert.assertEquals(CacheResultCode.EXPIRED, cache.GET("K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.EXPIRED, cache.GET("K1").getResultCode());
         ((LinkedHashMapCache) cache).cleanExpiredEntry();
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
     }
 
 

@@ -14,7 +14,7 @@ import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.StatInfo;
 import com.alicp.jetcache.support.StatInfoLogger;
 import com.alicp.jetcache.test.support.DynamicQuery;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,24 +51,24 @@ public abstract class AbstractCacheTest {
         illegalArgTest();
 
         // get/put/getByMethodInfo
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V1", 10, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("BASE_K1").getResultCode());
-        Assert.assertEquals("V1", cache.GET("BASE_K1").getValue());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V1", 10, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.GET("BASE_K1").getResultCode());
+        Assertions.assertEquals("V1", cache.GET("BASE_K1").getValue());
 
         // update
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V2", 10, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals("V2", cache.GET("BASE_K1").getValue());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("BASE_K1", "V2", 10, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals("V2", cache.GET("BASE_K1").getValue());
 
         //remove
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.REMOVE("BASE_K1").getResultCode());
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.REMOVE("BASE_K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("BASE_K1").getResultCode());
 
         // null value
         cache.put("BASE_K2", null);
         CacheGetResult<Object> r = cache.GET("BASE_K2");
-        Assert.assertTrue(r.isSuccess());
-        Assert.assertNull(r.getValue());
+        Assertions.assertTrue(r.isSuccess());
+        Assertions.assertNull(r.getValue());
 
         getAllTest();
         putAllTest();
@@ -85,30 +85,30 @@ public abstract class AbstractCacheTest {
     }
 
     private void illegalArgTest() {
-        Assert.assertNull(cache.get(null));
-        Assert.assertEquals(CacheResultCode.FAIL, cache.GET(null).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.GET(null).getMessage());
+        Assertions.assertNull(cache.get(null));
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.GET(null).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.GET(null).getMessage());
 
-        Assert.assertNull(cache.getAll(null));
-        Assert.assertEquals(CacheResultCode.FAIL, cache.GET_ALL(null).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.GET_ALL(null).getMessage());
+        Assertions.assertNull(cache.getAll(null));
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.GET_ALL(null).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.GET_ALL(null).getMessage());
 
-        Assert.assertEquals(CacheResultCode.FAIL, cache.PUT(null, "V1").getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT(null, "V1").getMessage());
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.PUT(null, "V1").getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT(null, "V1").getMessage());
 
-        Assert.assertEquals(CacheResultCode.FAIL, cache.PUT(null, "V1", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT(null, "V1", 1, TimeUnit.SECONDS).getMessage());
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.PUT(null, "V1", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT(null, "V1", 1, TimeUnit.SECONDS).getMessage());
 
-        Assert.assertEquals(CacheResultCode.FAIL, cache.PUT_ALL(null).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_ALL(null).getMessage());
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.PUT_ALL(null).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_ALL(null).getMessage());
 
-        Assert.assertEquals(CacheResultCode.FAIL, cache.PUT_ALL(null, 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_ALL(null, 1, TimeUnit.SECONDS).getMessage());
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.PUT_ALL(null, 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_ALL(null, 1, TimeUnit.SECONDS).getMessage());
 
         try {
-            Assert.assertFalse(cache.putIfAbsent(null, "V1"));
-            Assert.assertEquals(CacheResultCode.FAIL, cache.PUT_IF_ABSENT(null, "V1", 1, TimeUnit.SECONDS).getResultCode());
-            Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_IF_ABSENT(null, "V1", 1, TimeUnit.SECONDS).getMessage());
+            Assertions.assertFalse(cache.putIfAbsent(null, "V1"));
+            Assertions.assertEquals(CacheResultCode.FAIL, cache.PUT_IF_ABSENT(null, "V1", 1, TimeUnit.SECONDS).getResultCode());
+            Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.PUT_IF_ABSENT(null, "V1", 1, TimeUnit.SECONDS).getMessage());
         } catch (UnsupportedOperationException e) {
             Cache c = cache;
             while (c instanceof ProxyCache) {
@@ -117,25 +117,25 @@ public abstract class AbstractCacheTest {
             if (c instanceof MultiLevelCache) {
                 // OK
             } else {
-                Assert.fail();
+                Assertions.fail();
             }
         }
 
-        Assert.assertFalse(cache.remove(null));
-        Assert.assertEquals(CacheResultCode.FAIL, cache.REMOVE(null).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.REMOVE(null).getMessage());
+        Assertions.assertFalse(cache.remove(null));
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.REMOVE(null).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.REMOVE(null).getMessage());
 
-        Assert.assertEquals(CacheResultCode.FAIL, cache.REMOVE_ALL(null).getResultCode());
-        Assert.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.REMOVE_ALL(null).getMessage());
+        Assertions.assertEquals(CacheResultCode.FAIL, cache.REMOVE_ALL(null).getResultCode());
+        Assertions.assertEquals(CacheResult.MSG_ILLEGAL_ARGUMENT, cache.REMOVE_ALL(null).getMessage());
 
         try {
             cache.unwrap(String.class);
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
         }
 
-        Assert.assertNull(cache.tryLock(null, 1, TimeUnit.SECONDS));
-        cache.tryLockAndRun(null, 1, TimeUnit.SECONDS, () -> Assert.fail());
+        Assertions.assertNull(cache.tryLock(null, 1, TimeUnit.SECONDS));
+        cache.tryLockAndRun(null, 1, TimeUnit.SECONDS, () -> Assertions.fail());
     }
 
     private void getAllTest() {
@@ -148,22 +148,22 @@ public abstract class AbstractCacheTest {
         cache.put(k2, "V2");
 
         MultiGetResult<Object, Object> r = cache.GET_ALL(s);
-        Assert.assertTrue(r.isSuccess());
-        Assert.assertEquals(3, r.getValues().size());
-        Assert.assertTrue(r.getValues().get(k1).isSuccess());
-        Assert.assertEquals("V1", r.getValues().get(k1).getValue());
-        Assert.assertTrue(r.getValues().get(k2).isSuccess());
-        Assert.assertEquals("V2", r.getValues().get(k2).getValue());
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, r.getValues().get(k3).getResultCode());
-        Assert.assertNull(r.getValues().get(k3).getValue());
+        Assertions.assertTrue(r.isSuccess());
+        Assertions.assertEquals(3, r.getValues().size());
+        Assertions.assertTrue(r.getValues().get(k1).isSuccess());
+        Assertions.assertEquals("V1", r.getValues().get(k1).getValue());
+        Assertions.assertTrue(r.getValues().get(k2).isSuccess());
+        Assertions.assertEquals("V2", r.getValues().get(k2).getValue());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, r.getValues().get(k3).getResultCode());
+        Assertions.assertNull(r.getValues().get(k3).getValue());
 
         Map<Object, Object> map = cache.getAll(s);
-        Assert.assertEquals(2, map.size());
-        Assert.assertEquals("V1", map.get(k1));
-        Assert.assertEquals("V2", map.get(k2));
-        Assert.assertNull(map.get(k3));
+        Assertions.assertEquals(2, map.size());
+        Assertions.assertEquals("V1", map.get(k1));
+        Assertions.assertEquals("V2", map.get(k2));
+        Assertions.assertNull(map.get(k3));
 
-        Assert.assertEquals(0, cache.getAll(Collections.emptySet()).size());
+        Assertions.assertEquals(0, cache.getAll(Collections.emptySet()).size());
     }
 
     private void putAllTest() throws Exception {
@@ -174,37 +174,37 @@ public abstract class AbstractCacheTest {
         m.put(k1, "V1");
         m.put(k2, "V2");
         m.put(k3, "V3");
-        Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
-        Assert.assertEquals("V1", cache.get(k1));
-        Assert.assertEquals("V2", cache.get(k2));
-        Assert.assertEquals("V3", cache.get(k3));
+        Assertions.assertTrue(cache.PUT_ALL(m).isSuccess());
+        Assertions.assertEquals("V1", cache.get(k1));
+        Assertions.assertEquals("V2", cache.get(k2));
+        Assertions.assertEquals("V3", cache.get(k3));
 
         m.clear();
         m.put(k4, "V4");
         m.put(k5, "V5");
         m.put(k6, "V6");
         cache.putAll(m);
-        Assert.assertEquals("V4", cache.get(k4));
-        Assert.assertEquals("V5", cache.get(k5));
-        Assert.assertEquals("V6", cache.get(k6));
+        Assertions.assertEquals("V4", cache.get(k4));
+        Assertions.assertEquals("V5", cache.get(k5));
+        Assertions.assertEquals("V6", cache.get(k6));
 
         m.clear();
         m.put(k7, "V7");
         m.put(k8, "V8");
         m.put(k9, "V9");
-        Assert.assertTrue(cache.PUT_ALL(m, 5000, TimeUnit.MILLISECONDS).isSuccess());
-        Assert.assertEquals("V7", cache.get(k7));
-        Assert.assertEquals("V8", cache.get(k8));
-        Assert.assertEquals("V9", cache.get(k9));
+        Assertions.assertTrue(cache.PUT_ALL(m, 5000, TimeUnit.MILLISECONDS).isSuccess());
+        Assertions.assertEquals("V7", cache.get(k7));
+        Assertions.assertEquals("V8", cache.get(k8));
+        Assertions.assertEquals("V9", cache.get(k9));
 
         m.clear();
         m.put(k7, "V77");
         m.put(k8, "V88");
         m.put(k9, "V99");
         cache.putAll(m, 5000, TimeUnit.MILLISECONDS);
-        Assert.assertEquals("V77", cache.get(k7));
-        Assert.assertEquals("V88", cache.get(k8));
-        Assert.assertEquals("V99", cache.get(k9));
+        Assertions.assertEquals("V77", cache.get(k7));
+        Assertions.assertEquals("V88", cache.get(k8));
+        Assertions.assertEquals("V99", cache.get(k9));
     }
 
     private void removeAllTest() {
@@ -217,17 +217,17 @@ public abstract class AbstractCacheTest {
         s.add(k1);
         s.add(k2);
         cache.removeAll(s);
-        Assert.assertNull(cache.get(k1));
-        Assert.assertNull(cache.get(k2));
-        Assert.assertNotNull(cache.get(k3));
+        Assertions.assertNull(cache.get(k1));
+        Assertions.assertNull(cache.get(k2));
+        Assertions.assertNotNull(cache.get(k3));
 
         s = new HashSet();
         s.add(k1);
         s.add(k3);
-        Assert.assertTrue(cache.REMOVE_ALL(s).isSuccess());
-        Assert.assertNull(cache.get(k1));
-        Assert.assertNull(cache.get(k2));
-        Assert.assertNull(cache.get(k3));
+        Assertions.assertTrue(cache.REMOVE_ALL(s).isSuccess());
+        Assertions.assertNull(cache.get(k1));
+        Assertions.assertNull(cache.get(k2));
+        Assertions.assertNull(cache.get(k3));
     }
 
     private boolean isMultiLevelCache() {
@@ -242,20 +242,20 @@ public abstract class AbstractCacheTest {
         if (isMultiLevelCache()) {
             return;
         }
-        Assert.assertTrue(cache.putIfAbsent("PIA_K1", "V1"));
-        Assert.assertFalse(cache.putIfAbsent("PIA_K1", "V1"));
-        Assert.assertEquals("V1", cache.get("PIA_K1"));
-        Assert.assertTrue(cache.remove("PIA_K1"));
+        Assertions.assertTrue(cache.putIfAbsent("PIA_K1", "V1"));
+        Assertions.assertFalse(cache.putIfAbsent("PIA_K1", "V1"));
+        Assertions.assertEquals("V1", cache.get("PIA_K1"));
+        Assertions.assertTrue(cache.remove("PIA_K1"));
 
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.EXISTS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals("V2", cache.get("PIA_K2"));
-        Assert.assertTrue(cache.remove("PIA_K2"));
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.EXISTS, cache.PUT_IF_ABSENT("PIA_K2", "V2", 10, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals("V2", cache.get("PIA_K2"));
+        Assertions.assertTrue(cache.remove("PIA_K2"));
 
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
         // Time drift in docker (Mac)
         Thread.sleep(50);
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT_IF_ABSENT("PIA_K3", "V3", 5, TimeUnit.MILLISECONDS).getResultCode());
         cache.remove("PIA_K3");
     }
 
@@ -266,16 +266,16 @@ public abstract class AbstractCacheTest {
             cache.computeIfAbsent("CIA_K1", k -> {
                 throw new RuntimeException();
             });
-            Assert.assertEquals("AAA", cache.computeIfAbsent("CIA_NOT_EXIST_1", k -> "AAA"));
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_2", k -> null));
+            Assertions.assertEquals("AAA", cache.computeIfAbsent("CIA_NOT_EXIST_1", k -> "AAA"));
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_2", k -> null));
             final Object[] invoked = new Object[1];
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_2", k -> {
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_2", k -> {
                 invoked[0] = new Object();
                 return null;
             }));
-            Assert.assertNotNull(invoked[0]);
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_3", k -> null, true));
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_3", k -> {
+            Assertions.assertNotNull(invoked[0]);
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_3", k -> null, true));
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_3", k -> {
                 throw new RuntimeException();
             }, true));
         }
@@ -285,16 +285,16 @@ public abstract class AbstractCacheTest {
             cache.computeIfAbsent("CIA_K2", k -> {
                 throw new RuntimeException();
             }, false, 1, TimeUnit.MINUTES);
-            Assert.assertEquals("AAA", cache.computeIfAbsent("CIA_NOT_EXIST_11", k -> "AAA", false, 1, TimeUnit.MINUTES));
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_22", k -> null, false, 1, TimeUnit.MINUTES));
+            Assertions.assertEquals("AAA", cache.computeIfAbsent("CIA_NOT_EXIST_11", k -> "AAA", false, 1, TimeUnit.MINUTES));
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_22", k -> null, false, 1, TimeUnit.MINUTES));
             final Object[] invoked = new Object[1];
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_22", k -> {
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_22", k -> {
                 invoked[0] = new Object();
                 return null;
             }));
-            Assert.assertNotNull(invoked[0]);
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_33", k -> null, true, 1, TimeUnit.MINUTES));
-            Assert.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_33", k -> {
+            Assertions.assertNotNull(invoked[0]);
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_33", k -> null, true, 1, TimeUnit.MINUTES));
+            Assertions.assertNull(cache.computeIfAbsent("CIA_NOT_EXIST_33", k -> {
                 throw new RuntimeException();
             }, true, 1, TimeUnit.MINUTES));
         }
@@ -310,7 +310,7 @@ public abstract class AbstractCacheTest {
             }
         });
         putResult.future().toCompletableFuture().get();
-        Assert.assertFalse(asyncTestFail);
+        Assertions.assertFalse(asyncTestFail);
 
         CacheGetResult getResult = cache.GET("async_K1");
         getResult.future().thenAccept(resultData -> {
@@ -322,7 +322,7 @@ public abstract class AbstractCacheTest {
             }
         });
         getResult.future().toCompletableFuture().get();
-        Assert.assertFalse(asyncTestFail);
+        Assertions.assertFalse(asyncTestFail);
 
         CacheGetResult getResult2 = cache.GET("async_K1");
         getResult2.future().thenRun(() -> {
@@ -331,7 +331,7 @@ public abstract class AbstractCacheTest {
             }
         });
         getResult2.future().toCompletableFuture().get();
-        Assert.assertFalse(asyncTestFail);
+        Assertions.assertFalse(asyncTestFail);
 
         HashSet<String> s = new HashSet<>();
         s.add("async_K1");
@@ -358,7 +358,7 @@ public abstract class AbstractCacheTest {
             }
         });
         multiGetResult.future().toCompletableFuture().get();
-        Assert.assertFalse(asyncTestFail);
+        Assertions.assertFalse(asyncTestFail);
 
         MultiGetResult multiGetResult2 = cache.GET_ALL(s);
         multiGetResult2.future().thenRun(() -> {
@@ -374,7 +374,7 @@ public abstract class AbstractCacheTest {
             }
         });
         multiGetResult2.future().toCompletableFuture().get();
-        Assert.assertFalse(asyncTestFail);
+        Assertions.assertFalse(asyncTestFail);
 
         CacheResult removeResult = cache.REMOVE("async_K1");
         removeResult.future().thenAccept(resultData -> {
@@ -383,7 +383,7 @@ public abstract class AbstractCacheTest {
             }
         });
         removeResult.future().toCompletableFuture().get();
-        Assert.assertFalse(asyncTestFail);
+        Assertions.assertFalse(asyncTestFail);
     }
 
 
@@ -439,21 +439,21 @@ public abstract class AbstractCacheTest {
 
         cache.put("CVT_K1", a1);
         A fromCache = (A) cache.get("CVT_K1");
-        Assert.assertEquals(a2, fromCache);
-        Assert.assertNotEquals(a3, fromCache);
+        Assertions.assertEquals(a2, fromCache);
+        Assertions.assertNotEquals(a3, fromCache);
 
     }
 
     protected void lockTest() throws Exception {
         try (AutoReleaseLock lock = cache.tryLock("LockKey1", 200, TimeUnit.HOURS)) {
-            Assert.assertNotNull(lock);
-            Assert.assertNull(cache.tryLock("LockKey1", 200, TimeUnit.HOURS));
-            Assert.assertNotNull(cache.tryLock("LockKey2", 200, TimeUnit.MILLISECONDS));
+            Assertions.assertNotNull(lock);
+            Assertions.assertNull(cache.tryLock("LockKey1", 200, TimeUnit.HOURS));
+            Assertions.assertNotNull(cache.tryLock("LockKey2", 200, TimeUnit.MILLISECONDS));
         }
-        Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
-        Assert.assertNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
+        Assertions.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
+        Assertions.assertNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
         Thread.sleep(51);
-        Assert.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
+        Assertions.assertNotNull(cache.tryLock("LockKey1", 50, TimeUnit.MILLISECONDS));
 
         int count = 10;
         CountDownLatch countDownLatch = new CountDownLatch(count);
@@ -478,17 +478,17 @@ public abstract class AbstractCacheTest {
             new Thread(runnable).start();
         }
         countDownLatch.await();
-        Assert.assertEquals(1, runCount[0]);
-        Assert.assertEquals(1, runCount[1]);
+        Assertions.assertEquals(1, runCount[0]);
+        Assertions.assertEquals(1, runCount[1]);
 
         try {
             cache.tryLockAndRun("LockKeyAndRunKey", 10, TimeUnit.SECONDS, () -> {
                 throw new RuntimeException();
             });
-            Assert.fail();
+            Assertions.fail();
         } catch (Exception e) {
             try (AutoReleaseLock lock = cache.tryLock("LockKeyAndRunKey", 1, TimeUnit.SECONDS)) {
-                Assert.assertNotNull(lock);
+                Assertions.assertNotNull(lock);
             }
         }
     }
@@ -514,7 +514,7 @@ public abstract class AbstractCacheTest {
     }
 
     protected void expireAfterAccessTest(long ttl) throws InterruptedException {
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("EXPIRE_A_K1", "V1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("EXPIRE_A_K1", "V1").getResultCode());
         expireAfterAccessTestImpl("EXPIRE_A_K1", ttl);
 
         HashMap m = new HashMap();
@@ -530,31 +530,31 @@ public abstract class AbstractCacheTest {
 
     protected void expireAfterWriteTestImpl(String key, long ttl) throws InterruptedException {
         CacheGetResult r = cache.GET(key);
-        Assert.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
-        Assert.assertEquals("V1", r.getValue());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
+        Assertions.assertEquals("V1", r.getValue());
 
         Thread.sleep(ttl / 2);
         r = cache.GET(key);
-        Assert.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
-        Assert.assertEquals("V1", r.getValue());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, r.getResultCode());
+        Assertions.assertEquals("V1", r.getValue());
 
         // Time drift in docker (Mac)
         Thread.sleep(ttl / 2 + 50);
         r = cache.GET(key);
-        Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
-        Assert.assertNull(r.getValue());
+        Assertions.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
+        Assertions.assertNull(r.getValue());
     }
 
     protected void expireAfterAccessTestImpl(String key, long ttl) throws InterruptedException {
-        Assert.assertEquals("V1", cache.get(key));
+        Assertions.assertEquals("V1", cache.get(key));
         Thread.sleep(ttl / 2);
-        Assert.assertEquals("V1", cache.get(key));
+        Assertions.assertEquals("V1", cache.get(key));
         Thread.sleep(ttl / 2 + 2);
-        Assert.assertEquals("V1", cache.get(key));
+        Assertions.assertEquals("V1", cache.get(key));
         Thread.sleep(ttl + 1);
         CacheGetResult<Object> r = cache.GET(key);
-        Assert.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
-        Assert.assertNull(r.getValue());
+        Assertions.assertTrue(r.getResultCode() == CacheResultCode.EXPIRED || r.getResultCode() == CacheResultCode.NOT_EXISTS);
+        Assertions.assertNull(r.getValue());
     }
 
     protected void fastjsonKeyCoverterTest() {
@@ -569,8 +569,8 @@ public abstract class AbstractCacheTest {
 
         cache.get(d2);//warm up fastjson
         cache.put(d1, "V1");
-        Assert.assertEquals("V1", cache.get(d2));
-        Assert.assertNull(cache.get(d3));
+        Assertions.assertEquals("V1", cache.get(d2));
+        Assertions.assertNull(cache.get(d3));
     }
 
     protected void doWithMonitor(Cache cache, Runnable runnable) {
@@ -650,7 +650,7 @@ public abstract class AbstractCacheTest {
                     CacheGetResult result = cache.GET(key);
                     checkResult(key, value, result);
                     CacheResult removeResult = cache.REMOVE(key);
-                    Assert.assertTrue(removeResult.isSuccess() || removeResult.getResultCode() == CacheResultCode.NOT_EXISTS);
+                    Assertions.assertTrue(removeResult.isSuccess() || removeResult.getResultCode() == CacheResultCode.NOT_EXISTS);
 
                     if (!isMultiLevelCache()) {
                         cache.putIfAbsent(String.valueOf(i), i);
@@ -662,11 +662,11 @@ public abstract class AbstractCacheTest {
                     m.put(k1, value);
                     value = value + 1;
                     m.put(k2, value);
-                    Assert.assertTrue(cache.PUT_ALL(m).isSuccess());
+                    Assertions.assertTrue(cache.PUT_ALL(m).isSuccess());
                     MultiGetResult<Object, Object> multiGetResult = cache.GET_ALL(m.keySet());
-                    Assert.assertEquals(CacheResultCode.SUCCESS, multiGetResult.getResultCode());
+                    Assertions.assertEquals(CacheResultCode.SUCCESS, multiGetResult.getResultCode());
                     checkResult(k2, value, multiGetResult.getValues().get(k2));
-                    Assert.assertTrue(cache.REMOVE_ALL(m.keySet()).isSuccess());
+                    Assertions.assertTrue(cache.REMOVE_ALL(m.keySet()).isSuccess());
                 }
             }
 
@@ -685,8 +685,8 @@ public abstract class AbstractCacheTest {
                             long lockCountNum = lockCount.get();
 
                             cache.put(shareKey, x);
-                            Assert.assertEquals(x, cache.get(shareKey));
-                            Assert.assertTrue(cache.remove(shareKey));
+                            Assertions.assertEquals(x, cache.get(shareKey));
+                            Assertions.assertTrue(cache.remove(shareKey));
                             if (b) {
                                 putIfAbsentTest();
                             }
@@ -738,10 +738,10 @@ public abstract class AbstractCacheTest {
         }
         countDownLatch.await();
 
-        Assert.assertFalse(cocurrentFail);
+        Assertions.assertFalse(cocurrentFail);
 
-        Assert.assertEquals(lockAtommicCount1.get(), lockCount1.get());
-        Assert.assertEquals(lockAtommicCount2.get(), lockCount2.get());
+        Assertions.assertEquals(lockAtommicCount1.get(), lockCount1.get());
+        Assertions.assertEquals(lockAtommicCount2.get(), lockCount2.get());
 
     }
 
@@ -837,14 +837,14 @@ public abstract class AbstractCacheTest {
         }
         countDownLatch.await();
 
-        Assert.assertFalse(fail.get());
-        Assert.assertEquals(3, loadSuccess.get());
+        Assertions.assertFalse(fail.get());
+        Assertions.assertEquals(3, loadSuccess.get());
         // the rest of the threads will fail 5 times only.
-        Assert.assertEquals(2 + 3, getFailCount.get());
+        Assertions.assertEquals(2 + 3, getFailCount.get());
 
-        Assert.assertTrue(cache.remove(keyPrefix + "0"));
-        Assert.assertTrue(cache.remove(keyPrefix + "1"));
-        Assert.assertTrue(cache.remove(keyPrefix + "2"));
+        Assertions.assertTrue(cache.remove(keyPrefix + "0"));
+        Assertions.assertTrue(cache.remove(keyPrefix + "1"));
+        Assertions.assertTrue(cache.remove(keyPrefix + "2"));
     }
 
     private static void penetrationProtectTestWithLoadingCache(Cache cache) throws Exception {
@@ -914,7 +914,7 @@ public abstract class AbstractCacheTest {
         }).start();
         countDownLatch.await();
 
-        Assert.assertNull(failMsg[0]);
+        Assertions.assertNull(failMsg[0]);
 
         cache.config().setLoader(oldLoader);
     }
@@ -922,7 +922,7 @@ public abstract class AbstractCacheTest {
     private static void penetrationProtectReEntryTest(Cache cache) {
         Object v = cache.computeIfAbsent("penetrationProtectReEntryTest",
                 (k) -> cache.computeIfAbsent(k, (k2) -> "V"));
-        Assert.assertEquals("V", v);
+        Assertions.assertEquals("V", v);
     }
 
     private static void penetrationProtectTimeoutTest(Cache cache) throws Exception {
@@ -954,17 +954,17 @@ public abstract class AbstractCacheTest {
         // 3. start the blocking loader thread, and then verify that there is a block.
         t1.start();
         Thread.sleep(tick(25));
-        Assert.assertEquals(0, loadSuccess.intValue());
+        Assertions.assertEquals(0, loadSuccess.intValue());
         // 4. start the normal loader thread, and verify penetration protector expired after the delay.
         t2.start();
         Thread.sleep(tick(25));
-        Assert.assertEquals(1, loadSuccess.intValue());
+        Assertions.assertEquals(1, loadSuccess.intValue());
         // 5. release the barrier of blocking loader, and then verify all of the loaders execute.
         firstBarrier.countDown();
         t1.join();
         t2.join();
-        Assert.assertEquals(2, loadSuccess.intValue());
-        Assert.assertTrue(SHORT_PROTECT_DURATION.compareTo(duration.get()) < 0);
+        Assertions.assertEquals(2, loadSuccess.intValue());
+        Assertions.assertTrue(SHORT_PROTECT_DURATION.compareTo(duration.get()) < 0);
 
         // 6. reset the time of PenetrationProtectTimeout to a longer Duration.
         // reset two threads to a new loader.
@@ -992,7 +992,7 @@ public abstract class AbstractCacheTest {
         Thread.sleep(tick(25));
         t3.start();
         Thread.sleep(tick(25));
-        Assert.assertEquals(0, loadSuccess.intValue());
+        Assertions.assertEquals(0, loadSuccess.intValue());
         // 8. interrupt the second thread, and then release the barrier of blocking loader
         t2.interrupt();
         Thread.sleep(tick(25));
@@ -1001,8 +1001,8 @@ public abstract class AbstractCacheTest {
         t2.join();
         t3.join();
         // 9. verify only the first and the third threads were executed, and verify PenetrationProtect didn't expire.
-        Assert.assertEquals(2, loadSuccess.intValue());
-        Assert.assertTrue(LONG_PROTECT_DURATION.compareTo(duration.get()) > 0);
+        Assertions.assertEquals(2, loadSuccess.intValue());
+        Assertions.assertTrue(LONG_PROTECT_DURATION.compareTo(duration.get()) > 0);
     }
 
     @FunctionalInterface

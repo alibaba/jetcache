@@ -2,13 +2,13 @@ package com.alicp.jetcache.redisson;
 
 import com.alicp.jetcache.LoadingCacheTest;
 import com.alicp.jetcache.RefreshCacheTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
 import com.alicp.jetcache.support.KryoValueDecoder;
 import com.alicp.jetcache.support.KryoValueEncoder;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -32,7 +32,7 @@ public class RedissonCacheTest extends AbstractExternalCacheTest {
 
     private void doTest(final RedissonClient redissonClient) throws Exception {
         cache = RedissonCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .redissonClient(redissonClient)
@@ -45,13 +45,13 @@ public class RedissonCacheTest extends AbstractExternalCacheTest {
         expireAfterWriteTest(cache.config().getExpireAfterWriteInMillis());
 
         LoadingCacheTest.loadingCacheTest(RedissonCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .redissonClient(redissonClient)
                 .keyPrefix(new Random().nextInt() + ""), 0);
         RefreshCacheTest.refreshCacheTest(RedissonCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .redissonClient(redissonClient)
@@ -70,7 +70,7 @@ public class RedissonCacheTest extends AbstractExternalCacheTest {
         int thread = 10;
         int time = 3000;
         cache = RedissonCacheBuilder.createBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(KryoValueEncoder.INSTANCE)
                 .valueDecoder(KryoValueDecoder.INSTANCE)
                 .redissonClient(redissonClient)

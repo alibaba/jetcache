@@ -14,7 +14,7 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       poolConfig:
         minIdle: 5
@@ -100,7 +100,7 @@ pc.setMaxTotal(10);
 JedisPool pool = new JedisPool(pc, "localhost", 6379);
 
 Cache<Long,OrderDO> orderCache = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .jedisPool(pool)
@@ -122,7 +122,7 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       poolConfig:
         minIdle: 5
@@ -174,7 +174,7 @@ jetcache:
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2
+      keyConvertor: fastjson2 #其他可选：fastjson(等同fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       poolConfig:
         minIdle: 5

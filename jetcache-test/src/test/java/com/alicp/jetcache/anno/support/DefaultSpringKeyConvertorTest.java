@@ -3,7 +3,7 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -34,7 +34,7 @@ public class DefaultSpringKeyConvertorTest {
 
     @Test
     public void testParseKeyConvertor() {
-        assertSame(FastjsonKeyConvertor.INSTANCE, parser.parseKeyConvertor("fastjson"));
+        assertSame(Fastjson2KeyConvertor.INSTANCE, parser.parseKeyConvertor("fastjson"));
         Function<Object, Object> func = o -> null;
         beanFactory.registerSingleton("cvt", func);
         assertSame(func, parser.parseKeyConvertor("bean:cvt"));

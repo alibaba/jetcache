@@ -7,18 +7,16 @@ import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.template.QuickConfig;
 import com.alicp.jetcache.test.anno.TestUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 
 /**
@@ -26,8 +24,7 @@ import java.time.Duration;
  *
  * @author huangli
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = ConfigTest2.A.class)
+@SpringJUnitConfig(ConfigTest2.A.class)
 public class ConfigTest2 {
 
     @Autowired

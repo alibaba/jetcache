@@ -123,8 +123,9 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
             Cache local = buildLocal(config);
             Cache remote = buildRemote(config);
 
-
-            boolean useExpireOfSubCache = config.getLocalExpire() != null;
+            boolean useExpireOfSubCache = config.getLocalExpire() != null
+                    || (cacheBuilderTemplate.isUseDefaultLocalExpireInMultiLevelCache()
+                        && local.config().getExpireAfterWriteInMillis() != remote.config().getExpireAfterWriteInMillis());
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder()
                     .expireAfterWrite(remote.config().getExpireAfterWriteInMillis(), TimeUnit.MILLISECONDS)
                     .addCache(local, remote)
@@ -206,6 +207,11 @@ public class SimpleCacheManager implements CacheManager, AutoCloseable {
         if (config.getCacheType() == CacheType.BOTH &&
                 config.getLocalExpire() != null && config.getLocalExpire().toMillis() > 0) {
             cacheBuilder.expireAfterWrite(config.getLocalExpire().toMillis(), TimeUnit.MILLISECONDS);
+        } else if (config.getCacheType() == CacheType.BOTH
+                && cacheBuilderTemplate.isUseDefaultLocalExpireInMultiLevelCache()
+                && cacheBuilder.getConfig().getExpireAfterWriteInMillis() > 0
+                && (config.getExpire() == null || cacheBuilder.getConfig().getExpireAfterWriteInMillis() < config.getExpire().toMillis())) {
+            // use default local expire
         } else if (config.getExpire() != null && config.getExpire().toMillis() > 0) {
             cacheBuilder.expireAfterWrite(config.getExpire().toMillis(), TimeUnit.MILLISECONDS);
         }

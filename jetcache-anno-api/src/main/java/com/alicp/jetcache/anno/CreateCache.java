@@ -50,7 +50,10 @@ public @interface CreateCache {
     int expire() default CacheConsts.UNDEFINED_INT;
 
     /**
-     * Use to specify the local cache expire time when cacheType=CacheType.BOTH, use "expire" if absent.
+     * Use to specify the local cache expire time when cacheType=CacheType.BOTH.
+     * If not set, use "expire" as local expire time. If the global config
+     * "useDefaultLocalExpireInMultiLevelCache" is set to true, use the local cache
+     * builder's expireAfterWriteInMillis instead (but not greater than "expire").
      * @return the local cache expire time
      */
     int localExpire() default CacheConsts.UNDEFINED_INT;

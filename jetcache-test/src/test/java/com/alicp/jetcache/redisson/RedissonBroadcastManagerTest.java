@@ -3,12 +3,12 @@ package com.alicp.jetcache.redisson;
 import com.alicp.jetcache.SimpleCacheManager;
 import com.alicp.jetcache.redis.AbstractBroadcastManagerTest;
 import com.alicp.jetcache.support.BroadcastManager;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.support.JavaValueDecoder;
 import com.alicp.jetcache.support.JavaValueEncoder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -23,14 +23,14 @@ import java.util.Random;
 public class RedissonBroadcastManagerTest extends AbstractBroadcastManagerTest {
     private RedissonClient client;
 
-    @Before
+    @BeforeEach
     public void initRedissonClient() {
         final Config config = new Config();
         config.useSingleServer().setAddress("redis://127.0.0.1:6379").setDatabase(0);
         this.client = Redisson.create(config);
     }
 
-    @After
+    @AfterEach
     public void closeRedissonClient() {
         this.client.shutdown();
     }
@@ -39,7 +39,7 @@ public class RedissonBroadcastManagerTest extends AbstractBroadcastManagerTest {
     public void redissonTest() throws Exception {
         final BroadcastManager bm = RedissonCacheBuilder.createBuilder()
                 .redissonClient(client)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "")

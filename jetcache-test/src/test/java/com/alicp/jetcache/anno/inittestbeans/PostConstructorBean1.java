@@ -2,7 +2,7 @@ package com.alicp.jetcache.anno.inittestbeans;
 
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Created on 2017/5/4.

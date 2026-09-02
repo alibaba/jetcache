@@ -5,22 +5,19 @@ import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.beans.MyFactoryBean;
 import com.alicp.jetcache.test.spring.SpringTest;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Created on 2016/11/16.
  *
  * @author huangli
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = AnnoConfigTest.A.class)
+@SpringJUnitConfig(AnnoConfigTest.A.class)
 public class AnnoConfigTest extends SpringTest {
     @Test
     public void test() throws Exception {

@@ -15,7 +15,7 @@ import com.alicp.jetcache.anno.support.ConfigProvider;
 import com.alicp.jetcache.anno.support.GlobalCacheConfig;
 import com.alicp.jetcache.anno.support.JetCacheBaseBeans;
 import com.alicp.jetcache.embedded.LinkedHashMapCacheBuilder;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.test.anno.TestUtil;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.testsupport.CountClass;
@@ -54,7 +54,7 @@ public class CacheHandlerTest {
         configProvider.init();
         cacheManager = new JetCacheBaseBeans().cacheManager(configProvider);
         cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
 
         cachedAnnoConfig = new CachedAnnoConfig();

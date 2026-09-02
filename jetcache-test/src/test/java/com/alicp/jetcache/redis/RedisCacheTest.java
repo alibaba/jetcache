@@ -7,8 +7,8 @@ import com.alicp.jetcache.redis.lettuce.RedisLettuceCacheTest;
 import com.alicp.jetcache.support.*;
 import com.alicp.jetcache.test.external.AbstractExternalCacheTest;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
@@ -83,7 +83,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
 
     private RedisCacheBuilder createCacheBuilder(Object jedis) {
         RedisCacheBuilder builder = RedisCacheBuilder.createRedisCacheBuilder()
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .valueEncoder(JavaValueEncoder.INSTANCE)
                 .valueDecoder(JavaValueDecoder.INSTANCE)
                 .keyPrefix(new Random().nextInt() + "");
@@ -101,11 +101,11 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 .buildCache();
 
         if (jedis instanceof JedisPooled) {
-            Assert.assertSame(jedis, cache.unwrap(JedisPooled.class));
+            Assertions.assertSame(jedis, cache.unwrap(JedisPooled.class));
         } else if (jedis instanceof JedisCluster) {
-            Assert.assertSame(jedis, cache.unwrap(JedisCluster.class));
+            Assertions.assertSame(jedis, cache.unwrap(JedisCluster.class));
         } else if (jedis instanceof Pool) {
-            Assert.assertSame(jedis, cache.unwrap(Pool.class));
+            Assertions.assertSame(jedis, cache.unwrap(Pool.class));
         }
 
         baseTest();
@@ -134,8 +134,8 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 int index = RedisCache.randomIndex(ws);
                 result[index]++;
             }
-            Assert.assertEquals(1.0, 1.0 * result[1] / result[0], 0.2);
-            Assert.assertEquals(1.0, 1.0 * result[2] / result[0], 0.2);
+            Assertions.assertEquals(1.0, 1.0 * result[1] / result[0], 0.2);
+            Assertions.assertEquals(1.0, 1.0 * result[2] / result[0], 0.2);
         }
         {
             int[] ws = new int[]{1, 2, 3};
@@ -144,8 +144,8 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
                 int index = RedisCache.randomIndex(ws);
                 result[index]++;
             }
-            Assert.assertEquals(2.0, 1.0 * result[1] / result[0], 0.2);
-            Assert.assertEquals(3.0, 1.0 * result[2] / result[0], 0.4);
+            Assertions.assertEquals(2.0, 1.0 * result[1] / result[0], 0.2);
+            Assertions.assertEquals(3.0, 1.0 * result[2] / result[0], 0.4);
         }
     }
 
@@ -164,7 +164,7 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
         builder.setReadFromSlave(true);
         builder.setJedisSlavePools(pool2, pool3);
         builder.setSlaveReadWeights(1, 1);
-        builder.setKeyConvertor(FastjsonKeyConvertor.INSTANCE);
+        builder.setKeyConvertor(Fastjson2KeyConvertor.INSTANCE);
         builder.setValueEncoder(JavaValueEncoder.INSTANCE);
         builder.setValueDecoder(JavaValueDecoder.INSTANCE);
         builder.setKeyPrefix(new Random().nextInt() + "");
@@ -179,14 +179,14 @@ public class RedisCacheTest extends AbstractExternalCacheTest {
     private void readFromSlaveTestAsserts(JedisPool pool1, RedisCacheBuilder builder) throws InterruptedException {
         Cache cache = builder.buildCache();
         cache.put("readFromSlaveTest_K1", "V1");
-        Assert.assertNotSame(pool1, ((RedisCache) cache).readCommands());
-        Assert.assertNotSame(pool1, ((RedisCache) cache).readCommands());
-        Assert.assertNotSame(pool1, ((RedisCache) cache).readCommands());
-        Assert.assertNotSame(pool1, ((RedisCache) cache).readCommands());
+        Assertions.assertNotSame(pool1, ((RedisCache) cache).readCommands());
+        Assertions.assertNotSame(pool1, ((RedisCache) cache).readCommands());
+        Assertions.assertNotSame(pool1, ((RedisCache) cache).readCommands());
+        Assertions.assertNotSame(pool1, ((RedisCache) cache).readCommands());
         Thread.sleep(15);
-        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
-        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
-        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
-        Assert.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assertions.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assertions.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assertions.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
+        Assertions.assertEquals("V1", cache.get("readFromSlaveTest_K1"));
     }
 }

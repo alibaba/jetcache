@@ -1,6 +1,5 @@
 package com.alicp.jetcache.support;
 
-import com.alicp.jetcache.anno.SerialPolicy;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
@@ -18,7 +17,7 @@ public class Fastjson2EncoderTest extends AbstractEncoderTest {
         AbstractValueDecoder d = (AbstractValueDecoder) decoder;
         DecoderMap dm = new DecoderMap();
         dm.initDefaultDecoder();
-        dm.register(SerialPolicy.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
+        dm.register(DecoderMap.IDENTITY_NUMBER_FASTJSON2, Fastjson2ValueDecoder.INSTANCE);
         d.setDecoderMap(dm);
     }
 
@@ -55,7 +54,7 @@ public class Fastjson2EncoderTest extends AbstractEncoderTest {
         byte[] bytes = encoder.apply("12345");
         bytes[0] = 0;
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
-        writeHeader(bytes, SerialPolicy.IDENTITY_NUMBER_JAVA);
+        writeHeader(bytes, DecoderMap.IDENTITY_NUMBER_JAVA);
         assertThrows(CacheEncodeException.class, () -> decoder.apply(bytes));
 
         encoder = Fastjson2ValueEncoder.INSTANCE;

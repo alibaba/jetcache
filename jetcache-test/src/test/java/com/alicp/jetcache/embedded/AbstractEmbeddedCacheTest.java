@@ -5,11 +5,11 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.*;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.test.support.DynamicQuery;
 import com.alicp.jetcache.test.support.DynamicQueryWithEquals;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -22,20 +22,20 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
     protected abstract Function<CacheConfig, Cache> getBuildFunc();
 
     private void lruTest() {
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K2").getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.GET("K2").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
 
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1, TimeUnit.SECONDS).getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
-        Assert.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K2").getResultCode());
-        Assert.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K1", "V1", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K2", "V2", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.PUT("K3", "V3", 1, TimeUnit.SECONDS).getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.GET("K1").getResultCode());
+        Assertions.assertEquals(CacheResultCode.NOT_EXISTS, cache.GET("K2").getResultCode());
+        Assertions.assertEquals(CacheResultCode.SUCCESS, cache.GET("K3").getResultCode());
     }
 
     public void test(int expireMillis, boolean testLru) throws Exception {
@@ -60,7 +60,7 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
         }
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc())
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE).buildCache();
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE).buildCache();
         fastjsonKeyCoverterTest();
 
         cache = EmbeddedCacheBuilder.createEmbeddedCacheBuilder().buildFunc(getBuildFunc())
@@ -94,8 +94,8 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
             d2.setName("HL");
 
             cache.put(d1, "V1");
-            Assert.assertNull(cache.get(d2));
-            Assert.assertNull(cache.get(d3));
+            Assertions.assertNull(cache.get(d2));
+            Assertions.assertNull(cache.get(d3));
         }
 
         {
@@ -109,8 +109,8 @@ public abstract class AbstractEmbeddedCacheTest extends AbstractCacheTest {
             d2.setName("HL2");
 
             cache.put(d1, "V2");
-            Assert.assertEquals("V2", cache.get(d2));
-            Assert.assertNull(cache.get(d3));
+            Assertions.assertEquals("V2", cache.get(d2));
+            Assertions.assertNull(cache.get(d3));
         }
     }
 

@@ -7,9 +7,9 @@ import com.alicp.jetcache.anno.*;
 import com.alicp.jetcache.anno.method.CacheInvokeConfig;
 import com.alicp.jetcache.anno.support.CachedAnnoConfig;
 import com.alicp.jetcache.anno.support.ConfigMap;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import otherpackage.OtherService;
 
 import java.lang.reflect.Method;
@@ -22,7 +22,7 @@ public class CachePointCutTest {
     private CachePointcut pc;
     private ConfigMap map;
 
-    @Before
+    @BeforeEach
     public void setup() {
         pc = new CachePointcut(new String[]{"com.alicp.jetcache"});
         map = new ConfigMap();
@@ -42,30 +42,30 @@ public class CachePointCutTest {
 
     @Test
     public void testMatches1() throws Exception {
-        Assert.assertTrue(pc.matches(C1.class));
-        Assert.assertTrue(pc.matches(I1.class));
+        Assertions.assertTrue(pc.matches(C1.class));
+        Assertions.assertTrue(pc.matches(I1.class));
 
         Method m1 = I1.class.getMethod("foo");
         Method m2 = C1.class.getMethod("foo");
 
-        Assert.assertTrue(pc.matches(m1, C1.class));
-        Assert.assertTrue(pc.matches(m2, C1.class));
-        Assert.assertTrue(pc.matches(m1, I1.class));
-        Assert.assertTrue(pc.matches(m2, I1.class));
+        Assertions.assertTrue(pc.matches(m1, C1.class));
+        Assertions.assertTrue(pc.matches(m2, C1.class));
+        Assertions.assertTrue(pc.matches(m1, I1.class));
+        Assertions.assertTrue(pc.matches(m2, I1.class));
 
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, C1.class)).isEnableCacheContext());
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, I1.class)).isEnableCacheContext());
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C1.class)).isEnableCacheContext());
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, I1.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C1.class)).getCachedAnnoConfig());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, I1.class)).getCachedAnnoConfig());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C1.class)).getCachedAnnoConfig());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I1.class)).getCachedAnnoConfig());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, C1.class)).isEnableCacheContext());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, I1.class)).isEnableCacheContext());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C1.class)).isEnableCacheContext());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, I1.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C1.class)).getCachedAnnoConfig());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, I1.class)).getCachedAnnoConfig());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C1.class)).getCachedAnnoConfig());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I1.class)).getCachedAnnoConfig());
 
         Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, (proxy, method, args) -> null);
-        Assert.assertTrue(pc.matches(m1, o1.getClass()));
-        Assert.assertTrue(pc.matches(m2, o1.getClass()));
-        Assert.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));
+        Assertions.assertTrue(pc.matches(m1, o1.getClass()));
+        Assertions.assertTrue(pc.matches(m2, o1.getClass()));
+        Assertions.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));
     }
 
 
@@ -84,26 +84,26 @@ public class CachePointCutTest {
     public void testMatches2() throws Exception {
         Method m1 = I2.class.getMethod("foo");
         Method m2 = C2.class.getMethod("foo");
-        Assert.assertTrue(pc.matches(m1, C2.class));
-        Assert.assertTrue(pc.matches(m2, C2.class));
-        Assert.assertFalse(pc.matches(m1, I2.class));
-        Assert.assertTrue(pc.matches(m2, I2.class));
+        Assertions.assertTrue(pc.matches(m1, C2.class));
+        Assertions.assertTrue(pc.matches(m2, C2.class));
+        Assertions.assertFalse(pc.matches(m1, I2.class));
+        Assertions.assertTrue(pc.matches(m2, I2.class));
 
-        Assert.assertSame(CacheInvokeConfig.getNoCacheInvokeConfigInstance(), map.getByMethodInfo(CachePointcut.getKey(m1, I2.class)));
+        Assertions.assertSame(CacheInvokeConfig.getNoCacheInvokeConfigInstance(), map.getByMethodInfo(CachePointcut.getKey(m1, I2.class)));
 
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, C2.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C2.class)).getCachedAnnoConfig());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, C2.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C2.class)).getCachedAnnoConfig());
 
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, I2.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I2.class)).getCachedAnnoConfig());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, I2.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I2.class)).getCachedAnnoConfig());
 
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).getCachedAnnoConfig());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C2.class)).getCachedAnnoConfig());
 
         Object o1 = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{I1.class}, (proxy, method, args) -> null);
-        Assert.assertTrue(pc.matches(m1, o1.getClass()));
-        Assert.assertTrue(pc.matches(m2, o1.getClass()));
-        Assert.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));
+        Assertions.assertTrue(pc.matches(m1, o1.getClass()));
+        Assertions.assertTrue(pc.matches(m2, o1.getClass()));
+        Assertions.assertTrue(pc.matches(o1.getClass().getMethod("foo"), o1.getClass()));
     }
 
     interface I3_Parent {
@@ -127,28 +127,28 @@ public class CachePointCutTest {
         Method m1 = I3_Parent.class.getMethod("foo");
         Method m2 = I3.class.getMethod("foo");
         Method m3 = C3.class.getMethod("foo");
-        Assert.assertTrue(pc.matches(m1, C3.class));
-        Assert.assertTrue(pc.matches(m2, C3.class));
-        Assert.assertTrue(pc.matches(m3, C3.class));
-        Assert.assertTrue(pc.matches(m1, I3.class));
-        Assert.assertTrue(pc.matches(m2, I3.class));
-        Assert.assertTrue(pc.matches(m3, I3.class));
+        Assertions.assertTrue(pc.matches(m1, C3.class));
+        Assertions.assertTrue(pc.matches(m2, C3.class));
+        Assertions.assertTrue(pc.matches(m3, C3.class));
+        Assertions.assertTrue(pc.matches(m1, I3.class));
+        Assertions.assertTrue(pc.matches(m2, I3.class));
+        Assertions.assertTrue(pc.matches(m3, I3.class));
 
 
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, I3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, C3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, I3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, C3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m3, I3.class)).isEnableCacheContext());
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m3, C3.class)).isEnableCacheContext());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, I3.class)).isEnableCacheContext());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, C3.class)).isEnableCacheContext());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, I3.class)).isEnableCacheContext());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, C3.class)).isEnableCacheContext());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m3, I3.class)).isEnableCacheContext());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m3, C3.class)).isEnableCacheContext());
 
 
         CachedAnnoConfig cac = map.getByMethodInfo(CachePointcut.getKey(m1, I3.class)).getCachedAnnoConfig();
-        Assert.assertEquals("A1", cac.getArea());
-        Assert.assertEquals(false, cac.isEnabled());
-        Assert.assertEquals(1, cac.getExpire());
-        Assert.assertEquals(CacheType.BOTH, cac.getCacheType());
-        Assert.assertEquals(2, cac.getLocalLimit());
+        Assertions.assertEquals("A1", cac.getArea());
+        Assertions.assertEquals(false, cac.isEnabled());
+        Assertions.assertEquals(1, cac.getExpire());
+        Assertions.assertEquals(CacheType.BOTH, cac.getCacheType());
+        Assertions.assertEquals(2, cac.getLocalLimit());
     }
 
 
@@ -171,22 +171,22 @@ public class CachePointCutTest {
     public void testMatches4() throws Exception {
         Method m1 = I4.class.getMethod("foo");
         Method m2 = C4.class.getMethod("foo");
-        Assert.assertTrue(pc.matches(m1, C4.class));
-        Assert.assertTrue(pc.matches(m2, C4.class));
-        Assert.assertTrue(pc.matches(m1, I4.class));
-        Assert.assertTrue(pc.matches(m2, I4.class));
+        Assertions.assertTrue(pc.matches(m1, C4.class));
+        Assertions.assertTrue(pc.matches(m2, C4.class));
+        Assertions.assertTrue(pc.matches(m1, I4.class));
+        Assertions.assertTrue(pc.matches(m2, I4.class));
 
-        Assert.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, I4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, I4.class)).getCachedAnnoConfig());
+        Assertions.assertFalse(map.getByMethodInfo(CachePointcut.getKey(m1, I4.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, I4.class)).getCachedAnnoConfig());
 
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, C4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C4.class)).getCachedAnnoConfig());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m1, C4.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m1, C4.class)).getCachedAnnoConfig());
 
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, I4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I4.class)).getCachedAnnoConfig());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, I4.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, I4.class)).getCachedAnnoConfig());
 
-        Assert.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, C4.class)).isEnableCacheContext());
-        Assert.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C4.class)).getCachedAnnoConfig());
+        Assertions.assertTrue(map.getByMethodInfo(CachePointcut.getKey(m2, C4.class)).isEnableCacheContext());
+        Assertions.assertNotNull(map.getByMethodInfo(CachePointcut.getKey(m2, C4.class)).getCachedAnnoConfig());
 
     }
 
@@ -203,16 +203,16 @@ public class CachePointCutTest {
 
     @Test
     public void testMatches5()throws Exception{
-        Assert.assertTrue(pc.matches(C5.class));
+        Assertions.assertTrue(pc.matches(C5.class));
 
         Method m3 = OtherService.class.getMethod("bar");
         Method m4 = C5.class.getMethod("bar");
-        Assert.assertFalse(pc.matches(m3, OtherService.class));
-        Assert.assertFalse(pc.matches(m4, OtherService.class));
-        Assert.assertFalse(pc.matches(m3, C5.class));
-        Assert.assertFalse(pc.matches(m4, C5.class));
+        Assertions.assertFalse(pc.matches(m3, OtherService.class));
+        Assertions.assertFalse(pc.matches(m4, OtherService.class));
+        Assertions.assertFalse(pc.matches(m3, C5.class));
+        Assertions.assertFalse(pc.matches(m4, C5.class));
 
-        Assert.assertTrue(pc.matches(C5.class.getMethod("bar2"), C5.class));
+        Assertions.assertTrue(pc.matches(C5.class.getMethod("bar2"), C5.class));
     }
 
 
@@ -238,15 +238,15 @@ public class CachePointCutTest {
         Method m2 = C6_1.class.getMethod("foo");
         Method m3 = C6_2.class.getMethod("foo");
 
-        Assert.assertFalse(pc.matches(m1, I6.class));
-        Assert.assertFalse(pc.matches(m1, C6_1.class));
-        Assert.assertTrue(pc.matches(m1, C6_2.class));
+        Assertions.assertFalse(pc.matches(m1, I6.class));
+        Assertions.assertFalse(pc.matches(m1, C6_1.class));
+        Assertions.assertTrue(pc.matches(m1, C6_2.class));
 
-        Assert.assertFalse(pc.matches(m2, I6.class));
-        Assert.assertFalse(pc.matches(m2, C6_1.class));
+        Assertions.assertFalse(pc.matches(m2, I6.class));
+        Assertions.assertFalse(pc.matches(m2, C6_1.class));
 
-        Assert.assertTrue(pc.matches(m3, I6.class));
-        Assert.assertTrue(pc.matches(m3, C6_2.class));
+        Assertions.assertTrue(pc.matches(m3, I6.class));
+        Assertions.assertTrue(pc.matches(m3, C6_2.class));
     }
 
 }

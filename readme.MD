@@ -14,16 +14,16 @@ Full features of JetCache:
 * Create & configure ```Cache``` instance with cache manager
 * Automatically collect access statistics for ```Cache``` instance and method level cache
 * The strategy of key generation and value serialization can be customized
-* Cache key convertor supported: ```fastjson```/```fastjson2```/```jackson```; Value convertor supported: ```java```/```kryo```/```kryo5```
+* Cache key convertor supported: ```fastjson2```/```jackson```/```jackson3```; Value encoder/decoder supported: ```java```/```kryo```/```kryo5```
 * Distributed cache auto refresh and distributed lock. (2.2+)
 * Asynchronous access using Cache API (2.2+, with redis lettuce client)
 * Invalidate local caches (in all JVM process) after updates (2.7+)
 * Spring Boot support
 
 requirements:
-* JDK1.8
-* Spring Framework4.0.8+ (optional, with annotation support)，jetcache 2.7 need 5.2.4+
-* Spring Boot1.1.9+ (optional), jetcache 2.7 need 2.2.5+
+* JDK17+ (jetcache 2.8+); JDK8+ (jetcache 2.7 and earlier)
+* Spring Framework6.x+ (optional, with annotation support)
+* Spring Boot3.x+ (optional)
 
 Visit [docs](docs/EN/Readme.md) for more details.
 
@@ -53,7 +53,7 @@ public interface UserService {
     void deleteUser(long userId);
 }
 ```
-In order to use parameter name such as ```key="#userId"```, you javac compiler target must be 1.8 and above, and the ```-parameters``` should be set. Otherwise, use index to access parameters like ```key="args[0]"```
+In order to use parameter name such as ```key="#userId"```, the ```-parameters``` javac compiler flag should be set. Otherwise, use index to access parameters like ```key="args[0]"```
 
 Auto refreshment:
 ```java
@@ -157,15 +157,17 @@ spring boot application.yml config:
 jetcache:
   statIntervalMinutes: 15
   areaInCacheName: false
+  decodeFilterAllowPatterns:
+    - com.yourcompany. #add your package here, or set decodeFilterEnabled: false to disable the filter
   local:
     default:
       type: linkedhashmap #other choose：caffeine
-      keyConvertor: fastjson2 #other choose：fastjson/jackson
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       limit: 100
   remote:
     default:
       type: redis
-      keyConvertor: fastjson2 #other choose：fastjson/jackson
+      keyConvertor: fastjson2 #other choose：fastjson(same as fastjson2)/jackson/jackson3
       broadcastChannel: projectA
       valueEncoder: java #other choose：kryo/kryo5
       valueDecoder: java #other choose：kryo/kryo5

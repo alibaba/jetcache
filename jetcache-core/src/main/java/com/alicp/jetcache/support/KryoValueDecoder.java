@@ -8,14 +8,19 @@ import java.io.ByteArrayInputStream;
 /**
  * Created on 2016/10/4.
  *
+ * Since 2.8.0 the com.esotericsoftware:kryo should be 5+, kryo4 is not supported.
+ *
  * @author huangli
  */
 public class KryoValueDecoder extends AbstractValueDecoder {
 
-    public static final KryoValueDecoder INSTANCE = new KryoValueDecoder(true);
+    public static final KryoValueDecoder INSTANCE = new KryoValueDecoder(true, KryoValueEncoder.DEFAULT_POOL);
 
-    public KryoValueDecoder(boolean useIdentityNumber) {
+    private final ObjectPool<KryoValueEncoder.KryoCache> pool;
+
+    public KryoValueDecoder(boolean useIdentityNumber, ObjectPool<KryoValueEncoder.KryoCache> pool) {
         super(useIdentityNumber);
+        this.pool = pool;
     }
 
     @Override
@@ -29,7 +34,7 @@ public class KryoValueDecoder extends AbstractValueDecoder {
         Input input = new Input(in);
         KryoValueEncoder.KryoCache kryoCache = null;
         try {
-            kryoCache =  KryoValueEncoder.kryoCacheObjectPool.borrowObject();
+            kryoCache =  pool.borrowObject();
             Kryo kryo = kryoCache.getKryo();
             ClassLoader classLoader = KryoValueDecoder.class.getClassLoader();
             Thread t = Thread.currentThread();
@@ -43,7 +48,7 @@ public class KryoValueDecoder extends AbstractValueDecoder {
             return kryo.readClassAndObject(input);
         }finally {
             if(kryoCache != null){
-                KryoValueEncoder.kryoCacheObjectPool.returnObject(kryoCache);
+                pool.returnObject(kryoCache);
             }
         }
     }

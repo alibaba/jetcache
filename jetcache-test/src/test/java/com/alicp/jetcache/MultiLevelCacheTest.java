@@ -4,12 +4,12 @@ import com.alicp.jetcache.embedded.CaffeineCacheBuilder;
 import com.alicp.jetcache.support.DefaultCacheMonitor;
 import com.alicp.jetcache.support.DefaultMetricsManager;
 import com.alicp.jetcache.support.DefaultCacheMonitorTest;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
+import com.alicp.jetcache.support.Fastjson2KeyConvertor;
 import com.alicp.jetcache.test.AbstractCacheTest;
 import com.alicp.jetcache.external.MockRemoteCache;
 import com.alicp.jetcache.external.MockRemoteCacheBuilder;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -30,19 +30,19 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
         /*
         l2Cache = LinkedHashMapCacheBuilder.createLinkedHashMapCacheBuilder()
                 .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
         */
         l2Cache = new MockRemoteCacheBuilder()
                 .limit(LIMIT)
                 .expireAfterWrite(expireMillis, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .buildCache();
     }
 
@@ -50,12 +50,12 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     public void testConstructor() {
         try{
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().buildCache();
-            Assert.fail();
+            Assertions.fail();
         } catch (IllegalArgumentException e){
         }
         try{
             new MultiLevelCache(new Cache[0]);
-            Assert.fail();
+            Assertions.fail();
         } catch (IllegalArgumentException e){
         }
 
@@ -63,12 +63,12 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         l1Cache = CaffeineCacheBuilder.createCaffeineCacheBuilder()
                 .limit(10)
                 .expireAfterWrite(1000, TimeUnit.MILLISECONDS)
-                .keyConvertor(FastjsonKeyConvertor.INSTANCE)
+                .keyConvertor(Fastjson2KeyConvertor.INSTANCE)
                 .loader(key -> null)
                 .buildCache();
         try {
             cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
-            Assert.fail();
+            Assertions.fail();
         } catch (CacheConfigException e) {
         }
     }
@@ -78,8 +78,8 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
     public void testUnwrap() {
         initL1L2(100);
         cache = MultiLevelCacheBuilder.createMultiLevelCacheBuilder().addCache(l1Cache, l2Cache).buildCache();
-        Assert.assertTrue(cache.unwrap(LinkedHashMap.class) instanceof LinkedHashMap);
-        Assert.assertTrue(cache.unwrap(com.github.benmanes.caffeine.cache.Cache.class) instanceof com.github.benmanes.caffeine.cache.Cache);
+        Assertions.assertTrue(cache.unwrap(LinkedHashMap.class) instanceof LinkedHashMap);
+        Assertions.assertTrue(cache.unwrap(com.github.benmanes.caffeine.cache.Cache.class) instanceof com.github.benmanes.caffeine.cache.Cache);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 doTest(200);
             } catch (Exception e) {
                 e.printStackTrace();
-                Assert.fail();
+                Assertions.fail();
             }
         });
 
@@ -114,7 +114,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
                 concurrentTest(200, LIMIT , 3000);
             } catch (Exception e) {
                 e.printStackTrace();
-                Assert.fail();
+                Assertions.fail();
             }
         });
     }
@@ -146,7 +146,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         cache.put("KK1", "V1");
         Thread.sleep(15);
         l1Cache.remove("KK1");
-        Assert.assertEquals("V1", cache.get("KK1"));
+        Assertions.assertEquals("V1", cache.get("KK1"));
 
         AbstractCache c1 = getConcreteCache(l1Cache);
         AbstractCache c2 = getConcreteCache(l2Cache);
@@ -161,7 +161,7 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         if (Math.abs(x) > 10) {
             System.out.println(h1.getExpireTime() + ","  + ((CacheValueHolder) h1.getValue()).getExpireTime());
             System.out.println(h2.getExpireTime() + "," + ((CacheValueHolder) h2.getValue()).getExpireTime());
-            Assert.fail();
+            Assertions.fail();
         }
 
         testUseExpireOfSubCache();
@@ -174,11 +174,11 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
 
         cache.put("useSubExpire_key", "V1");
         Thread.sleep(16);
-        Assert.assertNull(l1Cache.get("useSubExpire_key"));
-        Assert.assertEquals("V1", cache.get("useSubExpire_key"));
-        Assert.assertNotNull(l1Cache.get("useSubExpire_key"));
+        Assertions.assertNull(l1Cache.get("useSubExpire_key"));
+        Assertions.assertEquals("V1", cache.get("useSubExpire_key"));
+        Assertions.assertNotNull(l1Cache.get("useSubExpire_key"));
         Thread.sleep(16);
-        Assert.assertNull(l1Cache.get("useSubExpire_key"));
+        Assertions.assertNull(l1Cache.get("useSubExpire_key"));
         cache.remove("useSubExpire_key");
 
         Set s = new HashSet();
@@ -187,11 +187,11 @@ public class MultiLevelCacheTest extends AbstractCacheTest {
         m.put("useSubExpire_key", "V2");
         cache.putAll(m);
         Thread.sleep(16);
-        Assert.assertNull(l1Cache.get("useSubExpire_key"));
-        Assert.assertEquals("V2", cache.getAll(s).get("useSubExpire_key"));
-        Assert.assertNotNull(l1Cache.get("useSubExpire_key"));
+        Assertions.assertNull(l1Cache.get("useSubExpire_key"));
+        Assertions.assertEquals("V2", cache.getAll(s).get("useSubExpire_key"));
+        Assertions.assertNotNull(l1Cache.get("useSubExpire_key"));
         Thread.sleep(16);
-        Assert.assertNull(l1Cache.get("useSubExpire_key"));
+        Assertions.assertNull(l1Cache.get("useSubExpire_key"));
         cache.remove("useSubExpire_key");
 
         ((MultiLevelCacheConfig<Object, Object>)cache.config()).setUseExpireOfSubCache(false);

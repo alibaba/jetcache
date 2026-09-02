@@ -22,6 +22,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.util.Pool;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -58,6 +59,7 @@ public class JetCacheConfig {
         globalCacheConfig.setLocalCacheBuilders(localBuilders);
         globalCacheConfig.setRemoteCacheBuilders(remoteBuilders);
         globalCacheConfig.setStatIntervalMinutes(1);
+        globalCacheConfig.setDecodeFilterAllowPatterns(List.of("jetcache.samples."));
 
         return globalCacheConfig;
     }

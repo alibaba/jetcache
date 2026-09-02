@@ -3,9 +3,6 @@
  */
 package com.alicp.jetcache.anno.support;
 
-import com.alicp.jetcache.CacheConfigException;
-import com.alicp.jetcache.anno.KeyConvertor;
-import com.alicp.jetcache.support.FastjsonKeyConvertor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

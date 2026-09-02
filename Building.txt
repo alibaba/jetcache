@@ -1,5 +1,7 @@
 0. Unit test in IDE under Windows
-==========================================================
+=========================================================
+    This project requires JDK 17+ to build and run tests.
+
     Run redis in docker:
 
     docker run --rm -it -p 6379-6381:6379-6381 -p 26379-26381:26379-26381 areyouok/redis-sentinel

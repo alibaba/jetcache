@@ -2,7 +2,7 @@ package com.alicp.jetcache.embedded;
 
 import com.alicp.jetcache.Cache;
 import com.alicp.jetcache.CacheConfig;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.Function;
 

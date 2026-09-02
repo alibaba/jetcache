@@ -38,6 +38,22 @@ pom中的指定方式：
 
 更进一步，如果想把自定义的序列化器设置为默认的，实现一个EncoderParser（继承DefaultSpringEncoderParser修改即可），然后做成一个bean放到 spring context中。
 
+## 升级到2.8以后反序列化报错怎么办（DecodeFilterException / InvalidClassException）
+JetCache 2.8.x 默认开启了反序列化安全过滤器，只允许 `java.lang`、`java.util`、`java.time`、`java.math`、`java.net`、`com.alicp.jetcache` 等包下的类被反序列化。如果你的缓存值包含自定义类，需要配置允许列表：
+
+```yaml
+jetcache:
+  decodeFilterAllowPatterns:
+    - com.yourcompany.  # 前缀匹配：允许该包及其子包下所有类
+```
+
+或者在代码中配置：
+```java
+DecodeFilter.getDefault().addAllowPatterns("com.yourcompany.");
+```
+
+如果暂时不想处理，可以设置 `jetcache.decodeFilterEnabled: false` 关闭过滤器（**不建议在生产环境关闭**）。详见[配置文档](Config.md)中的"反序列化过滤器配置"章节。
+
 ## 我想要JSON序列化器
 jetcache老版本中是有两个序列化器的：java、kryo。jetcache2.7增加了kryo5、fastjson2、jackson。
 现在默认的序列化器是性能最差，但是兼容性最好，大家也最熟悉的java序列化器。
@@ -48,4 +64,3 @@ json不是一个专门的java序列化库，更多的时候是用来和前端进
 
 因此fastjson2和jackson这两个json序列化器默认是没有注册的，如果要使用请自行做好相关的配置和改动。
 如果你不知道该怎么注册，建议不要用json序列化器，因为json反序列化出了问题你也搞不定的。
-

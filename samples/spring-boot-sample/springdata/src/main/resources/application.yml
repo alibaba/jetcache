@@ -1,6 +1,8 @@
 jetcache:
   statIntervalMinutes: 1
   areaInCacheName: false
+  decodeFilterAllowPatterns:
+    - jetcache.samples.
   local:
     default:
       type: linkedhashmap
@@ -15,7 +17,8 @@ jetcache:
       valueDecoder: java
       defaultExpireInMillis: 5000
 spring:
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    timeout: 1000
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      timeout: 1000
