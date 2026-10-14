@@ -42,10 +42,15 @@ public class NotifyMonitorInstaller implements CacheMonitorInstaller {
         }
 
         if (cacheManager.getBroadcastManager(area) == null) {
-            BroadcastManager cm = cacheBuilder.createBroadcastManager(cacheManager);
-            if (cm != null) {
-                cm.startSubscribe();
-                cacheManager.putBroadcastManager(area, cm);
+            // Different cache names can be initialized concurrently in the same area.
+            synchronized (cacheManager) {
+                if (cacheManager.getBroadcastManager(area) == null) {
+                    BroadcastManager cm = cacheBuilder.createBroadcastManager(cacheManager);
+                    if (cm != null) {
+                        cm.startSubscribe();
+                        cacheManager.putBroadcastManager(area, cm);
+                    }
+                }
             }
         }
 
