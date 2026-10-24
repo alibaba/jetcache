@@ -87,11 +87,11 @@ public void init() {
 ```
 The code above create a ```Cache``` instance. ```cacheType = CacheType.BOTH``` define a two level cache (a local in-memory-cache and a remote cache system) with local elements limited upper to 50(LRU based evict). You can use it like a map: 
 ```java
-UserDO user = userCache.get(12345L);
-userCache.put(12345L, loadUserFromDataBase(12345L));
-userCache.remove(12345L);
+UserDO user = userCache.get("12345");
+userCache.put("12345", loadUserFromDataBase("12345"));
+userCache.remove("12345");
 
-userCache.computeIfAbsent(1234567L, (key) -> loadUserFromDataBase(1234567L));
+userCache.computeIfAbsent("1234567", (key) -> loadUserFromDataBase(key));
 ```
 
 ## Advanced API
